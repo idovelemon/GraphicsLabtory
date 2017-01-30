@@ -1,0 +1,45 @@
+//-------------------------------------------------------------------------
+// Declaration: Copyright (c), by i_dovelemon, 2016. All right reserved.
+// Author: i_dovelemon[1322600812@qq.com]
+// Date: 2016 / 06 / 10
+// Brief: Define the vector tools
+//-------------------------------------------------------------------------
+#ifndef GLB_GLBVECTOR_H_
+#define GLB_GLBVECTOR_H_
+
+#include <math.h>
+
+namespace glb {
+
+class Vector {
+ public:
+    inline Vector();
+    inline Vector(float x, float y, float z);
+    inline ~Vector();  // Ignore virtual
+
+    inline void Set(float x, float y, float z);
+
+    inline const Vector operator+(const Vector& v);
+    inline const Vector operator-(const Vector& v);
+    inline const Vector operator*(float v);
+    inline const Vector& operator+=(const Vector& v);
+    inline const Vector& operator/=(float v);
+    inline const Vector& operator*=(float v);
+
+    inline float Length();
+    inline void Normalize();
+
+ public:
+    float x;
+    float y;
+    float z;
+};
+
+static const Vector Cross(const Vector& v1, const Vector& v2);
+static float Dot(const Vector& v1, const Vector& v2);
+
+#include "glbvector.inl"
+
+};  // namespace glb
+
+#endif  //  GLB_GLBVECTOR_H_

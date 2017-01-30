@@ -1,0 +1,33 @@
+//--------------------------------------------------------
+// Declaration: Copyright (c), by i_dovelemon, 2016. All right reserved.
+// Author: i_dovelemon[1322600812@qq.com]
+// Date: 2016 / 07 / 24
+// Brief: Tone mapping the HDR scene
+//--------------------------------------------------------
+#version 330
+
+in vec2 vs_texcoord;
+out vec4 color;
+
+uniform float lum_average;
+uniform sampler2D hdr_tex;
+uniform sampler2D bloom_tex;
+
+const float key = 0.7;
+
+void main() {
+	vec4 hdr_color = texture2D(hdr_tex, vs_texcoord);
+	vec4 bloom_color = texture2D(bloom_tex, vs_texcoord);
+
+	vec4 blend_color = hdr_color * 0.9 + bloom_color * 0.1;
+	float lum = blend_color.x * 0.27 + blend_color.y * 0.67 + blend_color.z * 0.06;
+	float lum_after_tonemapping = (key * lum) / lum_average;
+	
+	if (lum_after_tonemapping > 0.0) {
+		color = blend_color * lum_after_tonemapping;
+	} else {
+		color = bloom_color;
+	}
+
+	color /= vec4(1.0 + color.x, 1.0 + color.y, 1.0 + color.z, 1.0);
+}

@@ -1,0 +1,30 @@
+//--------------------------------------------------------------------
+// Declaration: Copyright (c), by i_dovelemon, 2016. All right reserved.
+// Author: i_dovelemon[1322600812@qq.com]
+// Date: 2016 / 06 / 29
+// Brief: Gauss blur vertical pass shader
+//--------------------------------------------------------------------
+#version 330
+
+in vec2 vs_texcoord;
+out vec3 color;
+
+uniform sampler2D tex;
+uniform float tex_height;
+
+uniform float gauss_num[41];
+
+void main() {
+    color = texture2D(tex, vs_texcoord).xyz * gauss_num[0];
+    float step = 1.0 / tex_height;
+
+    for (int i = 0; i < 41; i++) {
+        if (vs_texcoord.y - i * step >= 0.0) {
+            color += texture2D(tex, vec2(vs_texcoord.x, vs_texcoord.y - i * step)).xyz * gauss_num[i];
+        }
+
+        if (vs_texcoord.y + i * step <= 1.0) {
+            color += texture2D(tex, vec2(vs_texcoord.x, vs_texcoord.y + i * step)).xyz * gauss_num[i];
+        }
+    }
+}

@@ -1,0 +1,9 @@
+2017/01/15:
+(1)如果一个Texture绑定到了一个FBO上，那么如果你想对这个Texture进行一些操作，比如产生Mipmap，读取纹理数据等等，最好先将绑定的FBO给解除绑定
+
+(2) 关于log
+c库中log函数，表示的是以10为底数的。
+根据log的性质，如果你想求以log(x,y) = log(y) / log(x), 其中x为底数，y为真数
+
+(2)给定贴图的宽width和高height，计算1x1 Mipmap等级需要多少级？
+int32_t max_level = log(max(width,height)) / log(2);

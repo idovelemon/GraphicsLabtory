@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "glb_editor", "glb_editor\glb_editor.vcxproj", "{8A10B7FE-ED76-4F59-995D-FFE61F2FE292}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "glb_shadowmap", "glb_shadowmap\glb_shadowmap.vcxproj", "{9705D998-B325-44E4-9F21-A84A69D5B91A}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "glb_hdr", "glb_hdr\glb_hdr.vcxproj", "{299C4407-9712-4EFC-B719-9E2BC47FD813}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8A10B7FE-ED76-4F59-995D-FFE61F2FE292}.Debug|Win32.ActiveCfg = Debug|Win32
+		{8A10B7FE-ED76-4F59-995D-FFE61F2FE292}.Debug|Win32.Build.0 = Debug|Win32
+		{8A10B7FE-ED76-4F59-995D-FFE61F2FE292}.Release|Win32.ActiveCfg = Release|Win32
+		{8A10B7FE-ED76-4F59-995D-FFE61F2FE292}.Release|Win32.Build.0 = Release|Win32
+		{9705D998-B325-44E4-9F21-A84A69D5B91A}.Debug|Win32.ActiveCfg = Debug|Win32
+		{9705D998-B325-44E4-9F21-A84A69D5B91A}.Debug|Win32.Build.0 = Debug|Win32
+		{9705D998-B325-44E4-9F21-A84A69D5B91A}.Release|Win32.ActiveCfg = Release|Win32
+		{9705D998-B325-44E4-9F21-A84A69D5B91A}.Release|Win32.Build.0 = Release|Win32
+		{299C4407-9712-4EFC-B719-9E2BC47FD813}.Debug|Win32.ActiveCfg = Debug|Win32
+		{299C4407-9712-4EFC-B719-9E2BC47FD813}.Debug|Win32.Build.0 = Debug|Win32
+		{299C4407-9712-4EFC-B719-9E2BC47FD813}.Release|Win32.ActiveCfg = Release|Win32
+		{299C4407-9712-4EFC-B719-9E2BC47FD813}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

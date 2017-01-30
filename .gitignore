@@ -1,0 +1,17 @@
+glbcodebase/graphicslab_gl/glb/cpplint_bat.bat
+*.tlog
+*.obj
+glbcodebase/graphicslab_gl/glb_editor/Debug/glb_editor.lastbuildstate
+*.log
+*.pch
+glbcodebase/graphicslab_gl/glb_editor/Debug/glb_editor.res
+*.idb
+glbcodebase/graphicslab_gl/glb_editor/Debug/vc110.pdb
+*.aps
+glbcodebase/graphicslab_gl/glb_editor/glb_editor.ilk
+*.pdb
+glbcodebase/graphicslab_gl/glb_editor/glb_editor.rc
+*.user
+*.lastbuildstate
+*.ilk
+*.sdf
