@@ -15,3 +15,4 @@ glbcodebase/graphicslab_gl/glb_editor/glb_editor.rc
 *.lastbuildstate
 *.ilk
 *.sdf
+*.opensdf
