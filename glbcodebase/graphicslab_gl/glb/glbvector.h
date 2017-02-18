@@ -14,10 +14,10 @@ namespace glb {
 class Vector {
  public:
     inline Vector();
-    inline Vector(float x, float y, float z);
+    inline Vector(float x, float y, float z, float w = 1.0f);
     inline ~Vector();  // Ignore virtual
 
-    inline void Set(float x, float y, float z);
+    inline void Set(float x, float y, float z, float w = 1.0f);
 
     inline const Vector operator+(const Vector& v);
     inline const Vector operator-(const Vector& v);
@@ -33,6 +33,7 @@ class Vector {
     float x;
     float y;
     float z;
+    float w;
 };
 
 static const Vector Cross(const Vector& v1, const Vector& v2);

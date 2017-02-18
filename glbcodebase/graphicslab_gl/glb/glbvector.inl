@@ -10,19 +10,21 @@ Vector::Vector()
 , z(0.0f) {
 }
 
-Vector::Vector(float x, float y, float z)
+Vector::Vector(float x, float y, float z, float w)
 : x(x)
 , y(y)
-, z(z) {
+, z(z)
+, w(w) {
 }
 
 Vector::~Vector() {
 }
 
-void Vector::Set(float x, float y, float z) {
+void Vector::Set(float x, float y, float z, float w) {
     this->x = x;
     this->y = y;
     this->z = z;
+    this->w = w;
 }
 
 const Vector Vector::operator+(const Vector& v) {

@@ -126,11 +126,24 @@ void Matrix::MakeProjectionMatrix(float aspect, float fov, float znear, float zf
     float sina = sin(fov);
     float cosa = cos(fov);
     float cota = cosa / sina;
-    this->MakeIdentityMatrix();
+
     this->m_Matrix.v[0 * 4 + 0] = cota /  aspect;
+    this->m_Matrix.v[0 * 4 + 1] = 0.0f;
+    this->m_Matrix.v[0 * 4 + 2] = 0.0f;
+    this->m_Matrix.v[0 * 4 + 3] = 0.0f;
+
+    this->m_Matrix.v[1 * 4 + 0] = 0.0f;
     this->m_Matrix.v[1 * 4 + 1] = cota;
+    this->m_Matrix.v[1 * 4 + 2] = 0.0f;
+    this->m_Matrix.v[1 * 4 + 3] = 0.0f;
+
+    this->m_Matrix.v[2 * 4 + 0] = 0.0f;
+    this->m_Matrix.v[2 * 4 + 1] = 0.0f;
     this->m_Matrix.v[2 * 4 + 2] = - (zfar + znear) / (zfar - znear);
     this->m_Matrix.v[2 * 4 + 3] = -2.0f * zfar * znear / (zfar - znear);
+
+    this->m_Matrix.v[3 * 4 + 0] = 0.0f;
+    this->m_Matrix.v[3 * 4 + 1] = 0.0f;
     this->m_Matrix.v[3 * 4 + 2] = -1.0f;
     this->m_Matrix.v[3 * 4 + 3] = 0.0f;
 }
@@ -323,9 +336,10 @@ void Matrix::Inverse() {
 
 const Vector Matrix::operator*(const Vector& v) {
     Vector result(0.0f, 0.0f, 0.0f);
-    result.x = m_Matrix.m[0][0] * v.x + m_Matrix.m[0][1] * v.y + m_Matrix.m[0][2] * v.z + m_Matrix.m[0][3] * 1.0f;
-    result.y = m_Matrix.m[1][0] * v.x + m_Matrix.m[1][1] * v.y + m_Matrix.m[1][2] * v.z + m_Matrix.m[1][3] * 1.0f;
-    result.z = m_Matrix.m[2][0] * v.x + m_Matrix.m[2][1] * v.y + m_Matrix.m[2][2] * v.z + m_Matrix.m[2][3] * 1.0f;
+    result.x = m_Matrix.m[0][0] * v.x + m_Matrix.m[0][1] * v.y + m_Matrix.m[0][2] * v.z + m_Matrix.m[0][3] * v.w;
+    result.y = m_Matrix.m[1][0] * v.x + m_Matrix.m[1][1] * v.y + m_Matrix.m[1][2] * v.z + m_Matrix.m[1][3] * v.w;
+    result.z = m_Matrix.m[2][0] * v.x + m_Matrix.m[2][1] * v.y + m_Matrix.m[2][2] * v.z + m_Matrix.m[2][3] * v.w;
+    result.w = m_Matrix.m[3][0] * v.x + m_Matrix.m[3][1] * v.y + m_Matrix.m[3][2] * v.z + m_Matrix.m[3][3] * v.w;
 
     return result;
 }

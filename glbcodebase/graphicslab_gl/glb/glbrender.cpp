@@ -95,12 +95,14 @@ public:
 protected:
     void PreDraw();
     void DrawShadowMap();
+    void DrawAOMap();
     void DrawLightLoop();
     void DrawDebug();
     void DrawHDR();
     void AfterDraw();
 
     void PrepareShadowMap();
+    void PrepareAOMap();
     void PrepareHDR();
 
     // HDR
@@ -112,6 +114,9 @@ protected:
     void BloomH();
     void BloomV();
     void BlendHDRScene();
+
+    // SSAO
+    void DrawDepthMap();
 
     void SetUniform(int32_t location, uniform::Wrapper& wrapper);
     inline float ZValueFromCamera(Object* obj);
@@ -147,6 +152,11 @@ private:
     mesh::ScreenMesh*                       m_ScreenMesh;
     float                                   m_BloomWidth;
     float                                   m_BloomHeight;
+
+    // SSAO
+    RenderTarget*                           m_AORenderTarget;
+    int32_t                                 m_DepthMap;
+    int32_t                                 m_DepthShader;
 
     mesh::DebugMesh*                        m_DebugMesh;
 };
@@ -209,7 +219,10 @@ RenderImp::RenderImp()
 , m_MaxMipmapLevel(0)
 , m_DebugMesh(NULL)
 , m_BloomWidth(0.0f)
-, m_BloomHeight(0.0f) {
+, m_BloomHeight(0.0f)
+, m_AORenderTarget(NULL)
+, m_DepthMap(-1)
+, m_DepthShader(-1) {
     memset(m_Perspective, 0, sizeof(m_Perspective));
     m_ShaderGroups.clear();
 }
@@ -225,6 +238,8 @@ void RenderImp::Initialize(int32_t width, int32_t height) {
     m_Height = height;
 
     PrepareShadowMap();
+
+    PrepareAOMap();
 
     PrepareHDR();
 
@@ -242,6 +257,7 @@ void RenderImp::Destroy() {
 void RenderImp::Draw() {
     PreDraw();
     DrawShadowMap();
+    DrawAOMap();
     DrawLightLoop();
     DrawDebug();
     DrawHDR();
@@ -537,6 +553,10 @@ void RenderImp::DrawShadowMap() {
     render::Device::SetRenderTarget(0);
 }
 
+void RenderImp::DrawAOMap() {
+    DrawDepthMap();
+}
+
 void RenderImp::DrawLightLoop() {
     // Render Target
     render::Device::SetRenderTarget(m_HDRRenderTarget->GetRenderTargetObj());
@@ -574,7 +594,9 @@ void RenderImp::DrawLightLoop() {
             Object* obj = objs[j];
 
             // Textures
-            render::Device::SetTexture(render::TS_DIFFUSE, texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(render::TS_DIFFUSE))->GetTexObj(), 0);
+            if (obj->GetModel()->HasDiffuseTexture()) {
+                render::Device::SetTexture(render::TS_DIFFUSE, texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(render::TS_DIFFUSE))->GetTexObj(), 0);
+            }
             if (obj->GetModel()->HasAlphaTexture()) {
                 render::Device::SetTexture(render::TS_ALPHA, texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(render::TS_ALPHA))->GetTexObj(), 1);
             }
@@ -725,6 +747,27 @@ void RenderImp::PrepareShadowMap() {
 
     // Create shadow shader
     m_ShadowShader = shader::Mgr::AddShader("..\\glb\\shader\\shadow.vs", "..\\glb\\shader\\shadow.ps");
+}
+
+void RenderImp::PrepareAOMap() {
+    // Create depth map
+    texture::Texture* depth_map = texture::Texture::CreateFloat16DepthTexture(m_Width, m_Height);
+    if (depth_map != NULL) {
+        m_DepthMap = texture::Mgr::AddTexture(depth_map);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    // Create render target
+    m_AORenderTarget = RenderTarget::Create(m_Width, m_Height);
+    if (m_AORenderTarget != NULL) {
+        m_AORenderTarget->AttachDepthTexture(depth_map);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    // Create shader
+    m_DepthShader = shader::Mgr::AddShader("..\\glb\\shader\\depth.vs", "..\\glb\\shader\\depth.ps");
 }
 
 void RenderImp::PrepareHDR() {
@@ -1082,6 +1125,82 @@ void RenderImp::BlendHDRScene() {
 
     // Draw
     render::Device::Draw(render::PT_TRIANGLES, 0, num);
+
+    // Reset render target
+    render::Device::SetRenderTarget(0);
+}
+
+void RenderImp::DrawDepthMap() {
+    // Render Target
+    render::Device::SetRenderTarget(m_AORenderTarget->GetRenderTargetObj());
+
+    // Draw Buffer
+    render::Device::SetDrawColorBuffer(render::COLORBUF_NONE);
+
+    // Clear
+    render::Device::SetClearDepth(1.0f);
+    render::Device::Clear(CLEAR_DEPTH);
+
+    // Shader
+    shader::Program* program = shader::Mgr::GetShader(m_DepthShader);
+    std::vector<uniform::UniformEntry>& uniforms = program->GetUniforms();
+    render::Device::SetShader(program->GetShader());
+    render::Device::SetShaderLayout(program->GetShaderLayout());
+
+    // Scene uniforms
+    for (int32_t j = 0; j < static_cast<int32_t>(uniforms.size()); j++) {
+        uniform::UniformEntry entry = uniforms[j];
+        if (entry.flag) {
+            // TODO: for now, id is the index of the uniform picker table
+            uniform::Wrapper uniform_wrapper = uniform::kUniformPickers[entry.id].picker(NULL);
+            SetUniform(entry.location, uniform_wrapper);
+        }
+    }
+
+    for (int32_t i = 0; i < static_cast<int32_t>(m_ShaderGroups.size()); i++) {
+        std::vector<Object*> objs = m_ShaderGroups[i].GetObjects();
+
+        // Objects
+        for (int32_t j = 0; j < static_cast<int32_t>(objs.size()); j++) {
+            Object* obj = objs[j];
+
+            // Object Uniform
+            for (int32_t k = 0; k < static_cast<int32_t>(uniforms.size()); k++) {
+                uniform::UniformEntry entry = uniforms[k];
+                if (!entry.flag) {
+                    // TODO: for now, id is the index of the uniform picker table
+                    uniform::Wrapper uniform_wrapper = uniform::kUniformPickers[entry.id].picker(obj);
+                    SetUniform(entry.location, uniform_wrapper);
+                }
+            }
+
+            // Vertex Buffer
+            int32_t mesh_id = obj->GetModel()->GetMeshId();
+            uint32_t vao = mesh::Mgr::GetMeshById(mesh_id)->GetVAO();
+            uint32_t vbo = mesh::Mgr::GetMeshById(mesh_id)->GetVBO();
+            VertexLayout layout = mesh::Mgr::GetMeshById(mesh_id)->GetVertexLayout();
+            int32_t num = mesh::Mgr::GetMeshById(mesh_id)->GetVertexNum();
+            render::Device::SetVertexArray(vao);
+            render::Device::SetVertexBuffer(vbo);
+            render::Device::SetVertexLayout(layout);
+
+            if (obj->IsCullFaceEnable()) {
+                render::Device::SetCullFaceEnable(true);
+                render::Device::SetCullFaceMode(obj->GetCullFaceMode());
+            } else {
+                render::Device::SetCullFaceEnable(false);
+            }
+
+            if (obj->IsDepthTestEnable()) {
+                render::Device::SetDepthTestEnable(true);
+            } else {
+                render::Device::SetDepthTestEnable(false);
+            }
+
+            // Draw
+            render::Device::Draw(render::PT_TRIANGLES, 0, num);
+        }
+    }
 
     // Reset render target
     render::Device::SetRenderTarget(0);
