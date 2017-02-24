@@ -12,9 +12,10 @@ uniform mat4 glb_ProjM;
 uniform mat4 glb_ViewM;
 uniform mat4 glb_WorldM;
 
-out vec4 vs_Vertex;
+out float vs_DepthInViewSpace;
 
 void main() {
-	gl_Position = glb_ProjM * glb_ViewM * glb_WorldM * vec4(glb_Pos, 1.0);
-	vs_Vertex = gl_Position;
+	vec4 pos_in_view_space = glb_ViewM * glb_WorldM * vec4(glb_Pos, 1.0);
+	gl_Position = glb_ProjM * pos_in_view_space;
+	vs_DepthInViewSpace = pos_in_view_space.z / pos_in_view_space.w;
 }

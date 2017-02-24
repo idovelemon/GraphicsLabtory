@@ -7,11 +7,12 @@
 #version 330
 
 // Input attributes
-in vec4 vs_Vertex;
+in float vs_DepthInViewSpace;
+
+uniform float glb_FarClip;
 
 void main() {
-	// If you do not want to use fix pipeline, you must convert depth to [0,1]
-	// so that we can store it in a float texture
-	float depth = vs_Vertex.z / vs_Vertex.w + 1.0;
-	gl_FragDepth = depth / 2.0;
+	// Note: In opengl, camera look at -z axis
+	// so the depth value in view space is negative value
+	gl_FragDepth = -vs_DepthInViewSpace / glb_FarClip;
 }

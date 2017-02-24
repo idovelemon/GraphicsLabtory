@@ -63,6 +63,7 @@ class MgrImp {
 //--------------------------------------------------------------------------------------
 Texture::Texture()
 : m_Type(TEX_NONE)
+, m_Format(FMT_RGBA)
 , m_TexID(-1)
 , m_Width(0)
 , m_Height(0)
@@ -115,6 +116,7 @@ Texture* Texture::Create(const char* texture_name, int32_t type) {
                 tex->m_Width = texture_width;
                 tex->m_Height = texture_height;
                 tex->m_Depth = 0;
+                tex->m_Format = FMT_RGBA;
             }
             else if (type == TEX_3D) {
                 tex->m_Width = texture_width;
@@ -143,11 +145,13 @@ Texture* Texture::Create(int32_t width, int32_t height) {
 
         tex = new Texture();
         if (tex != NULL) {
+            tex->m_Type = TEX_2D;
             static char default_name[] = "DefaultEmpty";
             memcpy(tex->m_TexName, default_name, sizeof(default_name));
             tex->m_TexObj = tex_id;
             tex->m_Width = width;
             tex->m_Height = height;
+            tex->m_Format = FMT_RGBA;
         } else {
             GLB_SAFE_ASSERT(false);
         }
@@ -170,11 +174,13 @@ Texture* Texture::CreateFloat16Texture(int32_t width, int32_t height) {
 
         tex = new Texture();
         if (tex != NULL) {
+            tex->m_Type = TEX_2D;
             static char default_name[] = "DefaultEmpty";
             memcpy(tex->m_TexName, default_name, sizeof(default_name));
             tex->m_TexObj = tex_id;
             tex->m_Width = width;
             tex->m_Height = height;
+            tex->m_Format = FMT_RGBA16F;
         } else {
             GLB_SAFE_ASSERT(false);
         }
@@ -200,6 +206,7 @@ Texture* Texture::CreateFloat16DepthTexture(int32_t width, int32_t height) {
 
         tex = new Texture;
         if (tex != NULL) {
+            tex->m_Type = TEX_2D;
             tex->m_Depth = 0;
             tex->m_Height = height;
             static char default_name[] = "DefaultEmpty";
@@ -207,6 +214,7 @@ Texture* Texture::CreateFloat16DepthTexture(int32_t width, int32_t height) {
             tex->m_TexObj = tex_id;
             tex->m_Type = TEX_2D;
             tex->m_Width = width;
+            tex->m_Format = FMT_DEPTH16F;
         } else {
             GLB_SAFE_ASSERT(false);
         }
@@ -222,6 +230,33 @@ void Texture::Destroy() {
         glBindTexture(GL_TEXTURE_2D, 0);
         glDeleteTextures(1, reinterpret_cast<const GLuint*>(&m_TexObj));
         m_TexObj = 0;
+    }
+}
+
+void Texture::UpdateTexture(const void* pixels) {
+    switch (m_Type) {
+    case TEX_2D:
+        switch (m_Format) {
+        case FMT_RGBA:
+            glBindTexture(GL_TEXTURE_2D, m_TexObj);
+            glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_Width, m_Height, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+            glBindTexture(GL_TEXTURE_2D, 0);
+            break;
+
+        case FMT_RGBA16F:
+            glBindTexture(GL_TEXTURE_2D, m_TexObj);
+            glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_Width, m_Height, GL_RGBA, GL_FLOAT, pixels);
+            glBindTexture(GL_TEXTURE_2D, 0);
+            break;
+        default:
+            GLB_SAFE_ASSERT(false);  // Only support RGBA now
+            break;
+        }
+        break;
+
+    default:
+        GLB_SAFE_ASSERT(false);  // Only support 2D texture now
+        break;
     }
 }
 

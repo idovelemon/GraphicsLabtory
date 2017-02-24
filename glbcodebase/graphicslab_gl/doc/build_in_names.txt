@@ -26,3 +26,10 @@ glb_ParallelLight_Ambient                                        vec3           
 glb_ParallelLight_Diffuse                                        vec3              平行光漫反射颜色
 glb_ParallelLight_Specular                                       vec3              平行光镜面反射颜色
 glb_AverageLum							 float		   HDR场景的平均亮度
+glb_FarClip							 float		   远裁剪面
+glb_ScreenWidth							 float		   屏幕宽度
+glb_ScreenHeight					         float		   屏幕高度
+glb_DepthMap							 sampler2D         场景的深度贴图
+glb_RandomRotateMap					         sampler2D	   随机旋转向量贴图（AO使用）
+glb_AOMap							 sampler2D         Ambient Occlusion Map
+glb_BiBlurMap							 sampler2D         Blur map(AO使用)

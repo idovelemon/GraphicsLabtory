@@ -13,23 +13,23 @@ uniform sampler2D glb_Bloom;
 uniform float glb_BloomTexHeight;
 
 const float kGaussNum[10] = {
-0.3325988325916909,
-0.29351746424483355,
-0.20173145719908508,
-0.10797911335286782,
-0.04501241776837279,
-0.014613403548726683,
-0.0036948504639480314,
-0.0007275599897517733,
-0.00011157507882714101,
-1.3325761896576223e-05
+0.19947139242361153,
+0.17603290076919906,
+0.12098555593111537,
+0.06475892872301567,
+0.02699555370849171,
+0.008764179751319668,
+0.002215933715394386,
+0.000436343696989634,
+6.691555758028252e-05,
+7.991935088595893e-06,
 };
 
 void main() {
     color = texture2D(glb_Bloom, vs_texcoord).xyz * kGaussNum[0];
     float step = 1.0 / glb_BloomTexHeight;
 
-    for (int i = 0; i < 41; i++) {
+    for (int i = 0; i < 10; i++) {
         if (vs_texcoord.y - i * step >= 0.0) {
             color += texture2D(glb_Bloom, vec2(vs_texcoord.x, vs_texcoord.y - i * step)).xyz * kGaussNum[i];
         }

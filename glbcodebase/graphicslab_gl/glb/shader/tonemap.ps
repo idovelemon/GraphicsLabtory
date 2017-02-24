@@ -22,7 +22,7 @@ void main() {
 	float lum = hdr_color.x * 0.27 + hdr_color.y * 0.67 + hdr_color.z * 0.06;
 	float lum_after_tonemapping = (key * lum) / glb_AverageLum;
 	color = hdr_color * lum_after_tonemapping;
-	color = color + bloom_color * 0.1;
+	color = color + bloom_color * 0.5;
 
 	// Gamma correction
 	color.x = pow(color.x, 1.0 / kGamma);

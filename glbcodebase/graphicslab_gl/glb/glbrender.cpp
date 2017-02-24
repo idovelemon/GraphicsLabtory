@@ -84,6 +84,10 @@ public:
     void SetCurPerspectiveType(int32_t type);
     int32_t GetCurPerspectiveType();
     Vector GetFrustumPointInView(int32_t index);
+    float GetFarClip();
+    float GetScreenWidth();
+    float GetScreenHeight();
+    int32_t GetRandomRotateTex();
 
     float GetHDRAverageLum();
     int32_t GetHDRSceneTex();
@@ -102,6 +106,7 @@ protected:
     void AfterDraw();
 
     void PrepareShadowMap();
+    void PrepareDepthMap();
     void PrepareAOMap();
     void PrepareHDR();
 
@@ -117,6 +122,10 @@ protected:
 
     // SSAO
     void DrawDepthMap();
+    void GenRandRotateMap();
+    void DrawAO();
+    void BiBlurH();
+    void BiBlurV();
 
     void SetUniform(int32_t location, uniform::Wrapper& wrapper);
     inline float ZValueFromCamera(Object* obj);
@@ -134,6 +143,11 @@ private:
     RenderTarget*                           m_ShadowRenderTarget;
     int32_t                                 m_ShadowMap;
     int32_t                                 m_ShadowShader;
+
+    // Depth
+    RenderTarget*                           m_DepthTarget;
+    int32_t                                 m_DepthShader;
+    int32_t                                 m_DepthMap;
 
     // HDR
     RenderTarget*                           m_HDRRenderTarget;
@@ -155,8 +169,12 @@ private:
 
     // SSAO
     RenderTarget*                           m_AORenderTarget;
-    int32_t                                 m_DepthMap;
-    int32_t                                 m_DepthShader;
+    int32_t                                 m_RandRotateMap;
+    int32_t                                 m_AOMap;
+    int32_t                                 m_BiBlurMap;
+    int32_t                                 m_AOShader;
+    int32_t                                 m_BiBlurHShader;
+    int32_t                                 m_BiBlurVShader;
 
     mesh::DebugMesh*                        m_DebugMesh;
 };
@@ -201,9 +219,18 @@ RenderImp::RenderImp()
 : m_Width(0)
 , m_Height(0)
 , m_PerspectiveType(Render::PRIMARY_PERS)
+
+// Shadow
 , m_ShadowRenderTarget(NULL)
 , m_ShadowMap(-1)
 , m_ShadowShader(-1)
+
+// Depth
+, m_DepthTarget(NULL)
+, m_DepthMap(-1)
+, m_DepthShader(-1)
+
+// HDR
 , m_HDRRenderTarget(NULL)
 , m_BloomRenderTarget(NULL)
 , m_HDRSceneTex(-1)
@@ -217,12 +244,19 @@ RenderImp::RenderImp()
 , m_BloomVShader(-1)
 , m_TonemapShader(-1)
 , m_MaxMipmapLevel(0)
-, m_DebugMesh(NULL)
 , m_BloomWidth(0.0f)
 , m_BloomHeight(0.0f)
+
+// SSAO
 , m_AORenderTarget(NULL)
-, m_DepthMap(-1)
-, m_DepthShader(-1) {
+, m_RandRotateMap(-1)
+, m_AOMap(-1)
+, m_BiBlurMap(-1)
+, m_AOShader(-1)
+, m_BiBlurHShader(-1)
+, m_BiBlurVShader(-1)
+
+, m_DebugMesh(NULL){
     memset(m_Perspective, 0, sizeof(m_Perspective));
     m_ShaderGroups.clear();
 }
@@ -238,9 +272,8 @@ void RenderImp::Initialize(int32_t width, int32_t height) {
     m_Height = height;
 
     PrepareShadowMap();
-
+    PrepareDepthMap();
     PrepareAOMap();
-
     PrepareHDR();
 
     m_DebugMesh = mesh::DebugMesh::Create();
@@ -257,6 +290,7 @@ void RenderImp::Destroy() {
 void RenderImp::Draw() {
     PreDraw();
     DrawShadowMap();
+    DrawDepthMap();
     DrawAOMap();
     DrawLightLoop();
     DrawDebug();
@@ -362,6 +396,22 @@ Vector RenderImp::GetFrustumPointInView(int32_t index) {
     }
 
     return v;
+}
+
+float RenderImp::GetFarClip() {
+    return m_Perspective[Render::PRIMARY_PERS].zfar;
+}
+
+float RenderImp::GetScreenWidth() {
+    return m_Width;
+}
+
+float RenderImp::GetScreenHeight() {
+    return m_Height;
+}
+
+int32_t RenderImp::GetRandomRotateTex() {
+    return m_RandRotateMap;
 }
 
 float RenderImp::GetHDRAverageLum() {
@@ -554,7 +604,10 @@ void RenderImp::DrawShadowMap() {
 }
 
 void RenderImp::DrawAOMap() {
-    DrawDepthMap();
+    GenRandRotateMap();
+    DrawAO();
+    BiBlurH();
+    BiBlurV();
 }
 
 void RenderImp::DrawLightLoop() {
@@ -749,7 +802,7 @@ void RenderImp::PrepareShadowMap() {
     m_ShadowShader = shader::Mgr::AddShader("..\\glb\\shader\\shadow.vs", "..\\glb\\shader\\shadow.ps");
 }
 
-void RenderImp::PrepareAOMap() {
+void RenderImp::PrepareDepthMap() {
     // Create depth map
     texture::Texture* depth_map = texture::Texture::CreateFloat16DepthTexture(m_Width, m_Height);
     if (depth_map != NULL) {
@@ -759,15 +812,55 @@ void RenderImp::PrepareAOMap() {
     }
 
     // Create render target
-    m_AORenderTarget = RenderTarget::Create(m_Width, m_Height);
-    if (m_AORenderTarget != NULL) {
-        m_AORenderTarget->AttachDepthTexture(depth_map);
+    m_DepthTarget = RenderTarget::Create(m_Width, m_Height);
+    if (m_DepthTarget != NULL) {
+        m_DepthTarget->AttachDepthTexture(depth_map);
     } else {
         GLB_SAFE_ASSERT(false);
     }
 
     // Create shader
     m_DepthShader = shader::Mgr::AddShader("..\\glb\\shader\\depth.vs", "..\\glb\\shader\\depth.ps");
+}
+
+void RenderImp::PrepareAOMap() {
+    // Create random rotate map
+    texture::Texture* random_rotate_map = texture::Texture::CreateFloat16Texture(4, 4);
+    if (random_rotate_map != NULL) {
+        m_RandRotateMap = texture::Mgr::AddTexture(random_rotate_map);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    // Create ao map
+    texture::Texture* ao_map = texture::Texture::CreateFloat16Texture(m_Width, m_Height);
+    if (ao_map != NULL) {
+        m_AOMap = texture::Mgr::AddTexture(ao_map);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    // Create temp biblur map
+    texture::Texture* biblur_map = texture::Texture::CreateFloat16Texture(m_Width, m_Height);
+    if (biblur_map != NULL) {
+        m_BiBlurMap = texture::Mgr::AddTexture(biblur_map);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    // Create render target
+    m_AORenderTarget = RenderTarget::Create(m_Width, m_Height);
+    if (m_AORenderTarget != NULL) {
+        m_AORenderTarget->AttachColorTexture(render::COLORBUF_COLOR_ATTACHMENT0, ao_map);
+        m_AORenderTarget->AttachColorTexture(render::COLORBUF_COLOR_ATTACHMENT1, biblur_map);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    // Create shader
+    m_AOShader = shader::Mgr::AddShader("..\\glb\\shader\\ssao.vs", "..\\glb\\shader\\ssao.ps");
+    m_BiBlurHShader = shader::Mgr::AddShader("..\\glb\\shader\\biblur.vs", "..\\glb\\shader\\biblurh.ps");
+    m_BiBlurVShader = shader::Mgr::AddShader("..\\glb\\shader\\biblur.vs", "..\\glb\\shader\\biblurv.ps");
 }
 
 void RenderImp::PrepareHDR() {
@@ -1132,7 +1225,7 @@ void RenderImp::BlendHDRScene() {
 
 void RenderImp::DrawDepthMap() {
     // Render Target
-    render::Device::SetRenderTarget(m_AORenderTarget->GetRenderTargetObj());
+    render::Device::SetRenderTarget(m_DepthTarget->GetRenderTargetObj());
 
     // Draw Buffer
     render::Device::SetDrawColorBuffer(render::COLORBUF_NONE);
@@ -1164,43 +1257,224 @@ void RenderImp::DrawDepthMap() {
         for (int32_t j = 0; j < static_cast<int32_t>(objs.size()); j++) {
             Object* obj = objs[j];
 
-            // Object Uniform
-            for (int32_t k = 0; k < static_cast<int32_t>(uniforms.size()); k++) {
-                uniform::UniformEntry entry = uniforms[k];
-                if (!entry.flag) {
-                    // TODO: for now, id is the index of the uniform picker table
-                    uniform::Wrapper uniform_wrapper = uniform::kUniformPickers[entry.id].picker(obj);
-                    SetUniform(entry.location, uniform_wrapper);
+            // Check if cast shadow & enable depth
+            if (obj->GetModel()->IsCastShadow() && obj->IsDepthTestEnable()) {
+                // Object Uniform
+                for (int32_t k = 0; k < static_cast<int32_t>(uniforms.size()); k++) {
+                    uniform::UniformEntry entry = uniforms[k];
+                    if (!entry.flag) {
+                        // TODO: for now, id is the index of the uniform picker table
+                        uniform::Wrapper uniform_wrapper = uniform::kUniformPickers[entry.id].picker(obj);
+                        SetUniform(entry.location, uniform_wrapper);
+                    }
                 }
+
+                // Vertex Buffer
+                int32_t mesh_id = obj->GetModel()->GetMeshId();
+                uint32_t vao = mesh::Mgr::GetMeshById(mesh_id)->GetVAO();
+                uint32_t vbo = mesh::Mgr::GetMeshById(mesh_id)->GetVBO();
+                VertexLayout layout = mesh::Mgr::GetMeshById(mesh_id)->GetVertexLayout();
+                int32_t num = mesh::Mgr::GetMeshById(mesh_id)->GetVertexNum();
+                render::Device::SetVertexArray(vao);
+                render::Device::SetVertexBuffer(vbo);
+                render::Device::SetVertexLayout(layout);
+
+                if (obj->IsCullFaceEnable()) {
+                    render::Device::SetCullFaceEnable(true);
+                    render::Device::SetCullFaceMode(obj->GetCullFaceMode());
+                } else {
+                    render::Device::SetCullFaceEnable(false);
+                }
+
+                if (obj->IsDepthTestEnable()) {
+                    render::Device::SetDepthTestEnable(true);
+                } else {
+                    render::Device::SetDepthTestEnable(false);
+                }
+
+                // Draw
+                render::Device::Draw(render::PT_TRIANGLES, 0, num);
             }
-
-            // Vertex Buffer
-            int32_t mesh_id = obj->GetModel()->GetMeshId();
-            uint32_t vao = mesh::Mgr::GetMeshById(mesh_id)->GetVAO();
-            uint32_t vbo = mesh::Mgr::GetMeshById(mesh_id)->GetVBO();
-            VertexLayout layout = mesh::Mgr::GetMeshById(mesh_id)->GetVertexLayout();
-            int32_t num = mesh::Mgr::GetMeshById(mesh_id)->GetVertexNum();
-            render::Device::SetVertexArray(vao);
-            render::Device::SetVertexBuffer(vbo);
-            render::Device::SetVertexLayout(layout);
-
-            if (obj->IsCullFaceEnable()) {
-                render::Device::SetCullFaceEnable(true);
-                render::Device::SetCullFaceMode(obj->GetCullFaceMode());
-            } else {
-                render::Device::SetCullFaceEnable(false);
-            }
-
-            if (obj->IsDepthTestEnable()) {
-                render::Device::SetDepthTestEnable(true);
-            } else {
-                render::Device::SetDepthTestEnable(false);
-            }
-
-            // Draw
-            render::Device::Draw(render::PT_TRIANGLES, 0, num);
         }
     }
+
+    // Reset render target
+    render::Device::SetRenderTarget(0);
+}
+
+void RenderImp::GenRandRotateMap() {
+    // Build rand seed
+    float seed = 0.0f;
+    Matrix proj = m_Perspective[Render::PRIMARY_PERS].m;
+    Matrix view = scene::Scene::GetCamera(scene::Scene::GetCurCamera())->GetViewMatrix();
+    for (int32_t i = 0; i < 16; i++) {
+        seed += proj.GetData()[i];
+        seed += view.GetData()[i];
+    }
+    srand(floor(seed * 1000));
+
+    // Build random rotate vector
+    Vector rand_rotate_v[16];
+    for (int32_t i = 0; i < 16; i++) {
+        int32_t angle = rand() % 360;
+        float sinv = sin(angle / 180.0f * 3.1415926f);
+        float cosv = cos(angle / 180.0f * 3.1415926f);
+        rand_rotate_v[i].x = sinv;
+        rand_rotate_v[i].y = cosv;
+        rand_rotate_v[i].z = 0.0f;
+        rand_rotate_v[i].w = 0.0f;
+    }
+
+    // Update to pixels
+    float pixels[16 * 4];
+    for (int32_t i = 0; i < 16; i++) {
+        pixels[i * 4 + 0] = rand_rotate_v[i].x;
+        pixels[i * 4 + 1] = rand_rotate_v[i].y;
+        pixels[i * 4 + 2] = rand_rotate_v[i].z;
+        pixels[i * 4 + 3] = rand_rotate_v[i].w;
+    }
+    texture::Mgr::GetTextureById(m_RandRotateMap)->UpdateTexture(pixels);
+}
+
+void RenderImp::DrawAO() {
+    // Render Target
+    render::Device::SetRenderTarget(m_AORenderTarget->GetRenderTargetObj());
+
+    // Draw Buffer
+    render::Device::SetDrawColorBuffer(render::COLORBUF_COLOR_ATTACHMENT0);
+
+    // Clear
+    render::Device::SetClearDepth(1.0f);
+    render::Device::SetClearColor(1.0f, 1.0f, 1.0f);
+    render::Device::Clear(CLEAR_DEPTH | CLEAR_COLOR);
+
+    // Shader
+    shader::Program* program = shader::Mgr::GetShader(m_AOShader);
+    std::vector<uniform::UniformEntry>& uniforms = program->GetUniforms();
+    render::Device::SetShader(program->GetShader());
+    render::Device::SetShaderLayout(program->GetShaderLayout());
+
+    // Texture
+    render::Device::SetTexture(render::TS_DEPTH, texture::Mgr::GetTextureById(m_DepthMap)->GetTexObj(), 0);
+    render::Device::SetTexture(render::TS_RANDOM_ROTATE, texture::Mgr::GetTextureById(m_RandRotateMap)->GetTexObj(), 1);
+
+    // Scene uniforms
+    for (int32_t j = 0; j < static_cast<int32_t>(uniforms.size()); j++) {
+        uniform::UniformEntry entry = uniforms[j];
+        if (entry.flag) {
+            // TODO: for now, id is the index of the uniform picker table
+            uniform::Wrapper uniform_wrapper = uniform::kUniformPickers[entry.id].picker(NULL);
+            SetUniform(entry.location, uniform_wrapper);
+        }
+    }
+
+    // Vertex Buffer
+    uint32_t vao = m_ScreenMesh->GetVAO();
+    uint32_t vbo = m_ScreenMesh->GetVBO();
+    VertexLayout layout = m_ScreenMesh->GetVertexLayout();
+    int32_t num = m_ScreenMesh->GetVertexNum();
+    render::Device::SetVertexArray(vao);
+    render::Device::SetVertexBuffer(vbo);
+    render::Device::SetVertexLayout(layout);
+
+    // Draw
+    render::Device::Draw(render::PT_TRIANGLES, 0, num);
+
+    // Reset render target
+    render::Device::SetRenderTarget(0);
+}
+
+void RenderImp::BiBlurH() {
+    // Render Target
+    render::Device::SetRenderTarget(m_AORenderTarget->GetRenderTargetObj());
+
+    // Draw Buffer
+    render::Device::SetDrawColorBuffer(render::COLORBUF_COLOR_ATTACHMENT1);
+
+    // Clear
+    render::Device::SetClearDepth(1.0f);
+    render::Device::SetClearColor(1.0f, 1.0f, 1.0f);
+    render::Device::Clear(CLEAR_DEPTH | CLEAR_COLOR);
+
+    // Shader
+    shader::Program* program = shader::Mgr::GetShader(m_BiBlurHShader);
+    std::vector<uniform::UniformEntry>& uniforms = program->GetUniforms();
+    render::Device::SetShader(program->GetShader());
+    render::Device::SetShaderLayout(program->GetShaderLayout());
+
+    // Texture
+    render::Device::SetTexture(render::TS_DEPTH, texture::Mgr::GetTextureById(m_DepthMap)->GetTexObj(), 0);
+    render::Device::SetTexture(render::TS_AO_MAP, texture::Mgr::GetTextureById(m_AOMap)->GetTexObj(), 1);
+
+    // Scene uniforms
+    for (int32_t j = 0; j < static_cast<int32_t>(uniforms.size()); j++) {
+        uniform::UniformEntry entry = uniforms[j];
+        if (entry.flag) {
+            // TODO: for now, id is the index of the uniform picker table
+            uniform::Wrapper uniform_wrapper = uniform::kUniformPickers[entry.id].picker(NULL);
+            SetUniform(entry.location, uniform_wrapper);
+        }
+    }
+
+    // Vertex Buffer
+    uint32_t vao = m_ScreenMesh->GetVAO();
+    uint32_t vbo = m_ScreenMesh->GetVBO();
+    VertexLayout layout = m_ScreenMesh->GetVertexLayout();
+    int32_t num = m_ScreenMesh->GetVertexNum();
+    render::Device::SetVertexArray(vao);
+    render::Device::SetVertexBuffer(vbo);
+    render::Device::SetVertexLayout(layout);
+
+    // Draw
+    render::Device::Draw(render::PT_TRIANGLES, 0, num);
+
+    // Reset render target
+    render::Device::SetRenderTarget(0);
+}
+
+void RenderImp::BiBlurV() {
+    // Render Target
+    render::Device::SetRenderTarget(m_AORenderTarget->GetRenderTargetObj());
+
+    // Draw Buffer
+    render::Device::SetDrawColorBuffer(render::COLORBUF_COLOR_ATTACHMENT0);
+
+    // Clear
+    render::Device::SetClearDepth(1.0f);
+    render::Device::SetClearColor(1.0f, 1.0f, 1.0f);
+    render::Device::Clear(CLEAR_DEPTH | CLEAR_COLOR);
+
+    // Shader
+    shader::Program* program = shader::Mgr::GetShader(m_BiBlurVShader);
+    std::vector<uniform::UniformEntry>& uniforms = program->GetUniforms();
+    render::Device::SetShader(program->GetShader());
+    render::Device::SetShaderLayout(program->GetShaderLayout());
+
+    // Texture
+    render::Device::SetTexture(render::TS_DEPTH, texture::Mgr::GetTextureById(m_DepthMap)->GetTexObj(), 0);
+    render::Device::SetTexture(render::TS_BI_BLUR_MAP, texture::Mgr::GetTextureById(m_BiBlurMap)->GetTexObj(), 1);
+
+    // Scene uniforms
+    for (int32_t j = 0; j < static_cast<int32_t>(uniforms.size()); j++) {
+        uniform::UniformEntry entry = uniforms[j];
+        if (entry.flag) {
+            // TODO: for now, id is the index of the uniform picker table
+            uniform::Wrapper uniform_wrapper = uniform::kUniformPickers[entry.id].picker(NULL);
+            SetUniform(entry.location, uniform_wrapper);
+        }
+    }
+
+    // Vertex Buffer
+    uint32_t vao = m_ScreenMesh->GetVAO();
+    uint32_t vbo = m_ScreenMesh->GetVBO();
+    VertexLayout layout = m_ScreenMesh->GetVertexLayout();
+    int32_t num = m_ScreenMesh->GetVertexNum();
+    render::Device::SetVertexArray(vao);
+    render::Device::SetVertexBuffer(vbo);
+    render::Device::SetVertexLayout(layout);
+
+    // Draw
+    render::Device::Draw(render::PT_TRIANGLES, 0, num);
 
     // Reset render target
     render::Device::SetRenderTarget(0);
@@ -1351,6 +1625,54 @@ Vector Render::GetFrustumPointInView(int32_t index) {
     }
 
     return v;
+}
+
+float Render::GetFarClip() {
+    float result;
+
+    if (s_RenderImp != NULL) {
+        result = s_RenderImp->GetFarClip();
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return result;
+}
+
+float Render::GetScreenWidth() {
+    float result = 0.0f;
+
+    if (s_RenderImp != NULL) {
+        result = s_RenderImp->GetScreenWidth();
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return result;
+}
+
+float Render::GetScreenHeight() {
+    float result = 0.0f;
+
+    if (s_RenderImp != NULL) {
+        result = s_RenderImp->GetScreenHeight();
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return result;
+}
+
+int32_t Render::GetRandomRotateTex() {
+    int32_t result = 0;
+
+    if (s_RenderImp != NULL) {
+        result = s_RenderImp->GetRandomRotateTex();
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return result;
 }
 
 float Render::GetHDRAverageLum() {

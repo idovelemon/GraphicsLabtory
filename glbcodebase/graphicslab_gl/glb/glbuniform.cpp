@@ -423,6 +423,54 @@ Wrapper uniform_hdr_bloom_tex_picker(glb::Object*) {
     return wrapper;
 }
 
+Wrapper uniform_far_clip_picker(glb::Object*) {
+    Wrapper wrapper;
+    wrapper.SetFormat(Wrapper::FMT_FLOAT);
+    wrapper.SetFloat(render::Render::GetFarClip());
+    return wrapper;
+}
+
+Wrapper uniform_screen_width_picker(glb::Object*) {
+    Wrapper wrapper;
+    wrapper.SetFormat(Wrapper::FMT_FLOAT);
+    wrapper.SetFloat(render::Render::GetScreenWidth());
+    return wrapper;
+}
+
+Wrapper uniform_screen_height_picker(glb::Object*) {
+    Wrapper wrapper;
+    wrapper.SetFormat(Wrapper::FMT_FLOAT);
+    wrapper.SetFloat(render::Render::GetScreenHeight());
+    return wrapper;
+}
+
+Wrapper uniform_depth_tex_picker(glb::Object*) {
+    Wrapper wrapper;
+    wrapper.SetFormat(Wrapper::FMT_SAMPLER);
+    wrapper.SetSampler(render::TS_DEPTH);
+    return wrapper;
+}
+
+Wrapper uniform_random_rotate_tex_picker(glb::Object*) {
+    Wrapper wrapper;
+    wrapper.SetFormat(Wrapper::FMT_SAMPLER);
+    wrapper.SetSampler(render::TS_RANDOM_ROTATE);
+    return wrapper;
+}
+
+Wrapper uniform_ao_tex_picker(glb::Object*) {
+    Wrapper wrapper;
+    wrapper.SetFormat(Wrapper::FMT_SAMPLER);
+    wrapper.SetSampler(render::TS_AO_MAP);
+    return wrapper;
+}
+
+Wrapper uniform_biblur_tex_picker(glb::Object*) {
+    Wrapper wrapper;
+    wrapper.SetFormat(Wrapper::FMT_SAMPLER);
+    wrapper.SetSampler(render::TS_BI_BLUR_MAP);
+    return wrapper;
+}
 };  // namespace uniform
 
 };  // namespace glb

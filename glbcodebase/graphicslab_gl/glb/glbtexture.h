@@ -37,6 +37,12 @@ public:
         TEX_3D
     };
 
+    enum Format {
+        FMT_RGBA = 0,
+        FMT_RGBA16F,
+        FMT_DEPTH16F,
+    };
+
 public:
     Texture();
     virtual ~Texture();
@@ -55,9 +61,11 @@ public:
      int32_t GetTexObj();
 
      void Destroy();
+     void UpdateTexture(const void* pixel);
 
  private:
      int32_t m_Type;                    // The type of the texture
+     int32_t m_Format;                  // The format of the texture
      int32_t m_TexID;                   // The id of this texture
      int32_t m_Width;                   // The width of the texture
      int32_t m_Height;                  // The height of the texture
