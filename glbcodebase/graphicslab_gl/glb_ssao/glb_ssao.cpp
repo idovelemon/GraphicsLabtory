@@ -124,6 +124,10 @@ void glb_setup() {
     // Perspective
     glb::render::Render::SetPerspective(glb::render::Render::PRIMARY_PERS, 69.0f, g_WindowWidth * 1.0f / g_WindowHeight, 0.1f, 500.0f);
 
+    // HDR
+    glb::render::Render::SetExposureLevel(0.7f);
+    glb::render::Render::SetLightAdaption(0.04f);
+
     int32_t city = glb::scene::Scene::AddObject("city.obj");
     glb::scene::Scene::GetObjectById(city)->SetCullFaceEnable(true);
     glb::scene::Scene::GetObjectById(city)->SetCullFaceMode(glb::render::CULL_BACK);

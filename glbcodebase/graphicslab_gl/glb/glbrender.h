@@ -53,6 +53,10 @@ public:
     static int32_t GetHDRSceneTex();
     static float GetBloomWidth();
     static float GetBloomHeight();
+    static void SetExposureLevel(float level);
+    static float GetExposureLevel();
+    static void SetLightAdaption(float adaption);
+    static float GetLightAdaption();
 
     // Debug draw
     static void AddLine(Vector start, Vector end, Vector color);

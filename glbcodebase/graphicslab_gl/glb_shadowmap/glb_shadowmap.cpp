@@ -125,6 +125,10 @@ void glb_setup() {
     // Perspective
     glb::render::Render::SetPerspective(glb::render::Render::PRIMARY_PERS, 69.0f, g_WindowWidth * 1.0f / g_WindowHeight, 0.1f, 500.0f);
 
+    // HDR
+    glb::render::Render::SetExposureLevel(0.7f);
+    glb::render::Render::SetLightAdaption(0.04f);
+
     glb::scene::Scene::AddSkyObject("sky.obj");
 
     int32_t floor = glb::scene::Scene::AddObject("floor.obj");

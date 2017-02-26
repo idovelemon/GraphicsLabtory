@@ -93,6 +93,10 @@ public:
     int32_t GetHDRSceneTex();
     float GetBloomWidth();
     float GetBloomHeight();
+    void SetExposureLevel(float level);
+    float GetExposureLevel();
+    void SetLightAdaption(float adaption);
+    float GetLightAdaption();
 
     void AddLine(Vector start, Vector end, Vector color);
 
@@ -166,6 +170,9 @@ private:
     mesh::ScreenMesh*                       m_ScreenMesh;
     float                                   m_BloomWidth;
     float                                   m_BloomHeight;
+    float                                   m_ExposureLevel;
+    float                                   m_LightAdaption;
+    float                                   m_PreAverageLum;
 
     // SSAO
     RenderTarget*                           m_AORenderTarget;
@@ -246,6 +253,9 @@ RenderImp::RenderImp()
 , m_MaxMipmapLevel(0)
 , m_BloomWidth(0.0f)
 , m_BloomHeight(0.0f)
+, m_ExposureLevel(0.0f)
+, m_LightAdaption(0.0f)
+, m_PreAverageLum(0.0f)
 
 // SSAO
 , m_AORenderTarget(NULL)
@@ -428,6 +438,22 @@ float RenderImp::GetBloomWidth() {
 
 float RenderImp::GetBloomHeight() {
     return m_BloomHeight;
+}
+
+void RenderImp::SetExposureLevel(float level) {
+    m_ExposureLevel = level;
+}
+
+float RenderImp::GetExposureLevel() {
+    return m_ExposureLevel;
+}
+
+void RenderImp::SetLightAdaption(float adaption) {
+    m_LightAdaption = adaption;
+}
+
+float RenderImp::GetLightAdaption() {
+    return m_LightAdaption;
 }
 
 void RenderImp::AddLine(Vector start, Vector end, Vector color) {
@@ -988,7 +1014,9 @@ void RenderImp::CalcAverageLum() {
     memset(pixel, 0, sizeof(pixel));
     glGetTexImage(GL_TEXTURE_2D, m_MaxMipmapLevel, GL_RGBA, GL_FLOAT, pixel);
 
-    m_AverageLum = exp(pixel[0]);
+    float cur_scene_average_lum = exp(pixel[0]);
+    m_AverageLum = m_PreAverageLum + (cur_scene_average_lum - m_PreAverageLum) * m_LightAdaption;
+    m_PreAverageLum = m_AverageLum;
 }
 
 void RenderImp::FilterBrightness() {
@@ -1719,6 +1747,46 @@ float Render::GetBloomHeight() {
 
     if (s_RenderImp != NULL) {
         result = s_RenderImp->GetBloomHeight();
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return result;
+}
+
+void Render::SetExposureLevel(float level) {
+    if (s_RenderImp != NULL) {
+        s_RenderImp->SetExposureLevel(level);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+}
+
+float Render::GetExposureLevel() {
+    float result = 0.0f;
+
+    if (s_RenderImp != NULL) {
+        result = s_RenderImp->GetExposureLevel();
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return result;
+}
+
+void Render::SetLightAdaption(float adaption) {
+    if (s_RenderImp != NULL) {
+        s_RenderImp->SetLightAdaption(adaption);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+}
+
+float Render::GetLightAdaption() {
+    float result = 0.0f;
+
+    if (s_RenderImp != NULL) {
+        result = s_RenderImp->GetLightAdaption();
     } else {
         GLB_SAFE_ASSERT(false);
     }

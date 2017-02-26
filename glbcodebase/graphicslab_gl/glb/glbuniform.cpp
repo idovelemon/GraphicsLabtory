@@ -471,6 +471,13 @@ Wrapper uniform_biblur_tex_picker(glb::Object*) {
     wrapper.SetSampler(render::TS_BI_BLUR_MAP);
     return wrapper;
 }
+
+Wrapper uniform_exposure_level_picker(glb::Object*) {
+    Wrapper wrapper;
+    wrapper.SetFormat(Wrapper::FMT_FLOAT);
+    wrapper.SetFloat(render::Render::GetExposureLevel());
+    return wrapper;
+}
 };  // namespace uniform
 
 };  // namespace glb
