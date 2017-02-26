@@ -37,6 +37,12 @@ uniform sampler2D glb_ShadowTex;
 uniform mat4 glb_ShadowM;
 #endif
 
+#ifdef GLB_ENABLE_AO
+uniform float glb_ScreenWidth;
+uniform float glb_ScreenHeight;
+uniform sampler2D glb_AOMap;
+#endif
+
 #ifdef GLB_ENABLE_LIGHTING
 uniform vec3 glb_Material_Ambient;
 uniform vec3 glb_Material_Diffuse;
@@ -116,9 +122,10 @@ void main() {
 		#ifdef GLB_USE_PARALLEL_LIGHT
 			vec3 light_vec = -glb_ParallelLight_Dir;
 			vec3 ambient = glb_Material_Ambient * glb_ParallelLight_Ambient;
+
 			vec3 diffuse = calc_diffuse(light_vec, normal, glb_Material_Diffuse, glb_ParallelLight_Diffuse);
 			vec3 specular = calc_specular(light_vec, normal, view_vec, glb_Material_Specular, glb_ParallelLight_Specular, glb_Material_Pow);
-			vec3 light = ambient + diffuse + specular;
+			vec3 light = ambient + diffuse + specular;		
 		#endif
 
 		#ifdef GLB_TEXCOORD_IN_VERTEX
@@ -127,7 +134,8 @@ void main() {
 			oColor.xyz = vec3(light + glb_Material_Emission);
 		#endif
 	} else {
-		vec3 ambient = glb_Material_Ambient * glb_ParallelLight_Ambient;
+		vec3 ambient = glb_Material_Ambient * glb_ParallelLight_Ambient;	
+
 		#ifdef GLB_TEXCOORD_IN_VERTEX
 			oColor.xyz = vec3(oColor.xyz * ambient + glb_Material_Emission);
 		#else
@@ -139,4 +147,9 @@ void main() {
 		oColor.xyz = 0.5 * oColor.xyz;
 	}
 #endif
+
+#ifdef GLB_ENABLE_AO
+	vec2 ao_coord = vec2(gl_FragCoord.x / glb_ScreenWidth, gl_FragCoord.y / glb_ScreenHeight);
+	oColor.xyz *= texture2D(glb_AOMap, ao_coord).rgb;
+#endif	
 }

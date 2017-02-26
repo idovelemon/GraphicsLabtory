@@ -195,6 +195,10 @@ bool Model::IsCastShadow() {
 void Model::SetCastShadow(bool cast) {
     m_ModefEffectParam.cast_shadow = cast;
 }
+
+bool Model::IsUseAO() {
+    return m_ModefEffectParam.use_ao;
+}
 //-----------------------------------------------------------------------------------
 // ModelMgrImp DEFINITION
 //-----------------------------------------------------------------------------------

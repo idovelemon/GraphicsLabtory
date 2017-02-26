@@ -204,6 +204,10 @@ shader::Descriptor Object::CalculateShaderDesc() {
         desc.SetFlag(shader::GLB_ENABLE_SHADOW, true);
     }
 
+    if (m_Model->IsUseAO()) {
+        desc.SetFlag(shader::GLB_ENABLE_AO, true);
+    }
+
     return desc;
 }
 };  // namespace glb

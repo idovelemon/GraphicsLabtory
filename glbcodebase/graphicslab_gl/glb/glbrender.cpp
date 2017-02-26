@@ -656,6 +656,9 @@ void RenderImp::DrawLightLoop() {
             if (obj->GetModel()->IsAcceptShadow()) {
                 render::Device::SetTexture(render::TS_SHADOW, texture::Mgr::GetTextureById(m_ShadowMap)->GetTexObj(), 2);
             }
+            if (obj->GetModel()->IsUseAO()) {
+                render::Device::SetTexture(render::TS_AO_MAP, texture::Mgr::GetTextureById(m_AOMap)->GetTexObj(), 3);
+            }
 
             // Object Uniform
             for (int32_t k = 0; k < static_cast<int32_t>(uniforms.size()); k++) {

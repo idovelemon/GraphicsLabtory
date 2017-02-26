@@ -37,6 +37,7 @@ public:
     void SetAcceptShadow(bool accept);
     bool IsCastShadow();
     void SetCastShadow(bool cast);
+    bool IsUseAO();
 
 private:
     std::string m_Name;

@@ -217,6 +217,15 @@ int32_t ObjModelFile::ExtractModelData(
                     } else {
                         effect_param.accept_shadow = false;
                     }
+                } else if (!strcmp(prefix, "ao")) {
+                    // Use AO
+                    int32_t temp = 0;
+                    input >> temp;
+                    if (temp != 0) {
+                        effect_param.use_ao = true;
+                    } else {
+                        effect_param.use_ao = false;
+                    }
                 } else if (!strcmp(prefix, "cs")) {
                     // Cast shadow
                     int32_t temp = 0;

@@ -26,7 +26,8 @@ public:
     , has_normal(false)
     , accept_light(false)
     , accept_shadow(false)
-    , cast_shadow(false) {
+    , cast_shadow(false)
+    , use_ao(false) {
     }
 
     virtual ~ModelEffectParam() {
@@ -39,6 +40,7 @@ public:
     bool    accept_light;
     bool    accept_shadow;
     bool    cast_shadow;
+    bool    use_ao;
 };
 
 class ModelMaterialParam {

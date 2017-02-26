@@ -27,6 +27,7 @@ enum {
     GLB_ENABLE_SHADOW,
     GLB_USE_PARALLEL_LIGHT,
     GLB_ENABLE_ALPHA_TEX,
+    GLB_ENABLE_AO,
 };
 
 static const char* kEnableMacros[] = {
@@ -37,6 +38,7 @@ static const char* kEnableMacros[] = {
     "#define GLB_ENABLE_SHADOW\n",
     "#define GLB_USE_PARALLEL_LIGHT\n",
     "#define GLB_ENABLE_ALPHA_TEX\n",
+    "#define GLB_ENABLE_AO\n",
 };
 
 class VertexShader {
