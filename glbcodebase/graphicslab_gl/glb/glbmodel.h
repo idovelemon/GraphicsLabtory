@@ -14,6 +14,13 @@ namespace glb {
 
 class Model {
 public:
+    enum {
+        MT_DIFFUSE = 0,
+        MT_ALPHA,
+        MT_NORMAL,
+        MT_MAX,
+    };
+public:
     Model();
     virtual~Model();
 
@@ -30,7 +37,9 @@ public:
 
     bool HasDiffuseTexture();
     bool HasAlphaTexture();
+    bool HasNormalTexture();
     bool HasNormal();
+    bool HasTangent();
     bool IsAcceptLight();
     void SetAcceptLight(bool accept);
     bool IsAcceptShadow();
@@ -42,7 +51,7 @@ public:
 private:
     std::string m_Name;
     int32_t m_Mesh;
-    int32_t m_Tex[render::TS_MAX];
+    int32_t m_Tex[MT_MAX];
     int32_t m_Material;
     Vector  m_BoundBoxMax;
     Vector  m_BoundBoxMin;

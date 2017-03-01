@@ -183,8 +183,16 @@ shader::Descriptor Object::CalculateShaderDesc() {
         desc.SetFlag(shader::GLB_ENABLE_ALPHA_TEX, true);
     }
 
+    if (m_Model->HasNormalTexture()) {
+        desc.SetFlag(shader::GLB_ENABLE_NORMAL_TEX, true);
+    }
+
     if (m_Model->HasNormal()) {
         desc.SetFlag(shader::GLB_NORMAL_IN_VERTEX, true);
+    }
+
+    if (m_Model->HasTangent()) {
+        desc.SetFlag(shader::GLB_TANGENT_IN_VERTEX, true);
     }
 
     if (m_Model->IsAcceptLight()) {

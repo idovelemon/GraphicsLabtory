@@ -2,6 +2,7 @@
 glb_Pos			                                                 vec3	           顶点的Position属性
 glb_Color								 vec3	           顶点的Color属性
 glb_Normal		                                                 vec3	           顶点的Normal属性
+glb_Tangent								 vec3	           顶点的Tangent属性
 glb_TexCoord	                                                 vec2	           顶点对应的纹理坐标
 glb_ProjM                                                        mat4              投影变换矩阵
 glb_ViewM                                                        mat4              相机变换矩阵

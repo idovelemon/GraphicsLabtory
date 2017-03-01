@@ -60,8 +60,11 @@ public:
     // @param: normal_buf The buffer of the vertex normal. This is an optional parameter.
     // Each vertex has one normal and each normal has three float value,
     // so this buffer's size must be [3 * triangle_num * 3 * sizeof(float)] bytes
+    // @param: tanget_buf The buffer of the vertex tanget. This is an optional parameter
+    // Each vertex has one tanget and each tanget has three float value,
+    // so this buffer's size must be [3 * triangle_num * 3 * sizeof(float)] bytes
     //----------------------------------------------------------------------------------------------------
-    static TriangleMesh* Create(int32_t triangle_num, float* vertex_buf, float* coord_buf = 0, float* normal_buf = 0);
+    static TriangleMesh* Create(int32_t triangle_num, float* vertex_buf, float* coord_buf = 0, float* normal_buf = 0, float* tanget_buf = 0);
 
 public:
     void SetId(int32_t id);

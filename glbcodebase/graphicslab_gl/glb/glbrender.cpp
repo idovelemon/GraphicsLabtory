@@ -674,10 +674,10 @@ void RenderImp::DrawLightLoop() {
 
             // Textures
             if (obj->GetModel()->HasDiffuseTexture()) {
-                render::Device::SetTexture(render::TS_DIFFUSE, texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(render::TS_DIFFUSE))->GetTexObj(), 0);
+                render::Device::SetTexture(render::TS_DIFFUSE, texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(Model::MT_DIFFUSE))->GetTexObj(), 0);
             }
             if (obj->GetModel()->HasAlphaTexture()) {
-                render::Device::SetTexture(render::TS_ALPHA, texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(render::TS_ALPHA))->GetTexObj(), 1);
+                render::Device::SetTexture(render::TS_ALPHA, texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(Model::MT_ALPHA))->GetTexObj(), 1);
             }
             if (obj->GetModel()->IsAcceptShadow()) {
                 render::Device::SetTexture(render::TS_SHADOW, texture::Mgr::GetTextureById(m_ShadowMap)->GetTexObj(), 2);

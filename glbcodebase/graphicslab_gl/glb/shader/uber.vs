@@ -16,6 +16,10 @@ in vec3 glb_Color;
 in vec3 glb_Normal;
 #endif
 
+#ifdef GLB_TANGENT_IN_VERTEX
+in vec3 glb_Tangent;
+#endif
+
 #ifdef GLB_TEXCOORD_IN_VERTEX
 in vec2 glb_TexCoord;
 #endif
@@ -29,6 +33,10 @@ out vec3 vs_Color;
 
 #ifdef GLB_NORMAL_IN_VERTEX
 out vec3 vs_Normal;
+#endif
+
+#ifdef GLB_TANGENT_IN_VERTEX
+out vec3 vs_Tangent;
 #endif
 
 #ifdef GLB_TEXCOORD_IN_VERTEX
@@ -50,6 +58,10 @@ void main() {
 
 #ifdef GLB_NORMAL_IN_VERTEX
 	vs_Normal = (glb_Trans_Inv_WorldM * vec4(glb_Normal, 0.0)).xyz;
+#endif
+
+#ifdef GLB_TANGENT_IN_VERTEX
+	vs_Tangent = glb_Tangent;
 #endif
 
 #ifdef GLB_TEXCOORD_IN_VERTEX

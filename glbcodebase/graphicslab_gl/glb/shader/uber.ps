@@ -16,6 +16,10 @@ in vec3 vs_Color;
 in vec3 vs_Normal;
 #endif
 
+#ifdef GLB_TANGENT_IN_VERTEX
+in vec3 vs_Tangent;
+#endif
+
 #ifdef GLB_TEXCOORD_IN_VERTEX
 in vec2 vs_TexCoord;
 #endif

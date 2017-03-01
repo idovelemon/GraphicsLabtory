@@ -22,6 +22,7 @@ const int32_t kVertexPerTri = 3;
 const int32_t kObjFloatPerVertex = 3;
 const int32_t kObjFloatPerTexcoord = 2;
 const int32_t kObjFloatPerNormal = 3;
+const int32_t kObjFloatPerTangent = 3;
 const int32_t kObjMaxPrefixLength = 8;
 const int32_t kObjMaxLineLength = 256;
 
@@ -48,7 +49,7 @@ public:
         float** vertex_buf,
         float** texcoord_buf = NULL,
         float** normal_buf = NULL,
-        char** texture_name = NULL
+        float** tangent_buf = NULL
         ) = 0;
 };
 
@@ -68,11 +69,11 @@ class ObjModelFile:public ModelFileBase {
         float** vertex_buf,
         float** texcoord_buf = NULL,
         float** normal_buf = NULL,
-        char** texture_name = NULL
+        float** tangent_buf = NULL
         );
 
  protected:
-     void ExtractFaceData(const char* buffer, int32_t& vertex_index, int32_t& texcoord_index, int32_t& normal_index);
+     void ExtractFaceData(const char* buffer, int32_t& vertex_index, int32_t& texcoord_index, int32_t& normal_index, int32_t& tangent_index);
 };
 
 //----------------------------------------------------------------------------------------
@@ -87,11 +88,13 @@ public:
     int32_t vertex_index[3];
     int32_t texcoord_index[3];
     int32_t normal_index[3];
+    int32_t tangent_index[3];
 
     ObjFace() {
         memset(vertex_index, 0, sizeof(vertex_index));
         memset(texcoord_index, 0, sizeof(texcoord_index));
         memset(normal_index, 0, sizeof(normal_index));
+        memset(tangent_index, 0, sizeof(tangent_index));
     }
 };
 
@@ -107,7 +110,7 @@ int32_t ObjModelFile::ExtractModelData(
         float** vertex_buf,
         float** texcoord_buf,
         float** normal_buf,
-        char** texture_name
+        float** tangent_buf
         ) {
     int32_t result = 0;
 
@@ -119,9 +122,8 @@ int32_t ObjModelFile::ExtractModelData(
             std::vector<Vector> vertex_array;
             std::vector<Vector> tex_array;
             std::vector<Vector> normal_array;
+            std::vector<Vector> tangent_array;
             std::vector<ObjFace> face_array;
-            char texture_buf[kObjMaxLineLength];
-            bool has_texture = false;
 
             char prefix[kObjMaxPrefixLength];
             char buffer[kObjMaxLineLength];
@@ -171,34 +173,46 @@ int32_t ObjModelFile::ExtractModelData(
                     input >> normal.x >> normal.y >> normal.z;
                     normal_array.push_back(normal);
                     effect_param.has_normal = true;
+                } else if (!strcmp(prefix, "vtan")) {
+                    // Tangent
+                    Vector tanget;
+                    input >> tanget.x >> tanget.y >> tanget.z;
+                    tangent_array.push_back(tanget);
+                    effect_param.has_tanget = true;
                 } else if (!strcmp(prefix, "f")) {
                     // Triangle
                     ObjFace face;
                     
                     for (int32_t i = 0; i < kVertexPerTri; i++) {
                         input >> buffer;
-                        ExtractFaceData(buffer, face.vertex_index[i], face.texcoord_index[i], face.normal_index[i]);
+                        ExtractFaceData(buffer, face.vertex_index[i], face.texcoord_index[i], face.normal_index[i], face.tangent_index[i]);
                     }
 
                     face_array.push_back(face);
-                } else if ((texture_name != NULL) && (!strcmp(prefix, "td"))) {
+                } else if (!strcmp(prefix, "td")) {
                     // Diffuse texture
                     input >> buffer;
-                    has_texture = true;
                     effect_param.has_diffuse_tex = true;
 
                     int32_t len = strlen(buffer);
                     memcpy(material_param.diffuse_tex_name, buffer, len);
                     material_param.diffuse_tex_name[len] = '\0';
-                } else if ((texture_name != NULL) && (!strcmp(prefix, "ta"))) {
+                } else if (!strcmp(prefix, "ta")) {
                     // Alpha texture
                     input >> buffer;
-                    has_texture = true;
                     effect_param.has_alpha_tex = true;
 
                     int32_t len = strlen(buffer);
                     memcpy(material_param.alpha_tex_name, buffer, len);
                     material_param.alpha_tex_name[len] = '\0';
+                } else if (!strcmp(prefix, "tn")) {
+                    // Normal texture
+                    input >> buffer;
+                    effect_param.has_normal_tex = true;
+
+                    int32_t len = strlen(buffer);
+                    memcpy(material_param.normal_tex_name, buffer, len);
+                    material_param.normal_tex_name[len] = '\0';
                 } else if (!strcmp(prefix, "al")) {
                     // Accept light
                     int32_t temp = 0;
@@ -300,11 +314,15 @@ int32_t ObjModelFile::ExtractModelData(
                 }
             }
 
-            if (has_texture) {
-                int32_t len = strlen(texture_buf);
-                *texture_name = new char[len + 1];
-                memcpy(*texture_name, texture_buf, len);
-                (*texture_name)[len] = '\0';
+            if (tangent_array.size() > 0 && tangent_buf != NULL) {
+                *tangent_buf = new float[kVertexPerTri * triangle_num * kObjFloatPerTangent];
+                for (int32_t i = 0; i < triangle_num; i++) {
+                    for (int32_t j = 0; j < kVertexPerTri; j++) {
+                        (*tangent_buf)[i * kVertexPerTri * kObjFloatPerTangent + j * kObjFloatPerTangent + 0] = tangent_array[face_array[i].tangent_index[j] - 1].x;
+                        (*tangent_buf)[i * kVertexPerTri * kObjFloatPerTangent + j * kObjFloatPerTangent + 1] = tangent_array[face_array[i].tangent_index[j] - 1].y;
+                        (*tangent_buf)[i * kVertexPerTri * kObjFloatPerTangent + j * kObjFloatPerTangent + 2] = tangent_array[face_array[i].tangent_index[j] - 1].z;
+                    }
+                }
             }
 
             // Save the number of triangles
@@ -320,7 +338,7 @@ int32_t ObjModelFile::ExtractModelData(
     return result;
 }
 
-void ObjModelFile::ExtractFaceData(const char* buffer, int32_t& vertex_index, int32_t& texcoord_index, int32_t& normal_index) {
+void ObjModelFile::ExtractFaceData(const char* buffer, int32_t& vertex_index, int32_t& texcoord_index, int32_t& normal_index, int32_t& tanget_index) {
     if (buffer != NULL) {
         // Extract vertex index
         vertex_index = atoi(buffer);
@@ -352,6 +370,18 @@ void ObjModelFile::ExtractFaceData(const char* buffer, int32_t& vertex_index, in
             const char* normal_index_buf = reinterpret_cast<const char*>(buffer + index + 1);
             normal_index = atoi(normal_index_buf);
         }
+
+        // Has tanget index ?
+        for (index = index + 1; index < buf_len; index++) {
+            if (buffer[index] == '/') {
+                break;
+            }
+        }
+
+        if (index < buf_len - 1) {
+            const char* tanget_index_buf = reinterpret_cast<const char*>(buffer + index + 1);
+            tanget_index = atoi(tanget_index_buf);
+        }
     } else {
         GLB_SAFE_ASSERT(false);
     }
@@ -366,7 +396,7 @@ int32_t ModelFile::ExtractModelData(const char* model_file_name,
                                     float** vertex_buf,
                                     float** texcoord_buf,
                                     float** normal_buf,
-                                    char** texture_name) {
+                                    float** tanget_buf) {
     int32_t result = 0;
 
     if (model_file_name != NULL && vertex_buf != NULL) {
@@ -393,7 +423,7 @@ int32_t ModelFile::ExtractModelData(const char* model_file_name,
                     vertex_buf,
                     texcoord_buf,
                     normal_buf,
-                    texture_name);
+                    tanget_buf);
             } else {
                 GLB_SAFE_ASSERT(false);
             }
@@ -405,7 +435,7 @@ int32_t ModelFile::ExtractModelData(const char* model_file_name,
     return result;
 }
 
-void ModelFile::RelaseBuf(float** vertex_buf, float** texcoord_buf, float** normal_buf, char** texture_name) {
+void ModelFile::RelaseBuf(float** vertex_buf, float** texcoord_buf, float** normal_buf, float** tanget_buf) {
     if (vertex_buf != NULL) {
         float* buf = *vertex_buf;
         if (buf != NULL) {
@@ -433,9 +463,13 @@ void ModelFile::RelaseBuf(float** vertex_buf, float** texcoord_buf, float** norm
         *normal_buf = NULL;
     }
 
-    if (texture_name != NULL) {
-        delete[] *texture_name;
-        *texture_name = NULL;
+    if (tanget_buf != NULL) {
+        float* buf = *tanget_buf;
+        if (buf != NULL) {
+            delete[] buf;
+            buf = NULL;
+        }
+        *tanget_buf = NULL;
     }
 }
 };  // namespace glb

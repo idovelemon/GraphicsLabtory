@@ -67,12 +67,13 @@ Model* Model::Create(const char* file_name) {
         mesh::TriangleMesh* mesh = NULL;
         int32_t diffuse_tex = -1;
         int32_t alpha_tex = -1;
+        int32_t normal_tex = -1;
         int32_t material = -1;
 
         float* vertex_buf = NULL;
         float* tex_buf = NULL;
         float* normal_buf = NULL;
-        char* texture_name = NULL;
+        float* tangent_buf = NULL;
         ModelEffectParam effect_param;
         ModelMaterialParam material_param;
         int32_t num_triangles = ModelFile::ExtractModelData(
@@ -82,10 +83,10 @@ Model* Model::Create(const char* file_name) {
             &vertex_buf,
             &tex_buf,
             &normal_buf,
-            &texture_name
+            &tangent_buf
             );
         if (num_triangles > 0) {
-            mesh = mesh::TriangleMesh::Create(num_triangles, vertex_buf, tex_buf, normal_buf);
+            mesh = mesh::TriangleMesh::Create(num_triangles, vertex_buf, tex_buf, normal_buf, tangent_buf);
             mesh::Mgr::AddMesh(mesh);
 
             if (effect_param.has_diffuse_tex) {
@@ -96,7 +97,11 @@ Model* Model::Create(const char* file_name) {
                 alpha_tex = texture::Mgr::LoadTexture(material_param.alpha_tex_name);
             }
 
-            ModelFile::RelaseBuf(&vertex_buf, &tex_buf, &normal_buf, &texture_name);
+            if (effect_param.has_normal_tex) {
+                normal_tex = texture::Mgr::LoadTexture(material_param.normal_tex_name);
+            }
+
+            ModelFile::RelaseBuf(&vertex_buf, &tex_buf, &normal_buf, &tangent_buf);
         } else {
             GLB_SAFE_ASSERT(false);
         }
@@ -115,10 +120,13 @@ Model* Model::Create(const char* file_name) {
         model->m_Name = std::string(file_name);
         model->m_Mesh = mesh->GetId();
         if (effect_param.has_diffuse_tex) {
-            model->m_Tex[render::TS_DIFFUSE] = diffuse_tex;
+            model->m_Tex[MT_DIFFUSE] = diffuse_tex;
         }
         if (effect_param.has_alpha_tex) {
-            model->m_Tex[render::TS_ALPHA] = alpha_tex;
+            model->m_Tex[MT_ALPHA] = alpha_tex;
+        }
+        if (effect_param.has_normal_tex) {
+            model->m_Tex[MT_NORMAL] = normal_tex;
         }
         model->m_Material = material;
         model->m_ModefEffectParam = effect_param;
@@ -168,8 +176,16 @@ bool Model::HasAlphaTexture() {
     return m_ModefEffectParam.has_alpha_tex;
 }
 
+bool Model::HasNormalTexture() {
+    return m_ModefEffectParam.has_normal_tex;
+}
+
 bool Model::HasNormal() {
     return m_ModefEffectParam.has_normal;
+}
+
+bool Model::HasTangent() {
+    return m_ModefEffectParam.has_tanget;
 }
 
 bool Model::IsAcceptLight() {

@@ -22,22 +22,26 @@ namespace shader {
 enum {
     GLB_COLOR_IN_VERTEX = 0,
     GLB_NORMAL_IN_VERTEX,
+    GLB_TANGENT_IN_VERTEX,
     GLB_TEXCOORD_IN_VERTEX,
     GLB_ENABLE_LIGHTING,
     GLB_ENABLE_SHADOW,
     GLB_USE_PARALLEL_LIGHT,
     GLB_ENABLE_ALPHA_TEX,
+    GLB_ENABLE_NORMAL_TEX,
     GLB_ENABLE_AO,
 };
 
 static const char* kEnableMacros[] = {
     "#define GLB_COLOR_IN_VERTEX\n",
     "#define GLB_NORMAL_IN_VERTEX\n",
+    "#define GLB_TANGENT_IN_VERTEX\n",
     "#define GLB_TEXCOORD_IN_VERTEX\n",
     "#define GLB_ENABLE_LIGHTING\n",
     "#define GLB_ENABLE_SHADOW\n",
     "#define GLB_USE_PARALLEL_LIGHT\n",
     "#define GLB_ENABLE_ALPHA_TEX\n",
+    "#define GLB_ENABLE_NORMAL_TEX\n",
     "#define GLB_ENABLE_AO\n",
 };
 
