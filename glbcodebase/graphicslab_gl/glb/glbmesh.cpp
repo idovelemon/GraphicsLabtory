@@ -95,7 +95,7 @@ TriangleMesh::~TriangleMesh() {
     }
 }
 
-TriangleMesh* TriangleMesh::Create(int32_t triangle_num, float* vertices, float* tex_coords, float* normals, float* tangets) {
+TriangleMesh* TriangleMesh::Create(int32_t triangle_num, float* vertices, float* tex_coords, float* normals, float* tangets, float* binormals) {
     TriangleMesh* triangle_mesh = NULL;
 
     if (triangle_num > 0 && vertices != NULL) {
@@ -136,7 +136,16 @@ TriangleMesh* TriangleMesh::Create(int32_t triangle_num, float* vertices, float*
             layout.count++;
         }
 
-        int32_t buf_size = vertices_buf_size + tex_coords_buf_size + normal_buf_size + tanget_buf_size;
+        int32_t binormal_buf_size = 0;
+        if (binormals) {
+            binormal_buf_size = 3 * triangle_num * 3 * sizeof(float);
+            layout.layouts[layout.count].attriType = VA_BINORMAL;
+            layout.layouts[layout.count].size = binormal_buf_size;
+            layout.layouts[layout.count].offset = vertices_buf_size + tex_coords_buf_size + normal_buf_size + tanget_buf_size;
+            layout.count++;
+        }
+
+        int32_t buf_size = vertices_buf_size + tex_coords_buf_size + normal_buf_size + tanget_buf_size + binormal_buf_size;
 
         // Create vertex array object
         uint32_t vao = 0;
@@ -166,6 +175,12 @@ TriangleMesh* TriangleMesh::Create(int32_t triangle_num, float* vertices, float*
         if (tangets) {
             glBufferSubData(GL_ARRAY_BUFFER, vertices_buf_size + tex_coords_buf_size + normal_buf_size
                 , tanget_buf_size, tangets);
+        }
+
+        // Update binormal data
+        if (binormals) {
+            glBufferSubData(GL_ARRAY_BUFFER, vertices_buf_size + tex_coords_buf_size + normal_buf_size + tanget_buf_size
+                , binormal_buf_size, binormals);
         }
 
         // Create TriangleMesh and save value

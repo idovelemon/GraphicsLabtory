@@ -26,3 +26,5 @@ glbcodebase/graphicslab_gl/glb_shadowmap/glb_shadowmap_D.exe
 glbcodebase/graphicslab_gl/ipch/glb_normalmap-7ec57586/glb_normalmap-29c91807.ipch
 glbcodebase/graphicslab_gl/glb_tbn_gen/glb_tbn_gen_D.exe
 glbcodebase/graphicslab_gl/glb_tbn_gen/glb_tbn_gen_R.exe
+*.ipch
+*.unsuccessfulbuild

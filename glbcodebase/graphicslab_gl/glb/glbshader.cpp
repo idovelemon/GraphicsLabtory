@@ -607,6 +607,10 @@ VertexAttribute Program::GetVertexAttribute(const char* attribute_name) {
             result = VA_TEXCOORD;
         } else if (!strcmp("glb_Normal", attribute_name)) {
             result = VA_NORMAL;
+        } else if (!strcmp("glb_Tangent", attribute_name)) {
+            result = VA_TANGENT;
+        } else if (!strcmp("glb_Binormal", attribute_name)) {
+            result = VA_BINORMAL;
         } else {
             GLB_SAFE_ASSERT(false);
         }

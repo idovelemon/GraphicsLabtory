@@ -74,6 +74,7 @@ Model* Model::Create(const char* file_name) {
         float* tex_buf = NULL;
         float* normal_buf = NULL;
         float* tangent_buf = NULL;
+        float* binormal_buf = NULL;
         ModelEffectParam effect_param;
         ModelMaterialParam material_param;
         int32_t num_triangles = ModelFile::ExtractModelData(
@@ -83,10 +84,11 @@ Model* Model::Create(const char* file_name) {
             &vertex_buf,
             &tex_buf,
             &normal_buf,
-            &tangent_buf
+            &tangent_buf,
+            &binormal_buf
             );
         if (num_triangles > 0) {
-            mesh = mesh::TriangleMesh::Create(num_triangles, vertex_buf, tex_buf, normal_buf, tangent_buf);
+            mesh = mesh::TriangleMesh::Create(num_triangles, vertex_buf, tex_buf, normal_buf, tangent_buf, binormal_buf);
             mesh::Mgr::AddMesh(mesh);
 
             if (effect_param.has_diffuse_tex) {
@@ -101,7 +103,7 @@ Model* Model::Create(const char* file_name) {
                 normal_tex = texture::Mgr::LoadTexture(material_param.normal_tex_name);
             }
 
-            ModelFile::RelaseBuf(&vertex_buf, &tex_buf, &normal_buf, &tangent_buf);
+            ModelFile::RelaseBuf(&vertex_buf, &tex_buf, &normal_buf, &tangent_buf, &binormal_buf);
         } else {
             GLB_SAFE_ASSERT(false);
         }
@@ -186,6 +188,10 @@ bool Model::HasNormal() {
 
 bool Model::HasTangent() {
     return m_ModefEffectParam.has_tanget;
+}
+
+bool Model::HasBinormal() {
+    return m_ModefEffectParam.has_binormal;
 }
 
 bool Model::IsAcceptLight() {

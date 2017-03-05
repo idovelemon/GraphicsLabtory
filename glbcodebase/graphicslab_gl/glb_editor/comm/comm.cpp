@@ -10,6 +10,8 @@
 #include <assert.h>
 #include <WinSock2.h>
 
+#include "../log/glblog.h"
+
 #pragma comment(lib, "ws2_32.lib")
 
 namespace comm {
@@ -156,6 +158,7 @@ void CommImp::AcceptConnection(int16_t port) {
             listen(m_ListenSocket, 5);
             m_RecvSocket = accept(m_ListenSocket, reinterpret_cast<sockaddr*>(&addr), &addr_len);
             assert(m_RecvSocket != INVALID_SOCKET);
+            glb::log::LogPrint("View has connected editor");
         } else {
             assert(false);
         }

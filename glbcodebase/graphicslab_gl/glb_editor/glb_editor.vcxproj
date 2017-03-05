@@ -106,6 +106,7 @@
     <ClInclude Include="glbcomm\glbcomm.h" />
     <ClInclude Include="glb_editor.h" />
     <ClInclude Include="glb_editorDlg.h" />
+    <ClInclude Include="log\glblog.h" />
     <ClInclude Include="MaterialEditor.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
@@ -118,6 +119,7 @@
     <ClCompile Include="glbcomm\glbcomm.cpp" />
     <ClCompile Include="glb_editor.cpp" />
     <ClCompile Include="glb_editorDlg.cpp" />
+    <ClCompile Include="log\glblog.cpp" />
     <ClCompile Include="MaterialEditor.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

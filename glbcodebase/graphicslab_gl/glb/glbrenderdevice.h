@@ -42,6 +42,7 @@ enum ClearFlag {
 enum TextureSlot {
     TS_DIFFUSE = 0,
     TS_ALPHA,
+    TS_NORMAL,
     TS_SHADOW,
     TS_HDRSCENE,
     TS_LOG_LUM,

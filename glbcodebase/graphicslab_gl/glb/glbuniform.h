@@ -28,6 +28,7 @@ enum {
     GLB_TRANS_INV_WORLDM,
     GLB_DIFFUSETEX,
     GLB_ALPHATEX,
+    GLB_NORMALTEX,
     GLB_SHADOWTEX,
     GLB_MATERIAL_AMBIENT,
     GLB_MATERIAL_DIFFUSE,
@@ -68,6 +69,7 @@ static const struct {
     {"glb_Trans_Inv_WorldM",                GLB_TRANS_INV_WORLDM,               0},
     {"glb_DiffuseTex",                      GLB_DIFFUSETEX,                     0},
     {"glb_AlphaTex",                        GLB_ALPHATEX,                       0},
+    {"glb_NormalTex",                       GLB_NORMALTEX,                      0},
     {"glb_ShadowTex",                       GLB_SHADOWTEX,                      0},
     {"glb_Material_Ambient",                GLB_MATERIAL_AMBIENT,               0},
     {"glb_Material_Diffuse",                GLB_MATERIAL_DIFFUSE,               0},
@@ -149,6 +151,7 @@ Wrapper uniform_shadowm_picker(Object*);                   // Pick glb_ShadowM
 Wrapper uniform_trans_inv_worldm_picker(Object*);          // Pick glb_Trans_Inv_WorldM
 Wrapper uniform_diffuse_texslot_picker(Object*);           // Pick glb_DiffuseTex
 Wrapper uniform_alpha_texslot_picker(Object*);             // Pick glb_AlphaTex
+Wrapper uniform_normal_texslot_picker(Object*);            // Pick glb_NormalTex
 Wrapper uniform_shadow_texslot_picker(Object*);            // Pick glb_ShadowTex
 Wrapper uniform_material_ambient_picker(Object*);          // Pick glb_Material_Ambient
 Wrapper uniform_material_diffuse_picker(Object*);          // Pick glb_Material_Diffuse
@@ -187,6 +190,7 @@ static const struct {
     {uniform_trans_inv_worldm_picker,           GLB_TRANS_INV_WORLDM},
     {uniform_diffuse_texslot_picker,            GLB_DIFFUSETEX},
     {uniform_alpha_texslot_picker,              GLB_ALPHATEX},
+    {uniform_normal_texslot_picker,             GLB_NORMALTEX},
     {uniform_shadow_texslot_picker,             GLB_SHADOWTEX},
     {uniform_material_ambient_picker,           GLB_MATERIAL_AMBIENT},
     {uniform_material_diffuse_picker,           GLB_MATERIAL_DIFFUSE},

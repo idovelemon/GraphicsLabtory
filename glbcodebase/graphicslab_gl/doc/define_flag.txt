@@ -2,6 +2,7 @@
 GLB_COLOR_IN_VERTEX					       顶点数据中包含Color信息
 GLB_NORMAL_IN_VERTEX                                           顶点数据中包含Normal信息
 GLB_TANGENT_IN_VERTEX					       顶点数据中包含Tangent信息
+GLB_BINORMAL_IN_VERTEX					       顶点数据中包含Binormal信息
 GLB_TEXCOORD_IN_VERTEX                                         顶点数据中包含纹理坐标信息  
 GLB_ENABLE_LIGHTING                                            该Shader支持光照运算（目前只支持Phong光照）
 GLB_ENABLE_SHADOW					       该Shader支持阴影计算

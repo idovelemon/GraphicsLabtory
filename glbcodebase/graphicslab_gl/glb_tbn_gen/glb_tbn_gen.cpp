@@ -22,8 +22,8 @@ static const int32_t kMaxCharLen = 256;
 // CLASS DECLARATION
 //---------------------------------------------------------------------------------
 struct TangentSpace {
-    glb::Vector tangent;
-    glb::Vector binormal;
+    glb::Vector tangent[3];
+    glb::Vector binormal[3];
 };
 
 //-----------------------------------------------------------------------------------
@@ -43,19 +43,22 @@ bool glb_check_args(int argc, char* argv[], char* file_path);
 // @param: face_num The number of faces
 // @param: vertex_buf The buffer hold the face's vertex data
 // @param: texcoord_buf The buffer hold the face's texcoord data
+// @param: normal_buf The buffer hold the face's normal data
 // @out: tangents The list hold all the vertex's tangents space coordinate
 // @ret: If faild return false, otherwise return true.
 //------------------------------------------------------------------
-bool glb_calc_tangent_binormal_coordinates(int32_t face_num, float* vertex_buf, float* texcoord_buf, std::vector<TangentSpace> &tangents);
+bool glb_calc_tangent_binormal_coordinates(int32_t face_num, float* vertex_buf, float* texcoord_buf, float* normal_buf, std::vector<TangentSpace> &tangents);
 
 //------------------------------------------------------------------
 // @brief: Calculate tangent and binormal coordinate of a face
 // @param: v0-v2 The vertex of face
 // @param: t0-t2 The texture coordinate of face
+// @param: n0-n2 The normal of face
 // @out: space The tangent space coordinate
 //------------------------------------------------------------------
 void glb_calc_tangent_binormal(glb::Vector v0, glb::Vector v1, glb::Vector v2
                                , glb::Vector t0, glb::Vector t1, glb::Vector t2
+                               , glb::Vector n0, glb::Vector n1, glb::Vector n2
                                , TangentSpace& space);
 
 //------------------------------------------------------------------
@@ -91,7 +94,7 @@ int main(int argc,char* argv[]) {
     int32_t face_num = glb::ModelFile::ExtractModelData(obj_file_path, effect_param, material_param
         , &vertex_buf, &texcoord_buf, &normal_buf, &tangent_buf);
 
-    if (vertex_buf == NULL || texcoord_buf == NULL) {
+    if (vertex_buf == NULL || texcoord_buf == NULL || normal_buf == NULL) {
         glb::ModelFile::RelaseBuf(&vertex_buf, &texcoord_buf, &normal_buf, &tangent_buf);
         std::cout << "There is no texture coordinate, so there is no need for tangent-binormal coordinates!" << std::endl;
 
@@ -113,7 +116,7 @@ int main(int argc,char* argv[]) {
 
     // Calculate tangent and binormal coordinates
     std::vector<TangentSpace> tangents;
-    bool is_tangent_space_generated = glb_calc_tangent_binormal_coordinates(face_num, vertex_buf, texcoord_buf, tangents);
+    bool is_tangent_space_generated = glb_calc_tangent_binormal_coordinates(face_num, vertex_buf, texcoord_buf, normal_buf, tangents);
     glb::ModelFile::RelaseBuf(&vertex_buf, &texcoord_buf);
     if (!is_tangent_space_generated) {
         std::cout << "Generate tangent space coordinate error!" << std::endl;
@@ -176,14 +179,14 @@ bool glb_check_args(int argc, char* argv[], char* file_path) {
     return result;
 }
 
-bool glb_calc_tangent_binormal_coordinates(int32_t face_num, float* vertex_buf, float* texcoord_buf, std::vector<TangentSpace> &tangents) {
+bool glb_calc_tangent_binormal_coordinates(int32_t face_num, float* vertex_buf, float* texcoord_buf, float* normal_buf, std::vector<TangentSpace> &tangents) {
     bool result = true;
     if (vertex_buf == NULL || texcoord_buf == NULL) {
         result = false;
         return result;
     }
 
-    glb::Vector v0, v1, v2, t0, t1, t2;
+    glb::Vector v0, v1, v2, t0, t1, t2, n0, n1, n2;
     for (int32_t i = 0; i < face_num; i++) {
          v0.x = vertex_buf[i * 3 * 3 + 0 * 3 + 0];
          v0.y = vertex_buf[i * 3 * 3 + 0 * 3 + 1];
@@ -200,8 +203,17 @@ bool glb_calc_tangent_binormal_coordinates(int32_t face_num, float* vertex_buf, 
          t1.y = texcoord_buf[i * 3 * 2 + 1 * 2 + 1];
          t2.x = texcoord_buf[i * 3 * 2 + 2 * 2 + 0];
          t2.y = texcoord_buf[i * 3 * 2 + 2 * 2 + 1];
+         n0.x = normal_buf[i * 3 * 3 + 0 * 3 + 0];
+         n0.y = normal_buf[i * 3 * 3 + 0 * 3 + 1];
+         n0.z = normal_buf[i * 3 * 3 + 0 * 3 + 2];
+         n1.x = normal_buf[i * 3 * 3 + 1 * 3 + 0];
+         n1.y = normal_buf[i * 3 * 3 + 1 * 3 + 1];
+         n1.z = normal_buf[i * 3 * 3 + 1 * 3 + 2];
+         n2.x = normal_buf[i * 3 * 3 + 2 * 3 + 0];
+         n2.y = normal_buf[i * 3 * 3 + 2 * 3 + 1];
+         n2.z = normal_buf[i * 3 * 3 + 2 * 3 + 2];
          TangentSpace space;
-         glb_calc_tangent_binormal(v0, v1, v2, t0, t1, t2, space);
+         glb_calc_tangent_binormal(v0, v1, v2, t0, t1, t2, n0, n1, n2, space);
          tangents.push_back(space);
     }
 
@@ -210,16 +222,25 @@ bool glb_calc_tangent_binormal_coordinates(int32_t face_num, float* vertex_buf, 
 
 void glb_calc_tangent_binormal(glb::Vector v0, glb::Vector v1, glb::Vector v2
                                , glb::Vector t0, glb::Vector t1, glb::Vector t2
+                               , glb::Vector n0, glb::Vector n1, glb::Vector n2
                                , TangentSpace& space) {
     glb::Vector vedge0 = v1 - v0;
     glb::Vector vedge1 = v2 - v0;
     glb::Vector tedge0 = t1 - t0;
     glb::Vector tedge1 = t2 - t0;
     float temp = 1.0f / (tedge0.x * tedge1.y - tedge0.y * tedge1.x);
-    space.tangent = (vedge0 * tedge1.y - vedge1 * tedge0.y) * temp;
-    space.binormal = (vedge1 * tedge0.x - vedge0 * tedge1.x) * temp;
-    space.tangent.Normalize();
-    space.binormal.Normalize();
+    glb::Vector tangent = (vedge0 * tedge1.y - vedge1 * tedge0.y) * temp;
+    glb::Vector binormal = (vedge1 * tedge0.x - vedge0 * tedge1.x) * temp;
+    tangent.Normalize();
+    binormal.Normalize();
+
+    // Gram-Schmidt orthogonalize
+    space.tangent[0] = tangent - n0 * glb::Dot(n0, tangent);
+    space.binormal[0] = binormal - n0 * glb::Dot(n0, binormal);
+    space.tangent[1] = tangent - n1 * glb::Dot(n1, tangent);
+    space.binormal[1] = binormal - n1 * glb::Dot(n1, binormal);
+    space.tangent[2] = tangent - n2 * glb::Dot(n2, tangent);
+    space.binormal[2] = binormal - n2 * glb::Dot(n2, binormal);
 }
 
 bool glb_write_tangent_space(char* obj_file_path, std::vector<TangentSpace> tangents) {
@@ -254,47 +275,51 @@ bool glb_write_tangent_space(char* obj_file_path, std::vector<TangentSpace> tang
     // Build vtan string data
     std::string vtan_str;
     for (int32_t i = 0; i < tangents.size(); i++) {
-        std::string vtan;
-        vtan += "vtan ";
+        for (int32_t j = 0; j < 3; j++) {
+            std::string vtan;
+            vtan += "vtan ";
 
-        memset(temp, 0, sizeof(temp));
-        sprintf(temp, "%f ", tangents[i].tangent.x);
-        vtan += temp;
+            memset(temp, 0, sizeof(temp));
+            sprintf(temp, "%f ", tangents[i].tangent[j].x);
+            vtan += temp;
 
-        memset(temp, 0, sizeof(temp));
-        sprintf(temp, "%f ", tangents[i].tangent.y);
-        vtan += temp;
+            memset(temp, 0, sizeof(temp));
+            sprintf(temp, "%f ", tangents[i].tangent[j].y);
+            vtan += temp;
 
-        memset(temp, 0, sizeof(temp));
-        sprintf(temp, "%f\n", tangents[i].tangent.z);
-        vtan += temp;
-        vtan_str += vtan;
+            memset(temp, 0, sizeof(temp));
+            sprintf(temp, "%f\n", tangents[i].tangent[j].z);
+            vtan += temp;
+            vtan_str += vtan;
+        }
     }
     memset(temp, 0, sizeof(temp));
-    sprintf(temp, "# %d tangents (Gen by glb_tbn_gen)\n\n", tangents.size());
+    sprintf(temp, "# %d tangents (Gen by glb_tbn_gen)\n\n", tangents.size() * 3);
     vtan_str += temp;
 
     // Build vbi string data
     std::string vbi_str;
     for (int32_t i = 0; i < tangents.size(); i++) {
-        std::string vbi;
-        vbi += "vbi ";
+        for (int32_t j = 0; j < 3; j++) {
+            std::string vbi;
+            vbi += "vbi ";
 
-        memset(temp, 0, sizeof(temp));
-        sprintf(temp, "%f ", tangents[i].binormal.x);
-        vbi += temp;
+            memset(temp, 0, sizeof(temp));
+            sprintf(temp, "%f ", tangents[i].binormal[j].x);
+            vbi += temp;
 
-        memset(temp, 0, sizeof(temp));
-        sprintf(temp, "%f ", tangents[i].binormal.y);
-        vbi += temp;
+            memset(temp, 0, sizeof(temp));
+            sprintf(temp, "%f ", tangents[i].binormal[j].y);
+            vbi += temp;
 
-        memset(temp, 0, sizeof(temp));
-        sprintf(temp, "%f\n", tangents[i].binormal.z);
-        vbi += temp;
-        vbi_str += vbi;
+            memset(temp, 0, sizeof(temp));
+            sprintf(temp, "%f\n", tangents[i].binormal[j].z);
+            vbi += temp;
+            vbi_str += vbi;
+        }
     }
     memset(temp, 0, sizeof(temp));
-    sprintf(temp, "# %d binormals (Gen by glb_tbn_gen)\n\n", tangents.size());
+    sprintf(temp, "# %d binormals (Gen by glb_tbn_gen)\n\n", tangents.size() * 3);
     vbi_str += temp;
 
     // Build tangent space data
@@ -346,7 +371,7 @@ bool glb_write_tangent_space(char* obj_file_path, std::vector<TangentSpace> tang
         while (true) {
             if (data[face_pos] == ' ') {
                 memset(temp, 0, sizeof(temp));
-                sprintf(temp, "%d", i + 1);
+                sprintf(temp, "%d", i * 3 + 1);
                 int32_t len = strlen(temp);
                 data.insert(face_pos, 1, '/');
                 data.insert(face_pos + 1, temp);
@@ -363,7 +388,7 @@ bool glb_write_tangent_space(char* obj_file_path, std::vector<TangentSpace> tang
         while (true) {
             if (data[face_pos] == ' ') {
                 memset(temp, 0, sizeof(temp));
-                sprintf(temp, "%d", i + 1);
+                sprintf(temp, "%d", i * 3 + 2);
                 int32_t len = strlen(temp);
                 data.insert(face_pos, 1, '/');
                 data.insert(face_pos + 1, temp);
@@ -380,7 +405,7 @@ bool glb_write_tangent_space(char* obj_file_path, std::vector<TangentSpace> tang
         while (true) {
             if (data[face_pos] == ' ') {
                 memset(temp, 0, sizeof(temp));
-                sprintf(temp, "%d", i + 1);
+                sprintf(temp, "%d", i * 3 + 3);
                 int32_t len = strlen(temp);
                 data.insert(face_pos, 1, '/');
                 data.insert(face_pos + 1, temp);

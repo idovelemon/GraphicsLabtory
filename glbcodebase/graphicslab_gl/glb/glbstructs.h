@@ -27,6 +27,7 @@ enum VertexAttribute {
     VA_TEXCOORD,
     VA_NORMAL,
     VA_TANGENT,
+    VA_BINORMAL,
     VA_COLOR,
 };
 

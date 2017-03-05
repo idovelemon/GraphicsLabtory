@@ -19,6 +19,9 @@
     <Filter Include="头文件\glbcomm">
       <UniqueIdentifier>{db398539-90d9-450d-a8e4-e0eeac590c64}</UniqueIdentifier>
     </Filter>
+    <Filter Include="头文件\log">
+      <UniqueIdentifier>{0f9c1200-9080-4e92-b56d-b69170c27132}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -48,6 +51,9 @@
     <ClInclude Include="glbcomm\glbcomm.h">
       <Filter>头文件\glbcomm</Filter>
     </ClInclude>
+    <ClInclude Include="log\glblog.h">
+      <Filter>头文件\log</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="glb_editor.cpp">
@@ -67,6 +73,9 @@
     </ClCompile>
     <ClCompile Include="glbcomm\glbcomm.cpp">
       <Filter>头文件\glbcomm</Filter>
+    </ClCompile>
+    <ClCompile Include="log\glblog.cpp">
+      <Filter>头文件\log</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

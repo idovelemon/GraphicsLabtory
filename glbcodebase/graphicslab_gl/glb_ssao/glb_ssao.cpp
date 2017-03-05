@@ -114,8 +114,8 @@ void glb_setup() {
     // Light
     light::Light light(light::PARALLEL_LIGHT);
     light.ambient = glb::Vector(0.5f, 0.5f, 0.5f);
-    light.diffuse = glb::Vector(1.0f, 1.0f, 1.0f);
-    light.specular = glb::Vector(2.0f, 2.0f, 2.0f);
+    light.diffuse = glb::Vector(0.0f, 0.0f, 0.0f);
+    light.specular = glb::Vector(0.0f, 0.0f, 0.0f);
     light.dir = glb::Vector(-1.0f, -1.0f, 1.0f);
     light.dir.Normalize();
     light.pow = 128.0f;

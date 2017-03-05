@@ -7,6 +7,7 @@
 #include "glb_editorDlg.h"
 #include "comm/comm.h"
 #include "glbcomm/glbcomm.h"
+#include "log/glblog.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -41,6 +42,8 @@ CGlbEditorApp theApp;
 
 BOOL CGlbEditorApp::InitInstance()
 {
+    glb::log::Initialize();
+
     char cur_dir[128];
     int32_t real_len = GetCurrentDirectory(sizeof(cur_dir), cur_dir);
     memcpy(cur_dir + real_len, "\\editor.ini", sizeof("\\editor.ini"));
@@ -123,6 +126,9 @@ BOOL CGlbEditorApp::InitInstance()
 
     // Terminate the comm library
     comm::Comm::Terminate();
+
+    // Terminate the log
+    glb::log::Destroy();
 
 	// Since the dialog has been closed, return FALSE so that we exit the
 	//  application, rather than start the application's message pump.

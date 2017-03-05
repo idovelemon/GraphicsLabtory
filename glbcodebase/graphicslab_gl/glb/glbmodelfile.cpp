@@ -23,6 +23,7 @@ const int32_t kObjFloatPerVertex = 3;
 const int32_t kObjFloatPerTexcoord = 2;
 const int32_t kObjFloatPerNormal = 3;
 const int32_t kObjFloatPerTangent = 3;
+const int32_t kObjFloatPerBinormal = 3;
 const int32_t kObjMaxPrefixLength = 8;
 const int32_t kObjMaxLineLength = 256;
 
@@ -49,7 +50,8 @@ public:
         float** vertex_buf,
         float** texcoord_buf = NULL,
         float** normal_buf = NULL,
-        float** tangent_buf = NULL
+        float** tangent_buf = NULL,
+        float** binormal_buf = NULL
         ) = 0;
 };
 
@@ -69,11 +71,12 @@ class ObjModelFile:public ModelFileBase {
         float** vertex_buf,
         float** texcoord_buf = NULL,
         float** normal_buf = NULL,
-        float** tangent_buf = NULL
+        float** tangent_buf = NULL,
+        float** binormal_buf = NULL
         );
 
  protected:
-     void ExtractFaceData(const char* buffer, int32_t& vertex_index, int32_t& texcoord_index, int32_t& normal_index, int32_t& tangent_index);
+     void ExtractFaceData(const char* buffer, int32_t& vertex_index, int32_t& texcoord_index, int32_t& normal_index, int32_t& tangent_index, int32_t& binormal_index);
 };
 
 //----------------------------------------------------------------------------------------
@@ -89,12 +92,14 @@ public:
     int32_t texcoord_index[3];
     int32_t normal_index[3];
     int32_t tangent_index[3];
+    int32_t binormal_index[3];
 
     ObjFace() {
         memset(vertex_index, 0, sizeof(vertex_index));
         memset(texcoord_index, 0, sizeof(texcoord_index));
         memset(normal_index, 0, sizeof(normal_index));
         memset(tangent_index, 0, sizeof(tangent_index));
+        memset(binormal_index, 0, sizeof(binormal_index));
     }
 };
 
@@ -110,7 +115,8 @@ int32_t ObjModelFile::ExtractModelData(
         float** vertex_buf,
         float** texcoord_buf,
         float** normal_buf,
-        float** tangent_buf
+        float** tangent_buf,
+        float** binormal_buf
         ) {
     int32_t result = 0;
 
@@ -123,6 +129,7 @@ int32_t ObjModelFile::ExtractModelData(
             std::vector<Vector> tex_array;
             std::vector<Vector> normal_array;
             std::vector<Vector> tangent_array;
+            std::vector<Vector> binormal_array;
             std::vector<ObjFace> face_array;
 
             char prefix[kObjMaxPrefixLength];
@@ -179,13 +186,19 @@ int32_t ObjModelFile::ExtractModelData(
                     input >> tanget.x >> tanget.y >> tanget.z;
                     tangent_array.push_back(tanget);
                     effect_param.has_tanget = true;
+                } else if (!strcmp(prefix, "vbi")) {
+                    // Binormal
+                    Vector binormal;
+                    input >> binormal.x >> binormal.y >> binormal.z;
+                    binormal_array.push_back(binormal);
+                    effect_param.has_binormal = true;
                 } else if (!strcmp(prefix, "f")) {
                     // Triangle
                     ObjFace face;
                     
                     for (int32_t i = 0; i < kVertexPerTri; i++) {
                         input >> buffer;
-                        ExtractFaceData(buffer, face.vertex_index[i], face.texcoord_index[i], face.normal_index[i], face.tangent_index[i]);
+                        ExtractFaceData(buffer, face.vertex_index[i], face.texcoord_index[i], face.normal_index[i], face.tangent_index[i], face.binormal_index[i]);
                     }
 
                     face_array.push_back(face);
@@ -325,6 +338,17 @@ int32_t ObjModelFile::ExtractModelData(
                 }
             }
 
+            if (binormal_array.size() > 0 && binormal_buf != NULL) {
+                *binormal_buf = new float[kVertexPerTri * triangle_num * kObjFloatPerBinormal];
+                for (int32_t i = 0; i < triangle_num; i++) {
+                    for (int32_t j = 0; j < kVertexPerTri; j++) {
+                        (*binormal_buf)[i * kVertexPerTri * kObjFloatPerBinormal + j * kObjFloatPerBinormal + 0] = binormal_array[face_array[i].binormal_index[j] - 1].x;
+                        (*binormal_buf)[i * kVertexPerTri * kObjFloatPerBinormal + j * kObjFloatPerBinormal + 1] = binormal_array[face_array[i].binormal_index[j] - 1].y;
+                        (*binormal_buf)[i * kVertexPerTri * kObjFloatPerBinormal + j * kObjFloatPerBinormal + 2] = binormal_array[face_array[i].binormal_index[j] - 1].z;
+                    }
+                }
+            }
+
             // Save the number of triangles
             result = face_array.size();
         } else {
@@ -338,7 +362,7 @@ int32_t ObjModelFile::ExtractModelData(
     return result;
 }
 
-void ObjModelFile::ExtractFaceData(const char* buffer, int32_t& vertex_index, int32_t& texcoord_index, int32_t& normal_index, int32_t& tanget_index) {
+void ObjModelFile::ExtractFaceData(const char* buffer, int32_t& vertex_index, int32_t& texcoord_index, int32_t& normal_index, int32_t& tanget_index, int32_t& binormal_index) {
     if (buffer != NULL) {
         // Extract vertex index
         vertex_index = atoi(buffer);
@@ -382,6 +406,18 @@ void ObjModelFile::ExtractFaceData(const char* buffer, int32_t& vertex_index, in
             const char* tanget_index_buf = reinterpret_cast<const char*>(buffer + index + 1);
             tanget_index = atoi(tanget_index_buf);
         }
+
+        // Has binormal index ?
+        for (index = index + 1; index < buf_len; index++) {
+            if (buffer[index] == '/') {
+                break;
+            }
+        }
+
+        if (index < buf_len - 1) {
+            const char* binormal_index_buf = reinterpret_cast<const char*>(buffer + index + 1);
+            binormal_index = atoi(binormal_index_buf);
+        }
     } else {
         GLB_SAFE_ASSERT(false);
     }
@@ -396,7 +432,8 @@ int32_t ModelFile::ExtractModelData(const char* model_file_name,
                                     float** vertex_buf,
                                     float** texcoord_buf,
                                     float** normal_buf,
-                                    float** tanget_buf) {
+                                    float** tanget_buf,
+                                    float** binormal_buf) {
     int32_t result = 0;
 
     if (model_file_name != NULL && vertex_buf != NULL) {
@@ -423,7 +460,8 @@ int32_t ModelFile::ExtractModelData(const char* model_file_name,
                     vertex_buf,
                     texcoord_buf,
                     normal_buf,
-                    tanget_buf);
+                    tanget_buf,
+                    binormal_buf);
             } else {
                 GLB_SAFE_ASSERT(false);
             }
@@ -435,7 +473,7 @@ int32_t ModelFile::ExtractModelData(const char* model_file_name,
     return result;
 }
 
-void ModelFile::RelaseBuf(float** vertex_buf, float** texcoord_buf, float** normal_buf, float** tanget_buf) {
+void ModelFile::RelaseBuf(float** vertex_buf, float** texcoord_buf, float** normal_buf, float** tanget_buf, float** binormal_buf) {
     if (vertex_buf != NULL) {
         float* buf = *vertex_buf;
         if (buf != NULL) {
@@ -470,6 +508,15 @@ void ModelFile::RelaseBuf(float** vertex_buf, float** texcoord_buf, float** norm
             buf = NULL;
         }
         *tanget_buf = NULL;
+    }
+
+    if (binormal_buf != NULL) {
+        float* buf = *binormal_buf;
+        if (buf != NULL) {
+            delete[] buf;
+            buf = NULL;
+        }
+        *binormal_buf = NULL;
     }
 }
 };  // namespace glb

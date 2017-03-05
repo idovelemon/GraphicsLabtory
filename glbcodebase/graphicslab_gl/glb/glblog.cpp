@@ -53,6 +53,7 @@ void LogPrint(const char* fmt, ...) {
 
     if (s_LogFile) {
         fwrite(log, sizeof(char), strlen(log), s_LogFile);
+        fflush(s_LogFile);
     }
 
     OutputDebugStringA(log);

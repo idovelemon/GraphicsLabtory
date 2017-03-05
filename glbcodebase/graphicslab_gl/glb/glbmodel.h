@@ -40,6 +40,7 @@ public:
     bool HasNormalTexture();
     bool HasNormal();
     bool HasTangent();
+    bool HasBinormal();
     bool IsAcceptLight();
     void SetAcceptLight(bool accept);
     bool IsAcceptShadow();

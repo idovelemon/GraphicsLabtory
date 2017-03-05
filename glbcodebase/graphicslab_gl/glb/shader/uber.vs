@@ -20,6 +20,10 @@ in vec3 glb_Normal;
 in vec3 glb_Tangent;
 #endif
 
+#ifdef GLB_BINORMAL_IN_VERTEX
+in vec3 glb_Binormal;
+#endif
+
 #ifdef GLB_TEXCOORD_IN_VERTEX
 in vec2 glb_TexCoord;
 #endif
@@ -39,8 +43,18 @@ out vec3 vs_Normal;
 out vec3 vs_Tangent;
 #endif
 
+#ifdef GLB_BINORMAL_IN_VERTEX
+out vec3 vs_Binormal;
+#endif
+
 #ifdef GLB_TEXCOORD_IN_VERTEX
 out vec2 vs_TexCoord;
+#endif
+
+#ifdef GLB_TANGENT_IN_VERTEX
+#ifdef GLB_BINORMAL_IN_VERTEX
+out vec3 vs_NT;
+#endif
 #endif
 
 uniform mat4 glb_ProjM;
@@ -61,7 +75,18 @@ void main() {
 #endif
 
 #ifdef GLB_TANGENT_IN_VERTEX
-	vs_Tangent = glb_Tangent;
+#ifdef GLB_BINORMAL_IN_VERTEX
+	vs_NT = cross(glb_Tangent, glb_Binormal);
+	vs_NT = (glb_Trans_Inv_WorldM * vec4(vs_NT, 0.0)).xyz;
+#endif
+#endif
+
+#ifdef GLB_TANGENT_IN_VERTEX
+	vs_Tangent = (glb_Trans_Inv_WorldM * vec4(glb_Tangent, 0.0)).xyz;
+#endif
+
+#ifdef GLB_BINORMAL_IN_VERTEX
+	vs_Binormal = (glb_Trans_Inv_WorldM * vec4(glb_Binormal, 0.0)).xyz;
 #endif
 
 #ifdef GLB_TEXCOORD_IN_VERTEX

@@ -26,6 +26,7 @@ public:
     , has_normal_tex(false)
     , has_normal(false)
     , has_tanget(false)
+    , has_binormal(false)
     , accept_light(false)
     , accept_shadow(false)
     , cast_shadow(false)
@@ -41,6 +42,7 @@ public:
     bool    has_normal_tex;
     bool    has_normal;
     bool    has_tanget;
+    bool    has_binormal;
     bool    accept_light;
     bool    accept_shadow;
     bool    cast_shadow;
@@ -89,6 +91,7 @@ public:
     // @param: texcoord_buf A pointer to recieve the texture coordinate data. This is an optional parameter
     // @param: normal_buf A pointer to recieve the normal data. This is an optional parameter
     // @param: tangent_buf A pointer to recieve the tangent data. This is an optional parameter
+    // @param: binormal_buf A pointter to recieve the binormal data. This is an optional parameter
     // @return: If successfully, return the number of triangles. Otherwise retur 0.
     //----------------------------------------------------------------------------------------------
     static int32_t ExtractModelData(
@@ -98,7 +101,8 @@ public:
         float** vertex_buf,
         float** texcoord_buf = NULL,
         float** normal_buf = NULL,
-        float** tangent_buf = NULL
+        float** tangent_buf = NULL,
+        float** binormal_buf = NULL
         );
 
     //----------------------------------------------------------------------------------------------
@@ -107,9 +111,10 @@ public:
     // @param: texcoord_buf The buffer pointer hold the texcoord data
     // @param: normal_buf The buffer pointer hold the normal data
     // @param: tangent_buf The buffer pointer hold the tangent data
+    // @param: binormal_buf The buffer pointer hold the binormal data
     //----------------------------------------------------------------------------------------------
     static void RelaseBuf(float** vertex_buf, float** texcoord_buf = NULL, float** normal_buf = NULL
-        , float** tangent_buf = NULL);
+        , float** tangent_buf = NULL, float** binormal_buf = NULL);
 };
 
 };  // namespace glb

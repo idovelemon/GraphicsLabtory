@@ -3,6 +3,7 @@ glb_Pos			                                                 vec3	           ¶¥µãµ
 glb_Color								 vec3	           ¶¥µãµÄColorÊôĞÔ
 glb_Normal		                                                 vec3	           ¶¥µãµÄNormalÊôĞÔ
 glb_Tangent								 vec3	           ¶¥µãµÄTangentÊôĞÔ
+glb_Binormal								 vec3              ¶¥µãµÄBinormalÊôĞÔ
 glb_TexCoord	                                                 vec2	           ¶¥µã¶ÔÓ¦µÄÎÆÀí×ø±ê
 glb_ProjM                                                        mat4              Í¶Ó°±ä»»¾ØÕó
 glb_ViewM                                                        mat4              Ïà»ú±ä»»¾ØÕó
@@ -11,6 +12,7 @@ glb_ShadowM
 glb_Trans_Inv_WorldM                                             mat4              ÊÀ½ç±ä»»¾ØÕóµÄÄæ¾ØÕóµÄ×ªÖÃ¾ØÕó
 glb_DiffuseTex                                                   sampler2D         Âş·´ÉäÌùÍ¼
 glb_AlphaTex						         sampler2D	   Alpha»ìºÏÌùÍ¼
+glb_NormalTex							 sampler2D         ·¨ÏßÌùÍ¼
 glb_ShadowTex						         sampler2D	   Shadow Map
 glb_HDRSceneTex							 sampler2D         HDRÌùÍ¼
 glb_HighLightTex						 sampler2D	   HDR high light texture

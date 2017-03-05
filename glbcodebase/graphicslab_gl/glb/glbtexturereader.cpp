@@ -74,6 +74,10 @@ int32_t BmpTextureReader::ReadTexture(const char* file_name, int8_t** texture_da
             fread(&info_header, sizeof(BITMAPINFOHEADER), 1, file);
 
             (*texture_data) = new int8_t[info_header.biWidth * info_header.biHeight * kBytesPerPixel];
+            if (info_header.biSizeImage == 0) {
+                int32_t raw_data_size = info_header.biWidth * info_header.biHeight * info_header.biBitCount / 8;
+                info_header.biSizeImage = raw_data_size;
+            }
             int8_t* raw_data = new int8_t[info_header.biSizeImage];
             fread(raw_data, sizeof(int8_t), info_header.biSizeImage, file);
 

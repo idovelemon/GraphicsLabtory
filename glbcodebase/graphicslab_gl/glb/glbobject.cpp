@@ -195,6 +195,10 @@ shader::Descriptor Object::CalculateShaderDesc() {
         desc.SetFlag(shader::GLB_TANGENT_IN_VERTEX, true);
     }
 
+    if (m_Model->HasBinormal()) {
+        desc.SetFlag(shader::GLB_BINORMAL_IN_VERTEX, true);
+    }
+
     if (m_Model->IsAcceptLight()) {
         desc.SetFlag(shader::GLB_ENABLE_LIGHTING, true);
         switch(scene::Scene::GetLight(0).type) {

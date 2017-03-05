@@ -20,6 +20,16 @@ in vec3 vs_Normal;
 in vec3 vs_Tangent;
 #endif
 
+#ifdef GLB_BINORMAL_IN_VERTEX
+in vec3 vs_Binormal;
+#endif
+
+#ifdef GLB_TANGENT_IN_VERTEX
+#ifdef GLB_BINORMAL_IN_VERTEX
+in vec3 vs_NT;
+#endif
+#endif
+
 #ifdef GLB_TEXCOORD_IN_VERTEX
 in vec2 vs_TexCoord;
 #endif
@@ -27,11 +37,22 @@ in vec2 vs_TexCoord;
 // Output color
 out vec4 oColor;
 
+// Uniform
 #ifdef GLB_TEXCOORD_IN_VERTEX
 uniform sampler2D glb_DiffuseTex;
 
 	#ifdef GLB_ENABLE_ALPHA_TEX
 	uniform sampler2D glb_AlphaTex;
+	#endif
+
+	#ifdef GLB_ENABLE_NORMAL_TEX
+	uniform sampler2D glb_NormalTex;
+
+		#ifdef GLB_TANGENT_IN_VERTEX
+		#ifdef GLB_BINORMAL_IN_VERTEX
+			#define GLB_ENABLE_NORMAL_MAPPING
+		#endif
+		#endif
 	#endif
 
 #endif
@@ -117,10 +138,20 @@ void main() {
 	if (is_in_shadow <= 0.0) {
 		vec3 view_vec = normalize(glb_EyePos - vs_Vertex);
 
-		#ifdef GLB_NORMAL_IN_VERTEX
-			vec3 normal = normalize(vs_Normal);
+		#ifdef GLB_ENABLE_NORMAL_MAPPING
+			vec3 normal = texture2D(glb_NormalTex, vs_TexCoord).xyz;
+			normal -= vec3(0.5, 0.5, 0.5);
+			normal *= 2.0;
+
+			mat3 tbn = mat3(vs_Tangent, vs_Binormal, vs_NT);
+			normal = tbn * normal;
+			normalize(normal);
 		#else
-			#error No normal in vertex attributes
+			#ifdef GLB_NORMAL_IN_VERTEX
+				vec3 normal = normalize(vs_Normal);
+			#else
+				#error No normal in vertex attributes
+			#endif		
 		#endif
 
 		#ifdef GLB_USE_PARALLEL_LIGHT
@@ -155,5 +186,5 @@ void main() {
 #ifdef GLB_ENABLE_AO
 	vec2 ao_coord = vec2(gl_FragCoord.x / glb_ScreenWidth, gl_FragCoord.y / glb_ScreenHeight);
 	oColor.xyz *= texture2D(glb_AOMap, ao_coord).rgb;
-#endif	
+#endif
 }

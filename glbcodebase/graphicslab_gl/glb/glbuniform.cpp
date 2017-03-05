@@ -239,6 +239,20 @@ Wrapper uniform_alpha_texslot_picker(glb::Object* obj) {
     return wrapper;
 }
 
+Wrapper uniform_normal_texslot_picker(glb::Object* obj) {
+    Wrapper wrapper;
+    wrapper.SetFormat(Wrapper::FMT_SAMPLER);
+
+    if (obj != NULL) {
+        wrapper.SetSampler(render::TS_NORMAL);
+    } else {
+        GLB_SAFE_ASSERT(false);
+        wrapper.SetSampler(0);
+    }
+
+    return wrapper;
+}
+
 Wrapper uniform_shadow_texslot_picker(glb::Object* obj) {
     Wrapper wrapper;
     wrapper.SetFormat(Wrapper::FMT_SAMPLER);

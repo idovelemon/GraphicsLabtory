@@ -9,6 +9,7 @@
 static const int32_t g_WindowWidth = 800;
 static const int32_t g_WindowHeight = 600;
 static int32_t g_CurButton = 0;
+static int32_t g_Cube = 0;
 
 void glb_display();
 void glb_timer(int);
@@ -83,6 +84,7 @@ void glb_display() {
     Matrix rot;
     rot.MakeRotateYMatrix(rotY);
     lit.dir = rot * lit.dir;
+    //glb::scene::Scene::SetLight(lit, 0);
     glb::scene::Scene::Update();
 
     // Draw scene
@@ -113,12 +115,12 @@ void glb_setup() {
 
     // Light
     light::Light light(light::PARALLEL_LIGHT);
-    light.ambient = glb::Vector(0.5f, 0.5f, 0.5f);
-    light.diffuse = glb::Vector(0.0f, 0.0f, 0.0f);
-    light.specular = glb::Vector(0.0f, 0.0f, 0.0f);
-    light.dir = glb::Vector(-1.0f, -1.0f, 1.0f);
+    light.ambient = glb::Vector(0.1f, 0.1f, 0.1f);
+    light.diffuse = glb::Vector(0.5f, 0.5f, 0.5f);
+    light.specular = glb::Vector(1.0f, 1.0f, 1.0f);
+    light.dir = glb::Vector(-1.0f, -1.0f, -1.0f);
     light.dir.Normalize();
-    light.pow = 128.0f;
+    light.pow = 100.0f;
     glb::scene::Scene::SetLight(light, 0);
 
     // Perspective
@@ -129,9 +131,10 @@ void glb_setup() {
     glb::render::Render::SetLightAdaption(0.04f);
 
     // Objects
-    int32_t cube = glb::scene::Scene::AddObject("cube.obj");
+    int32_t cube = glb::scene::Scene::AddObject("sphere.obj");
     glb::scene::Scene::GetObjectById(cube)->SetCullFaceEnable(true);
     glb::scene::Scene::GetObjectById(cube)->SetCullFaceMode(glb::render::CULL_BACK);
     glb::scene::Scene::GetObjectById(cube)->SetDepthTestEnable(true);
     glb::scene::Scene::GetObjectById(cube)->SetPos(Vector(0.0f, 0.0f, 0.0f));
+    g_Cube = cube;
 }

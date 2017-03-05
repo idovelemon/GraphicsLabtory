@@ -75,7 +75,7 @@ public:
     virtual ~RenderImp();
 
 public:
-    void Initialize(int32_t width, int32_t height);
+    void Initialize(float width, float height);
     void Destroy();
     void Draw();
 
@@ -135,8 +135,8 @@ protected:
     inline float ZValueFromCamera(Object* obj);
 
 private:
-    int32_t                                 m_Width;
-    int32_t                                 m_Height;
+    float                                   m_Width;
+    float                                   m_Height;
     std::vector<ShaderGroup>                m_ShaderGroups;
 
     // Perspective
@@ -275,7 +275,7 @@ RenderImp::~RenderImp() {
     Destroy();
 }
 
-void RenderImp::Initialize(int32_t width, int32_t height) {
+void RenderImp::Initialize(float width, float height) {
     m_ShaderGroups.clear();
 
     m_Width = width;
@@ -679,11 +679,14 @@ void RenderImp::DrawLightLoop() {
             if (obj->GetModel()->HasAlphaTexture()) {
                 render::Device::SetTexture(render::TS_ALPHA, texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(Model::MT_ALPHA))->GetTexObj(), 1);
             }
+            if (obj->GetModel()->HasNormalTexture()) {
+                render::Device::SetTexture(render::TS_NORMAL, texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(Model::MT_NORMAL))->GetTexObj(), 2);
+            }
             if (obj->GetModel()->IsAcceptShadow()) {
-                render::Device::SetTexture(render::TS_SHADOW, texture::Mgr::GetTextureById(m_ShadowMap)->GetTexObj(), 2);
+                render::Device::SetTexture(render::TS_SHADOW, texture::Mgr::GetTextureById(m_ShadowMap)->GetTexObj(), 3);
             }
             if (obj->GetModel()->IsUseAO()) {
-                render::Device::SetTexture(render::TS_AO_MAP, texture::Mgr::GetTextureById(m_AOMap)->GetTexObj(), 3);
+                render::Device::SetTexture(render::TS_AO_MAP, texture::Mgr::GetTextureById(m_AOMap)->GetTexObj(), 4);
             }
 
             // Object Uniform
@@ -812,11 +815,11 @@ void RenderImp::AfterDraw() {
 
 void RenderImp::PrepareShadowMap() {
     // Create shadow render target
-    m_ShadowRenderTarget = RenderTarget::Create(m_Width, m_Height);
+    m_ShadowRenderTarget = RenderTarget::Create(static_cast<int32_t>(m_Width), static_cast<int32_t>(m_Height));
     GLB_SAFE_ASSERT(m_ShadowRenderTarget != NULL);
 
     // Create shadow map
-    texture::Texture* shadow_map = texture::Texture::CreateFloat16DepthTexture(m_Width, m_Height);
+    texture::Texture* shadow_map = texture::Texture::CreateFloat16DepthTexture(static_cast<int32_t>(m_Width), static_cast<int32_t>(m_Height));
     if (shadow_map != NULL) {
         m_ShadowMap = texture::Mgr::AddTexture(shadow_map);
     } else {
@@ -833,7 +836,7 @@ void RenderImp::PrepareShadowMap() {
 
 void RenderImp::PrepareDepthMap() {
     // Create depth map
-    texture::Texture* depth_map = texture::Texture::CreateFloat16DepthTexture(m_Width, m_Height);
+    texture::Texture* depth_map = texture::Texture::CreateFloat16DepthTexture(static_cast<int32_t>(m_Width), static_cast<int32_t>(m_Height));
     if (depth_map != NULL) {
         m_DepthMap = texture::Mgr::AddTexture(depth_map);
     } else {
@@ -841,7 +844,7 @@ void RenderImp::PrepareDepthMap() {
     }
 
     // Create render target
-    m_DepthTarget = RenderTarget::Create(m_Width, m_Height);
+    m_DepthTarget = RenderTarget::Create(static_cast<int32_t>(m_Width), static_cast<int32_t>(m_Height));
     if (m_DepthTarget != NULL) {
         m_DepthTarget->AttachDepthTexture(depth_map);
     } else {
@@ -862,7 +865,7 @@ void RenderImp::PrepareAOMap() {
     }
 
     // Create ao map
-    texture::Texture* ao_map = texture::Texture::CreateFloat16Texture(m_Width, m_Height);
+    texture::Texture* ao_map = texture::Texture::CreateFloat16Texture(static_cast<int32_t>(m_Width), static_cast<int32_t>(m_Height));
     if (ao_map != NULL) {
         m_AOMap = texture::Mgr::AddTexture(ao_map);
     } else {
@@ -870,7 +873,7 @@ void RenderImp::PrepareAOMap() {
     }
 
     // Create temp biblur map
-    texture::Texture* biblur_map = texture::Texture::CreateFloat16Texture(m_Width, m_Height);
+    texture::Texture* biblur_map = texture::Texture::CreateFloat16Texture(static_cast<int32_t>(m_Width), static_cast<int32_t>(m_Height));
     if (biblur_map != NULL) {
         m_BiBlurMap = texture::Mgr::AddTexture(biblur_map);
     } else {
@@ -878,7 +881,7 @@ void RenderImp::PrepareAOMap() {
     }
 
     // Create render target
-    m_AORenderTarget = RenderTarget::Create(m_Width, m_Height);
+    m_AORenderTarget = RenderTarget::Create(static_cast<int32_t>(m_Width), static_cast<int32_t>(m_Height));
     if (m_AORenderTarget != NULL) {
         m_AORenderTarget->AttachColorTexture(render::COLORBUF_COLOR_ATTACHMENT0, ao_map);
         m_AORenderTarget->AttachColorTexture(render::COLORBUF_COLOR_ATTACHMENT1, biblur_map);
@@ -894,15 +897,15 @@ void RenderImp::PrepareAOMap() {
 
 void RenderImp::PrepareHDR() {
     // Create hdr render target
-    m_HDRRenderTarget = RenderTarget::Create(m_Width, m_Height);
-    m_BloomRenderTarget = RenderTarget::Create(m_Width / 2, m_Height / 2);
+    m_HDRRenderTarget = RenderTarget::Create(static_cast<int32_t>(m_Width), static_cast<int32_t>(m_Height));
+    m_BloomRenderTarget = RenderTarget::Create(static_cast<int32_t>(m_Width / 2.0f), static_cast<int32_t>(m_Height / 2.0f));
     GLB_SAFE_ASSERT(m_HDRRenderTarget != NULL);
     GLB_SAFE_ASSERT(m_BloomRenderTarget != NULL);
 
     // Create hdr texture
-    texture::Texture* hdr_tex = texture::Texture::CreateFloat16Texture(m_Width, m_Height);
-    texture::Texture* log_lum_tex = texture::Texture::CreateFloat16Texture(m_Width / 2, m_Height / 2);
-    texture::Texture* bloom_tex = texture::Texture::CreateFloat16Texture(m_Width / 2, m_Height / 2);
+    texture::Texture* hdr_tex = texture::Texture::CreateFloat16Texture(static_cast<int32_t>(m_Width), static_cast<int32_t>(m_Height));
+    texture::Texture* log_lum_tex = texture::Texture::CreateFloat16Texture(static_cast<int32_t>(m_Width / 2.0f), static_cast<int32_t>(m_Height / 2.0f));
+    texture::Texture* bloom_tex = texture::Texture::CreateFloat16Texture(static_cast<int32_t>(m_Width / 2.0f), static_cast<int32_t>(m_Height / 2.0f));
     if (hdr_tex != NULL && bloom_tex != NULL && log_lum_tex != NULL) {
         m_HDRSceneTex = texture::Mgr::AddTexture(hdr_tex);
         m_LogLumTex = texture::Mgr::AddTexture(log_lum_tex);
@@ -935,7 +938,7 @@ void RenderImp::PrepareHDR() {
     m_TonemapShader = shader::Mgr::AddShader("..\\glb\\shader\\tonemap.vs", "..\\glb\\shader\\tonemap.ps");
 
     // Create screen mesh
-    m_ScreenMesh = mesh::ScreenMesh::Create(m_Width, m_Height);
+    m_ScreenMesh = mesh::ScreenMesh::Create(static_cast<int32_t>(m_Width), static_cast<int32_t>(m_Height));
 }
 
 void RenderImp::DownsamplerHDRScene() {
