@@ -1,0 +1,145 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{01C08B1F-E1B9-4A2A-A37A-92DD9B936FE6}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>glb_tbn_gen</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v110</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v110</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(SolutionDir)$(ProjectName)\</OutDir>
+    <TargetName>$(ProjectName)_D</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)$(ProjectName)\</OutDir>
+    <TargetName>$(ProjectName)_R</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)\glb;$(SolutionDir)\..\GLUT;$(SolutionDir)\..\glew\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(SolutionDir)\..\GLUT;$(SolutionDir)\..\glew\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glew32.lib;glut32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)\glb;$(SolutionDir)\..\GLUT;$(SolutionDir)\..\glew\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>$(SolutionDir)\..\GLUT;$(SolutionDir)\..\glew\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glew32.lib;glut32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\glb\comm.cpp" />
+    <ClCompile Include="..\glb\glbcamera.cpp" />
+    <ClCompile Include="..\glb\glbeditorcomm.cpp" />
+    <ClCompile Include="..\glb\glblog.cpp" />
+    <ClCompile Include="..\glb\glbmaterial.cpp" />
+    <ClCompile Include="..\glb\glbmesh.cpp" />
+    <ClCompile Include="..\glb\glbmodel.cpp" />
+    <ClCompile Include="..\glb\glbmodelfile.cpp" />
+    <ClCompile Include="..\glb\glbobject.cpp" />
+    <ClCompile Include="..\glb\glbprofile.cpp" />
+    <ClCompile Include="..\glb\glbrender.cpp" />
+    <ClCompile Include="..\glb\glbrenderdevice.cpp" />
+    <ClCompile Include="..\glb\glbrendertarget.cpp" />
+    <ClCompile Include="..\glb\glbscene.cpp" />
+    <ClCompile Include="..\glb\glbshader.cpp" />
+    <ClCompile Include="..\glb\glbtexture.cpp" />
+    <ClCompile Include="..\glb\glbtexturereader.cpp" />
+    <ClCompile Include="..\glb\glbuniform.cpp" />
+    <ClCompile Include="glb_tbn_gen.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\glb\comm.h" />
+    <ClInclude Include="..\glb\glb.h" />
+    <ClInclude Include="..\glb\glbcamera.h" />
+    <ClInclude Include="..\glb\glbcomm.h" />
+    <ClInclude Include="..\glb\glbeditorcomm.h" />
+    <ClInclude Include="..\glb\glblight.h" />
+    <ClInclude Include="..\glb\glblog.h" />
+    <ClInclude Include="..\glb\glbmacro.h" />
+    <ClInclude Include="..\glb\glbmaterial.h" />
+    <ClInclude Include="..\glb\glbmatrix.cpp.h" />
+    <ClInclude Include="..\glb\glbmatrix.h" />
+    <ClInclude Include="..\glb\glbmesh.h" />
+    <ClInclude Include="..\glb\glbmodel.h" />
+    <ClInclude Include="..\glb\glbmodelfile.h" />
+    <ClInclude Include="..\glb\glbobject.h" />
+    <ClInclude Include="..\glb\glbprofile.h" />
+    <ClInclude Include="..\glb\glbrender.h" />
+    <ClInclude Include="..\glb\glbrenderdevice.h" />
+    <ClInclude Include="..\glb\glbrendertarget.h" />
+    <ClInclude Include="..\glb\glbscene.h" />
+    <ClInclude Include="..\glb\glbshader.h" />
+    <ClInclude Include="..\glb\glbstructs.h" />
+    <ClInclude Include="..\glb\glbtexture.h" />
+    <ClInclude Include="..\glb\glbtexturereader.h" />
+    <ClInclude Include="..\glb\glbuniform.h" />
+    <ClInclude Include="..\glb\glbvector.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\glb\glbvector.inl" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

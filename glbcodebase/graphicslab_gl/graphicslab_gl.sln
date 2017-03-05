@@ -11,6 +11,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "glb_ssao", "glb_ssao\glb_ss
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "glb_normalmap", "glb_normalmap\glb_normalmap.vcxproj", "{4564E98D-36C0-4F4C-B36F-39F49E26ED95}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "glb_tbn_gen", "glb_tbn_gen\glb_tbn_gen.vcxproj", "{01C08B1F-E1B9-4A2A-A37A-92DD9B936FE6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -37,6 +39,10 @@ Global
 		{4564E98D-36C0-4F4C-B36F-39F49E26ED95}.Debug|Win32.Build.0 = Debug|Win32
 		{4564E98D-36C0-4F4C-B36F-39F49E26ED95}.Release|Win32.ActiveCfg = Release|Win32
 		{4564E98D-36C0-4F4C-B36F-39F49E26ED95}.Release|Win32.Build.0 = Release|Win32
+		{01C08B1F-E1B9-4A2A-A37A-92DD9B936FE6}.Debug|Win32.ActiveCfg = Debug|Win32
+		{01C08B1F-E1B9-4A2A-A37A-92DD9B936FE6}.Debug|Win32.Build.0 = Debug|Win32
+		{01C08B1F-E1B9-4A2A-A37A-92DD9B936FE6}.Release|Win32.ActiveCfg = Release|Win32
+		{01C08B1F-E1B9-4A2A-A37A-92DD9B936FE6}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

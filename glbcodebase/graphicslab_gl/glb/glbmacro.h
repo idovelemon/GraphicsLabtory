@@ -23,13 +23,25 @@
         _pointer_ = NULL; \
     }
 
-#define GLB_SAFE_ASSERT(_expression_) \
+#if _DEBUG
+#define GLB_SAFE_ASSERT(_expression_) GLB_SAFE_ASSERT_D(_expression_)
+#else
+#define GLB_SAFE_ASSERT(_expression_) GLB_SAFE_ASSERT_R(_expression_)
+#endif
+
+#define GLB_SAFE_ASSERT_D(_expression_) \
     do {\
         bool result = _expression_; \
         if (result == false) {\
             OutputDebugStringA(__FUNCTION__); \
             MessageBoxA(NULL, __FUNCTION__, "Assert-Error", MB_OK); \
         } \
+        assert(result); \
+    }while(false);
+
+#define GLB_SAFE_ASSERT_R(_expression_) \
+    do {\
+        bool result = _expression_; \
         assert(result); \
     }while(false);
 

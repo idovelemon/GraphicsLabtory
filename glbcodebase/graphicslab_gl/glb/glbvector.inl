@@ -27,7 +27,7 @@ void Vector::Set(float x, float y, float z, float w) {
     this->w = w;
 }
 
-const Vector Vector::operator+(const Vector& v) {
+Vector Vector::operator+(const Vector& v) {
     Vector result(0.0f, 0.0f, 0.0f);
     result.x = this->x + v.x;
     result.y = this->y + v.y;
@@ -36,7 +36,7 @@ const Vector Vector::operator+(const Vector& v) {
     return result;
 }
 
-const Vector Vector::operator-(const Vector& v) {
+Vector Vector::operator-(const Vector& v) {
     Vector result(0.0f, 0.0f, 0.0f);
     result.x = this->x - v.x;
     result.y = this->y - v.y;
@@ -45,7 +45,7 @@ const Vector Vector::operator-(const Vector& v) {
     return result;
 }
 
-const Vector Vector::operator*(float v) {
+Vector Vector::operator*(float v) {
     Vector result(0.0f, 0.0f, 0.0f);
     result.x = this->x * v;
     result.y = this->y * v;
