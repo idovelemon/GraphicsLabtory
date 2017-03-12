@@ -11,7 +11,6 @@
 
 // Other Support library Header
 #include <GL\glew.h>
-#include <glut.h>
 #include <GL\GL.h>
 
 // Host Project Header

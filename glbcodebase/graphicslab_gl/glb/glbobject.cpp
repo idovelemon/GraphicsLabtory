@@ -81,6 +81,10 @@ void Object::SetRotation(Vector rotation) {
     m_Rotation = rotation;
 }
 
+Vector Object::GetRotation() const {
+    return m_Rotation;
+}
+
 Vector Object::GetBoundBoxMax() {
     Vector boundbox_max = m_Model->GetBoundBoxMax();
     boundbox_max += m_Pos;

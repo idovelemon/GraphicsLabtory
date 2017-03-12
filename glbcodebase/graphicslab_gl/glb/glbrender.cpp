@@ -266,7 +266,7 @@ RenderImp::RenderImp()
 , m_BiBlurHShader(-1)
 , m_BiBlurVShader(-1)
 
-, m_DebugMesh(NULL){
+, m_DebugMesh(NULL) {
     memset(m_Perspective, 0, sizeof(m_Perspective));
     m_ShaderGroups.clear();
 }
@@ -291,9 +291,50 @@ void RenderImp::Initialize(float width, float height) {
 
 void RenderImp::Destroy() {
     m_ShaderGroups.clear();
+
+    m_Width = 0;
+    m_Height = 0;
+    m_PerspectiveType = Render::PRIMARY_PERS;
+
+    // Shadow
     GLB_SAFE_DELETE(m_ShadowRenderTarget);
+    m_ShadowMap = -1;
+    m_ShadowShader = -1;
+
+    // Depth
+    GLB_SAFE_DELETE(m_DepthTarget);
+    m_DepthMap = -1;
+    m_DepthShader = -1;
+
+    // HDR
     GLB_SAFE_DELETE(m_HDRRenderTarget);
-    GLB_SAFE_DELETE(m_ScreenMesh);
+    GLB_SAFE_DELETE(m_BloomRenderTarget);
+    m_HDRSceneTex = -1;
+    m_HighLightSceneTex = -1;
+    m_LogLumTex = -1;
+    m_BloomTex = -1;
+    m_AverageLum = 0.0f;
+    m_LogLumShader = -1;
+    m_FilterBrightnessShader = -1;
+    m_BloomHShader = -1;
+    m_BloomVShader = -1;
+    m_TonemapShader = -1;
+    m_MaxMipmapLevel = 0;
+    m_BloomWidth = 0.0f;
+    m_BloomHeight = 0.0f;
+    m_ExposureLevel = 0.0f;
+    m_LightAdaption = 0.0f;
+    m_PreAverageLum = 0.0f;
+
+    // SSAO
+    GLB_SAFE_DELETE(m_AORenderTarget);
+    m_RandRotateMap = -1;
+    m_AOMap = -1;
+    m_BiBlurMap = -1;
+    m_AOShader = -1;
+    m_BiBlurHShader = -1;
+    m_BiBlurVShader = -1;
+
     GLB_SAFE_DELETE(m_DebugMesh);
 }
 

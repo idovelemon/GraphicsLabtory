@@ -8,6 +8,7 @@
 #define GLB_GLB_H_
 
 #include "comm.h"
+#include "glbapplication.h"
 #include "glbcamera.h"
 #include "glbeditorcomm.h"
 #include "glblight.h"

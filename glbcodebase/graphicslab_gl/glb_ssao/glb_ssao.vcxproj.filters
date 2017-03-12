@@ -75,6 +75,9 @@
     <ClCompile Include="glb_ssao.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="..\glb\glbapplication.cpp">
+      <Filter>源文件\glb</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\glb\comm.h">
@@ -157,6 +160,9 @@
     </ClInclude>
     <ClInclude Include="glb_ssao.h">
       <Filter>源文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\glbapplication.h">
+      <Filter>源文件\glb</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

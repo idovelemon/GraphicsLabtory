@@ -99,6 +99,9 @@
     <ClInclude Include="..\glb\glbmaterial.h">
       <Filter>源文件\glb</Filter>
     </ClInclude>
+    <ClInclude Include="..\glb\glbapplication.h">
+      <Filter>源文件\glb</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\glb\glbcamera.cpp">
@@ -156,6 +159,9 @@
       <Filter>源文件\glb</Filter>
     </ClCompile>
     <ClCompile Include="..\glb\glbmaterial.cpp">
+      <Filter>源文件\glb</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\glbapplication.cpp">
       <Filter>源文件\glb</Filter>
     </ClCompile>
   </ItemGroup>

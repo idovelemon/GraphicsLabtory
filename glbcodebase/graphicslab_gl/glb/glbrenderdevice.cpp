@@ -9,8 +9,9 @@
 #include <stdint.h>
 
 #include <GL\glew.h>
-#include <glut.h>
 #include <GL\GL.h>
+
+#include "glbapplication.h"
 
 namespace glb {
 
@@ -96,6 +97,10 @@ protected:
     void SetupTexture();
 
 private:
+    // OS-specific
+    HDC                 m_WindowDC;
+    HGLRC               m_OpenGLContext;
+
     // Vertex Buffer
     int32_t             m_VertexArrayObject;
     int32_t             m_VertexBufferObject;
@@ -130,7 +135,9 @@ private:
 // DeviceImp DEFINITION
 //-----------------------------------------------------------------------------------
 DeviceImp::DeviceImp()
-: m_VertexArrayObject(-1)
+: m_WindowDC(NULL)
+, m_OpenGLContext(NULL)
+, m_VertexArrayObject(-1)
 , m_VertexBufferObject(-1)
 , m_VertexLayout()
 , m_ShaderLayout()
@@ -152,11 +159,67 @@ DeviceImp::~DeviceImp() {
 }
 
 void DeviceImp::Initialize() {
+    m_WindowDC = ::GetDC(app::Application::GetWindowHandle());
+
+    // Set surface pixel format
+    PIXELFORMATDESCRIPTOR pixel_desc;
+    pixel_desc.nSize = sizeof(pixel_desc);
+    pixel_desc.nVersion = 1;
+    pixel_desc.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER;
+    pixel_desc.iPixelType = PFD_TYPE_RGBA;
+    pixel_desc.cColorBits = 32;
+    pixel_desc.cRedBits = 0;
+    pixel_desc.cRedShift = 0;
+    pixel_desc.cGreenBits = 0;
+    pixel_desc.cGreenShift = 0;
+    pixel_desc.cBlueBits = 0;
+    pixel_desc.cBlueShift = 0;
+    pixel_desc.cAlphaBits = 0;
+    pixel_desc.cAlphaShift = 0;
+    pixel_desc.cAccumBits = 0;
+    pixel_desc.cAccumRedBits = 0;
+    pixel_desc.cAccumGreenBits = 0;
+    pixel_desc.cAccumBlueBits = 0;
+    pixel_desc.cAccumAlphaBits = 0;
+    pixel_desc.cDepthBits = 24;
+    pixel_desc.cStencilBits = 8;
+    pixel_desc.cAuxBuffers = 0;
+    pixel_desc.iLayerType = PFD_MAIN_PLANE;
+    pixel_desc.bReserved = 0;
+    pixel_desc.dwLayerMask = 0;
+    pixel_desc.dwVisibleMask = 0;
+    pixel_desc.dwDamageMask = 0;
+
+    int pixel_fmt = ChoosePixelFormat(m_WindowDC, &pixel_desc);
+    if (pixel_fmt == 0) {
+        return;
+    }
+
+    if (SetPixelFormat(m_WindowDC, pixel_fmt, &pixel_desc) == FALSE) {
+        return;
+    }
+
+    int n = GetPixelFormat(m_WindowDC);
+    DescribePixelFormat(m_WindowDC, n, sizeof(pixel_desc), &pixel_desc);
+
+    // Create opengl render context
+    m_OpenGLContext = wglCreateContext(m_WindowDC);
+    if (m_OpenGLContext == NULL) {
+        return;
+    }
+    wglMakeCurrent(m_WindowDC, m_OpenGLContext);
+
+    // Initialize opengl extension
+    glewInit();
 }
 
 void DeviceImp::Destroy() {
+    wglMakeCurrent(m_WindowDC, NULL);
+    wglDeleteContext(m_OpenGLContext);
+    ReleaseDC(app::Application::GetWindowHandle(), m_WindowDC);
+    m_WindowDC = NULL;
+    m_OpenGLContext = NULL;
 }
-
 
 // Vertex Buffer
 void DeviceImp::SetVertexArray(int32_t va) {
@@ -334,7 +397,8 @@ void DeviceImp::Draw(PrimitiveType type, int32_t first, int32_t size) {
 }
 
 void DeviceImp::SwapBuffer() {
-    glutSwapBuffers();
+    glFlush();
+    SwapBuffers(m_WindowDC);
 }
 
 // Internel Helper

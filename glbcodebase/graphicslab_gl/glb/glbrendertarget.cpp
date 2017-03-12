@@ -9,7 +9,6 @@
 #include <stdio.h>
 
 #include <GL\glew.h>
-#include <glut.h>
 #include <GL\GL.h>
 
 #include "glbmacro.h"
@@ -28,13 +27,13 @@ RenderTarget::RenderTarget()
 
 RenderTarget::~RenderTarget() {
     if (m_DepthRBO != 0) {
-        glBindRenderbuffer(GL_RENDERBUFFER, m_DepthRBO);
-        glDeleteRenderbuffers(1, reinterpret_cast<const GLuint*>(m_DepthRBO));
+        glBindRenderbuffer(GL_RENDERBUFFER, 0);
+        glDeleteRenderbuffers(1, reinterpret_cast<const GLuint*>(&m_DepthRBO));
         m_DepthRBO = 0;
     }
 
     if (m_FBO != 0) {
-        glBindFramebuffer(GL_FRAMEBUFFER, m_FBO);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glDeleteFramebuffers(1, reinterpret_cast<const GLuint*>(&m_FBO));
         m_FBO = 0;
     }

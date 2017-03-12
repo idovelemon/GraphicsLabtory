@@ -19,16 +19,12 @@ $(ProjectName)_R (For release version)
 C/C++ Setting:
 Common->Addtional Include Directory:
 $(SolutionDir)\glb
-$(SolutionDir)\..\GLUT
 $(SolutionDir)\..\glew\include
 
 Linker Setting:
 Common->Addtional Library:
-$(SolutionDir)\..\GLUT
 $(SolutionDir)\..\glew\lib
 Input->Addtional:
 glew32.lib
-glut32.lib
-Advance->Safe Exception Handle:
-/SAFESEH:NO
+opengl32.lib
 ***************************************************************************************/

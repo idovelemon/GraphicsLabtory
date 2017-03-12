@@ -75,6 +75,9 @@
     <ClCompile Include="glb_tbn_gen.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="..\glb\glbapplication.cpp">
+      <Filter>源文件\glb</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\glb\comm.h">
@@ -153,6 +156,9 @@
       <Filter>源文件\glb</Filter>
     </ClInclude>
     <ClInclude Include="..\glb\glbvector.h">
+      <Filter>源文件\glb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\glbapplication.h">
       <Filter>源文件\glb</Filter>
     </ClInclude>
   </ItemGroup>

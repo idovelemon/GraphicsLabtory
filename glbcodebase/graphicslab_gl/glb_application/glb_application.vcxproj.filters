@@ -1,0 +1,173 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="源文件">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="头文件">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="资源文件">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="源文件\glb">
+      <UniqueIdentifier>{dd2791d1-db33-4db6-b40d-fe2de54d4c9a}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\glb\comm.cpp">
+      <Filter>源文件\glb</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\glbcamera.cpp">
+      <Filter>源文件\glb</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\glbeditorcomm.cpp">
+      <Filter>源文件\glb</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\glblog.cpp">
+      <Filter>源文件\glb</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\glbmaterial.cpp">
+      <Filter>源文件\glb</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\glbmesh.cpp">
+      <Filter>源文件\glb</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\glbmodel.cpp">
+      <Filter>源文件\glb</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\glbmodelfile.cpp">
+      <Filter>源文件\glb</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\glbobject.cpp">
+      <Filter>源文件\glb</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\glbprofile.cpp">
+      <Filter>源文件\glb</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\glbrender.cpp">
+      <Filter>源文件\glb</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\glbrenderdevice.cpp">
+      <Filter>源文件\glb</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\glbrendertarget.cpp">
+      <Filter>源文件\glb</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\glbscene.cpp">
+      <Filter>源文件\glb</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\glbshader.cpp">
+      <Filter>源文件\glb</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\glbtexture.cpp">
+      <Filter>源文件\glb</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\glbtexturereader.cpp">
+      <Filter>源文件\glb</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\glbuniform.cpp">
+      <Filter>源文件\glb</Filter>
+    </ClCompile>
+    <ClCompile Include="glb_application.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\glbapplication.cpp">
+      <Filter>源文件\glb</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\glb\comm.h">
+      <Filter>源文件\glb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\glb.h">
+      <Filter>源文件\glb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\glbcamera.h">
+      <Filter>源文件\glb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\glbcomm.h">
+      <Filter>源文件\glb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\glbeditorcomm.h">
+      <Filter>源文件\glb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\glblight.h">
+      <Filter>源文件\glb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\glblog.h">
+      <Filter>源文件\glb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\glbmacro.h">
+      <Filter>源文件\glb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\glbmaterial.h">
+      <Filter>源文件\glb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\glbmatrix.cpp.h">
+      <Filter>源文件\glb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\glbmatrix.h">
+      <Filter>源文件\glb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\glbmesh.h">
+      <Filter>源文件\glb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\glbmodel.h">
+      <Filter>源文件\glb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\glbmodelfile.h">
+      <Filter>源文件\glb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\glbobject.h">
+      <Filter>源文件\glb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\glbprofile.h">
+      <Filter>源文件\glb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\glbrender.h">
+      <Filter>源文件\glb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\glbrenderdevice.h">
+      <Filter>源文件\glb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\glbrendertarget.h">
+      <Filter>源文件\glb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\glbscene.h">
+      <Filter>源文件\glb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\glbshader.h">
+      <Filter>源文件\glb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\glbstructs.h">
+      <Filter>源文件\glb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\glbtexture.h">
+      <Filter>源文件\glb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\glbtexturereader.h">
+      <Filter>源文件\glb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\glbuniform.h">
+      <Filter>源文件\glb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\glbvector.h">
+      <Filter>源文件\glb</Filter>
+    </ClInclude>
+    <ClInclude Include="glb_application.h">
+      <Filter>源文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\glbapplication.h">
+      <Filter>源文件\glb</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\glb\glbvector.inl">
+      <Filter>源文件\glb</Filter>
+    </None>
+  </ItemGroup>
+</Project>

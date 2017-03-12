@@ -236,6 +236,10 @@ void ModelMgrImp::Initialize() {
 }
 
 void ModelMgrImp::Destroy() {
+    for (int32_t i = 0; i < m_ModelDataBase.size(); i++) {
+        GLB_SAFE_DELETE(m_ModelDataBase[i]);
+    }
+    m_ModelDataBase.clear();
 }
 
 Model* ModelMgrImp::AddModel(const char* file_name) {

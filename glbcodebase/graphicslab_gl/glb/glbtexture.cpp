@@ -11,7 +11,6 @@
 #include <vector>
 
 #include <GL\glew.h>
-#include <glut.h>
 
 #include "glbmacro.h"
 #include "glbtexturereader.h"
@@ -226,10 +225,11 @@ Texture* Texture::CreateFloat16DepthTexture(int32_t width, int32_t height) {
 }
 
 void Texture::Destroy() {
-    if (m_TexID) {
+    if (m_TexID != -1) {
         glBindTexture(GL_TEXTURE_2D, 0);
         glDeleteTextures(1, reinterpret_cast<const GLuint*>(&m_TexObj));
         m_TexObj = 0;
+        m_TexID = -1;
     }
 }
 
@@ -301,7 +301,7 @@ void MgrImp::Initialize() {
 void MgrImp::Destroy() {
     for (size_t i = 0; i < m_TexDataBase.size(); i++) {
         m_TexDataBase[i]->Destroy();
-        delete m_TexDataBase[i];
+        GLB_SAFE_DELETE(m_TexDataBase[i]);
     }
 
     m_TexDataBase.clear();
