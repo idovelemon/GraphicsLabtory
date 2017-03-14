@@ -9,7 +9,6 @@
 /***************************************************************************************
 Project Config
 
-
 Common Setting:
 Output Directory: $(SolutionDir)$(ProjectName)\
 Target File Name: 
@@ -20,6 +19,10 @@ C/C++ Setting:
 Common->Addtional Include Directory:
 $(SolutionDir)\glb
 $(SolutionDir)\..\glew\include
+
+Preprocessor->Preprocessor:
+GLB_PLATFORM_OPENGL (For opengl version graphics labtory)
+GLB_PLATFORM_DX11 (For directx11 version graphics labtory)
 
 Linker Setting:
 Common->Addtional Library:

@@ -72,7 +72,11 @@ public:
 };
 
 int _stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPreInstance, LPSTR cmdLine, int nShowCmd) {
-    if (!glb::app::Application::Initialize(ApplicationSSAO::Create, hInstance, 800, 600, L"glb_ssao")) {
+    glb::app::AppConfig config;
+    memcpy(config.caption, L"glb_ssao", sizeof(L"glb_ssao"));
+    config.screen_width = 800;
+    config.screen_height = 600;
+    if (!glb::app::Application::Initialize(ApplicationSSAO::Create, hInstance, config)) {
         return 0;
     }
 

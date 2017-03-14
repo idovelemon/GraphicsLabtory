@@ -715,19 +715,19 @@ void RenderImp::DrawLightLoop() {
 
             // Textures
             if (obj->GetModel()->HasDiffuseTexture()) {
-                render::Device::SetTexture(render::TS_DIFFUSE, texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(Model::MT_DIFFUSE))->GetTexObj(), 0);
+                render::Device::SetTexture(render::TS_DIFFUSE, reinterpret_cast<int32_t>(texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(Model::MT_DIFFUSE))->GetNativeTex()), 0);
             }
             if (obj->GetModel()->HasAlphaTexture()) {
-                render::Device::SetTexture(render::TS_ALPHA, texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(Model::MT_ALPHA))->GetTexObj(), 1);
+                render::Device::SetTexture(render::TS_ALPHA, reinterpret_cast<int32_t>(texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(Model::MT_ALPHA))->GetNativeTex()), 1);
             }
             if (obj->GetModel()->HasNormalTexture()) {
-                render::Device::SetTexture(render::TS_NORMAL, texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(Model::MT_NORMAL))->GetTexObj(), 2);
+                render::Device::SetTexture(render::TS_NORMAL, reinterpret_cast<int32_t>(texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(Model::MT_NORMAL))->GetNativeTex()), 2);
             }
             if (obj->GetModel()->IsAcceptShadow()) {
-                render::Device::SetTexture(render::TS_SHADOW, texture::Mgr::GetTextureById(m_ShadowMap)->GetTexObj(), 3);
+                render::Device::SetTexture(render::TS_SHADOW, reinterpret_cast<int32_t>(texture::Mgr::GetTextureById(m_ShadowMap)->GetNativeTex()), 3);
             }
             if (obj->GetModel()->IsUseAO()) {
-                render::Device::SetTexture(render::TS_AO_MAP, texture::Mgr::GetTextureById(m_AOMap)->GetTexObj(), 4);
+                render::Device::SetTexture(render::TS_AO_MAP, reinterpret_cast<int32_t>(texture::Mgr::GetTextureById(m_AOMap)->GetNativeTex()), 4);
             }
 
             // Object Uniform
@@ -983,7 +983,7 @@ void RenderImp::PrepareHDR() {
 }
 
 void RenderImp::DownsamplerHDRScene() {
-    GLint obj = texture::Mgr::GetTextureById(m_HDRSceneTex)->GetTexObj();
+    GLint obj = reinterpret_cast<GLint>(texture::Mgr::GetTextureById(m_HDRSceneTex)->GetNativeTex());
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, obj);
     glGenerateMipmap(GL_TEXTURE_2D);
@@ -1011,7 +1011,7 @@ void RenderImp::CalcLogLum() {
 
     // Set texture
     render::Device::ClearTexture();
-    render::Device::SetTexture(render::TS_HDRSCENE, texture::Mgr::GetTextureById(m_HDRSceneTex)->GetTexObj(), 0);
+    render::Device::SetTexture(render::TS_HDRSCENE, reinterpret_cast<int32_t>(texture::Mgr::GetTextureById(m_HDRSceneTex)->GetNativeTex()), 0);
 
     // Scene uniforms
     std::vector<uniform::UniformEntry> uniforms = program->GetUniforms();
@@ -1049,7 +1049,7 @@ void RenderImp::CalcLogLum() {
 }
 
 void RenderImp::CalcAverageLum() {
-    GLint obj = texture::Mgr::GetTextureById(m_LogLumTex)->GetTexObj();
+    GLint obj = reinterpret_cast<GLint>(texture::Mgr::GetTextureById(m_LogLumTex)->GetNativeTex());
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, obj);
     glGenerateMipmap(GL_TEXTURE_2D);
@@ -1085,7 +1085,7 @@ void RenderImp::FilterBrightness() {
 
     // Set texture
     render::Device::ClearTexture();
-    render::Device::SetTexture(render::TS_HDRSCENE, texture::Mgr::GetTextureById(m_HDRSceneTex)->GetTexObj(), 0);
+    render::Device::SetTexture(render::TS_HDRSCENE, reinterpret_cast<int32_t>(texture::Mgr::GetTextureById(m_HDRSceneTex)->GetNativeTex()), 0);
 
     // Scene uniforms
     std::vector<uniform::UniformEntry> uniforms = program->GetUniforms();
@@ -1123,7 +1123,7 @@ void RenderImp::FilterBrightness() {
 }
 
 void RenderImp::DownsamplerBrightness() {
-    GLint obj = texture::Mgr::GetTextureById(m_HighLightSceneTex)->GetTexObj();
+    GLint obj = reinterpret_cast<GLint>(texture::Mgr::GetTextureById(m_HighLightSceneTex)->GetNativeTex());
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, obj);
     glGenerateMipmap(GL_TEXTURE_2D);
@@ -1151,7 +1151,7 @@ void RenderImp::BloomH() {
 
     // Set texture
     render::Device::ClearTexture();
-    render::Device::SetTexture(render::TS_LOG_LUM, texture::Mgr::GetTextureById(m_LogLumTex)->GetTexObj(), 0);
+    render::Device::SetTexture(render::TS_LOG_LUM, reinterpret_cast<int32_t>(texture::Mgr::GetTextureById(m_LogLumTex)->GetNativeTex()), 0);
 
     // Scene uniforms
     std::vector<uniform::UniformEntry> uniforms = program->GetUniforms();
@@ -1210,7 +1210,7 @@ void RenderImp::BloomV() {
 
     // Set texture
     render::Device::ClearTexture();
-    render::Device::SetTexture(render::TS_HDR_BLOOM, texture::Mgr::GetTextureById(m_BloomTex)->GetTexObj(), 0);
+    render::Device::SetTexture(render::TS_HDR_BLOOM, reinterpret_cast<int32_t>(texture::Mgr::GetTextureById(m_BloomTex)->GetNativeTex()), 0);
 
     // Scene uniforms
     std::vector<uniform::UniformEntry> uniforms = program->GetUniforms();
@@ -1263,8 +1263,8 @@ void RenderImp::BlendHDRScene() {
 
     // Set texture
     render::Device::ClearTexture();
-    render::Device::SetTexture(render::TS_LOG_LUM, texture::Mgr::GetTextureById(m_LogLumTex)->GetTexObj(), 0);
-    render::Device::SetTexture(render::TS_HDRSCENE, texture::Mgr::GetTextureById(m_HDRSceneTex)->GetTexObj(), 1);
+    render::Device::SetTexture(render::TS_LOG_LUM, reinterpret_cast<int32_t>(texture::Mgr::GetTextureById(m_LogLumTex)->GetNativeTex()), 0);
+    render::Device::SetTexture(render::TS_HDRSCENE, reinterpret_cast<int32_t>(texture::Mgr::GetTextureById(m_HDRSceneTex)->GetNativeTex()), 1);
 
     // Scene uniforms
     std::vector<uniform::UniformEntry> uniforms = program->GetUniforms();
@@ -1430,8 +1430,8 @@ void RenderImp::DrawAO() {
     render::Device::SetShaderLayout(program->GetShaderLayout());
 
     // Texture
-    render::Device::SetTexture(render::TS_DEPTH, texture::Mgr::GetTextureById(m_DepthMap)->GetTexObj(), 0);
-    render::Device::SetTexture(render::TS_RANDOM_ROTATE, texture::Mgr::GetTextureById(m_RandRotateMap)->GetTexObj(), 1);
+    render::Device::SetTexture(render::TS_DEPTH, reinterpret_cast<int32_t>(texture::Mgr::GetTextureById(m_DepthMap)->GetNativeTex()), 0);
+    render::Device::SetTexture(render::TS_RANDOM_ROTATE, reinterpret_cast<int32_t>(texture::Mgr::GetTextureById(m_RandRotateMap)->GetNativeTex()), 1);
 
     // Scene uniforms
     for (int32_t j = 0; j < static_cast<int32_t>(uniforms.size()); j++) {
@@ -1478,8 +1478,8 @@ void RenderImp::BiBlurH() {
     render::Device::SetShaderLayout(program->GetShaderLayout());
 
     // Texture
-    render::Device::SetTexture(render::TS_DEPTH, texture::Mgr::GetTextureById(m_DepthMap)->GetTexObj(), 0);
-    render::Device::SetTexture(render::TS_AO_MAP, texture::Mgr::GetTextureById(m_AOMap)->GetTexObj(), 1);
+    render::Device::SetTexture(render::TS_DEPTH, reinterpret_cast<int32_t>(texture::Mgr::GetTextureById(m_DepthMap)->GetNativeTex()), 0);
+    render::Device::SetTexture(render::TS_AO_MAP, reinterpret_cast<int32_t>(texture::Mgr::GetTextureById(m_AOMap)->GetNativeTex()), 1);
 
     // Scene uniforms
     for (int32_t j = 0; j < static_cast<int32_t>(uniforms.size()); j++) {
@@ -1526,8 +1526,8 @@ void RenderImp::BiBlurV() {
     render::Device::SetShaderLayout(program->GetShaderLayout());
 
     // Texture
-    render::Device::SetTexture(render::TS_DEPTH, texture::Mgr::GetTextureById(m_DepthMap)->GetTexObj(), 0);
-    render::Device::SetTexture(render::TS_BI_BLUR_MAP, texture::Mgr::GetTextureById(m_BiBlurMap)->GetTexObj(), 1);
+    render::Device::SetTexture(render::TS_DEPTH, reinterpret_cast<int32_t>(texture::Mgr::GetTextureById(m_DepthMap)->GetNativeTex()), 0);
+    render::Device::SetTexture(render::TS_BI_BLUR_MAP, reinterpret_cast<int32_t>(texture::Mgr::GetTextureById(m_BiBlurMap)->GetNativeTex()), 1);
 
     // Scene uniforms
     for (int32_t j = 0; j < static_cast<int32_t>(uniforms.size()); j++) {

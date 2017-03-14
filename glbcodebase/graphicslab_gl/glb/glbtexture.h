@@ -58,20 +58,14 @@ public:
      int32_t GetWidth();
      int32_t GetHeight();
      const char* GetName();
-     int32_t GetTexObj();
+     void* GetNativeTex();
 
      void Destroy();
      void UpdateTexture(const void* pixel);
 
  private:
-     int32_t m_Type;                    // The type of the texture
-     int32_t m_Format;                  // The format of the texture
-     int32_t m_TexID;                   // The id of this texture
-     int32_t m_Width;                   // The width of the texture
-     int32_t m_Height;                  // The height of the texture
-     int32_t m_Depth;                   // The depth of the texture
-     char    m_TexName[kMaxTexNameLen]; // The name of the texture
-     int32_t m_TexObj;                  // The texture object in opengl
+     class Imp;
+     Imp*   m_Imp;
 };
 
 //-----------------------------------------------------------------------------------

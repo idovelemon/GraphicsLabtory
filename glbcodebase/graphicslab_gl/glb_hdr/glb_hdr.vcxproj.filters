@@ -12,6 +12,12 @@
     <Filter Include="源文件\glb">
       <UniqueIdentifier>{33dd0c74-68e1-4a40-90ef-946669b97118}</UniqueIdentifier>
     </Filter>
+    <Filter Include="源文件\glb\imp">
+      <UniqueIdentifier>{f3bed1eb-042e-4eff-a82a-f7615c93656a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\glb\imp\gl">
+      <UniqueIdentifier>{d8be3079-aa86-4b41-9027-a2bc5dbf38e4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\glb\comm.cpp">
@@ -73,6 +79,9 @@
     </ClCompile>
     <ClCompile Include="..\glb\glbapplication.cpp">
       <Filter>源文件\glb</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\imp\gl\glbtextureimp.cpp">
+      <Filter>源文件\glb\imp\gl</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -159,6 +168,9 @@
     </ClInclude>
     <ClInclude Include="..\glb\glbapplication.h">
       <Filter>源文件\glb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\imp\gl\glbtextureimp.h">
+      <Filter>源文件\glb\imp\gl</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

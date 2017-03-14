@@ -16,6 +16,12 @@
     <Filter Include="源文件\glb">
       <UniqueIdentifier>{5e5f536a-3e29-40df-a9b2-59d1e03d92f9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="源文件\glb\imp">
+      <UniqueIdentifier>{eb76e8e8-ca75-4a59-9b0a-a12adc769abe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\glb\imp\gl">
+      <UniqueIdentifier>{ca1440ed-1c91-426b-a2ce-d248b54ae406}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\glb\glb.h">
@@ -102,6 +108,9 @@
     <ClInclude Include="..\glb\glbapplication.h">
       <Filter>源文件\glb</Filter>
     </ClInclude>
+    <ClInclude Include="..\glb\imp\gl\glbtextureimp.h">
+      <Filter>源文件\glb\imp\gl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\glb\glbcamera.cpp">
@@ -163,6 +172,9 @@
     </ClCompile>
     <ClCompile Include="..\glb\glbapplication.cpp">
       <Filter>源文件\glb</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\imp\gl\glbtextureimp.cpp">
+      <Filter>源文件\glb\imp\gl</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

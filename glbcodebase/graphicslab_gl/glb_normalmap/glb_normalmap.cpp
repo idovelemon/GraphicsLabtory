@@ -84,7 +84,11 @@ protected:
 };
 
 int _stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPreInstance, LPSTR cmdLine, int nShowCmd) {
-    if (!glb::app::Application::Initialize(ApplicationNormalMap::Create, hInstance, 800, 600, L"glb_normalmap")) {
+    glb::app::AppConfig config;
+    memcpy(config.caption, L"glb_normalmap", sizeof(L"glb_normalmap"));
+    config.screen_width = 800;
+    config.screen_height = 600;
+    if (!glb::app::Application::Initialize(ApplicationNormalMap::Create, hInstance, config)) {
         return 0;
     }
 

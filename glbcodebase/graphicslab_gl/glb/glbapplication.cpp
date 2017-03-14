@@ -45,11 +45,7 @@ public:
     virtual~ApplicationImp();
 
 public:
-    virtual bool Initialize(
-        APPLICATION_CREATOR creator
-        , HINSTANCE hInstance
-        , int32_t width, int32_t height
-        , const wchar_t* caption);
+    virtual bool Initialize(APPLICATION_CREATOR creator, HINSTANCE hInstance, AppConfig config);
     virtual void Update();
     virtual void Destroy();
 
@@ -95,11 +91,7 @@ ApplicationImp::ApplicationImp()
 ApplicationImp::~ApplicationImp() {
 }
 
-bool ApplicationImp::Initialize(
-        APPLICATION_CREATOR creator
-        , HINSTANCE hInstance
-        , int32_t width, int32_t height
-        , const wchar_t* caption) {
+bool ApplicationImp::Initialize(APPLICATION_CREATOR creator, HINSTANCE hInstance, AppConfig config) {
     bool result = true;
 
     // Create user application
@@ -111,14 +103,14 @@ bool ApplicationImp::Initialize(
     }
 
     // Create window
-    if (!CreateWnd(hInstance, width, height, caption)) {
+    if (!CreateWnd(hInstance, config.screen_width, config.screen_height, config.caption)) {
         result = false;
         GLB_SAFE_ASSERT(false);
         return result;
     }
 
     // Setup glb
-    if (!SetupGLB(width, height)) {
+    if (!SetupGLB(config.screen_width, config.screen_height)) {
         result = false;
         GLB_SAFE_ASSERT(false);
         return result;
@@ -223,16 +215,12 @@ bool ApplicationImp::SetupGLB(int32_t width, int32_t height) {
 //-----------------------------------------------------------------------------------
 // Application DEFINITION
 //-----------------------------------------------------------------------------------
-bool Application::Initialize(
-        APPLICATION_CREATOR creator
-        , HINSTANCE hInstance
-        , int32_t width, int32_t height
-        , const wchar_t* caption) {
+bool Application::Initialize(APPLICATION_CREATOR creator, HINSTANCE hInstance, AppConfig config) {
     bool result = true;
     if (s_ApplicationImp == NULL) {
         s_ApplicationImp = new ApplicationImp;
         if (s_ApplicationImp != NULL) {
-            result = s_ApplicationImp->Initialize(creator, hInstance, width, height, caption);
+            result = s_ApplicationImp->Initialize(creator, hInstance, config);
         } else {
             GLB_SAFE_ASSERT(false);
             result = false;

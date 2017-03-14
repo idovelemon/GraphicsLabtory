@@ -23,14 +23,23 @@ namespace glb {
 
 namespace app {
 
+enum PlatformAPI {
+    PA_OPENGL = 0,
+    PA_DX11,
+    PA_MAX,
+};
+
+struct AppConfig {
+    int32_t screen_width;
+    int32_t screen_height;
+    int32_t platform_api;
+    wchar_t caption[128];
+};
+
 class Application {
 public:
     // Core
-    static bool Initialize(
-        APPLICATION_CREATOR creator
-        , HINSTANCE hInstance
-        , int32_t width, int32_t height
-        , const wchar_t* caption);
+    static bool Initialize(APPLICATION_CREATOR creator, HINSTANCE hInstance, AppConfig config);
     static void Update();
     static void Destroy();
 

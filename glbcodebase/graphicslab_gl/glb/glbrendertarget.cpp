@@ -81,8 +81,8 @@ RenderTarget* RenderTarget::Create(int32_t width, int32_t height) {
 void RenderTarget::AttachDepthTexture(texture::Texture* depth_tex) {
     if (depth_tex != NULL) {
         glBindFramebuffer(GL_FRAMEBUFFER, m_FBO);
-        glBindTexture(GL_TEXTURE_2D, depth_tex->GetTexObj());
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depth_tex->GetTexObj(), 0);
+        glBindTexture(GL_TEXTURE_2D, reinterpret_cast<GLuint>(depth_tex->GetNativeTex()));
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, reinterpret_cast<GLuint>(depth_tex->GetNativeTex()), 0);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     } else {
         GLB_SAFE_ASSERT(false);
@@ -93,8 +93,8 @@ void RenderTarget::AttachColorTexture(render::DrawColorBuffer index, texture::Te
     if (render::COLORBUF_COLOR_ATTACHMENT0 <= index && index <= render::COLORBUF_COLOR_ATTACHMENT7
         && color_tex != NULL) {
         glBindFramebuffer(GL_FRAMEBUFFER, m_FBO);
-        glBindTexture(GL_TEXTURE_2D, color_tex->GetTexObj());
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index - render::COLORBUF_COLOR_ATTACHMENT0, GL_TEXTURE_2D, color_tex->GetTexObj(), 0);
+        glBindTexture(GL_TEXTURE_2D, reinterpret_cast<GLuint>(color_tex->GetNativeTex()));
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index - render::COLORBUF_COLOR_ATTACHMENT0, GL_TEXTURE_2D, reinterpret_cast<GLuint>(color_tex->GetNativeTex()), 0);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     } else {
         GLB_SAFE_ASSERT(false);
