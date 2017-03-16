@@ -111,6 +111,9 @@
     <ClInclude Include="..\glb\imp\gl\glbtextureimp.h">
       <Filter>源文件\glb\imp\gl</Filter>
     </ClInclude>
+    <ClInclude Include="..\glb\imp\gl\glbmeshimp.h">
+      <Filter>源文件\glb\imp\gl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\glb\glbcamera.cpp">
@@ -174,6 +177,9 @@
       <Filter>源文件\glb</Filter>
     </ClCompile>
     <ClCompile Include="..\glb\imp\gl\glbtextureimp.cpp">
+      <Filter>源文件\glb\imp\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\imp\gl\glbmeshimp.cpp">
       <Filter>源文件\glb\imp\gl</Filter>
     </ClCompile>
   </ItemGroup>

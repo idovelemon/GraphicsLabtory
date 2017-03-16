@@ -6,17 +6,14 @@
 //-----------------------------------------------------------------------------------
 #include "glbmesh.h"
 
-#include <stdio.h>
-
 #include <fstream>
 #include <vector>
-
-#include <GL\glew.h>
-#include <GL\GL.h>
 
 #include "glbmacro.h"
 #include "glbshader.h"
 #include "glbvector.h"
+
+#include "imp/gl/glbmeshimp.h"
 
 namespace glb {
 
@@ -25,17 +22,10 @@ namespace mesh {
 //-----------------------------------------------------------------------------------
 // CONSTANT VALUE
 //-----------------------------------------------------------------------------------
-static const int32_t kMaxBytesPerLine = 256;
-static const int32_t kScreenMeshBufSize = ((3 + 2)) * 6;
 
 //-----------------------------------------------------------------------------------
 // TYPE DECLARATION
 //-----------------------------------------------------------------------------------
-struct Face {
-    int32_t vertex_index[3];
-    int32_t texcoord_index[3];
-};
-
 class MgrImp;
 static MgrImp* s_MgrImp = NULL;
 
@@ -60,7 +50,7 @@ public:
 
 private:
     std::vector<TriangleMesh*> m_MeshDataBase;
-};  // class TriangleMeshMgrImp
+};  // class MgrImp
 
 //-----------------------------------------------------------------------------------
 // CLASS DEFINITION
@@ -70,134 +60,20 @@ private:
 // TriangleMesh DEFINITION
 //-----------------------------------------------------------------------------------
 TriangleMesh::TriangleMesh()
-: m_ID(-1)
-, m_Name()
-, m_VertexNum(0)
-, m_TriangleNum(0)
-, m_BufSizeInBytes(0)
-, m_VAO(0)
-, m_VBO(0)
-, m_VertexLayout() {
-    memset(&m_VertexLayout, 0, sizeof(m_VertexLayout));
+: m_Imp(NULL) {
 }
 
 TriangleMesh::~TriangleMesh() {
-    if (m_VAO != 0) {
-        glBindVertexArray(0);
-        glDeleteVertexArrays(1, &m_VAO);
-        m_VAO = 0;
-    }
-
-    if (m_VBO != 0) {
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glDeleteBuffers(1, &m_VBO);
-        m_VBO = 0;
-    }
+    GLB_SAFE_DELETE(m_Imp);
 }
 
 TriangleMesh* TriangleMesh::Create(int32_t triangle_num, float* vertices, float* tex_coords, float* normals, float* tangets, float* binormals) {
     TriangleMesh* triangle_mesh = NULL;
 
-    if (triangle_num > 0 && vertices != NULL) {
-        // Calculate buffer size in bytes
-        VertexLayout layout;
-        memset(&layout, 0, sizeof(layout));
-
-        int32_t vertices_buf_size = 3 * triangle_num * 3 * sizeof(float);
-        layout.layouts[layout.count].attriType = VA_POS;
-        layout.layouts[layout.count].size = vertices_buf_size;
-        layout.layouts[layout.count].offset = 0;
-        layout.count++;
-
-        int32_t tex_coords_buf_size = 0;
-        if (tex_coords) {
-            tex_coords_buf_size = 3 * triangle_num * 2 * sizeof(float);
-            layout.layouts[layout.count].attriType = VA_TEXCOORD;
-            layout.layouts[layout.count].size = tex_coords_buf_size;
-            layout.layouts[layout.count].offset = vertices_buf_size;
-            layout.count++;
-        }
-
-        int32_t normal_buf_size = 0;
-        if (normals) {
-            normal_buf_size = 3 * triangle_num * 3 * sizeof(float);
-            layout.layouts[layout.count].attriType = VA_NORMAL;
-            layout.layouts[layout.count].size = normal_buf_size;
-            layout.layouts[layout.count].offset = vertices_buf_size + tex_coords_buf_size;
-            layout.count++;
-        }
-
-        int32_t tanget_buf_size = 0;
-        if (tangets) {
-            tanget_buf_size = 3 * triangle_num * 3 * sizeof(float);
-            layout.layouts[layout.count].attriType = VA_TANGENT;
-            layout.layouts[layout.count].size = tanget_buf_size;
-            layout.layouts[layout.count].offset = vertices_buf_size + tex_coords_buf_size + normal_buf_size;
-            layout.count++;
-        }
-
-        int32_t binormal_buf_size = 0;
-        if (binormals) {
-            binormal_buf_size = 3 * triangle_num * 3 * sizeof(float);
-            layout.layouts[layout.count].attriType = VA_BINORMAL;
-            layout.layouts[layout.count].size = binormal_buf_size;
-            layout.layouts[layout.count].offset = vertices_buf_size + tex_coords_buf_size + normal_buf_size + tanget_buf_size;
-            layout.count++;
-        }
-
-        int32_t buf_size = vertices_buf_size + tex_coords_buf_size + normal_buf_size + tanget_buf_size + binormal_buf_size;
-
-        // Create vertex array object
-        uint32_t vao = 0;
-        glGenVertexArrays(1, &vao);
-        glBindVertexArray(vao);
-
-        // Create vertex buffer object
-        uint32_t vbo = 0;
-        glGenBuffers(1, &vbo);
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBufferData(GL_ARRAY_BUFFER, buf_size, NULL, GL_STATIC_DRAW);
-
-        // Update vertex data
-        glBufferSubData(GL_ARRAY_BUFFER, 0, vertices_buf_size, vertices);
-
-        // Update texture data
-        if (tex_coords) {
-            glBufferSubData(GL_ARRAY_BUFFER, vertices_buf_size, tex_coords_buf_size, tex_coords);
-        }
-
-        // Update normal data
-        if (normals) {
-            glBufferSubData(GL_ARRAY_BUFFER, vertices_buf_size + tex_coords_buf_size, normal_buf_size, normals);
-        }
-
-        // Update tanget data
-        if (tangets) {
-            glBufferSubData(GL_ARRAY_BUFFER, vertices_buf_size + tex_coords_buf_size + normal_buf_size
-                , tanget_buf_size, tangets);
-        }
-
-        // Update binormal data
-        if (binormals) {
-            glBufferSubData(GL_ARRAY_BUFFER, vertices_buf_size + tex_coords_buf_size + normal_buf_size + tanget_buf_size
-                , binormal_buf_size, binormals);
-        }
-
-        // Create TriangleMesh and save value
-        triangle_mesh = new TriangleMesh();
-        if (triangle_mesh != NULL) {
-            triangle_mesh->m_TriangleNum = triangle_num;
-            triangle_mesh->m_VertexNum = 3 * triangle_num;
-            triangle_mesh->m_BufSizeInBytes = buf_size;
-            triangle_mesh->m_VAO = vao;
-            triangle_mesh->m_VBO = vbo;
-            memcpy(&triangle_mesh->m_VertexLayout, &layout, sizeof(layout));
-        } else {
-            GLB_SAFE_ASSERT(false);
-        }
-
-        // Un-binding
-        glBindVertexArray(0);
+    TriangleMesh::Imp* imp = TriangleMesh::Imp::Create(triangle_num, vertices, tex_coords, normals, tangets, binormals);
+    if (imp != NULL) {
+        triangle_mesh = new TriangleMesh;
+        triangle_mesh->m_Imp = imp;
     } else {
         GLB_SAFE_ASSERT(false);
     }
@@ -206,101 +82,124 @@ TriangleMesh* TriangleMesh::Create(int32_t triangle_num, float* vertices, float*
 }
 
 void TriangleMesh::SetId(int32_t id) {
-    m_ID = id;
+    if (m_Imp != NULL) {
+        m_Imp->SetId(id);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
 }
 
 int32_t TriangleMesh::GetId() {
-    return m_ID;
+    int32_t id = 0;
+
+    if (m_Imp != NULL) {
+        id = m_Imp->GetId();
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return id;
 }
 
 void TriangleMesh::SetName(std::string name) {
-    m_Name = name;
+    if (m_Imp != NULL) {
+        m_Imp->SetName(name);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
 }
 
 std::string TriangleMesh::GetName() {
-    return m_Name;
+    std::string name;
+
+    if (m_Imp != NULL) {
+        name = m_Imp->GetName();
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return name;
 }
 
 uint32_t TriangleMesh::GetVAO() {
-    return m_VAO;
+    int32_t ao = -1;
+
+    if (m_Imp != NULL) {
+        ao = m_Imp->GetVAO();
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return ao;
 }
 
 uint32_t TriangleMesh::GetVBO() {
-    return m_VBO;
+    int32_t bo = -1;
+
+    if (m_Imp != NULL) {
+        bo = m_Imp->GetVBO();
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return bo;
 }
 
 VertexLayout TriangleMesh::GetVertexLayout() {
-    return m_VertexLayout;
+    VertexLayout layout;
+
+    if (m_Imp != NULL) {
+        layout = m_Imp->GetVertexLayout();
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return layout;
 }
 
 int32_t TriangleMesh::GetVertexNum() {
-    return m_VertexNum;
+    int32_t vn = 0;
+
+    if (m_Imp != NULL) {
+        vn = m_Imp->GetVertexNum();
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return vn;
+}
+
+VertexBuffer* TriangleMesh::GetVertexBuffer() {
+    VertexBuffer* buf = NULL;
+
+    if (m_Imp != NULL) {
+        buf = m_Imp->GetVertexBuffer();
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return buf;
 }
 
 //-----------------------------------------------------------------------------------
 // DebugMesh DEFINITION
 //-----------------------------------------------------------------------------------
 DebugMesh::DebugMesh()
-: m_VertexArrayObject(0)
-, m_VertexBufferObject(0)
-, m_VertexLayout()
-, m_ShaderDesc()
-, m_VertexNum(0)
-, m_CurLineNum(0) {
+: m_Imp(NULL) {
 }
 
 DebugMesh::~DebugMesh() {
-    if (m_VertexArrayObject != 0) {
-        glBindVertexArray(0);
-        glDeleteVertexArrays(1, &m_VertexArrayObject);
-        m_VertexArrayObject = 0;
-    }
-
-    if (m_VertexBufferObject != 0) {
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glDeleteBuffers(1, &m_VertexBufferObject);
-        m_VertexBufferObject = 0;
-    }
+    GLB_SAFE_DELETE(m_Imp);
 }
 
 DebugMesh* DebugMesh::Create(int32_t max_lines) {
     DebugMesh* mesh = NULL;
 
-    // This mesh only has line primitive with position and color
-    int32_t buf_size = (sizeof(float) * (3 + 3)) * max_lines * 2;
-
-    // Create vertex array object
-    uint32_t vao = 0;
-    glGenVertexArrays(1, &vao);
-    glBindVertexArray(vao);
-
-    // Create vertex buffer object
-    uint32_t vbo = 0;
-    glGenBuffers(1, &vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, buf_size, NULL, GL_DYNAMIC_DRAW);
-
-    if (vao != 0 && vbo != 0) {
+    DebugMesh::Imp* imp = DebugMesh::Imp::Create(max_lines);
+    if (imp != NULL) {
         mesh = new DebugMesh;
         if (mesh != NULL) {
-            mesh->m_VertexArrayObject = vao;
-            mesh->m_VertexBufferObject = vbo;
-            mesh->m_VertexNum = max_lines * 2;
-            mesh->m_MaxLineNum = max_lines;
-            mesh->m_VertexLayout.count = 2;
-
-            // Pos attribute layout
-            mesh->m_VertexLayout.layouts[0].attriType = VA_POS;
-            mesh->m_VertexLayout.layouts[0].offset = 0;
-            mesh->m_VertexLayout.layouts[0].size = 0;
-
-            // Color attribute layout
-            mesh->m_VertexLayout.layouts[1].attriType = VA_COLOR;
-            mesh->m_VertexLayout.layouts[1].offset = sizeof(float) * 3 * 2 * max_lines;
-            mesh->m_VertexLayout.layouts[1].size = 0;
-
-            // Shader desc
-            mesh->m_ShaderDesc.SetFlag(shader::GLB_COLOR_IN_VERTEX, true);
+            mesh->m_Imp = imp;
         } else {
             GLB_SAFE_ASSERT(false);
         }
@@ -312,160 +211,110 @@ DebugMesh* DebugMesh::Create(int32_t max_lines) {
 }
 
 void DebugMesh::AddLine(Vector start, Vector end, Vector color) {
-    if (m_CurLineNum < m_MaxLineNum) {
-        GLfloat vertex_buf[6];
-        vertex_buf[0] = start.x;
-        vertex_buf[1] = start.y;
-        vertex_buf[2] = start.z;
-        vertex_buf[3] = end.x;
-        vertex_buf[4] = end.y;
-        vertex_buf[5] = end.z;
-
-        GLfloat color_buf[6];
-        color_buf[0] = color.x;
-        color_buf[1] = color.y;
-        color_buf[2] = color.z;
-        color_buf[3] = color.x;
-        color_buf[4] = color.y;
-        color_buf[5] = color.z;
-
-        glBindVertexArray(m_VertexArrayObject);
-        glBindBuffer(GL_ARRAY_BUFFER, m_VertexBufferObject);
-        glBufferSubData(GL_ARRAY_BUFFER, m_CurLineNum * 2 * 3 * sizeof(float), sizeof(vertex_buf), vertex_buf);
-        glBufferSubData(GL_ARRAY_BUFFER, m_MaxLineNum * 2 * 3 * sizeof(float) + m_CurLineNum * 2 * 3 * sizeof(float), sizeof(color_buf), color_buf);
-
-        m_CurLineNum++;
+    if (m_Imp != NULL) {
+        m_Imp->AddLine(start, end, color);
+    } else {
+        GLB_SAFE_ASSERT(false);
     }
 }
 
 void DebugMesh::ClearAllLines() {
-    m_CurLineNum = 0;
+    if (m_Imp != NULL) {
+        m_Imp->ClearAllLines();
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
 }
 
 int32_t DebugMesh::GetVAO() {
-    return m_VertexArrayObject;
+    int32_t ao = -1;
+
+    if (m_Imp != NULL) {
+        ao = m_Imp->GetVAO();
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return ao;
 }
 
 int32_t DebugMesh::GetVBO() {
-    return m_VertexBufferObject;
+    int32_t bo = -1;
+
+    if (m_Imp != NULL) {
+        bo = m_Imp->GetVBO();
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return bo;
 }
 
 VertexLayout DebugMesh::GetVertexLayout() {
-    return m_VertexLayout;
+    VertexLayout layout;
+
+    if (m_Imp != NULL) {
+        layout = m_Imp->GetVertexLayout();
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return layout;
 }
 
 shader::Descriptor DebugMesh::GetShaderDesc() {
-    return m_ShaderDesc;
+    shader::Descriptor desc;
+
+    if (m_Imp != NULL) {
+        desc = m_Imp->GetShaderDesc();
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return desc;
 }
 
 int32_t DebugMesh::GetVertexNum() {
-    return m_CurLineNum * 2;
+    int32_t num = 0;
+
+    if (m_Imp != NULL) {
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return num;
+}
+
+VertexBuffer* DebugMesh::GetVertexBuffer() {
+    VertexBuffer* buf = NULL;
+
+    if (m_Imp != NULL) {
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return buf;
 }
 
 //-----------------------------------------------------------------------------------
 // ScreenMesh DEFINITION
 //-----------------------------------------------------------------------------------
 ScreenMesh::ScreenMesh()
-: m_VertexArrayObject(-1)
-, m_VertexBufferObject(-1)
-, m_VertexLayout()
-, m_VertexNum(0) {
+: m_Imp(NULL) {
 }
 
 ScreenMesh::~ScreenMesh() {
-    if (m_VertexArrayObject != 0) {
-        glBindVertexArray(0);
-        glDeleteVertexArrays(1, &m_VertexArrayObject);
-        m_VertexArrayObject = 0;
-    }
-
-    if (m_VertexBufferObject != 0) {
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glDeleteBuffers(1, &m_VertexBufferObject);
-        m_VertexBufferObject = 0;
-    }
+    GLB_SAFE_DELETE(m_Imp);
 }
 
 ScreenMesh* ScreenMesh::Create(int32_t width, int32_t height) {
     ScreenMesh* mesh = NULL;
 
-    if (0 < width && 0 < height) {
-        // This mesh only has position and texture coordinate
-        float buffer[kScreenMeshBufSize];
-        memset(buffer, 0, sizeof(buffer));
-
-        // Build mesh data
-        float half_width = 1.0f;
-        float half_height = 1.0f;
-        float depth = 0.0f;
-
-        // Triangle data
-        buffer[0] = -half_width;
-        buffer[1] = half_height;
-        buffer[2] = depth;
-        buffer[3] = half_width;
-        buffer[4] = -half_height;
-        buffer[5] = depth;
-        buffer[6] = half_width;
-        buffer[7] = half_height;
-        buffer[8] = depth;
-        buffer[9] = -half_width;
-        buffer[10] = half_height;
-        buffer[11] = depth;
-        buffer[12] = -half_width;
-        buffer[13] = -half_height;
-        buffer[14] = depth;
-        buffer[15] = half_width;
-        buffer[16] = -half_height;
-        buffer[17] = depth;
-
-        // Texture coordinate
-        buffer[18] = 0.0f;
-        buffer[19] = 1.0f;
-        buffer[20] = 1.0f;
-        buffer[21] = 0.0f;
-        buffer[22] = 1.0f;
-        buffer[23] = 1.0f;
-        buffer[24] = 0.0f;
-        buffer[25] = 1.0f;
-        buffer[26] = 0.0f;
-        buffer[27] = 0.0f;
-        buffer[28] = 1.0f;
-        buffer[29] = 0.0f;
-
-        // Create vertex array object
-        uint32_t vao = 0;
-        glGenVertexArrays(1, &vao);
-        glBindVertexArray(vao);
-
-        // Create vertex buffer object
-        uint32_t vbo = 0;
-        glGenBuffers(1, &vbo);
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBufferData(GL_ARRAY_BUFFER, kScreenMeshBufSize * sizeof(float), NULL, GL_STATIC_DRAW);
-        glBufferSubData(GL_ARRAY_BUFFER, 0, kScreenMeshBufSize * sizeof(float), buffer);
-
-        if (vao != 0 && vbo != 0) {
-            mesh = new ScreenMesh;
-            if (mesh != NULL) {
-                mesh->m_VertexArrayObject = vao;
-                mesh->m_VertexBufferObject = vbo;
-                mesh->m_VertexNum = 6;
-
-                mesh->m_VertexLayout.count = 2;
-
-                // Pos attribute layout
-                mesh->m_VertexLayout.layouts[0].attriType = VA_POS;
-                mesh->m_VertexLayout.layouts[0].offset = 0;
-                mesh->m_VertexLayout.layouts[0].size = 0;
-
-                // Color attribute layout
-                mesh->m_VertexLayout.layouts[1].attriType = VA_TEXCOORD;
-                mesh->m_VertexLayout.layouts[1].offset = sizeof(float) * 3 * 6;
-                mesh->m_VertexLayout.layouts[1].size = 0;
-            } else {
-                GLB_SAFE_ASSERT(false);
-            }
+    ScreenMesh::Imp* imp = ScreenMesh::Imp::Create(width, height);
+    if (imp != NULL) {
+        mesh = new ScreenMesh;
+        if (mesh != NULL) {
+            mesh->m_Imp = imp;
         } else {
             GLB_SAFE_ASSERT(false);
         }
@@ -477,19 +326,63 @@ ScreenMesh* ScreenMesh::Create(int32_t width, int32_t height) {
 }
 
 int32_t ScreenMesh::GetVAO() {
-    return m_VertexArrayObject;
+    int32_t ao = -1;
+
+    if (m_Imp != NULL) {
+        ao = m_Imp->GetVAO();
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return ao;
 }
 
 int32_t ScreenMesh::GetVBO() {
-    return m_VertexBufferObject;
+    int32_t bo = -1;
+
+    if (m_Imp != NULL) {
+        bo = m_Imp->GetVBO();
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return bo;
 }
 
 VertexLayout ScreenMesh::GetVertexLayout() {
-    return m_VertexLayout;
+    VertexLayout layout;
+
+    if (m_Imp != NULL) {
+        layout = m_Imp->GetVertexLayout();
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return layout;
 }
 
 int32_t ScreenMesh::GetVertexNum() {
-    return m_VertexNum;
+    int32_t vn = 0;
+
+    if (m_Imp != NULL) {
+        vn = m_Imp->GetVertexNum();
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return vn;
+}
+
+VertexBuffer* ScreenMesh::GetVertexBuffer() {
+    VertexBuffer* buf = NULL;
+
+    if (m_Imp != NULL) {
+        buf = m_Imp->GetVertexBuffer();
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return buf;
 }
 
 //-----------------------------------------------------------------------------------

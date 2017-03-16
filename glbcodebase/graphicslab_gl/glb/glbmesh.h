@@ -27,16 +27,7 @@ static const int32_t kDefaultMaxLines = 1000;
 //-----------------------------------------------------------------------------------
 // TYPE DECLARATION
 //-----------------------------------------------------------------------------------
-
-//------------------------------------------------------
-// @TODO(i_dovelemon):Attribute index must be continuous,
-// so define enumurate do not work in any situations.
-//------------------------------------------------------
-enum VertexAttributeIndex{
-    VAI_POSITION,
-    VAI_TEXCOORD,
-    VAI_NORMAL,
-};
+class VertexBuffer;
 
 //-----------------------------------------------------------------------------------
 // CLASS DECLARATION
@@ -81,18 +72,14 @@ public:
     VertexLayout GetVertexLayout();
     int32_t GetVertexNum();
 
+    VertexBuffer* GetVertexBuffer();
+
 protected:
     TriangleMesh();
 
 private:
-    int32_t      m_ID;
-    std::string  m_Name;
-    int32_t      m_VertexNum;
-    int32_t      m_TriangleNum;
-    int32_t      m_BufSizeInBytes;
-    uint32_t     m_VAO;
-    uint32_t     m_VBO;
-    VertexLayout m_VertexLayout;
+    class Imp;
+    Imp*         m_Imp;
 };
 
 //-----------------------------------------------------------------------------------
@@ -111,18 +98,14 @@ public:
     VertexLayout GetVertexLayout();
     shader::Descriptor GetShaderDesc();
     int32_t GetVertexNum();
+    VertexBuffer* GetVertexBuffer();
 
 protected:
     DebugMesh();
 
 private:
-    uint32_t            m_VertexArrayObject;
-    uint32_t            m_VertexBufferObject;
-    VertexLayout        m_VertexLayout;
-    shader::Descriptor  m_ShaderDesc;
-    int32_t             m_VertexNum;
-    int32_t             m_CurLineNum;
-    int32_t             m_MaxLineNum;
+    class Imp;
+    Imp*                m_Imp;
 };
 
 //-----------------------------------------------------------------------------------
@@ -138,15 +121,14 @@ public:
     int32_t GetVBO();
     VertexLayout GetVertexLayout();
     int32_t GetVertexNum();
+    VertexBuffer* GetVertexBuffer();
 
 protected:
     ScreenMesh();
 
 private:
-    uint32_t            m_VertexArrayObject;
-    uint32_t            m_VertexBufferObject;
-    VertexLayout        m_VertexLayout;
-    int32_t             m_VertexNum;
+    class Imp;
+    Imp*                m_Imp;
 };
 
 //-----------------------------------------------------------------------------------

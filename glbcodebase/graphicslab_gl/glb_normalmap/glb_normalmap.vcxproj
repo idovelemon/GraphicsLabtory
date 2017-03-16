@@ -106,6 +106,7 @@
     <ClCompile Include="..\glb\glbtexture.cpp" />
     <ClCompile Include="..\glb\glbtexturereader.cpp" />
     <ClCompile Include="..\glb\glbuniform.cpp" />
+    <ClCompile Include="..\glb\imp\gl\glbmeshimp.cpp" />
     <ClCompile Include="..\glb\imp\gl\glbtextureimp.cpp" />
     <ClCompile Include="glb_normalmap.cpp" />
   </ItemGroup>
@@ -137,6 +138,7 @@
     <ClInclude Include="..\glb\glbtexturereader.h" />
     <ClInclude Include="..\glb\glbuniform.h" />
     <ClInclude Include="..\glb\glbvector.h" />
+    <ClInclude Include="..\glb\imp\gl\glbmeshimp.h" />
     <ClInclude Include="..\glb\imp\gl\glbtextureimp.h" />
     <ClInclude Include="glb_normalmap.h" />
   </ItemGroup>
