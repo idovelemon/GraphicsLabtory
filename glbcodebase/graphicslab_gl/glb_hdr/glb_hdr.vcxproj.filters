@@ -89,6 +89,9 @@
     <ClCompile Include="..\glb\imp\gl\glbrendertargetimp.cpp">
       <Filter>源文件\glb\imp\gl</Filter>
     </ClCompile>
+    <ClCompile Include="..\glb\imp\gl\glbshaderimp.cpp">
+      <Filter>源文件\glb\imp\gl</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\glb\comm.h">
@@ -182,6 +185,9 @@
       <Filter>源文件\glb\imp\gl</Filter>
     </ClInclude>
     <ClInclude Include="..\glb\imp\gl\glbrendertargetimp.h">
+      <Filter>源文件\glb\imp\gl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\imp\gl\glbshaderimp.h">
       <Filter>源文件\glb\imp\gl</Filter>
     </ClInclude>
   </ItemGroup>

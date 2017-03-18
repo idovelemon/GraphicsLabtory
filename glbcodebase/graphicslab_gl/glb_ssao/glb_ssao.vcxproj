@@ -109,6 +109,7 @@
     <ClCompile Include="..\glb\glbuniform.cpp" />
     <ClCompile Include="..\glb\imp\gl\glbmeshimp.cpp" />
     <ClCompile Include="..\glb\imp\gl\glbrendertargetimp.cpp" />
+    <ClCompile Include="..\glb\imp\gl\glbshaderimp.cpp" />
     <ClCompile Include="..\glb\imp\gl\glbtextureimp.cpp" />
     <ClCompile Include="glb_ssao.cpp" />
   </ItemGroup>
@@ -142,6 +143,7 @@
     <ClInclude Include="..\glb\glbvector.h" />
     <ClInclude Include="..\glb\imp\gl\glbmeshimp.h" />
     <ClInclude Include="..\glb\imp\gl\glbrendertargetimp.h" />
+    <ClInclude Include="..\glb\imp\gl\glbshaderimp.h" />
     <ClInclude Include="..\glb\imp\gl\glbtextureimp.h" />
     <ClInclude Include="glb_ssao.h" />
   </ItemGroup>

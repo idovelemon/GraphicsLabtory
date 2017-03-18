@@ -605,7 +605,7 @@ void RenderImp::DrawShadowMap() {
     // Shader
     shader::Program* program = shader::Mgr::GetShader(m_ShadowShader);
     std::vector<uniform::UniformEntry>& uniforms = program->GetUniforms();
-    render::Device::SetShader(program->GetShader());
+    render::Device::SetShader(reinterpret_cast<int32_t>(program->GetNativeShader()));
     render::Device::SetShaderLayout(program->GetShaderLayout());
 
     // Scene uniforms
@@ -696,7 +696,7 @@ void RenderImp::DrawLightLoop() {
         std::vector<uniform::UniformEntry>& uniforms = program->GetUniforms();
 
         // Shader
-        render::Device::SetShader(program->GetShader());
+        render::Device::SetShader(reinterpret_cast<int32_t>(program->GetNativeShader()));
         render::Device::SetShaderLayout(program->GetShaderLayout());
 
         // Scene uniforms
@@ -790,7 +790,7 @@ void RenderImp::DrawDebug() {
     // Shader
     int32_t shader_id = shader::Mgr::GetShader(m_DebugMesh->GetShaderDesc());
     shader::Program* program = shader::Mgr::GetShader(shader_id);
-    render::Device::SetShader(program->GetShader());
+    render::Device::SetShader(reinterpret_cast<int32_t>(program->GetNativeShader()));
     render::Device::SetShaderLayout(program->GetShaderLayout());
 
     // Scene uniforms
@@ -1006,7 +1006,7 @@ void RenderImp::CalcLogLum() {
 
     // Shader
     shader::Program* program = shader::Mgr::GetShader(m_LogLumShader);
-    render::Device::SetShader(program->GetShader());
+    render::Device::SetShader(reinterpret_cast<int32_t>(program->GetNativeShader()));
     render::Device::SetShaderLayout(program->GetShaderLayout());
 
     // Set texture
@@ -1080,7 +1080,7 @@ void RenderImp::FilterBrightness() {
 
     // Shader
     shader::Program* program = shader::Mgr::GetShader(m_FilterBrightnessShader);
-    render::Device::SetShader(program->GetShader());
+    render::Device::SetShader(reinterpret_cast<int32_t>(program->GetNativeShader()));
     render::Device::SetShaderLayout(program->GetShaderLayout());
 
     // Set texture
@@ -1146,7 +1146,7 @@ void RenderImp::BloomH() {
 
     // Shader
     shader::Program* program = shader::Mgr::GetShader(m_BloomHShader);
-    render::Device::SetShader(program->GetShader());
+    render::Device::SetShader(reinterpret_cast<int32_t>(program->GetNativeShader()));
     render::Device::SetShaderLayout(program->GetShaderLayout());
 
     // Set texture
@@ -1205,7 +1205,7 @@ void RenderImp::BloomV() {
 
     // Shader
     shader::Program* program = shader::Mgr::GetShader(m_BloomVShader);
-    render::Device::SetShader(program->GetShader());
+    render::Device::SetShader(reinterpret_cast<int32_t>(program->GetNativeShader()));
     render::Device::SetShaderLayout(program->GetShaderLayout());
 
     // Set texture
@@ -1258,7 +1258,7 @@ void RenderImp::BlendHDRScene() {
 
     // Shader
     shader::Program* program = shader::Mgr::GetShader(m_TonemapShader);
-    render::Device::SetShader(program->GetShader());
+    render::Device::SetShader(reinterpret_cast<int32_t>(program->GetNativeShader()));
     render::Device::SetShaderLayout(program->GetShaderLayout());
 
     // Set texture
@@ -1312,7 +1312,7 @@ void RenderImp::DrawDepthMap() {
     // Shader
     shader::Program* program = shader::Mgr::GetShader(m_DepthShader);
     std::vector<uniform::UniformEntry>& uniforms = program->GetUniforms();
-    render::Device::SetShader(program->GetShader());
+    render::Device::SetShader(reinterpret_cast<int32_t>(program->GetNativeShader()));
     render::Device::SetShaderLayout(program->GetShaderLayout());
 
     // Scene uniforms
@@ -1426,7 +1426,7 @@ void RenderImp::DrawAO() {
     // Shader
     shader::Program* program = shader::Mgr::GetShader(m_AOShader);
     std::vector<uniform::UniformEntry>& uniforms = program->GetUniforms();
-    render::Device::SetShader(program->GetShader());
+    render::Device::SetShader(reinterpret_cast<int32_t>(program->GetNativeShader()));
     render::Device::SetShaderLayout(program->GetShaderLayout());
 
     // Texture
@@ -1474,7 +1474,7 @@ void RenderImp::BiBlurH() {
     // Shader
     shader::Program* program = shader::Mgr::GetShader(m_BiBlurHShader);
     std::vector<uniform::UniformEntry>& uniforms = program->GetUniforms();
-    render::Device::SetShader(program->GetShader());
+    render::Device::SetShader(reinterpret_cast<int32_t>(program->GetNativeShader()));
     render::Device::SetShaderLayout(program->GetShaderLayout());
 
     // Texture
@@ -1522,7 +1522,7 @@ void RenderImp::BiBlurV() {
     // Shader
     shader::Program* program = shader::Mgr::GetShader(m_BiBlurVShader);
     std::vector<uniform::UniformEntry>& uniforms = program->GetUniforms();
-    render::Device::SetShader(program->GetShader());
+    render::Device::SetShader(reinterpret_cast<int32_t>(program->GetNativeShader()));
     render::Device::SetShaderLayout(program->GetShaderLayout());
 
     // Texture

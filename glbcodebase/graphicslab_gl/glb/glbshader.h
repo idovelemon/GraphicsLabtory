@@ -15,8 +15,6 @@
 
 namespace glb {
 
-class Vector;
-
 namespace shader {
 
 enum {
@@ -47,38 +45,6 @@ static const char* kEnableMacros[] = {
     "#define GLB_ENABLE_AO\n",
 };
 
-class VertexShader {
-public:
-    virtual ~VertexShader();
-    static VertexShader* Create(const char* vertex_shader_name);
-    static VertexShader* Create(std::vector<std::string> enable_macros, const char* uber_shader_file_name);
-
-public:
-    uint32_t GetHandle() const;
-
-protected:
-    VertexShader();
-
-private:
-    uint32_t m_VertexShader;
-};
-
-class FragmentShader {
-public:
-    virtual ~FragmentShader();
-    static FragmentShader* Create(const char* fragment_shader_name);
-    static FragmentShader* Create(std::vector<std::string> enable_macros, const char* uber_shader_file_name);
-
-public:
-    uint32_t GetHandle() const;
-
-protected:
-    FragmentShader();
-
-private:
-    uint32_t m_FragmentShader;
-};
-
 class Descriptor {
 public:
     static const int32_t kFlagBitNum = 128;
@@ -97,6 +63,40 @@ private:
     char m_ShaderFlag[16];  // 128 bit flag
 };
 
+class VertexShader {
+public:
+    virtual ~VertexShader();
+    static VertexShader* Create(const char* vertex_shader_name);
+    static VertexShader* Create(std::vector<std::string> enable_macros, const char* uber_shader_file_name);
+
+public:
+    uint32_t GetHandle() const;
+
+protected:
+    VertexShader();
+
+private:
+    class Imp;
+    Imp*    m_Imp;
+};
+
+class FragmentShader {
+public:
+    virtual ~FragmentShader();
+    static FragmentShader* Create(const char* fragment_shader_name);
+    static FragmentShader* Create(std::vector<std::string> enable_macros, const char* uber_shader_file_name);
+
+public:
+    uint32_t GetHandle() const;
+
+protected:
+    FragmentShader();
+
+private:
+    class Imp;
+    Imp*    m_Imp;
+};
+
 class Program {
 public:
     virtual ~Program();
@@ -105,14 +105,9 @@ public:
 
 public:
     void SetID(int32_t id);
-
-    //-------------------------------------------------------------------------------------------
-    // @brief: Get the shader input layout
-    // @return: Shader layout
-    //-------------------------------------------------------------------------------------------
-    const ShaderLayout& GetShaderLayout();
-    const Descriptor& GetShaderDescriptor();
-    const uint32_t GetShader();
+    ShaderLayout GetShaderLayout();
+    Descriptor GetShaderDescriptor();
+    void* GetNativeShader();
     std::vector<uniform::UniformEntry>& GetUniforms();
 
 protected:
@@ -125,13 +120,8 @@ protected:
     static VertexAttribute GetVertexAttribute(const char* attribute_name);
 
 private:
-    int32_t                              m_ID;
-    uint32_t                             m_Program;
-    VertexShader*                        m_VertexShader;
-    FragmentShader*                      m_FragmentShader;
-    ShaderLayout                         m_ShaderLayout;
-    Descriptor                           m_ShaderDescptor;
-    std::vector<uniform::UniformEntry>   m_Uniforms;
+    class Imp;
+    Imp*    m_Imp;
 };
 
 class Mgr {
