@@ -67,8 +67,6 @@ public:
     void SetName(std::string name);
     std::string GetName();
 
-    uint32_t GetVAO();
-    uint32_t GetVBO();
     VertexLayout GetVertexLayout();
     int32_t GetVertexNum();
 
@@ -93,8 +91,6 @@ public:
 public:
     void AddLine(Vector start, Vector end, Vector color);
     void ClearAllLines();
-    int32_t GetVAO();
-    int32_t GetVBO();
     VertexLayout GetVertexLayout();
     shader::Descriptor GetShaderDesc();
     int32_t GetVertexNum();
@@ -117,8 +113,6 @@ public:
     static ScreenMesh* Create(int32_t width, int32_t height);
 
 public:
-    int32_t GetVAO();
-    int32_t GetVBO();
     VertexLayout GetVertexLayout();
     int32_t GetVertexNum();
     VertexBuffer* GetVertexBuffer();

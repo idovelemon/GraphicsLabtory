@@ -15,6 +15,21 @@
 
 namespace glb {
 
+namespace mesh {
+    class TriangleMesh;
+    class VertexBuffer;
+};
+
+namespace shader {
+    class Program;
+};
+
+namespace texture {
+    class Texture;
+};
+
+class RenderTarget;
+
 namespace render {
 
 enum RenderState {
@@ -88,16 +103,15 @@ public:
     static void Destroy();
 
     // Vertex Buffer
-    static void SetVertexArray(int32_t va);
-    static void SetVertexBuffer(int32_t vb);
+    static void SetVertexBuffer(mesh::VertexBuffer* buf);
     static void SetVertexLayout(VertexLayout vlayout);
 
     // Texture
-    static void SetTexture(int32_t slot, int32_t tex_obj, int32_t tex_unit);
+    static void SetTexture(int32_t slot, texture::Texture* tex, int32_t tex_unit);
     static void ClearTexture();
 
     // Shader
-    static void SetShader(int32_t shader);
+    static void SetShader(shader::Program* program);
     static void SetShaderLayout(ShaderLayout layout);
     static void SetUniform1i(int32_t location, int32_t v);
     static void SetUniform1f(int32_t location, float v);
@@ -115,7 +129,7 @@ public:
     static void SetCullFaceMode(CullMode mode);
 
     // Render Target
-    static void SetRenderTarget(int32_t rt);
+    static void SetRenderTarget(RenderTarget* rt);
 
     // Viewport
     static void SetViewport(int32_t x, int32_t y, int32_t width, int32_t height);

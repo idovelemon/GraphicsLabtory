@@ -75,7 +75,7 @@ public:
     virtual ~RenderImp();
 
 public:
-    void Initialize(float width, float height);
+    void Initialize(int32_t width, int32_t height);
     void Destroy();
     void Draw();
 
@@ -85,8 +85,8 @@ public:
     int32_t GetCurPerspectiveType();
     Vector GetFrustumPointInView(int32_t index);
     float GetFarClip();
-    float GetScreenWidth();
-    float GetScreenHeight();
+    int32_t GetScreenWidth();
+    int32_t GetScreenHeight();
     int32_t GetRandomRotateTex();
 
     float GetHDRAverageLum();
@@ -135,8 +135,8 @@ protected:
     inline float ZValueFromCamera(Object* obj);
 
 private:
-    float                                   m_Width;
-    float                                   m_Height;
+    int32_t                                 m_Width;
+    int32_t                                 m_Height;
     std::vector<ShaderGroup>                m_ShaderGroups;
 
     // Perspective
@@ -275,7 +275,7 @@ RenderImp::~RenderImp() {
     Destroy();
 }
 
-void RenderImp::Initialize(float width, float height) {
+void RenderImp::Initialize(int32_t width, int32_t height) {
     m_ShaderGroups.clear();
 
     m_Width = width;
@@ -453,11 +453,11 @@ float RenderImp::GetFarClip() {
     return m_Perspective[Render::PRIMARY_PERS].zfar;
 }
 
-float RenderImp::GetScreenWidth() {
+int32_t RenderImp::GetScreenWidth() {
     return m_Width;
 }
 
-float RenderImp::GetScreenHeight() {
+int32_t RenderImp::GetScreenHeight() {
     return m_Height;
 }
 
@@ -593,7 +593,7 @@ void RenderImp::PreDraw() {
 
 void RenderImp::DrawShadowMap() {
     // Render Target
-    render::Device::SetRenderTarget(reinterpret_cast<int32_t>(m_ShadowRenderTarget->GetNativeRenderTarget()));
+    render::Device::SetRenderTarget(m_ShadowRenderTarget);
 
     // Draw Buffer
     render::Device::SetDrawColorBuffer(render::COLORBUF_NONE);
@@ -605,7 +605,7 @@ void RenderImp::DrawShadowMap() {
     // Shader
     shader::Program* program = shader::Mgr::GetShader(m_ShadowShader);
     std::vector<uniform::UniformEntry>& uniforms = program->GetUniforms();
-    render::Device::SetShader(reinterpret_cast<int32_t>(program->GetNativeShader()));
+    render::Device::SetShader(program);
     render::Device::SetShaderLayout(program->GetShaderLayout());
 
     // Scene uniforms
@@ -639,12 +639,9 @@ void RenderImp::DrawShadowMap() {
 
                 // Vertex Buffer
                 int32_t mesh_id = obj->GetModel()->GetMeshId();
-                uint32_t vao = mesh::Mgr::GetMeshById(mesh_id)->GetVAO();
-                uint32_t vbo = mesh::Mgr::GetMeshById(mesh_id)->GetVBO();
                 VertexLayout layout = mesh::Mgr::GetMeshById(mesh_id)->GetVertexLayout();
                 int32_t num = mesh::Mgr::GetMeshById(mesh_id)->GetVertexNum();
-                render::Device::SetVertexArray(vao);
-                render::Device::SetVertexBuffer(vbo);
+                render::Device::SetVertexBuffer(mesh::Mgr::GetMeshById(mesh_id)->GetVertexBuffer());
                 render::Device::SetVertexLayout(layout);
 
                 if (obj->IsCullFaceEnable()) {
@@ -667,7 +664,7 @@ void RenderImp::DrawShadowMap() {
     }
 
     // Reset render target
-    render::Device::SetRenderTarget(0);
+    render::Device::SetRenderTarget(NULL);
 }
 
 void RenderImp::DrawAOMap() {
@@ -679,7 +676,7 @@ void RenderImp::DrawAOMap() {
 
 void RenderImp::DrawLightLoop() {
     // Render Target
-    render::Device::SetRenderTarget(reinterpret_cast<int32_t>(m_HDRRenderTarget->GetNativeRenderTarget()));
+    render::Device::SetRenderTarget(m_HDRRenderTarget);
 
     // Draw Buffer
     render::Device::SetDrawColorBuffer(render::COLORBUF_COLOR_ATTACHMENT0);
@@ -696,7 +693,7 @@ void RenderImp::DrawLightLoop() {
         std::vector<uniform::UniformEntry>& uniforms = program->GetUniforms();
 
         // Shader
-        render::Device::SetShader(reinterpret_cast<int32_t>(program->GetNativeShader()));
+        render::Device::SetShader(program);
         render::Device::SetShaderLayout(program->GetShaderLayout());
 
         // Scene uniforms
@@ -715,19 +712,19 @@ void RenderImp::DrawLightLoop() {
 
             // Textures
             if (obj->GetModel()->HasDiffuseTexture()) {
-                render::Device::SetTexture(render::TS_DIFFUSE, reinterpret_cast<int32_t>(texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(Model::MT_DIFFUSE))->GetNativeTex()), 0);
+                render::Device::SetTexture(render::TS_DIFFUSE, texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(Model::MT_DIFFUSE)), 0);
             }
             if (obj->GetModel()->HasAlphaTexture()) {
-                render::Device::SetTexture(render::TS_ALPHA, reinterpret_cast<int32_t>(texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(Model::MT_ALPHA))->GetNativeTex()), 1);
+                render::Device::SetTexture(render::TS_ALPHA, texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(Model::MT_ALPHA)), 1);
             }
             if (obj->GetModel()->HasNormalTexture()) {
-                render::Device::SetTexture(render::TS_NORMAL, reinterpret_cast<int32_t>(texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(Model::MT_NORMAL))->GetNativeTex()), 2);
+                render::Device::SetTexture(render::TS_NORMAL, texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(Model::MT_NORMAL)), 2);
             }
             if (obj->GetModel()->IsAcceptShadow()) {
-                render::Device::SetTexture(render::TS_SHADOW, reinterpret_cast<int32_t>(texture::Mgr::GetTextureById(m_ShadowMap)->GetNativeTex()), 3);
+                render::Device::SetTexture(render::TS_SHADOW, texture::Mgr::GetTextureById(m_ShadowMap), 3);
             }
             if (obj->GetModel()->IsUseAO()) {
-                render::Device::SetTexture(render::TS_AO_MAP, reinterpret_cast<int32_t>(texture::Mgr::GetTextureById(m_AOMap)->GetNativeTex()), 4);
+                render::Device::SetTexture(render::TS_AO_MAP, texture::Mgr::GetTextureById(m_AOMap), 4);
             }
 
             // Object Uniform
@@ -742,12 +739,9 @@ void RenderImp::DrawLightLoop() {
 
             // Vertex Buffer
             int32_t mesh_id = obj->GetModel()->GetMeshId();
-            uint32_t vao = mesh::Mgr::GetMeshById(mesh_id)->GetVAO();
-            uint32_t vbo = mesh::Mgr::GetMeshById(mesh_id)->GetVBO();
             VertexLayout layout = mesh::Mgr::GetMeshById(mesh_id)->GetVertexLayout();
             int32_t num = mesh::Mgr::GetMeshById(mesh_id)->GetVertexNum();
-            render::Device::SetVertexArray(vao);
-            render::Device::SetVertexBuffer(vbo);
+            render::Device::SetVertexBuffer(mesh::Mgr::GetMeshById(mesh_id)->GetVertexBuffer());
             render::Device::SetVertexLayout(layout);
 
             if (obj->IsCullFaceEnable()) {
@@ -782,7 +776,7 @@ void RenderImp::DrawLightLoop() {
 
 void RenderImp::DrawDebug() {
     // Render Target
-    render::Device::SetRenderTarget(reinterpret_cast<int32_t>(m_HDRRenderTarget->GetNativeRenderTarget()));
+    render::Device::SetRenderTarget(m_HDRRenderTarget);
 
     // Draw Buffer
     render::Device::SetDrawColorBuffer(render::COLORBUF_COLOR_ATTACHMENT0);
@@ -790,7 +784,7 @@ void RenderImp::DrawDebug() {
     // Shader
     int32_t shader_id = shader::Mgr::GetShader(m_DebugMesh->GetShaderDesc());
     shader::Program* program = shader::Mgr::GetShader(shader_id);
-    render::Device::SetShader(reinterpret_cast<int32_t>(program->GetNativeShader()));
+    render::Device::SetShader(program);
     render::Device::SetShaderLayout(program->GetShaderLayout());
 
     // Scene uniforms
@@ -816,12 +810,9 @@ void RenderImp::DrawDebug() {
     }
 
     // Vertex Buffer
-    uint32_t vao = m_DebugMesh->GetVAO();
-    uint32_t vbo = m_DebugMesh->GetVBO();
     VertexLayout layout = m_DebugMesh->GetVertexLayout();
     int32_t num = m_DebugMesh->GetVertexNum();
-    render::Device::SetVertexArray(vao);
-    render::Device::SetVertexBuffer(vbo);
+    render::Device::SetVertexBuffer(m_DebugMesh->GetVertexBuffer());
     render::Device::SetVertexLayout(layout);
 
     // Render State
@@ -991,10 +982,10 @@ void RenderImp::DownsamplerHDRScene() {
 
 void RenderImp::CalcLogLum() {
     // Change viewport to match render target
-    render::Device::SetViewport(0.0f, 0.0f, m_Width / 2.0f, m_Height / 2.0f);
+    render::Device::SetViewport(0, 0, m_Width / 2, m_Height / 2);
 
     // Render Target
-    render::Device::SetRenderTarget(reinterpret_cast<int32_t>(m_BloomRenderTarget->GetNativeRenderTarget()));
+    render::Device::SetRenderTarget(m_BloomRenderTarget);
 
     // Draw Buffer
     render::Device::SetDrawColorBuffer(render::COLORBUF_COLOR_ATTACHMENT0);
@@ -1006,12 +997,12 @@ void RenderImp::CalcLogLum() {
 
     // Shader
     shader::Program* program = shader::Mgr::GetShader(m_LogLumShader);
-    render::Device::SetShader(reinterpret_cast<int32_t>(program->GetNativeShader()));
+    render::Device::SetShader(program);
     render::Device::SetShaderLayout(program->GetShaderLayout());
 
     // Set texture
     render::Device::ClearTexture();
-    render::Device::SetTexture(render::TS_HDRSCENE, reinterpret_cast<int32_t>(texture::Mgr::GetTextureById(m_HDRSceneTex)->GetNativeTex()), 0);
+    render::Device::SetTexture(render::TS_HDRSCENE, texture::Mgr::GetTextureById(m_HDRSceneTex), 0);
 
     // Scene uniforms
     std::vector<uniform::UniformEntry> uniforms = program->GetUniforms();
@@ -1025,12 +1016,9 @@ void RenderImp::CalcLogLum() {
     }
 
     // Vertex Buffer
-    uint32_t vao = m_ScreenMesh->GetVAO();
-    uint32_t vbo = m_ScreenMesh->GetVBO();
     VertexLayout layout = m_ScreenMesh->GetVertexLayout();
     int32_t num = m_ScreenMesh->GetVertexNum();
-    render::Device::SetVertexArray(vao);
-    render::Device::SetVertexBuffer(vbo);
+    render::Device::SetVertexBuffer(m_ScreenMesh->GetVertexBuffer());
     render::Device::SetVertexLayout(layout);
 
     // Render State
@@ -1045,7 +1033,7 @@ void RenderImp::CalcLogLum() {
     render::Device::SetRenderTarget(0);
 
     // Reset viewport
-    render::Device::SetViewport(0.0f, 0.0f, m_Width, m_Height);
+    render::Device::SetViewport(0, 0, m_Width, m_Height);
 }
 
 void RenderImp::CalcAverageLum() {
@@ -1065,10 +1053,10 @@ void RenderImp::CalcAverageLum() {
 
 void RenderImp::FilterBrightness() {
     // Change viewport to match render target
-    render::Device::SetViewport(0.0f, 0.0f, m_Width / 2.0f, m_Height / 2.0f);
+    render::Device::SetViewport(0, 0, m_Width / 2, m_Height / 2);
 
     // Render Target
-    render::Device::SetRenderTarget(reinterpret_cast<int32_t>(m_BloomRenderTarget->GetNativeRenderTarget()));
+    render::Device::SetRenderTarget(m_BloomRenderTarget);
 
     // Draw Buffer
     render::Device::SetDrawColorBuffer(render::COLORBUF_COLOR_ATTACHMENT0);
@@ -1080,12 +1068,12 @@ void RenderImp::FilterBrightness() {
 
     // Shader
     shader::Program* program = shader::Mgr::GetShader(m_FilterBrightnessShader);
-    render::Device::SetShader(reinterpret_cast<int32_t>(program->GetNativeShader()));
+    render::Device::SetShader(program);
     render::Device::SetShaderLayout(program->GetShaderLayout());
 
     // Set texture
     render::Device::ClearTexture();
-    render::Device::SetTexture(render::TS_HDRSCENE, reinterpret_cast<int32_t>(texture::Mgr::GetTextureById(m_HDRSceneTex)->GetNativeTex()), 0);
+    render::Device::SetTexture(render::TS_HDRSCENE, texture::Mgr::GetTextureById(m_HDRSceneTex), 0);
 
     // Scene uniforms
     std::vector<uniform::UniformEntry> uniforms = program->GetUniforms();
@@ -1099,12 +1087,9 @@ void RenderImp::FilterBrightness() {
     }
 
     // Vertex Buffer
-    uint32_t vao = m_ScreenMesh->GetVAO();
-    uint32_t vbo = m_ScreenMesh->GetVBO();
     VertexLayout layout = m_ScreenMesh->GetVertexLayout();
     int32_t num = m_ScreenMesh->GetVertexNum();
-    render::Device::SetVertexArray(vao);
-    render::Device::SetVertexBuffer(vbo);
+    render::Device::SetVertexBuffer(m_ScreenMesh->GetVertexBuffer());
     render::Device::SetVertexLayout(layout);
 
     // Render State
@@ -1119,7 +1104,7 @@ void RenderImp::FilterBrightness() {
     render::Device::SetRenderTarget(0);
 
     // Reset viewport
-    render::Device::SetViewport(0.0f, 0.0f, m_Width, m_Height);
+    render::Device::SetViewport(0, 0, m_Width, m_Height);
 }
 
 void RenderImp::DownsamplerBrightness() {
@@ -1131,10 +1116,10 @@ void RenderImp::DownsamplerBrightness() {
 
 void RenderImp::BloomH() {
     // Change viewport to match render target
-    render::Device::SetViewport(0.0f, 0.0f, m_Width / 2.0f, m_Height / 2.0f);
+    render::Device::SetViewport(0, 0, m_Width / 2, m_Height / 2);
 
     // Render Target
-    render::Device::SetRenderTarget(reinterpret_cast<int32_t>(m_BloomRenderTarget->GetNativeRenderTarget()));
+    render::Device::SetRenderTarget(m_BloomRenderTarget);
 
     // Draw Buffer
     render::Device::SetDrawColorBuffer(render::COLORBUF_COLOR_ATTACHMENT1);
@@ -1146,12 +1131,12 @@ void RenderImp::BloomH() {
 
     // Shader
     shader::Program* program = shader::Mgr::GetShader(m_BloomHShader);
-    render::Device::SetShader(reinterpret_cast<int32_t>(program->GetNativeShader()));
+    render::Device::SetShader(program);
     render::Device::SetShaderLayout(program->GetShaderLayout());
 
     // Set texture
     render::Device::ClearTexture();
-    render::Device::SetTexture(render::TS_LOG_LUM, reinterpret_cast<int32_t>(texture::Mgr::GetTextureById(m_LogLumTex)->GetNativeTex()), 0);
+    render::Device::SetTexture(render::TS_LOG_LUM, texture::Mgr::GetTextureById(m_LogLumTex), 0);
 
     // Scene uniforms
     std::vector<uniform::UniformEntry> uniforms = program->GetUniforms();
@@ -1165,12 +1150,9 @@ void RenderImp::BloomH() {
     }
 
     // Vertex Buffer
-    uint32_t vao = m_ScreenMesh->GetVAO();
-    uint32_t vbo = m_ScreenMesh->GetVBO();
     VertexLayout layout = m_ScreenMesh->GetVertexLayout();
     int32_t num = m_ScreenMesh->GetVertexNum();
-    render::Device::SetVertexArray(vao);
-    render::Device::SetVertexBuffer(vbo);
+    render::Device::SetVertexBuffer(m_ScreenMesh->GetVertexBuffer());
     render::Device::SetVertexLayout(layout);
 
     // Render State
@@ -1185,15 +1167,15 @@ void RenderImp::BloomH() {
     render::Device::SetRenderTarget(0);
 
     // Reset viewport
-    render::Device::SetViewport(0.0f, 0.0f, m_Width, m_Height);
+    render::Device::SetViewport(0, 0, m_Width, m_Height);
 }
 
 void RenderImp::BloomV() {
     // Change viewport to match render target
-    render::Device::SetViewport(0.0f, 0.0f, m_Width / 2.0f, m_Height / 2.0f);
+    render::Device::SetViewport(0, 0, m_Width / 2, m_Height / 2);
 
     // Render Target
-    render::Device::SetRenderTarget(reinterpret_cast<int32_t>(m_BloomRenderTarget->GetNativeRenderTarget()));
+    render::Device::SetRenderTarget(m_BloomRenderTarget);
 
     // Draw Buffer
     render::Device::SetDrawColorBuffer(render::COLORBUF_COLOR_ATTACHMENT0);
@@ -1205,12 +1187,12 @@ void RenderImp::BloomV() {
 
     // Shader
     shader::Program* program = shader::Mgr::GetShader(m_BloomVShader);
-    render::Device::SetShader(reinterpret_cast<int32_t>(program->GetNativeShader()));
+    render::Device::SetShader(program);
     render::Device::SetShaderLayout(program->GetShaderLayout());
 
     // Set texture
     render::Device::ClearTexture();
-    render::Device::SetTexture(render::TS_HDR_BLOOM, reinterpret_cast<int32_t>(texture::Mgr::GetTextureById(m_BloomTex)->GetNativeTex()), 0);
+    render::Device::SetTexture(render::TS_HDR_BLOOM, texture::Mgr::GetTextureById(m_BloomTex), 0);
 
     // Scene uniforms
     std::vector<uniform::UniformEntry> uniforms = program->GetUniforms();
@@ -1224,12 +1206,9 @@ void RenderImp::BloomV() {
     }
 
     // Vertex Buffer
-    uint32_t vao = m_ScreenMesh->GetVAO();
-    uint32_t vbo = m_ScreenMesh->GetVBO();
     VertexLayout layout = m_ScreenMesh->GetVertexLayout();
     int32_t num = m_ScreenMesh->GetVertexNum();
-    render::Device::SetVertexArray(vao);
-    render::Device::SetVertexBuffer(vbo);
+    render::Device::SetVertexBuffer(m_ScreenMesh->GetVertexBuffer());
     render::Device::SetVertexLayout(layout);
 
     // Render State
@@ -1244,7 +1223,7 @@ void RenderImp::BloomV() {
     render::Device::SetRenderTarget(0);
 
     // Reset viewport
-    render::Device::SetViewport(0.0f, 0.0f, m_Width, m_Height);
+    render::Device::SetViewport(0, 0, m_Width, m_Height);
 }
 
 void RenderImp::BlendHDRScene() {
@@ -1258,13 +1237,13 @@ void RenderImp::BlendHDRScene() {
 
     // Shader
     shader::Program* program = shader::Mgr::GetShader(m_TonemapShader);
-    render::Device::SetShader(reinterpret_cast<int32_t>(program->GetNativeShader()));
+    render::Device::SetShader(program);
     render::Device::SetShaderLayout(program->GetShaderLayout());
 
     // Set texture
     render::Device::ClearTexture();
-    render::Device::SetTexture(render::TS_LOG_LUM, reinterpret_cast<int32_t>(texture::Mgr::GetTextureById(m_LogLumTex)->GetNativeTex()), 0);
-    render::Device::SetTexture(render::TS_HDRSCENE, reinterpret_cast<int32_t>(texture::Mgr::GetTextureById(m_HDRSceneTex)->GetNativeTex()), 1);
+    render::Device::SetTexture(render::TS_LOG_LUM, texture::Mgr::GetTextureById(m_LogLumTex), 0);
+    render::Device::SetTexture(render::TS_HDRSCENE, texture::Mgr::GetTextureById(m_HDRSceneTex), 1);
 
     // Scene uniforms
     std::vector<uniform::UniformEntry> uniforms = program->GetUniforms();
@@ -1278,12 +1257,9 @@ void RenderImp::BlendHDRScene() {
     }
 
     // Vertex Buffer
-    uint32_t vao = m_ScreenMesh->GetVAO();
-    uint32_t vbo = m_ScreenMesh->GetVBO();
     VertexLayout layout = m_ScreenMesh->GetVertexLayout();
     int32_t num = m_ScreenMesh->GetVertexNum();
-    render::Device::SetVertexArray(vao);
-    render::Device::SetVertexBuffer(vbo);
+    render::Device::SetVertexBuffer(m_ScreenMesh->GetVertexBuffer());
     render::Device::SetVertexLayout(layout);
 
     // Render State
@@ -1300,7 +1276,7 @@ void RenderImp::BlendHDRScene() {
 
 void RenderImp::DrawDepthMap() {
     // Render Target
-    render::Device::SetRenderTarget(reinterpret_cast<int32_t>(m_DepthTarget->GetNativeRenderTarget()));
+    render::Device::SetRenderTarget(m_DepthTarget);
 
     // Draw Buffer
     render::Device::SetDrawColorBuffer(render::COLORBUF_NONE);
@@ -1312,7 +1288,7 @@ void RenderImp::DrawDepthMap() {
     // Shader
     shader::Program* program = shader::Mgr::GetShader(m_DepthShader);
     std::vector<uniform::UniformEntry>& uniforms = program->GetUniforms();
-    render::Device::SetShader(reinterpret_cast<int32_t>(program->GetNativeShader()));
+    render::Device::SetShader(program);
     render::Device::SetShaderLayout(program->GetShaderLayout());
 
     // Scene uniforms
@@ -1346,12 +1322,9 @@ void RenderImp::DrawDepthMap() {
 
                 // Vertex Buffer
                 int32_t mesh_id = obj->GetModel()->GetMeshId();
-                uint32_t vao = mesh::Mgr::GetMeshById(mesh_id)->GetVAO();
-                uint32_t vbo = mesh::Mgr::GetMeshById(mesh_id)->GetVBO();
                 VertexLayout layout = mesh::Mgr::GetMeshById(mesh_id)->GetVertexLayout();
                 int32_t num = mesh::Mgr::GetMeshById(mesh_id)->GetVertexNum();
-                render::Device::SetVertexArray(vao);
-                render::Device::SetVertexBuffer(vbo);
+                render::Device::SetVertexBuffer(mesh::Mgr::GetMeshById(mesh_id)->GetVertexBuffer());
                 render::Device::SetVertexLayout(layout);
 
                 if (obj->IsCullFaceEnable()) {
@@ -1386,7 +1359,7 @@ void RenderImp::GenRandRotateMap() {
         seed += proj.GetData()[i];
         seed += view.GetData()[i];
     }
-    srand(floor(seed * 1000));
+    srand(static_cast<unsigned int>(floor(seed * 1000)));
 
     // Build random rotate vector
     Vector rand_rotate_v[16];
@@ -1413,7 +1386,7 @@ void RenderImp::GenRandRotateMap() {
 
 void RenderImp::DrawAO() {
     // Render Target
-    render::Device::SetRenderTarget(reinterpret_cast<int32_t>(m_AORenderTarget->GetNativeRenderTarget()));
+    render::Device::SetRenderTarget(m_AORenderTarget);
 
     // Draw Buffer
     render::Device::SetDrawColorBuffer(render::COLORBUF_COLOR_ATTACHMENT0);
@@ -1426,12 +1399,12 @@ void RenderImp::DrawAO() {
     // Shader
     shader::Program* program = shader::Mgr::GetShader(m_AOShader);
     std::vector<uniform::UniformEntry>& uniforms = program->GetUniforms();
-    render::Device::SetShader(reinterpret_cast<int32_t>(program->GetNativeShader()));
+    render::Device::SetShader(program);
     render::Device::SetShaderLayout(program->GetShaderLayout());
 
     // Texture
-    render::Device::SetTexture(render::TS_DEPTH, reinterpret_cast<int32_t>(texture::Mgr::GetTextureById(m_DepthMap)->GetNativeTex()), 0);
-    render::Device::SetTexture(render::TS_RANDOM_ROTATE, reinterpret_cast<int32_t>(texture::Mgr::GetTextureById(m_RandRotateMap)->GetNativeTex()), 1);
+    render::Device::SetTexture(render::TS_DEPTH, texture::Mgr::GetTextureById(m_DepthMap), 0);
+    render::Device::SetTexture(render::TS_RANDOM_ROTATE, texture::Mgr::GetTextureById(m_RandRotateMap), 1);
 
     // Scene uniforms
     for (int32_t j = 0; j < static_cast<int32_t>(uniforms.size()); j++) {
@@ -1444,12 +1417,9 @@ void RenderImp::DrawAO() {
     }
 
     // Vertex Buffer
-    uint32_t vao = m_ScreenMesh->GetVAO();
-    uint32_t vbo = m_ScreenMesh->GetVBO();
     VertexLayout layout = m_ScreenMesh->GetVertexLayout();
     int32_t num = m_ScreenMesh->GetVertexNum();
-    render::Device::SetVertexArray(vao);
-    render::Device::SetVertexBuffer(vbo);
+    render::Device::SetVertexBuffer(m_ScreenMesh->GetVertexBuffer());
     render::Device::SetVertexLayout(layout);
 
     // Draw
@@ -1461,7 +1431,7 @@ void RenderImp::DrawAO() {
 
 void RenderImp::BiBlurH() {
     // Render Target
-    render::Device::SetRenderTarget(reinterpret_cast<int32_t>(m_AORenderTarget->GetNativeRenderTarget()));
+    render::Device::SetRenderTarget(m_AORenderTarget);
 
     // Draw Buffer
     render::Device::SetDrawColorBuffer(render::COLORBUF_COLOR_ATTACHMENT1);
@@ -1474,12 +1444,12 @@ void RenderImp::BiBlurH() {
     // Shader
     shader::Program* program = shader::Mgr::GetShader(m_BiBlurHShader);
     std::vector<uniform::UniformEntry>& uniforms = program->GetUniforms();
-    render::Device::SetShader(reinterpret_cast<int32_t>(program->GetNativeShader()));
+    render::Device::SetShader(program);
     render::Device::SetShaderLayout(program->GetShaderLayout());
 
     // Texture
-    render::Device::SetTexture(render::TS_DEPTH, reinterpret_cast<int32_t>(texture::Mgr::GetTextureById(m_DepthMap)->GetNativeTex()), 0);
-    render::Device::SetTexture(render::TS_AO_MAP, reinterpret_cast<int32_t>(texture::Mgr::GetTextureById(m_AOMap)->GetNativeTex()), 1);
+    render::Device::SetTexture(render::TS_DEPTH, texture::Mgr::GetTextureById(m_DepthMap), 0);
+    render::Device::SetTexture(render::TS_AO_MAP, texture::Mgr::GetTextureById(m_AOMap), 1);
 
     // Scene uniforms
     for (int32_t j = 0; j < static_cast<int32_t>(uniforms.size()); j++) {
@@ -1492,12 +1462,9 @@ void RenderImp::BiBlurH() {
     }
 
     // Vertex Buffer
-    uint32_t vao = m_ScreenMesh->GetVAO();
-    uint32_t vbo = m_ScreenMesh->GetVBO();
     VertexLayout layout = m_ScreenMesh->GetVertexLayout();
     int32_t num = m_ScreenMesh->GetVertexNum();
-    render::Device::SetVertexArray(vao);
-    render::Device::SetVertexBuffer(vbo);
+    render::Device::SetVertexBuffer(m_ScreenMesh->GetVertexBuffer());
     render::Device::SetVertexLayout(layout);
 
     // Draw
@@ -1509,7 +1476,7 @@ void RenderImp::BiBlurH() {
 
 void RenderImp::BiBlurV() {
     // Render Target
-    render::Device::SetRenderTarget(reinterpret_cast<int32_t>(m_AORenderTarget->GetNativeRenderTarget()));
+    render::Device::SetRenderTarget(m_AORenderTarget);
 
     // Draw Buffer
     render::Device::SetDrawColorBuffer(render::COLORBUF_COLOR_ATTACHMENT0);
@@ -1522,12 +1489,12 @@ void RenderImp::BiBlurV() {
     // Shader
     shader::Program* program = shader::Mgr::GetShader(m_BiBlurVShader);
     std::vector<uniform::UniformEntry>& uniforms = program->GetUniforms();
-    render::Device::SetShader(reinterpret_cast<int32_t>(program->GetNativeShader()));
+    render::Device::SetShader(program);
     render::Device::SetShaderLayout(program->GetShaderLayout());
 
     // Texture
-    render::Device::SetTexture(render::TS_DEPTH, reinterpret_cast<int32_t>(texture::Mgr::GetTextureById(m_DepthMap)->GetNativeTex()), 0);
-    render::Device::SetTexture(render::TS_BI_BLUR_MAP, reinterpret_cast<int32_t>(texture::Mgr::GetTextureById(m_BiBlurMap)->GetNativeTex()), 1);
+    render::Device::SetTexture(render::TS_DEPTH, texture::Mgr::GetTextureById(m_DepthMap), 0);
+    render::Device::SetTexture(render::TS_BI_BLUR_MAP, texture::Mgr::GetTextureById(m_BiBlurMap), 1);
 
     // Scene uniforms
     for (int32_t j = 0; j < static_cast<int32_t>(uniforms.size()); j++) {
@@ -1540,12 +1507,9 @@ void RenderImp::BiBlurV() {
     }
 
     // Vertex Buffer
-    uint32_t vao = m_ScreenMesh->GetVAO();
-    uint32_t vbo = m_ScreenMesh->GetVBO();
     VertexLayout layout = m_ScreenMesh->GetVertexLayout();
     int32_t num = m_ScreenMesh->GetVertexNum();
-    render::Device::SetVertexArray(vao);
-    render::Device::SetVertexBuffer(vbo);
+    render::Device::SetVertexBuffer(m_ScreenMesh->GetVertexBuffer());
     render::Device::SetVertexLayout(layout);
 
     // Draw
@@ -1714,8 +1678,8 @@ float Render::GetFarClip() {
     return result;
 }
 
-float Render::GetScreenWidth() {
-    float result = 0.0f;
+int32_t Render::GetScreenWidth() {
+    int32_t result = 0;
 
     if (s_RenderImp != NULL) {
         result = s_RenderImp->GetScreenWidth();
@@ -1726,8 +1690,8 @@ float Render::GetScreenWidth() {
     return result;
 }
 
-float Render::GetScreenHeight() {
-    float result = 0.0f;
+int32_t Render::GetScreenHeight() {
+    int32_t result = 0;
 
     if (s_RenderImp != NULL) {
         result = s_RenderImp->GetScreenHeight();

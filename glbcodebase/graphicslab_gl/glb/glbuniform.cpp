@@ -447,14 +447,14 @@ Wrapper uniform_far_clip_picker(glb::Object*) {
 Wrapper uniform_screen_width_picker(glb::Object*) {
     Wrapper wrapper;
     wrapper.SetFormat(Wrapper::FMT_FLOAT);
-    wrapper.SetFloat(render::Render::GetScreenWidth());
+    wrapper.SetFloat(static_cast<float>(render::Render::GetScreenWidth()));
     return wrapper;
 }
 
 Wrapper uniform_screen_height_picker(glb::Object*) {
     Wrapper wrapper;
     wrapper.SetFormat(Wrapper::FMT_FLOAT);
-    wrapper.SetFloat(render::Render::GetScreenHeight());
+    wrapper.SetFloat(static_cast<float>(render::Render::GetScreenHeight()));
     return wrapper;
 }
 

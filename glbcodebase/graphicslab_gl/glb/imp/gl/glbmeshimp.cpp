@@ -206,30 +206,6 @@ std::string TriangleMesh::Imp::GetName() {
     return m_Name;
 }
 
-uint32_t TriangleMesh::Imp::GetVAO() {
-    uint32_t ao = -1;
-
-    if (m_VertexBuffer) {
-        ao = m_VertexBuffer->GetVAO();
-    } else {
-        GLB_SAFE_ASSERT(false);
-    }
-
-    return ao;
-}
-
-uint32_t TriangleMesh::Imp::GetVBO() {
-    uint32_t bo = -1;
-
-    if (m_VertexBuffer) {
-        bo = m_VertexBuffer->GetVBO();
-    } else {
-        GLB_SAFE_ASSERT(false);
-    }
-
-    return bo;
-}
-
 VertexLayout TriangleMesh::Imp::GetVertexLayout() {
     return m_VertexLayout;
 }
@@ -332,30 +308,6 @@ void DebugMesh::Imp::AddLine(Vector start, Vector end, Vector color) {
 
 void DebugMesh::Imp::ClearAllLines() {
     m_CurLineNum = 0;
-}
-
-int32_t DebugMesh::Imp::GetVAO() {
-    int32_t ao = -1;
-
-    if (m_VertexBuffer != NULL) {
-        ao = m_VertexBuffer->GetVAO();
-    } else {
-        GLB_SAFE_ASSERT(false);
-    }
-
-    return ao;
-}
-
-int32_t DebugMesh::Imp::GetVBO() {
-    int32_t bo = -1;
-
-    if (m_VertexBuffer != NULL) {
-        bo = m_VertexBuffer->GetVBO();
-    } else {
-        GLB_SAFE_ASSERT(false);
-    }
-
-    return bo;
 }
 
 VertexLayout DebugMesh::Imp::GetVertexLayout() {
@@ -471,30 +423,6 @@ ScreenMesh::Imp* ScreenMesh::Imp::Create(int32_t width, int32_t height) {
     }
 
     return mesh;
-}
-
-int32_t ScreenMesh::Imp::GetVAO() {
-    int32_t ao = -1;
-
-    if (m_VertexBuffer != NULL) {
-        ao = m_VertexBuffer->GetVAO();
-    } else {
-        GLB_SAFE_ASSERT(false);
-    }
-
-    return ao;
-}
-
-int32_t ScreenMesh::Imp::GetVBO() {
-    int32_t bo = -1;
-
-    if (m_VertexBuffer != NULL) {
-        bo = m_VertexBuffer->GetVBO();
-    } else {
-        GLB_SAFE_ASSERT(false);
-    }
-
-    return bo;
 }
 
 VertexLayout ScreenMesh::Imp::GetVertexLayout() {

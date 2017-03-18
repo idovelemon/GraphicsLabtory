@@ -44,8 +44,8 @@ public:
     static int32_t GetCurPerspectiveType();
     static Vector GetFrustumPointInView(int32_t index);
     static float GetFarClip();
-    static float GetScreenWidth();
-    static float GetScreenHeight();
+    static int32_t GetScreenWidth();
+    static int32_t GetScreenHeight();
     static int32_t GetRandomRotateTex();
 
     // HDR
