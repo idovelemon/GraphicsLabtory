@@ -36,12 +36,11 @@ public:
     void DisableDrawColorBuffer(render::DrawColorBuffer index);
     void DisableAllDrawColorBuffers();
 
-    int32_t GetRenderTargetObj();
+    void* GetNativeRenderTarget();
 
 private:
-    int32_t m_FBO;
-    int32_t m_DepthRBO;
-    bool m_bDrawColorBuffers[kMaxDrawColorBuffers];
+    class Imp;
+    Imp*    m_Imp;
 };
 
 };  // namespace glb

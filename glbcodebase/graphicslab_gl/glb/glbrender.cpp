@@ -593,7 +593,7 @@ void RenderImp::PreDraw() {
 
 void RenderImp::DrawShadowMap() {
     // Render Target
-    render::Device::SetRenderTarget(m_ShadowRenderTarget->GetRenderTargetObj());
+    render::Device::SetRenderTarget(reinterpret_cast<int32_t>(m_ShadowRenderTarget->GetNativeRenderTarget()));
 
     // Draw Buffer
     render::Device::SetDrawColorBuffer(render::COLORBUF_NONE);
@@ -679,7 +679,7 @@ void RenderImp::DrawAOMap() {
 
 void RenderImp::DrawLightLoop() {
     // Render Target
-    render::Device::SetRenderTarget(m_HDRRenderTarget->GetRenderTargetObj());
+    render::Device::SetRenderTarget(reinterpret_cast<int32_t>(m_HDRRenderTarget->GetNativeRenderTarget()));
 
     // Draw Buffer
     render::Device::SetDrawColorBuffer(render::COLORBUF_COLOR_ATTACHMENT0);
@@ -782,7 +782,7 @@ void RenderImp::DrawLightLoop() {
 
 void RenderImp::DrawDebug() {
     // Render Target
-    render::Device::SetRenderTarget(m_HDRRenderTarget->GetRenderTargetObj());
+    render::Device::SetRenderTarget(reinterpret_cast<int32_t>(m_HDRRenderTarget->GetNativeRenderTarget()));
 
     // Draw Buffer
     render::Device::SetDrawColorBuffer(render::COLORBUF_COLOR_ATTACHMENT0);
@@ -994,7 +994,7 @@ void RenderImp::CalcLogLum() {
     render::Device::SetViewport(0.0f, 0.0f, m_Width / 2.0f, m_Height / 2.0f);
 
     // Render Target
-    render::Device::SetRenderTarget(m_BloomRenderTarget->GetRenderTargetObj());
+    render::Device::SetRenderTarget(reinterpret_cast<int32_t>(m_BloomRenderTarget->GetNativeRenderTarget()));
 
     // Draw Buffer
     render::Device::SetDrawColorBuffer(render::COLORBUF_COLOR_ATTACHMENT0);
@@ -1068,7 +1068,7 @@ void RenderImp::FilterBrightness() {
     render::Device::SetViewport(0.0f, 0.0f, m_Width / 2.0f, m_Height / 2.0f);
 
     // Render Target
-    render::Device::SetRenderTarget(m_BloomRenderTarget->GetRenderTargetObj());
+    render::Device::SetRenderTarget(reinterpret_cast<int32_t>(m_BloomRenderTarget->GetNativeRenderTarget()));
 
     // Draw Buffer
     render::Device::SetDrawColorBuffer(render::COLORBUF_COLOR_ATTACHMENT0);
@@ -1134,7 +1134,7 @@ void RenderImp::BloomH() {
     render::Device::SetViewport(0.0f, 0.0f, m_Width / 2.0f, m_Height / 2.0f);
 
     // Render Target
-    render::Device::SetRenderTarget(m_BloomRenderTarget->GetRenderTargetObj());
+    render::Device::SetRenderTarget(reinterpret_cast<int32_t>(m_BloomRenderTarget->GetNativeRenderTarget()));
 
     // Draw Buffer
     render::Device::SetDrawColorBuffer(render::COLORBUF_COLOR_ATTACHMENT1);
@@ -1193,7 +1193,7 @@ void RenderImp::BloomV() {
     render::Device::SetViewport(0.0f, 0.0f, m_Width / 2.0f, m_Height / 2.0f);
 
     // Render Target
-    render::Device::SetRenderTarget(m_BloomRenderTarget->GetRenderTargetObj());
+    render::Device::SetRenderTarget(reinterpret_cast<int32_t>(m_BloomRenderTarget->GetNativeRenderTarget()));
 
     // Draw Buffer
     render::Device::SetDrawColorBuffer(render::COLORBUF_COLOR_ATTACHMENT0);
@@ -1300,7 +1300,7 @@ void RenderImp::BlendHDRScene() {
 
 void RenderImp::DrawDepthMap() {
     // Render Target
-    render::Device::SetRenderTarget(m_DepthTarget->GetRenderTargetObj());
+    render::Device::SetRenderTarget(reinterpret_cast<int32_t>(m_DepthTarget->GetNativeRenderTarget()));
 
     // Draw Buffer
     render::Device::SetDrawColorBuffer(render::COLORBUF_NONE);
@@ -1413,7 +1413,7 @@ void RenderImp::GenRandRotateMap() {
 
 void RenderImp::DrawAO() {
     // Render Target
-    render::Device::SetRenderTarget(m_AORenderTarget->GetRenderTargetObj());
+    render::Device::SetRenderTarget(reinterpret_cast<int32_t>(m_AORenderTarget->GetNativeRenderTarget()));
 
     // Draw Buffer
     render::Device::SetDrawColorBuffer(render::COLORBUF_COLOR_ATTACHMENT0);
@@ -1461,7 +1461,7 @@ void RenderImp::DrawAO() {
 
 void RenderImp::BiBlurH() {
     // Render Target
-    render::Device::SetRenderTarget(m_AORenderTarget->GetRenderTargetObj());
+    render::Device::SetRenderTarget(reinterpret_cast<int32_t>(m_AORenderTarget->GetNativeRenderTarget()));
 
     // Draw Buffer
     render::Device::SetDrawColorBuffer(render::COLORBUF_COLOR_ATTACHMENT1);
@@ -1509,7 +1509,7 @@ void RenderImp::BiBlurH() {
 
 void RenderImp::BiBlurV() {
     // Render Target
-    render::Device::SetRenderTarget(m_AORenderTarget->GetRenderTargetObj());
+    render::Device::SetRenderTarget(reinterpret_cast<int32_t>(m_AORenderTarget->GetNativeRenderTarget()));
 
     // Draw Buffer
     render::Device::SetDrawColorBuffer(render::COLORBUF_COLOR_ATTACHMENT0);

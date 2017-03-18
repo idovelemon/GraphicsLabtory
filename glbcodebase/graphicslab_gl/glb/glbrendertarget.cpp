@@ -6,71 +6,29 @@
 //----------------------------------------------------------------
 #include "glbrendertarget.h"
 
-#include <stdio.h>
-
-#include <GL\glew.h>
-#include <GL\GL.h>
-
 #include "glbmacro.h"
-#include "glbtexture.h"
+#include "imp/gl/glbrendertargetimp.h"
 
 namespace glb {
 
-static const int32_t kMinColorBufferIndex = 0;
-static const int32_t kMaxColorBufferIndex = 8;
-
 RenderTarget::RenderTarget()
-: m_FBO(0)
-, m_DepthRBO(0) {
-    memset(m_bDrawColorBuffers, 0, sizeof(m_bDrawColorBuffers));
+: m_Imp(NULL) {
 }
 
 RenderTarget::~RenderTarget() {
-    if (m_DepthRBO != 0) {
-        glBindRenderbuffer(GL_RENDERBUFFER, 0);
-        glDeleteRenderbuffers(1, reinterpret_cast<const GLuint*>(&m_DepthRBO));
-        m_DepthRBO = 0;
-    }
-
-    if (m_FBO != 0) {
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        glDeleteFramebuffers(1, reinterpret_cast<const GLuint*>(&m_FBO));
-        m_FBO = 0;
-    }
+    GLB_SAFE_DELETE(m_Imp);
 }
 
 RenderTarget* RenderTarget::Create(int32_t width, int32_t height) {
-    // Create frame buffer object
-    int32_t fbo = 0;
-    glGenFramebuffers(1, reinterpret_cast<GLuint*>(&fbo));
-    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-    
-    //------------------------------------------------------------------------
-    // Must attach a depth buffer. If do not, the image won't have the effect of depth
-    //------------------------------------------------------------------------
-
-    // Create depth render buffer object
-    int32_t depth_rbo = 0;
-    glGenRenderbuffers(1, reinterpret_cast<GLuint*>(&depth_rbo));
-    glBindRenderbuffer(GL_RENDERBUFFER, depth_rbo);
-
-    // Allocate memory for depth render buffer object
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
-
-    // Attach to frame buffer
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depth_rbo);
-
-    // Check the status
-    GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-    char err_msg[64];
-    sprintf(err_msg, "FBO not ready Status:0x%X", status);
-    GLB_SAFE_ASSERT(status == GL_FRAMEBUFFER_COMPLETE);
-
-    RenderTarget* target = new RenderTarget();
-    if (target != NULL) {
-        target->m_FBO = fbo;
-        target->m_DepthRBO = depth_rbo;
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    RenderTarget* target = NULL;
+    RenderTarget::Imp* imp = RenderTarget::Imp::Create(width, height);
+    if (imp != NULL) {
+        target = new RenderTarget();
+        if (target != NULL) {
+            target->m_Imp = imp;
+        } else {
+            GLB_SAFE_ASSERT(false);
+        }
     } else {
         GLB_SAFE_ASSERT(false);
     }
@@ -79,52 +37,54 @@ RenderTarget* RenderTarget::Create(int32_t width, int32_t height) {
 }
 
 void RenderTarget::AttachDepthTexture(texture::Texture* depth_tex) {
-    if (depth_tex != NULL) {
-        glBindFramebuffer(GL_FRAMEBUFFER, m_FBO);
-        glBindTexture(GL_TEXTURE_2D, reinterpret_cast<GLuint>(depth_tex->GetNativeTex()));
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, reinterpret_cast<GLuint>(depth_tex->GetNativeTex()), 0);
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    if (m_Imp != NULL) {
+        m_Imp->AttachDepthTexture(depth_tex);
     } else {
         GLB_SAFE_ASSERT(false);
     }
 }
 
 void RenderTarget::AttachColorTexture(render::DrawColorBuffer index, texture::Texture* color_tex) {
-    if (render::COLORBUF_COLOR_ATTACHMENT0 <= index && index <= render::COLORBUF_COLOR_ATTACHMENT7
-        && color_tex != NULL) {
-        glBindFramebuffer(GL_FRAMEBUFFER, m_FBO);
-        glBindTexture(GL_TEXTURE_2D, reinterpret_cast<GLuint>(color_tex->GetNativeTex()));
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index - render::COLORBUF_COLOR_ATTACHMENT0, GL_TEXTURE_2D, reinterpret_cast<GLuint>(color_tex->GetNativeTex()), 0);
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    if (m_Imp != NULL) {
+        m_Imp->AttachColorTexture(index, color_tex);
     } else {
         GLB_SAFE_ASSERT(false);
     }
 }
 
 void RenderTarget::EnableDrawColorBuffer(render::DrawColorBuffer index) {
-    if (render::COLORBUF_COLOR_ATTACHMENT0 <= index && index <= render::COLORBUF_COLOR_ATTACHMENT7) {
-        m_bDrawColorBuffers[index - render::COLORBUF_COLOR_ATTACHMENT0] = true;
+    if (m_Imp != NULL) {
+        m_Imp->EnableDrawColorBuffer(index);
     } else {
         GLB_SAFE_ASSERT(false);
     }
 }
 
 void RenderTarget::DisableDrawColorBuffer(render::DrawColorBuffer index) {
-    if (render::COLORBUF_COLOR_ATTACHMENT0 <= index && index <= render::COLORBUF_COLOR_ATTACHMENT7) {
-        m_bDrawColorBuffers[index - render::COLORBUF_COLOR_ATTACHMENT0] = false;
+    if (m_Imp != NULL) {
+        m_Imp->DisableDrawColorBuffer(index);
     } else {
         GLB_SAFE_ASSERT(false);
     }
 }
 
 void RenderTarget::DisableAllDrawColorBuffers() {
-    for (int32_t i = 0; i < kMaxDrawColorBuffers; i++) {
-        m_bDrawColorBuffers[i] = false;
+    if (m_Imp != NULL) {
+        m_Imp->DisableAllDrawColorBuffers();
+    } else {
+        GLB_SAFE_ASSERT(false);
     }
 }
 
-int32_t RenderTarget::GetRenderTargetObj() {
-    return m_FBO;
-}
+void* RenderTarget::GetNativeRenderTarget() {
+    void* rt = NULL;
 
+    if (m_Imp != NULL) {
+        rt = m_Imp->GetNativeRenderTarget();
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return rt;
+}
 };  // namespace glb

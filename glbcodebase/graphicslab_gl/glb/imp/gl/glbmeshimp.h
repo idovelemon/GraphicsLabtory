@@ -4,8 +4,8 @@
 // Date: 2017 / 03 / 14
 // Brief: Implement mesh with opengl
 //-----------------------------------------------------------------------------------
-#ifndef GLB_GLBMESHIMP_H_
-#define GLB_GLBMESHIMP_H_
+#ifndef GLB_GLBMESH_IMP_H_
+#define GLB_GLBMESH_IMP_H_
 
 #ifdef GLB_PLATFORM_OPENGL
 
@@ -139,4 +139,4 @@ private:
 
 #endif  // GLB_PLATFORM_OPENGL
 
-#endif  // GLB_GLBMESHIMP_H_
+#endif  // GLB_GLBMESH_IMP_H_
