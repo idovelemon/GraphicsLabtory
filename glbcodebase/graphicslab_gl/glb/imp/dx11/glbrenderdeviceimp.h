@@ -2,18 +2,21 @@
 // Declaration: Copyright (c), by i_dovelemon, 2017. All right reserved.
 // Author: i_dovelemon[1322600812@qq.com]
 // Date: 2017 / 03 / 18
-// Brief: Implement renderdevice with opengl
+// Brief: Implement renderdevice with dx11
 //-----------------------------------------------------------------------------------
-#ifdef GLB_PLATFORM_OPENGL
+#ifdef GLB_PLATFORM_DX11
 
 #ifndef GLB_GLBRENDERDEVICE_IMP_H_
 #define GLB_GLBRENDERDEVICE_IMP_H_
 
-
 #include "glbrenderdevice.h"
 
-#include <GL\glew.h>
-#include <GL\GL.h>
+class ID3D11Device;
+class ID3D11DeviceContext;
+class IDXGISwapChain;
+class ID3D11RenderTargetView;
+class ID3D11Texture2D;
+class ID3D11DepthStencilView;
 
 namespace glb {
 
@@ -93,9 +96,6 @@ public:
 
 protected:
     void SetupRenderState();
-    GLenum GetPrimitiveTypeGL(PrimitiveType type);
-    GLenum GetAlphaBlendFuncGL(AlphaBlendFunc func);
-    GLenum GetDrawColorBufferGL(DrawColorBuffer buffer);
 
     void SetupCullFace();
     void SetupAlphaBlend();
@@ -103,34 +103,36 @@ protected:
     void SetupTexture();
 
 private:
-    // OS-specific
-    HDC                 m_WindowDC;
-    HGLRC               m_OpenGLContext;
-
-    // Vertex Buffer
-    int32_t             m_VertexArrayObject;
-    int32_t             m_VertexBufferObject;
-    VertexLayout        m_VertexLayout;
+    // D3D device
+    ID3D11Device*           m_D3DDevice;
+    ID3D11DeviceContext*    m_D3DContext;
+    IDXGISwapChain*         m_SwapChain;
+    ID3D11RenderTargetView* m_RenderTargetView;
+    ID3D11Texture2D*        m_DepthStencilTex;
+    ID3D11DepthStencilView* m_DepthStencilView;
 
     // Texture
-    TextureUnit         m_Texture[TS_MAX];
+    TextureUnit             m_Texture[TS_MAX];
+
+    // Vertex Buffer
+    VertexLayout            m_VertexLayout;
 
     // Shader
-    ShaderLayout        m_ShaderLayout;
+    ShaderLayout            m_ShaderLayout;
 
     // Render State
-    bool                m_EnableDepthTest;
-    bool                m_EnableAlphaBlend;
-    bool                m_EnableCullFace;
-    CullMode            m_CullMode;
-    AlphaBlendFunc      m_SrcBlendFunc;
-    AlphaBlendFunc      m_DstBlendFunc;
+    bool                    m_EnableDepthTest;
+    bool                    m_EnableAlphaBlend;
+    bool                    m_EnableCullFace;
+    CullMode                m_CullMode;
+    AlphaBlendFunc          m_SrcBlendFunc;
+    AlphaBlendFunc          m_DstBlendFunc;
 
     // Draw
-    float               m_ClearR;
-    float               m_ClearG;
-    float               m_ClearB;
-    float               m_ClearDepth;
+    float                   m_ClearR;
+    float                   m_ClearG;
+    float                   m_ClearB;
+    float                   m_ClearDepth;
 };
 
 };  // namespace render
@@ -139,4 +141,4 @@ private:
 
 #endif  // GLB_GLBRENDERDEVICE_IMP_H_
 
-#endif  // GLB_PLATFORM_OPENGL
+#endif  // GLB_PLATFORM_DX11

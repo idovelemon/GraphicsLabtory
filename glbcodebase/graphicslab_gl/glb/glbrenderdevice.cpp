@@ -6,6 +6,7 @@
 //--------------------------------------------------------------------
 #include "glbrenderdevice.h"
 
+#include "imp/dx11/glbrenderdeviceimp.h"
 #include "imp/gl/glbrenderdeviceimp.h"
 
 namespace glb {
@@ -237,6 +238,7 @@ void Device::SwapBuffer() {
         GLB_SAFE_ASSERT(false);
     }
 }
+
 };  // namespace render
 
 };  // namespace glb

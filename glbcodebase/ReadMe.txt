@@ -4,16 +4,21 @@
 // Date: 2017/01/14
 // Breif: Include some important information about the graphics labtory project
 // Update: 2017/01/14 File created. All project config information
+// Update: 2017/03/19 Add config for dx11
 //-----------------------------------------------------------------------------------
 
 /***************************************************************************************
+---------------------------------------------------------------------------------------------------------------------------
+                                    OpenGL Version
+---------------------------------------------------------------------------------------------------------------------------
+
 Project Config
 
 Common Setting:
 Output Directory: $(SolutionDir)$(ProjectName)\
 Target File Name: 
-$(ProjectName)_D (For debug version)
-$(ProjectName)_R (For release version)
+$(ProjectName)_DGL (For debug version)
+$(ProjectName)_RGL (For release version)
 
 C/C++ Setting:
 Common->Addtional Include Directory:
@@ -22,7 +27,6 @@ $(SolutionDir)\..\glew\include
 
 Preprocessor->Preprocessor:
 GLB_PLATFORM_OPENGL (For opengl version graphics labtory)
-GLB_PLATFORM_DX11 (For directx11 version graphics labtory)
 
 Linker Setting:
 Common->Addtional Library:
@@ -30,4 +34,37 @@ $(SolutionDir)\..\glew\lib
 Input->Addtional:
 glew32.lib
 opengl32.lib
+***************************************************************************************/
+
+/***************************************************************************************
+---------------------------------------------------------------------------------------------------------------------------
+	                                    DX11 Version
+---------------------------------------------------------------------------------------------------------------------------
+
+Project Config
+
+Common Setting:
+Output Directory: $(SolutionDir)$(ProjectName)\
+Target File Name: 
+$(ProjectName)_DDX (For debug version)
+$(ProjectName)_RDX (For release version)
+
+C/C++ Setting:
+Common->Addtional Include Directory:
+$(SolutionDir)\glb
+(YOUR_DX11_SDK_PATH)\Include
+
+Preprocessor->Preprocessor:
+GLB_PLATFORM_DX11 (For directx11 version graphics labtory)
+
+Linker Setting:
+Common->Addtional Library:
+(YOUR_DX11_SDK_PATH)\Lib\x86
+Input->Addtional:
+d3d11.lib
+d3dx11d.lib (For debug version)
+d3dx11.lib (For release version)
+d3dcompiler.lib
+dxerr.lib
+dxgi.lib
 ***************************************************************************************/

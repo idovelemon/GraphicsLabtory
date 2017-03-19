@@ -23,6 +23,12 @@
         _pointer_ = NULL; \
     }
 
+#define GLB_SAFE_RELEASE(_pointer_) \
+    if (_pointer_ != NULL) { \
+        _pointer_->Release(); \
+        _pointer_ = NULL; \
+    }
+
 #if _DEBUG
 #define GLB_SAFE_ASSERT(_expression_) GLB_SAFE_ASSERT_D(_expression_)
 #else

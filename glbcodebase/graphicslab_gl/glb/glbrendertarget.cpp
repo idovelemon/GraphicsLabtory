@@ -7,6 +7,7 @@
 #include "glbrendertarget.h"
 
 #include "glbmacro.h"
+#include "imp/dx11/glbrendertargetimp.h"
 #include "imp/gl/glbrendertargetimp.h"
 
 namespace glb {

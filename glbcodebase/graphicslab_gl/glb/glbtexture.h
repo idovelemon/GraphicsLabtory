@@ -61,7 +61,9 @@ public:
      void* GetNativeTex();
 
      void Destroy();
-     void UpdateTexture(const void* pixel);
+     void UpdateTextureData(const void* pixel, int32_t miplevel = 0);
+     void GetTextureData(void* pixel, int32_t miplevel = 0);
+     void GenerateMipmap();
 
  private:
      class Imp;

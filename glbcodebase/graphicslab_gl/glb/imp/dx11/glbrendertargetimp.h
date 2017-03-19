@@ -1,10 +1,10 @@
 //-----------------------------------------------------------------------------------
 // Declaration: Copyright (c), by i_dovelemon, 2017. All right reserved.
 // Author: i_dovelemon[1322600812@qq.com]
-// Date: 2017 / 03 / 18
-// Brief: Implement render target with opengl
+// Date: 2017 / 03 / 19
+// Brief: Implement render target with dx11
 //-----------------------------------------------------------------------------------
-#ifdef GLB_PLATFORM_OPENGL
+#ifdef GLB_PLATFORM_DX11
 
 #ifndef GLB_GLBRENDERTARGET_IMP_H_
 #define GLB_GLBRENDERTARGET_IMP_H_
@@ -46,8 +46,6 @@ public:
     void* GetNativeRenderTarget();
 
 private:
-    int32_t m_FBO;
-    int32_t m_DepthRBO;
     bool m_bDrawColorBuffers[kMaxDrawColorBuffers];
 };
 
@@ -55,4 +53,4 @@ private:
 
 #endif  // GLB_GLBRENDERTARGET_IMP_H_
 
-#endif  // GLB_PLATFORM_OPENGL
+#endif  // GLB_PLATFORM_DX11

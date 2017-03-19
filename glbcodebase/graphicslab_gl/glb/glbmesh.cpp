@@ -13,6 +13,7 @@
 #include "glbshader.h"
 #include "glbvector.h"
 
+#include "imp/dx11/glbmeshimp.h"
 #include "imp/gl/glbmeshimp.h"
 
 namespace glb {

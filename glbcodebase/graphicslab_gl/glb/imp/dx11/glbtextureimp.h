@@ -1,17 +1,15 @@
 //-----------------------------------------------------------------------
 // Declaration: Copyright (c), i_dovelemon, 2017. All right reserved.
 // Author: i_dovelemon[1322600812@qq.com]
-// Date: 2017/03/13
-// Brief: Implement the texture with opengl
+// Date: 2017/03/19
+// Brief: Implement the texture with dx11
 //-----------------------------------------------------------------------
-#ifdef GLB_PLATFORM_OPENGL
+#ifdef GLB_PLATFORM_DX11
 
-#ifndef GLB_GLBTEXTUREIMP_GL_
-#define GLB_GLBTEXTUREIMP_GL_
+#ifndef GLB_GLBTEXTUREIMP_H_
+#define GLB_GLBTEXTUREIMP_H_
 
 #include "glbtexture.h"
-
-#include <GL\glew.h>
 
 namespace glb {
 
@@ -63,13 +61,12 @@ public:
      int32_t m_Height;                  // The height of the texture
      int32_t m_Depth;                   // The depth of the texture
      char    m_TexName[kMaxTexNameLen]; // The name of the texture
-     int32_t m_TexObj;                  // The texture object in opengl
 };
 
 };  // namespace texture
 
 };  // namespace glb
 
-#endif  // GLB_GLBTEXTUREIMP_GL_
+#endif  // GLB_GLBTEXTUREIMP_H_
 
-#endif  // GLB_PLATFORM_OPENGL
+#endif  // GLB_PLATFORM_DX11

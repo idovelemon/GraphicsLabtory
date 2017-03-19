@@ -12,6 +12,7 @@
 
 #include "glbmacro.h"
 #include "glbtexturereader.h"
+#include "imp/dx11/glbtextureimp.h"
 #include "imp/gl/glbtextureimp.h"
 
 namespace glb {
@@ -146,9 +147,25 @@ void Texture::Destroy() {
     }
 }
 
-void Texture::UpdateTexture(const void* pixels) {
+void Texture::UpdateTextureData(const void* pixels, int32_t miplevel) {
     if (m_Imp != NULL) {
-        m_Imp->UpdateTexture(pixels);
+        m_Imp->UpdateTextureData(pixels, miplevel);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+}
+
+void Texture::GetTextureData(void* pixels, int32_t miplevel) {
+    if (m_Imp != NULL) {
+        m_Imp->GetTextureData(pixels, miplevel);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+}
+
+void Texture::GenerateMipmap() {
+    if (m_Imp != NULL) {
+        m_Imp->GenerateMipmap();
     } else {
         GLB_SAFE_ASSERT(false);
     }

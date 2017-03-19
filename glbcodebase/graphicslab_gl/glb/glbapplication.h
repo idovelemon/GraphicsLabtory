@@ -44,6 +44,8 @@ public:
     static void Destroy();
 
     static HWND GetWindowHandle();
+    static int32_t GetWindowWidth();
+    static int32_t GetWindowHeight();
 };
 
 class ApplicationBase {

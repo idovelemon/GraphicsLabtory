@@ -1,10 +1,10 @@
 //-----------------------------------------------------------------------
 // Declaration: Copyright (c), i_dovelemon, 2017. All right reserved.
 // Author: i_dovelemon[1322600812@qq.com]
-// Date: 2017/03/18
-// Brief: Implement the shader with opengl
+// Date: 2017/03/19
+// Brief: Implement the shader with dx11
 //-----------------------------------------------------------------------
-#ifdef GLB_PLATFORM_OPENGL
+#ifdef GLB_PLATFORM_DX11
 
 #ifndef GLB_GLBSHADER_IMP_H_
 #define GLB_GLBSHADER_IMP_H_
@@ -43,7 +43,6 @@ protected:
     Imp();
 
 private:
-    uint32_t m_VertexShader;
 };
 
 //-----------------------------------------------------------------------------------
@@ -62,7 +61,6 @@ protected:
     Imp();
 
 private:
-    uint32_t m_FragmentShader;
 };
 
 //-----------------------------------------------------------------------------------
@@ -86,7 +84,6 @@ protected:
 
 private:
     int32_t                              m_ID;
-    uint32_t                             m_Program;
     VertexShader*                        m_VertexShader;
     FragmentShader*                      m_FragmentShader;
     ShaderLayout                         m_ShaderLayout;
@@ -100,4 +97,4 @@ private:
 
 #endif  // GLB_GLBSHADER_IMP_H_
 
-#endif  // GLB_PLATFORM_OPENGL
+#endif  // GLB_PLATFORM_DX11

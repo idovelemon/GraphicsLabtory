@@ -9,9 +9,11 @@
 
 #include <stdio.h>
 
+#ifdef GLB_PLATFORM_OPENGL
 // Other Support library Header
 #include <GL\glew.h>
 #include <GL\GL.h>
+#endif
 
 // Host Project Header
 #include "glb.h"

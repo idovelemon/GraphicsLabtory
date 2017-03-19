@@ -1,10 +1,10 @@
 //-----------------------------------------------------------------------------------
 // Declaration: Copyright (c), by i_dovelemon, 2017. All right reserved.
 // Author: i_dovelemon[1322600812@qq.com]
-// Date: 2017 / 03 / 14
-// Brief: Implement mesh with opengl
+// Date: 2017 / 03 / 19
+// Brief: Implement mesh with dx11
 //-----------------------------------------------------------------------------------
-#ifdef GLB_PLATFORM_OPENGL
+#ifdef GLB_PLATFORM_DX11
 
 #ifndef GLB_GLBMESH_IMP_H_
 #define GLB_GLBMESH_IMP_H_
@@ -36,12 +36,8 @@ public:
     virtual~ VertexBuffer();
 
 public:
-    int32_t GetVAO();
-    int32_t GetVBO();
 
 protected:
-    int32_t             m_VAO;
-    int32_t             m_VBO;
 };
 
 //-----------------------------------------------------------------------------------
@@ -133,4 +129,4 @@ private:
 
 #endif  // GLB_GLBMESH_IMP_H_
 
-#endif  // GLB_PLATFORM_OPENGL
+#endif  // GLB_PLATFORM_DX11

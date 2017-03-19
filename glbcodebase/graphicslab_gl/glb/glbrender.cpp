@@ -18,7 +18,10 @@
 #include "glbscene.h"
 #include "glbshader.h"
 #include "glbtexture.h"
-#include "GL\glew.h"
+
+#ifdef GLB_PLATFORM_OPENGL
+#include "GL/glew.h"
+#endif
 
 namespace glb {
 
@@ -347,7 +350,10 @@ void RenderImp::Draw() {
     DrawDebug();
     DrawHDR();
     AfterDraw();
+
+#ifdef GLB_PLATFORM_OPENGL
     GLB_CHECK_GL_ERROR;
+#endif
 }
 
 void RenderImp::SetPerspective(int32_t type, float fov, float aspect, float znear, float zfar) {
@@ -974,10 +980,7 @@ void RenderImp::PrepareHDR() {
 }
 
 void RenderImp::DownsamplerHDRScene() {
-    GLint obj = reinterpret_cast<GLint>(texture::Mgr::GetTextureById(m_HDRSceneTex)->GetNativeTex());
-    glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, obj);
-    glGenerateMipmap(GL_TEXTURE_2D);
+    texture::Mgr::GetTextureById(m_HDRSceneTex)->GenerateMipmap();
 }
 
 void RenderImp::CalcLogLum() {
@@ -1037,14 +1040,12 @@ void RenderImp::CalcLogLum() {
 }
 
 void RenderImp::CalcAverageLum() {
-    GLint obj = reinterpret_cast<GLint>(texture::Mgr::GetTextureById(m_LogLumTex)->GetNativeTex());
-    glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, obj);
-    glGenerateMipmap(GL_TEXTURE_2D);
+    texture::Texture* tex = texture::Mgr::GetTextureById(m_LogLumTex);
+    tex->GenerateMipmap();
 
-    GLfloat pixel[4];
+    float pixel[4];
     memset(pixel, 0, sizeof(pixel));
-    glGetTexImage(GL_TEXTURE_2D, m_MaxMipmapLevel, GL_RGBA, GL_FLOAT, pixel);
+    tex->GetTextureData(pixel, m_MaxMipmapLevel);
 
     float cur_scene_average_lum = exp(pixel[0]);
     m_AverageLum = m_PreAverageLum + (cur_scene_average_lum - m_PreAverageLum) * m_LightAdaption;
@@ -1108,10 +1109,7 @@ void RenderImp::FilterBrightness() {
 }
 
 void RenderImp::DownsamplerBrightness() {
-    GLint obj = reinterpret_cast<GLint>(texture::Mgr::GetTextureById(m_HighLightSceneTex)->GetNativeTex());
-    glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, obj);
-    glGenerateMipmap(GL_TEXTURE_2D);
+    texture::Mgr::GetTextureById(m_HighLightSceneTex)->GenerateMipmap();
 }
 
 void RenderImp::BloomH() {
@@ -1381,7 +1379,7 @@ void RenderImp::GenRandRotateMap() {
         pixels[i * 4 + 2] = rand_rotate_v[i].z;
         pixels[i * 4 + 3] = rand_rotate_v[i].w;
     }
-    texture::Mgr::GetTextureById(m_RandRotateMap)->UpdateTexture(pixels);
+    texture::Mgr::GetTextureById(m_RandRotateMap)->UpdateTextureData(pixels);
 }
 
 void RenderImp::DrawAO() {

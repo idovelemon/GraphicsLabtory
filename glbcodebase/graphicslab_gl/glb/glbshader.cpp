@@ -6,6 +6,7 @@
 //-------------------------------------------------------------------------------------
 #include "glbshader.h"
 
+#include "imp/dx11/glbshaderimp.h"
 #include "imp/gl/glbshaderimp.h"
 
 namespace glb {

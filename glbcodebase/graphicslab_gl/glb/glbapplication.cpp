@@ -50,6 +50,8 @@ public:
     virtual void Destroy();
 
     HWND GetWindowHandle();
+    int32_t GetWindowWidth();
+    int32_t GetWindowHeight();
 
 protected:
     bool CreateWnd(HINSTANCE hInstance, int32_t width, int32_t height, const wchar_t* caption);
@@ -58,6 +60,7 @@ protected:
 private:
     ApplicationBase*                m_Application;
     HWND                            m_WndHandle;
+    AppConfig                       m_Config;
 };
 
 //----------------------------------------------------------------------------------
@@ -85,7 +88,8 @@ LRESULT CALLBACK GLB_WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) 
 //-----------------------------------------------------------------------------------
 ApplicationImp::ApplicationImp()
 : m_Application(NULL)
-, m_WndHandle(NULL) {
+, m_WndHandle(NULL)
+, m_Config() {
 }
 
 ApplicationImp::~ApplicationImp() {
@@ -93,6 +97,9 @@ ApplicationImp::~ApplicationImp() {
 
 bool ApplicationImp::Initialize(APPLICATION_CREATOR creator, HINSTANCE hInstance, AppConfig config) {
     bool result = true;
+
+    // Save config
+    m_Config = config;
 
     // Create user application
     m_Application = creator();
@@ -160,6 +167,14 @@ void ApplicationImp::Destroy() {
 
 HWND ApplicationImp::GetWindowHandle() {
     return m_WndHandle;
+}
+
+int32_t ApplicationImp::GetWindowWidth() {
+    return m_Config.screen_width;
+}
+
+int32_t ApplicationImp::GetWindowHeight() {
+    return m_Config.screen_height;
 }
 
 bool ApplicationImp::CreateWnd(HINSTANCE hInstance, int32_t width, int32_t height, const wchar_t* caption) {
@@ -254,6 +269,28 @@ HWND Application::GetWindowHandle() {
     HWND result = NULL;
     if (s_ApplicationImp != NULL) {
         result = s_ApplicationImp->GetWindowHandle();
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return result;
+}
+
+int32_t Application::GetWindowWidth() {
+    int32_t result = 0;
+    if (s_ApplicationImp != NULL) {
+        result = s_ApplicationImp->GetWindowWidth();
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return result;
+}
+
+int32_t Application::GetWindowHeight() {
+    int32_t result = 0;
+    if (s_ApplicationImp != NULL) {
+        result = s_ApplicationImp->GetWindowHeight();
     } else {
         GLB_SAFE_ASSERT(false);
     }
