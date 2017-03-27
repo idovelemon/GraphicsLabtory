@@ -101,6 +101,20 @@ void DeviceImp::Initialize() {
 
     // Initialize opengl extension
     glewInit();
+
+#if _DEBUG
+    const GLubyte* version = glGetString(GL_VERSION);
+    OutputDebugStringA("OpenGL Version: ");
+    OutputDebugStringA(reinterpret_cast<LPCSTR>(version));
+
+    const GLubyte* vendor = glGetString(GL_VENDOR);
+    OutputDebugStringA("\nOpenGL Vendor: ");
+    OutputDebugStringA(reinterpret_cast<LPCSTR>(vendor));
+
+    const GLubyte* render = glGetString(GL_RENDERER);
+    OutputDebugStringA("\nOpenGL Render: ");
+    OutputDebugStringA(reinterpret_cast<LPCSTR>(render));
+#endif
 }
 
 void DeviceImp::Destroy() {
