@@ -58,6 +58,7 @@ enum TextureSlot {
     TS_DIFFUSE = 0,
     TS_ALPHA,
     TS_NORMAL,
+    TS_REFLECT,
     TS_SHADOW,
     TS_HDRSCENE,
     TS_LOG_LUM,
@@ -117,7 +118,8 @@ public:
     static void SetUniform1f(int32_t location, float v);
     static void SetUniform3f(int32_t location, const Vector& v);
     static void SetUniformMatrix(int32_t location, const Matrix& m);
-    static void SetUniformSampler(int32_t location, int32_t slot);
+    static void SetUniformSampler2D(int32_t location, int32_t slot);
+    static void SetUniformSamplerCube(int32_t location, int32_t slot);
 
     // Render State
     static void SetDepthTestEnable(bool enable);

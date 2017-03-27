@@ -66,7 +66,8 @@ public:
     void SetUniform1f(int32_t location, float v);
     void SetUniform3f(int32_t location, const Vector& v);
     void SetUniformMatrix(int32_t location, Matrix& m);
-    void SetUniformSampler(int32_t location, int32_t slot);
+    void SetUniformSampler2D(int32_t location, int32_t slot);
+    void SetUniformSamplerCube(int32_t location, int32_t slot);
 
     // Render State
     void SetDepthTestEnable(bool enable);

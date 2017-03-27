@@ -5,5 +5,7 @@
 c库中log函数，表示的是以10为底数的。
 根据log的性质，如果你想求以log(x,y) = log(y) / log(x), 其中x为底数，y为真数
 
-(2)给定贴图的宽width和高height，计算1x1 Mipmap等级需要多少级？
+(3)给定贴图的宽width和高height，计算1x1 Mipmap等级需要多少级？
 int32_t max_level = log(max(width,height)) / log(2);
+
+(4)Cube Map的贴图必须要是正方形的，且尺寸一致

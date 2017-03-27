@@ -53,7 +53,7 @@ Model::Model()
 , m_ModefEffectParam()
 , m_BoundBoxMax(0.0f, 0.0f, 0.0f)
 , m_BoundBoxMin(0.0f, 0.0f, 0.0f) {
-    for (int32_t i = 0; i < render::TS_MAX; i++) {
+    for (int32_t i = 0; i < MT_MAX; i++) {
         m_Tex[i] = -1;
     }
 }
@@ -151,7 +151,7 @@ int32_t Model::GetMeshId() {
 
 int32_t Model::GetTexId(int32_t slot) {
     int32_t result = -1;
-    if (0 <= slot && slot < render::TS_MAX) {
+    if (0 <= slot && slot < MT_MAX) {
         result = m_Tex[slot];
     }
 
@@ -180,6 +180,16 @@ bool Model::HasAlphaTexture() {
 
 bool Model::HasNormalTexture() {
     return m_ModefEffectParam.has_normal_tex;
+}
+
+bool Model::HasReflectTexture() {
+    bool result = false;
+
+    if (m_Tex[MT_REFLECT] != -1) {
+        result = true;
+    }
+
+    return result;
 }
 
 bool Model::HasNormal() {
@@ -220,6 +230,14 @@ void Model::SetCastShadow(bool cast) {
 
 bool Model::IsUseAO() {
     return m_ModefEffectParam.use_ao;
+}
+
+void Model::SetTexWithId(int32_t slot, int32_t tex_id) {
+    if (0 <= slot && slot < MT_MAX) {
+        m_Tex[slot] = tex_id;
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
 }
 //-----------------------------------------------------------------------------------
 // ModelMgrImp DEFINITION

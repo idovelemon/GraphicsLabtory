@@ -20,7 +20,8 @@ namespace uniform {
 Wrapper::Wrapper()
 : m_Int(0)
 , m_Float(0.0f)
-, m_Sampler(0)
+, m_Sampler2D(-1)
+, m_SamplerCube(-1)
 , m_Vector(0.0f, 0.0f, 0.0f)
 , m_Matrix()
 , m_Format(0) {
@@ -45,12 +46,20 @@ float Wrapper::GetFloat() {
     return m_Float;
 }
 
-void Wrapper::SetSampler(int32_t sampler) {
-    m_Sampler = sampler;
+void Wrapper::SetSampler2D(int32_t sampler) {
+    m_Sampler2D = sampler;
 }
 
-int32_t Wrapper::GetSampler() {
-    return m_Sampler;
+int32_t Wrapper::GetSampler2D() {
+    return m_Sampler2D;
+}
+
+void Wrapper::SetSamplerCube(int32_t sampler) {
+    m_SamplerCube = sampler;
+}
+
+int32_t Wrapper::GetSamplerCube() {
+    return m_SamplerCube;
 }
 
 void Wrapper::SetVector(Vector v) {
@@ -93,7 +102,7 @@ Wrapper uniform_viewm_picker(glb::Object*) {
     Wrapper wrapper;
     wrapper.SetFormat(Wrapper::FMT_MATRIX);
 
-    int32_t type = glb::scene::Scene::GetCurCamera();
+    int32_t type = glb::scene::Scene::GetCurCameraType();
     glb::camera::CameraBase* cam = glb::scene::Scene::GetCamera(type);
     if (cam != NULL) {
         wrapper.SetMatrix(cam->GetViewMatrix());
@@ -213,13 +222,13 @@ Wrapper uniform_trans_inv_worldm_picker(glb::Object* obj) {
 
 Wrapper uniform_diffuse_texslot_picker(glb::Object* obj) {
     Wrapper wrapper;
-    wrapper.SetFormat(Wrapper::FMT_SAMPLER);
+    wrapper.SetFormat(Wrapper::FMT_SAMPLER2D);
 
     if (obj != NULL) {
-        wrapper.SetSampler(render::TS_DIFFUSE);
+        wrapper.SetSampler2D(render::TS_DIFFUSE);
     } else {
         GLB_SAFE_ASSERT(false);
-        wrapper.SetSampler(0);
+        wrapper.SetSampler2D(0);
     }
 
     return wrapper;
@@ -227,13 +236,13 @@ Wrapper uniform_diffuse_texslot_picker(glb::Object* obj) {
 
 Wrapper uniform_alpha_texslot_picker(glb::Object* obj) {
     Wrapper wrapper;
-    wrapper.SetFormat(Wrapper::FMT_SAMPLER);
+    wrapper.SetFormat(Wrapper::FMT_SAMPLER2D);
 
     if (obj != NULL) {
-        wrapper.SetSampler(render::TS_ALPHA);
+        wrapper.SetSampler2D(render::TS_ALPHA);
     } else {
         GLB_SAFE_ASSERT(false);
-        wrapper.SetSampler(0);
+        wrapper.SetSampler2D(0);
     }
 
     return wrapper;
@@ -241,22 +250,29 @@ Wrapper uniform_alpha_texslot_picker(glb::Object* obj) {
 
 Wrapper uniform_normal_texslot_picker(glb::Object* obj) {
     Wrapper wrapper;
-    wrapper.SetFormat(Wrapper::FMT_SAMPLER);
+    wrapper.SetFormat(Wrapper::FMT_SAMPLER2D);
 
     if (obj != NULL) {
-        wrapper.SetSampler(render::TS_NORMAL);
+        wrapper.SetSampler2D(render::TS_NORMAL);
     } else {
         GLB_SAFE_ASSERT(false);
-        wrapper.SetSampler(0);
+        wrapper.SetSampler2D(0);
     }
 
     return wrapper;
 }
 
+Wrapper uniform_reflect_texslot_picker(glb::Object* obj) {
+    Wrapper wrapper;
+    wrapper.SetFormat(Wrapper::FMT_SAMPLERCUBE);
+    wrapper.SetSamplerCube(render::TS_REFLECT);
+    return wrapper;
+}
+
 Wrapper uniform_shadow_texslot_picker(glb::Object* obj) {
     Wrapper wrapper;
-    wrapper.SetFormat(Wrapper::FMT_SAMPLER);
-    wrapper.SetSampler(render::TS_SHADOW);
+    wrapper.SetFormat(Wrapper::FMT_SAMPLER2D);
+    wrapper.SetSampler2D(render::TS_SHADOW);
     return wrapper;
 }
 
@@ -404,15 +420,15 @@ Wrapper uniform_hdr_average_lum_picker(glb::Object*) {
 
 Wrapper uniform_hdr_scene_tex_picker(glb::Object*) {
     Wrapper wrapper;
-    wrapper.SetFormat(Wrapper::FMT_SAMPLER);
-    wrapper.SetSampler(render::TS_HDRSCENE);
+    wrapper.SetFormat(Wrapper::FMT_SAMPLER2D);
+    wrapper.SetSampler2D(render::TS_HDRSCENE);
     return wrapper;
 }
 
 Wrapper uniform_log_lum_tex_picker(glb::Object*) {
     Wrapper wrapper;
-    wrapper.SetFormat(Wrapper::FMT_SAMPLER);
-    wrapper.SetSampler(render::TS_LOG_LUM);
+    wrapper.SetFormat(Wrapper::FMT_SAMPLER2D);
+    wrapper.SetSampler2D(render::TS_LOG_LUM);
     return wrapper;
 }
 
@@ -432,8 +448,8 @@ Wrapper uniform_bloom_tex_height_picker(glb::Object*) {
 
 Wrapper uniform_hdr_bloom_tex_picker(glb::Object*) {
     Wrapper wrapper;
-    wrapper.SetFormat(Wrapper::FMT_SAMPLER);
-    wrapper.SetSampler(render::TS_HDR_BLOOM);
+    wrapper.SetFormat(Wrapper::FMT_SAMPLER2D);
+    wrapper.SetSampler2D(render::TS_HDR_BLOOM);
     return wrapper;
 }
 
@@ -460,29 +476,29 @@ Wrapper uniform_screen_height_picker(glb::Object*) {
 
 Wrapper uniform_depth_tex_picker(glb::Object*) {
     Wrapper wrapper;
-    wrapper.SetFormat(Wrapper::FMT_SAMPLER);
-    wrapper.SetSampler(render::TS_DEPTH);
+    wrapper.SetFormat(Wrapper::FMT_SAMPLER2D);
+    wrapper.SetSampler2D(render::TS_DEPTH);
     return wrapper;
 }
 
 Wrapper uniform_random_rotate_tex_picker(glb::Object*) {
     Wrapper wrapper;
-    wrapper.SetFormat(Wrapper::FMT_SAMPLER);
-    wrapper.SetSampler(render::TS_RANDOM_ROTATE);
+    wrapper.SetFormat(Wrapper::FMT_SAMPLER2D);
+    wrapper.SetSampler2D(render::TS_RANDOM_ROTATE);
     return wrapper;
 }
 
 Wrapper uniform_ao_tex_picker(glb::Object*) {
     Wrapper wrapper;
-    wrapper.SetFormat(Wrapper::FMT_SAMPLER);
-    wrapper.SetSampler(render::TS_AO_MAP);
+    wrapper.SetFormat(Wrapper::FMT_SAMPLER2D);
+    wrapper.SetSampler2D(render::TS_AO_MAP);
     return wrapper;
 }
 
 Wrapper uniform_biblur_tex_picker(glb::Object*) {
     Wrapper wrapper;
-    wrapper.SetFormat(Wrapper::FMT_SAMPLER);
-    wrapper.SetSampler(render::TS_BI_BLUR_MAP);
+    wrapper.SetFormat(Wrapper::FMT_SAMPLER2D);
+    wrapper.SetSampler2D(render::TS_BI_BLUR_MAP);
     return wrapper;
 }
 

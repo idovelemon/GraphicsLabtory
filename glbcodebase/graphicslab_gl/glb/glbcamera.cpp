@@ -14,6 +14,13 @@ namespace glb {
 
 namespace camera {
 
+//-----------------------------------------------------------------------------------
+// CLASS DEFINITION
+//-----------------------------------------------------------------------------------
+
+//-----------------------------------------------------------------------------------
+// FreeCamera DEFINITION
+//-----------------------------------------------------------------------------------
 FreeCamera::FreeCamera() {
 }
 
@@ -31,6 +38,42 @@ FreeCamera* FreeCamera::Create(Vector pos, Vector target) {
     }
 
     return camera;
+}
+
+void FreeCamera::Clone(CameraBase** cam) {
+    if (cam != NULL) {
+        if (*cam == NULL) {
+            FreeCamera* free_cam = new FreeCamera;
+            if (free_cam != NULL) {
+                free_cam->m_Pos = m_Pos;
+                free_cam->m_Target = m_Target;
+                free_cam->m_ViewMatrix = m_ViewMatrix;
+                *cam = free_cam;
+            } else {
+                GLB_SAFE_ASSERT(false);
+            }
+        } else {
+            GLB_SAFE_ASSERT(false);
+        }
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+}
+
+void FreeCamera::Restore(CameraBase** cam) {
+    if (cam != NULL) {
+        if (*cam != NULL) {
+            FreeCamera* free_cam = reinterpret_cast<FreeCamera*>(*cam);
+            m_Pos = free_cam->m_Pos;
+            m_Target = free_cam->m_Target;
+            m_ViewMatrix = free_cam->m_ViewMatrix;
+            GLB_SAFE_DELETE((*cam));
+        } else {
+            GLB_SAFE_ASSERT(false);
+        }
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
 }
 
 void FreeCamera::Update(float dt) {
@@ -73,6 +116,78 @@ void FreeCamera::Rotate(float rx, float ry) {
     to_target = rot_y * to_target;
 
     m_Target = m_Pos + to_target;
+}
+
+//-----------------------------------------------------------------------------------
+// ModelCamera DEFINITION
+//-----------------------------------------------------------------------------------
+ModelCamera::ModelCamera() {
+}
+
+ModelCamera::~ModelCamera() {
+}
+
+ModelCamera* ModelCamera::Create(Vector pos, Vector target) {
+    ModelCamera* camera = new ModelCamera();
+    if (camera != NULL) {
+        camera->m_Pos = pos;
+        camera->m_Target = target;
+        camera->m_ViewMatrix.MakeViewMatrix(pos, target);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return camera;
+}
+
+void ModelCamera::Clone(CameraBase** cam) {
+    if (cam != NULL) {
+        if (*cam == NULL) {
+            ModelCamera* model_cam = new ModelCamera;
+            if (model_cam != NULL) {
+                model_cam->m_Pos = m_Pos;
+                model_cam->m_Target = m_Target;
+                model_cam->m_ViewMatrix = m_ViewMatrix;
+                *cam = model_cam;
+            } else {
+                GLB_SAFE_ASSERT(false);
+            }
+        } else {
+            GLB_SAFE_ASSERT(false);
+        }
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+}
+
+void ModelCamera::Restore(CameraBase** cam) {
+    if (cam != NULL) {
+        if (*cam != NULL) {
+            ModelCamera* free_cam = reinterpret_cast<ModelCamera*>(*cam);
+            m_Pos = free_cam->m_Pos;
+            m_Target = free_cam->m_Target;
+            m_ViewMatrix = free_cam->m_ViewMatrix;
+            GLB_SAFE_DELETE((*cam));
+        } else {
+            GLB_SAFE_ASSERT(false);
+        }
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+}
+
+void ModelCamera::Update(float dt) {
+    m_ViewMatrix.MakeViewMatrix(m_Pos, m_Target);
+}
+
+void ModelCamera::Rotate(float rot) {
+    Vector to_cam = m_Pos - m_Target;
+    Matrix m;
+    m.MakeTranslateMatrix(-m_Target.x, -m_Target.y, -m_Target.z);
+    m.RotateY(rot);
+    m.Translate(m_Target.x, m_Target.y, m_Target.z);
+    to_cam = m * to_cam;
+    m_Pos = m_Target + to_cam;
 }
 
 };  // namespace camera

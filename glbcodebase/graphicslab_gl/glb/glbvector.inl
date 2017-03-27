@@ -27,6 +27,10 @@ void Vector::Set(float x, float y, float z, float w) {
     this->w = w;
 }
 
+Vector Vector::operator-() {
+    return Vector(-x, -y, -z, w);
+}
+
 Vector Vector::operator+(const Vector& v) {
     Vector result(0.0f, 0.0f, 0.0f);
     result.x = this->x + v.x;

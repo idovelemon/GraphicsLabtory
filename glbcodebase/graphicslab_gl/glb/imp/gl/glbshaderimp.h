@@ -47,6 +47,24 @@ private:
 };
 
 //-----------------------------------------------------------------------------------
+// GeometryShader::Imp DECLARATION
+//----------------------------------------------------------------------------------
+class GeometryShader::Imp {
+public:
+    virtual ~Imp();
+    static GeometryShader::Imp* Create(const char* geometry_shader_name);
+
+public:
+    uint32_t GetHandle() const;
+
+protected:
+    Imp();
+
+private:
+    uint32_t m_GeometryShader;
+};
+
+//-----------------------------------------------------------------------------------
 // FragmentShader::Imp DECLARATION
 //----------------------------------------------------------------------------------
 class FragmentShader::Imp {
@@ -71,7 +89,7 @@ private:
 class Program::Imp {
 public:
     virtual ~Imp();
-    static Program::Imp* Create(const char* vertex_shader_file, const char* fragment_shader_file);
+    static Program::Imp* Create(const char* vertex_shader_file, const char* fragment_shader_file, const char* geometry_shader_file = NULL);
     static Program::Imp* Create(Descriptor desc);
 
 public:

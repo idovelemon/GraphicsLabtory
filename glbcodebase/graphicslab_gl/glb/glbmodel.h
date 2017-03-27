@@ -18,6 +18,7 @@ public:
         MT_DIFFUSE = 0,
         MT_ALPHA,
         MT_NORMAL,
+        MT_REFLECT,
         MT_MAX,
     };
 public:
@@ -38,6 +39,7 @@ public:
     bool HasDiffuseTexture();
     bool HasAlphaTexture();
     bool HasNormalTexture();
+    bool HasReflectTexture();
     bool HasNormal();
     bool HasTangent();
     bool HasBinormal();
@@ -48,6 +50,8 @@ public:
     bool IsCastShadow();
     void SetCastShadow(bool cast);
     bool IsUseAO();
+
+    void SetTexWithId(int32_t slot, int32_t tex_id);
 
 private:
     std::string m_Name;

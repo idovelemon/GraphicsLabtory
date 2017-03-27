@@ -47,7 +47,6 @@ Object* Object::Create(const char* file_name, Vector pos, Vector scale, Vector r
                 obj->m_Rotation = rotation;
                 obj->m_WorldMatrix.MakeIdentityMatrix();
                 obj->m_ShaderDesc = obj->CalculateShaderDesc();
-                obj->m_ShaderProgramID = shader::Mgr::GetShader(obj->m_ShaderDesc);
             } else {
                 GLB_SAFE_ASSERT(false);
             }
@@ -109,10 +108,6 @@ shader::Descriptor Object::GetShaderDesc() {
     return m_ShaderDesc;
 }
 
-int32_t Object::GetShaderProgramID() {
-    return m_ShaderProgramID;
-}
-
 void Object::SetAlphaBlendEnable(bool enable) {
     m_EnableAlphaBlend = enable;
 }
@@ -163,6 +158,39 @@ void Object::SetCullFaceMode(render::CullMode cull_mode) {
 
 render::CullMode Object::GetCullFaceMode() {
     return m_CullMode;
+}
+
+void Object::SetTexWithId(int32_t slot, int32_t tex_id) {
+    if (m_Model) {
+        switch (slot) {
+        case Model::MT_ALPHA:
+            m_ShaderDesc.SetFlag(shader::GLB_ENABLE_ALPHA_TEX, true);
+            break;
+
+        case Model::MT_NORMAL:
+            m_ShaderDesc.SetFlag(shader::GLB_ENABLE_NORMAL_TEX, true);
+            break;
+
+        case Model::MT_REFLECT:
+            m_ShaderDesc.SetFlag(shader::GLB_ENABLE_REFLECT_TEX, true);
+            break;
+        }
+        m_Model->SetTexWithId(slot, tex_id);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+}
+
+int32_t Object::GetTexId(int32_t slot) {
+    int32_t result = -1;
+
+    if (m_Model) {
+        result = m_Model->GetTexId(slot);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return result;
 }
 
 void Object::Update() {

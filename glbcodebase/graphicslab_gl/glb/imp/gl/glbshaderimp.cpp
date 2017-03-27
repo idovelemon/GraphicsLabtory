@@ -215,6 +215,66 @@ uint32_t VertexShader::Imp::GetHandle() const {
 }
 
 //--------------------------------------------------------------------------------------
+// GeometryShader::Imp DEFINITION
+//--------------------------------------------------------------------------------------
+GeometryShader::Imp::Imp()
+: m_GeometryShader(0) {
+}
+
+GeometryShader::Imp::~Imp() {
+    if (m_GeometryShader != 0) {
+        glDeleteShader(m_GeometryShader);
+        m_GeometryShader = NULL;
+    }
+}
+
+GeometryShader::Imp* GeometryShader::Imp::Create(const char* geometry_shader_name) {
+    GeometryShader::Imp* result = NULL;
+
+    if (geometry_shader_name != NULL) {
+        GLuint geometry_shader = glCreateShader(GL_GEOMETRY_SHADER_ARB);
+
+        // Load the shader program string from file
+        char* shader_str = glbLoadShaderBufferFromFile(geometry_shader_name);
+
+        if (shader_str != NULL) {
+            GLint len = static_cast<GLint>(strlen(shader_str));
+            glShaderSource(geometry_shader, 1, const_cast<const GLchar**>(&shader_str), &len);
+            glCompileShader(geometry_shader);
+
+            GLint success = 0;
+            glGetShaderiv(geometry_shader, GL_COMPILE_STATUS, &success);
+            if (success == 0) {
+                GLchar info_log[256];
+                glGetShaderInfoLog(geometry_shader, sizeof(info_log), NULL, info_log);
+                printf(reinterpret_cast<char*>(info_log));
+                char err[128];
+                sprintf_s(err, sizeof(err), "Compile shader failed:%s", geometry_shader_name);
+                GLB_SAFE_ASSERT(false);
+            } else {
+                result = new GeometryShader::Imp();
+                if (result != NULL) {
+                    result->m_GeometryShader = geometry_shader;
+                } else {
+                    GLB_SAFE_ASSERT(false);
+                }
+            }
+
+            glbReleaseBuffer(&shader_str);
+        } else {
+            GLB_SAFE_ASSERT(false);
+        }
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return result;
+}
+
+uint32_t GeometryShader::Imp::GetHandle() const {
+    return m_GeometryShader;
+}
+//--------------------------------------------------------------------------------------
 // FragmentShader::Imp DEFINITION
 //--------------------------------------------------------------------------------------
 FragmentShader::Imp::Imp()
@@ -372,10 +432,14 @@ Program::Imp::~Imp() {
     }
 }
 
-Program::Imp* Program::Imp::Create(const char* vertex_shader_file, const char* fragment_shader_file) {
+Program::Imp* Program::Imp::Create(const char* vertex_shader_file, const char* fragment_shader_file, const char* geometry_shader_file) {
     Program::Imp* shader_program = NULL;
     VertexShader* vertex_shader = VertexShader::Create(vertex_shader_file);
     FragmentShader* fragment_shader = FragmentShader::Create(fragment_shader_file);
+    GeometryShader* geometry_shader = NULL;
+    if (geometry_shader) {
+        geometry_shader = GeometryShader::Create(geometry_shader_file);
+    }
 
     if (vertex_shader != NULL && fragment_shader != NULL) {
         GLuint program = glCreateProgram();
@@ -383,6 +447,9 @@ Program::Imp* Program::Imp::Create(const char* vertex_shader_file, const char* f
         if (program != 0) {
             glAttachShader(program, vertex_shader->GetHandle());
             glAttachShader(program, fragment_shader->GetHandle());
+            if (geometry_shader) {
+                glAttachShader(program, geometry_shader->GetHandle());
+            }
 
             glLinkProgram(program);
 

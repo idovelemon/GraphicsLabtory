@@ -10,4 +10,5 @@ GLB_ENABLE_AO						       该Shader支持AO
 GLB_USE_PARALLEL_LIGHT                                         使用平行光进行光照计算
 GLB_ENABLE_ALPHA_TEX					       使用Alpha贴图进行alpha blend
 GLB_ENABLE_NORMAL_TEX					       使用Normal贴图进行Bump mapping
+GLB_ENABLE_REFLECT_TEX					       使用Environment贴图进行Environment Reflect
             

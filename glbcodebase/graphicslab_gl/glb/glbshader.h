@@ -29,6 +29,7 @@ enum {
     GLB_ENABLE_ALPHA_TEX,
     GLB_ENABLE_NORMAL_TEX,
     GLB_ENABLE_AO,
+    GLB_ENABLE_REFLECT_TEX,
 };
 
 static const char* kEnableMacros[] = {
@@ -43,6 +44,7 @@ static const char* kEnableMacros[] = {
     "#define GLB_ENABLE_ALPHA_TEX\n",
     "#define GLB_ENABLE_NORMAL_TEX\n",
     "#define GLB_ENABLE_AO\n",
+    "#define GLB_ENABLE_REFLECT_TEX\n",
 };
 
 class Descriptor {
@@ -80,6 +82,22 @@ private:
     Imp*    m_Imp;
 };
 
+class GeometryShader {
+public:
+    virtual ~GeometryShader();
+    static GeometryShader* Create(const char* geometry_shader_name);
+
+public:
+    uint32_t GetHandle() const;
+
+protected:
+    GeometryShader();
+
+private:
+    class Imp;
+    Imp*    m_Imp;
+};
+
 class FragmentShader {
 public:
     virtual ~FragmentShader();
@@ -100,7 +118,7 @@ private:
 class Program {
 public:
     virtual ~Program();
-    static Program* Create(const char* vertex_shader_file, const char* fragment_shader_file);
+    static Program* Create(const char* vertex_shader_file, const char* fragment_shader_file, const char* geometry_shader = NULL);
     static Program* Create(Descriptor desc);
 
 public:
@@ -132,7 +150,7 @@ public:
 public:
     static void SetCurShader(int32_t cur_shader_id);
     static int32_t GetCurShader();
-    static int32_t AddShader(const char* vertex_shader_file, const char* fragment_shader_file);
+    static int32_t AddShader(const char* vertex_shader_file, const char* fragment_shader_file, const char* geometry_shader_file = NULL);
     static Program* GetShader(int32_t shader_id);
     static int32_t GetShader(Descriptor desc);
 };

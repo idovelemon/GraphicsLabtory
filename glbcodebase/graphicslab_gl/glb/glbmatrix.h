@@ -44,6 +44,7 @@ class Matrix {
     inline void MakeProjectionMatrix(float left, float right, float bottom, float top, float near, float far);
     inline void MakeOrthogonalMatrix(float left, float right, float bottom, float top, float near, float far);
     inline void MakeViewMatrix(Vector pos, Vector target);
+    inline void MakeViewMatrix(Vector pos, Vector x_axis, Vector y_axis, Vector z_axis);
 
     //----------------------------------------------------------------------
     // @brief: These method will multiply a scale, translate and rotate matrix

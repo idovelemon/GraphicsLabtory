@@ -69,7 +69,8 @@ public:
     static void SetCamera(int32_t type, camera::CameraBase* camera);
     static camera::CameraBase* GetCamera(int32_t type);
     static void SetCurCamera(int32_t type);
-    static int32_t GetCurCamera();
+    static int32_t GetCurCameraType();
+    static camera::CameraBase* GetCurCamera();
 
     // Debug Draw
     static void AddBoundBox(Vector color);

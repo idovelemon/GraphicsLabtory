@@ -34,7 +34,8 @@ public:
     enum Type {
         TEX_NONE = 0,
         TEX_2D,
-        TEX_3D
+        TEX_3D,
+        TEX_CUBE,
     };
 
     enum Format {
@@ -51,6 +52,7 @@ public:
     static Texture* Create(int32_t width, int32_t height);
     static Texture* CreateFloat16Texture(int32_t width, int32_t height);
     static Texture* CreateFloat16DepthTexture(int32_t width, int32_t height);
+    static Texture* CreateFloat16CubeTexture(int32_t width, int32_t height);
 
  public:
      int32_t GetID();
@@ -58,6 +60,7 @@ public:
      int32_t GetWidth();
      int32_t GetHeight();
      const char* GetName();
+     int32_t GetType();
      void* GetNativeTex();
 
      void Destroy();

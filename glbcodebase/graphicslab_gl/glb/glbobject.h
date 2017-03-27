@@ -54,7 +54,6 @@ public:
 
     Model* GetModel();
     shader::Descriptor GetShaderDesc();
-    int32_t GetShaderProgramID();
 
     void SetDepthTestEnable(bool enable);
     bool IsDepthTestEnable();
@@ -69,6 +68,9 @@ public:
     void SetCullFaceMode(render::CullMode mode);
     render::CullMode GetCullFaceMode();
 
+    void SetTexWithId(int32_t slot, int32_t tex_id);
+    int32_t GetTexId(int32_t slot);
+
     virtual void Update();
 
 private:
@@ -81,7 +83,6 @@ private:
     Vector m_Rotation;
     Matrix m_WorldMatrix;
     shader::Descriptor m_ShaderDesc;
-    int32_t m_ShaderProgramID;
 
     bool   m_EnableCullFace;
     bool   m_EnableDepthTest;

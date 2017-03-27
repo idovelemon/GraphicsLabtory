@@ -41,12 +41,14 @@ public:
     static Imp* Create(int32_t width, int32_t height);
     static Imp* CreateFloat16Texture(int32_t width, int32_t height);
     static Imp* CreateFloat16DepthTexture(int32_t width, int32_t height);
+    static Imp* CreateFloat16CubeTexture(int32_t width, int32_t height);
 
  public:
      int32_t GetID();
      void SetID(int32_t id);
      int32_t GetWidth();
      int32_t GetHeight();
+     int32_t GetType();
      const char* GetName();
      int32_t GetNativeTex();
 

@@ -59,7 +59,8 @@ public:
     void SetCamera(int32_t type, camera::CameraBase* cam);
     camera::CameraBase* GetCamera(int32_t type);
     void SetCurCamera(int32_t type);
-    int32_t GetCurCamera();
+    int32_t GetCurCameraType();
+    camera::CameraBase* GetCurCamera();
 
     // Debug Draw
     void AddBoundBox(Vector color);
@@ -265,8 +266,12 @@ void SceneImp::SetCurCamera(int32_t type) {
     m_CurCameraType = type;
 }
 
-int32_t SceneImp::GetCurCamera() {
+int32_t SceneImp::GetCurCameraType() {
     return m_CurCameraType;
+}
+
+camera::CameraBase* SceneImp::GetCurCamera() {
+    return m_Camera[m_CurCameraType];
 }
 
 void SceneImp::AddBoundBox(Vector color) {
@@ -452,16 +457,28 @@ void Scene::SetCurCamera(int32_t type) {
     }
 }
 
-int32_t Scene::GetCurCamera() {
+int32_t Scene::GetCurCameraType() {
     int32_t result = PRIMIAY_CAM;
 
     if (s_SceneImp != NULL) {
-        result = s_SceneImp->GetCurCamera();
+        result = s_SceneImp->GetCurCameraType();
     } else {
         GLB_SAFE_ASSERT(false);
     }
 
     return result;
+}
+
+camera::CameraBase* Scene::GetCurCamera() {
+    camera::CameraBase* cam = NULL;
+
+    if (s_SceneImp != NULL) {
+        cam = s_SceneImp->GetCurCamera();
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return cam;
 }
 
 void Scene::AddBoundBox(Vector color) {

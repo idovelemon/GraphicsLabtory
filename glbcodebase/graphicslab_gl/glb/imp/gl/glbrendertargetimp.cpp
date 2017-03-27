@@ -114,6 +114,28 @@ void RenderTarget::Imp::AttachColorTexture(render::DrawColorBuffer index, textur
     }
 }
 
+void RenderTarget::Imp::AttachCubeTexture(render::DrawColorBuffer* index, texture::Texture* cube_tex) {
+    if (cube_tex != NULL) {
+        GLuint tex_obj = reinterpret_cast<GLuint>(cube_tex->GetNativeTex());
+        if (cube_tex->GetType() == texture::Texture::TEX_CUBE) {
+            glBindFramebuffer(GL_FRAMEBUFFER, m_FBO);
+            glBindTexture(GL_TEXTURE_CUBE_MAP, tex_obj);
+            for (int32_t i = 0; i < 6; i++) {
+                if (render::COLORBUF_COLOR_ATTACHMENT0 <= index[i] && index[i] <= render::COLORBUF_COLOR_ATTACHMENT7) {
+                    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index[i] - render::COLORBUF_COLOR_ATTACHMENT0
+                    , GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, tex_obj, 0);
+                } else {
+                    GLB_SAFE_ASSERT(false);
+                }
+            }
+        } else {
+            GLB_SAFE_ASSERT(false);
+        }
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+}
+
 void RenderTarget::Imp::EnableDrawColorBuffer(render::DrawColorBuffer index) {
     if (render::COLORBUF_COLOR_ATTACHMENT0 <= index && index <= render::COLORBUF_COLOR_ATTACHMENT7) {
         m_bDrawColorBuffers[index - render::COLORBUF_COLOR_ATTACHMENT0] = true;

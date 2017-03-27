@@ -194,9 +194,46 @@ Texture::Imp* Texture::Imp::CreateFloat16DepthTexture(int32_t width, int32_t hei
             static char default_name[] = "DefaultEmpty";
             memcpy(tex->m_TexName, default_name, sizeof(default_name));
             tex->m_TexObj = tex_id;
-            tex->m_Type = TEX_2D;
             tex->m_Width = width;
             tex->m_Format = FMT_DEPTH16F;
+        } else {
+            GLB_SAFE_ASSERT(false);
+        }
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return tex;
+}
+
+Texture::Imp* Texture::Imp::CreateFloat16CubeTexture(int32_t width, int32_t height) {
+    Texture::Imp* tex = NULL;
+
+    // Warning: The cube map's 6 texture must be square and have the same size
+    if (width > 0 && height > 0 && width == height) {
+        int32_t tex_id = 0;
+        glGenTextures(1, reinterpret_cast<GLuint*>(&tex_id));
+        glBindTexture(GL_TEXTURE_CUBE_MAP, tex_id);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+        for(int32_t i = 0; i < 6; i++) {
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, NULL);
+        }
+
+        tex = new Texture::Imp;
+        if (tex != NULL) {
+            tex->m_Type = TEX_CUBE;
+            tex->m_Depth = 0;
+            tex->m_Height = height;
+            static char default_name[] = "DefaultEmpty";
+            memcpy(tex->m_TexName, default_name, sizeof(default_name));
+            tex->m_TexObj = tex_id;
+            tex->m_Width = width;
+            tex->m_Format = FMT_RGBA16F;
         } else {
             GLB_SAFE_ASSERT(false);
         }
@@ -244,13 +281,31 @@ void Texture::Imp::UpdateTextureData(const void* pixels, int32_t miplevel) {
 }
 
 void Texture::Imp::GetTextureData(void* pixel, int32_t miplevel) {
-    glGetTexImage(GL_TEXTURE_2D, miplevel, GL_RGBA, GL_FLOAT, pixel);
+    switch (m_Type) {
+    case TEX_2D:
+        glEnable(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D, m_TexObj);
+        glGetTexImage(GL_TEXTURE_2D, miplevel, GL_RGBA, GL_FLOAT, pixel);
+        break;
+
+    default:
+        GLB_SAFE_ASSERT(false);  // Only support 2D texture now
+        break;
+    }
 }
 
 void Texture::Imp::GenerateMipmap() {
-    glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, m_TexObj);
-    glGenerateMipmap(GL_TEXTURE_2D);
+    switch (m_Type) {
+    case TEX_2D:
+        glEnable(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D, m_TexObj);
+        glGenerateMipmap(GL_TEXTURE_2D);
+        break;
+
+    default:
+        GLB_SAFE_ASSERT(false);  // Only support 2D texture now
+        break;
+    }
 }
 
 int32_t Texture::Imp::GetID() {
@@ -267,6 +322,10 @@ int32_t Texture::Imp::GetWidth() {
 
 int32_t Texture::Imp::GetHeight() {
     return m_Height;
+}
+
+int32_t Texture::Imp::GetType() {
+    return m_Type;
 }
 
 const char* Texture::Imp::GetName() {

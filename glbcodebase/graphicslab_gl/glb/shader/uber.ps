@@ -55,6 +55,10 @@ uniform sampler2D glb_DiffuseTex;
 		#endif
 	#endif
 
+	#ifdef GLB_ENABLE_REFLECT_TEX
+		uniform samplerCube glb_ReflectTex;
+	#endif
+
 #endif
 
 #ifdef GLB_ENABLE_SHADOW
@@ -168,6 +172,12 @@ void main() {
 		#else
 			oColor.xyz = vec3(light + glb_Material_Emission);
 		#endif
+
+		#ifdef GLB_ENABLE_REFLECT_TEX
+			vec3 refl = reflect(-view_vec, normal);
+			refl = normalize(refl);
+			oColor.xyz = textureCube(glb_ReflectTex, refl).xyz;  // Just for environment mapping now, please fix this
+		#endif		
 	} else {
 		vec3 ambient = glb_Material_Ambient * glb_ParallelLight_Ambient;	
 

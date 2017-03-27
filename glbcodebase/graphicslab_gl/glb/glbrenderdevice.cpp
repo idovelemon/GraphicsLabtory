@@ -127,9 +127,17 @@ void Device::SetUniformMatrix(int32_t location, const Matrix& m) {
     }
 }
 
-void Device::SetUniformSampler(int32_t location, int32_t sampler) {
+void Device::SetUniformSampler2D(int32_t location, int32_t sampler) {
     if (s_DeviceImp != NULL) {
-        s_DeviceImp->SetUniformSampler(location, sampler);
+        s_DeviceImp->SetUniformSampler2D(location, sampler);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+}
+
+void Device::SetUniformSamplerCube(int32_t location, int32_t sampler) {
+    if (s_DeviceImp != NULL) {
+        s_DeviceImp->SetUniformSamplerCube(location, sampler);
     } else {
         GLB_SAFE_ASSERT(false);
     }

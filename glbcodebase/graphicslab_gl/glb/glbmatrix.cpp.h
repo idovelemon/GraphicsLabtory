@@ -223,6 +223,28 @@ void Matrix::MakeViewMatrix(Vector pos, Vector target) {
     this->m_Matrix.m[3][3] = 1.0f;
 }
 
+void Matrix::MakeViewMatrix(Vector pos, Vector x_axis, Vector y_axis, Vector z_axis) {
+    this->m_Matrix.m[0][0] = x_axis.x;
+    this->m_Matrix.m[1][0] = y_axis.x;
+    this->m_Matrix.m[2][0] = z_axis.x;
+    this->m_Matrix.m[3][0] = 0.0f;
+    
+    this->m_Matrix.m[0][1] = x_axis.y;
+    this->m_Matrix.m[1][1] = y_axis.y;
+    this->m_Matrix.m[2][1] = z_axis.y;
+    this->m_Matrix.m[3][1] = 0.0f;
+
+    this->m_Matrix.m[0][2] = x_axis.z;
+    this->m_Matrix.m[1][2] = y_axis.z;
+    this->m_Matrix.m[2][2] = z_axis.z;
+    this->m_Matrix.m[3][2] = 0.0f;
+
+    this->m_Matrix.m[0][3] = - Dot(pos, x_axis);
+    this->m_Matrix.m[1][3] = - Dot(pos, y_axis);
+    this->m_Matrix.m[2][3] = - Dot(pos, z_axis);
+    this->m_Matrix.m[3][3] = 1.0f;
+}
+
 void Matrix::Scale(float sx, float sy, float sz) {
     Matrix scale;
     scale.MakeScaleMatrix(sx, sy, sz);

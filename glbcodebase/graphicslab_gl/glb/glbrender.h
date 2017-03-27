@@ -11,6 +11,8 @@
 
 namespace glb {
 
+class Object;
+
 namespace render {
 
 class Render {
@@ -46,6 +48,8 @@ public:
     static float GetFarClip();
     static int32_t GetScreenWidth();
     static int32_t GetScreenHeight();
+
+    // AO
     static int32_t GetRandomRotateTex();
 
     // HDR
@@ -57,6 +61,10 @@ public:
     static float GetExposureLevel();
     static void SetLightAdaption(float adaption);
     static float GetLightAdaption();
+
+    // Env Map
+    static int32_t RequestBakeEnvMap(int32_t width, int32_t height, Object* obj);
+    static void CancleBakeEnvMap(Object* obj);
 
     // Debug draw
     static void AddLine(Vector start, Vector end, Vector color);

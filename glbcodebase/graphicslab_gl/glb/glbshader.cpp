@@ -38,7 +38,7 @@ public:
 public:
     void SetCurShader(int32_t cur_shader_id);
     int32_t GetCurShader();
-    int32_t AddShader(const char* vertex_shader_file, const char* fragment_shader_file);
+    int32_t AddShader(const char* vertex_shader_file, const char* fragment_shader_file, const char* geometry_shader_file);
     Program* GetShader(int32_t shader_id);
     int32_t GetShader(Descriptor desc);
 
@@ -109,6 +109,45 @@ uint32_t VertexShader::GetHandle() const {
 }
 
 //-----------------------------------------------------------------------------------
+// GeometryShader DEFINITION
+//-----------------------------------------------------------------------------------
+GeometryShader::GeometryShader()
+: m_Imp(NULL) {
+}
+
+GeometryShader::~GeometryShader() {
+    GLB_SAFE_DELETE(m_Imp);
+}
+
+GeometryShader* GeometryShader::Create(const char* geometry_shader_name) {
+    GeometryShader* result = NULL;
+    GeometryShader::Imp* imp = GeometryShader::Imp::Create(geometry_shader_name);
+    if (imp != NULL) {
+        result = new GeometryShader;
+        if (result != NULL) {
+            result->m_Imp = imp;
+        } else {
+            GLB_SAFE_ASSERT(false);
+        }
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return result;
+}
+
+uint32_t GeometryShader::GetHandle() const {
+    uint32_t handle = -1;
+
+    if (m_Imp != NULL) {
+        handle = m_Imp->GetHandle();
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return handle;
+}
+//-----------------------------------------------------------------------------------
 // FragmentShader DEFINITION
 //-----------------------------------------------------------------------------------
 FragmentShader::FragmentShader()
@@ -176,9 +215,9 @@ Program::~Program() {
     GLB_SAFE_DELETE(m_Imp);
 }
 
-Program* Program::Create(const char* vertex_shader_file, const char* fragment_shader_file) {
+Program* Program::Create(const char* vertex_shader_file, const char* fragment_shader_file, const char* geometry_shader_file) {
     Program* shader_program = NULL;
-    Program::Imp* imp = Program::Imp::Create(vertex_shader_file, fragment_shader_file);
+    Program::Imp* imp = Program::Imp::Create(vertex_shader_file, fragment_shader_file, geometry_shader_file);
     if (imp != NULL) {
         shader_program = new Program;
         if (shader_program != NULL) {
@@ -376,10 +415,10 @@ int32_t MgrImp::GetCurShader() {
     return m_CurShader;
 }
 
-int32_t MgrImp::AddShader(const char* vertex_shader_file, const char* fragment_shader_file) {
+int32_t MgrImp::AddShader(const char* vertex_shader_file, const char* fragment_shader_file, const char* geometry_shader_file) {
     int32_t id = -1;
 
-    Program* program = Program::Create(vertex_shader_file, fragment_shader_file);
+    Program* program = Program::Create(vertex_shader_file, fragment_shader_file, geometry_shader_file);
     if (program != NULL) {
         id = m_ShaderDataBase.size();
         program->SetID(id);
@@ -470,11 +509,11 @@ int32_t Mgr::GetCurShader() {
     return result;
 }
 
-int32_t Mgr::AddShader(const char* vertex_shader_file, const char* fragment_shader_file) {
+int32_t Mgr::AddShader(const char* vertex_shader_file, const char* fragment_shader_file, const char* geometry_shader_file) {
     int32_t result = -1;
 
     if (s_MgrImp != NULL) {
-        result = s_MgrImp->AddShader(vertex_shader_file, fragment_shader_file);
+        result = s_MgrImp->AddShader(vertex_shader_file, fragment_shader_file, geometry_shader_file);
     } else {
         GLB_SAFE_ASSERT(false);
     }

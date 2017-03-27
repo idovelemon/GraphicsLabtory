@@ -19,6 +19,7 @@ class Vector {
 
     inline void Set(float x, float y, float z, float w = 1.0f);
 
+    inline Vector operator-();
     inline Vector operator+(const Vector& v);
     inline Vector operator-(const Vector& v);
     inline Vector operator*(float v);

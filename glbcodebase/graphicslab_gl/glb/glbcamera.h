@@ -25,18 +25,32 @@ public:
     virtual ~CameraBase() {
     }
 
+    virtual void Clone(CameraBase** cam) = 0;
+    virtual void Restore(CameraBase** cam) = 0;
     virtual void Update(float dt) = 0;
     
     virtual Matrix GetViewMatrix() {
         return m_ViewMatrix;
     }
 
+    virtual void SetViewMatrix(Matrix m) {
+        m_ViewMatrix = m;
+    }
+
     virtual Vector GetPos() {
         return m_Pos;
     }
 
+    virtual void SetPos(Vector pos) {
+        m_Pos = pos;
+    }
+
     virtual Vector GetTarget() {
         return m_Target;
+    }
+
+    virtual void SetTarget(Vector target) {
+        m_Target = target;
     }
 
 protected:
@@ -53,9 +67,25 @@ public:
     static FreeCamera* Create(Vector pos, Vector target);
 
 public:
+    virtual void Clone(CameraBase** cam);
+    virtual void Restore(CameraBase** cam);
     virtual void Update(float dt);
     void Move(float dx, float dy, float dz);
     void Rotate(float rx, float ry);
+};
+
+class ModelCamera : public CameraBase {
+public:
+    ModelCamera();
+    virtual ~ModelCamera();
+
+    static ModelCamera* Create(Vector pos, Vector target);
+
+public:
+    virtual void Clone(CameraBase** cam);
+    virtual void Restore(CameraBase** cam);
+    virtual void Update(float dt);
+    void Rotate(float rot);
 };
 
 };  // namespace camera

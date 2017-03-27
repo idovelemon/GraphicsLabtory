@@ -140,6 +140,24 @@ Texture* Texture::CreateFloat16DepthTexture(int32_t width, int32_t height) {
     return tex;
 }
 
+Texture* Texture::CreateFloat16CubeTexture(int32_t width, int32_t height) {
+    Texture* tex = NULL;
+    Texture::Imp* imp = Texture::Imp::CreateFloat16CubeTexture(width, height);
+
+    if (imp != NULL) {
+        tex = new Texture;
+        if (tex != NULL) {
+            tex->m_Imp = imp;
+        } else {
+            GLB_SAFE_ASSERT(false);
+        }
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return tex;
+}
+
 void Texture::Destroy() {
     if (m_Imp != NULL) {
         m_Imp->Destroy();
@@ -223,6 +241,18 @@ const char* Texture::GetName() {
     }
 
     return NULL;
+}
+
+int32_t Texture::GetType() {
+    int32_t result = TEX_2D;
+
+    if (m_Imp != NULL) {
+        result = m_Imp->GetType();
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return result;
 }
 
 void* Texture::GetNativeTex() {
