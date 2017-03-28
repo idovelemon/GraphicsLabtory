@@ -120,10 +120,18 @@ void RenderTarget::Imp::AttachCubeTexture(render::DrawColorBuffer* index, textur
         if (cube_tex->GetType() == texture::Texture::TEX_CUBE) {
             glBindFramebuffer(GL_FRAMEBUFFER, m_FBO);
             glBindTexture(GL_TEXTURE_CUBE_MAP, tex_obj);
+            GLint face[6] = {
+                GL_TEXTURE_CUBE_MAP_POSITIVE_X,
+                GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
+                GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,
+                GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
+                GL_TEXTURE_CUBE_MAP_NEGATIVE_Z,
+                GL_TEXTURE_CUBE_MAP_POSITIVE_Z,
+            };
             for (int32_t i = 0; i < 6; i++) {
                 if (render::COLORBUF_COLOR_ATTACHMENT0 <= index[i] && index[i] <= render::COLORBUF_COLOR_ATTACHMENT7) {
                     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index[i] - render::COLORBUF_COLOR_ATTACHMENT0
-                    , GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, tex_obj, 0);
+                    , face[i], tex_obj, 0);
                 } else {
                     GLB_SAFE_ASSERT(false);
                 }

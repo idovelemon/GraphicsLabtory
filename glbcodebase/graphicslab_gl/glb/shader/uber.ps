@@ -176,8 +176,9 @@ void main() {
 		#ifdef GLB_ENABLE_REFLECT_TEX
 			vec3 refl = reflect(-view_vec, normal);
 			refl = normalize(refl);
+			refl.yz = -refl.yz;
 			oColor.xyz = textureCube(glb_ReflectTex, refl).xyz;  // Just for environment mapping now, please fix this
-		#endif		
+		#endif
 	} else {
 		vec3 ambient = glb_Material_Ambient * glb_ParallelLight_Ambient;	
 

@@ -114,6 +114,10 @@ void DeviceImp::Initialize() {
     const GLubyte* render = glGetString(GL_RENDERER);
     OutputDebugStringA("\nOpenGL Render: ");
     OutputDebugStringA(reinterpret_cast<LPCSTR>(render));
+
+    const GLubyte* glew_version = glewGetString(GLEW_VERSION);
+    OutputDebugStringA("\nGLEW Version: ");
+    OutputDebugStringA(reinterpret_cast<LPCSTR>(glew_version));
 #endif
 }
 

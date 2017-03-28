@@ -44,42 +44,42 @@ public:
 
         glb::scene::Scene::AddSkyObject("sky.obj");
 
-        m_Cube = glb::scene::Scene::AddObject("cube.obj");
+        m_Cube = glb::scene::Scene::AddObject("cube_no_light.obj");
         glb::Object* obj = glb::scene::Scene::GetObjectById(m_Cube);
         obj->SetCullFaceEnable(true);
         obj->SetCullFaceMode(glb::render::CULL_BACK);
         obj->SetDepthTestEnable(true);
         obj->SetPos(Vector(-200.0f, 0.0f, 0.0f));
 
-        m_Cube = glb::scene::Scene::AddObject("cube.obj");
+        m_Cube = glb::scene::Scene::AddObject("cube_no_light.obj");
         obj = glb::scene::Scene::GetObjectById(m_Cube);
         obj->SetCullFaceEnable(true);
         obj->SetCullFaceMode(glb::render::CULL_BACK);
         obj->SetDepthTestEnable(true);
         obj->SetPos(Vector(200.0f, 0.0f, 0.0f));
 
-        m_Cube = glb::scene::Scene::AddObject("cube.obj");
+        m_Cube = glb::scene::Scene::AddObject("cube_no_light.obj");
         obj = glb::scene::Scene::GetObjectById(m_Cube);
         obj->SetCullFaceEnable(true);
         obj->SetCullFaceMode(glb::render::CULL_BACK);
         obj->SetDepthTestEnable(true);
         obj->SetPos(Vector(0.0f, 200.0f, 0.0f));
 
-        m_Cube = glb::scene::Scene::AddObject("cube.obj");
+        m_Cube = glb::scene::Scene::AddObject("cube_no_light.obj");
         obj = glb::scene::Scene::GetObjectById(m_Cube);
         obj->SetCullFaceEnable(true);
         obj->SetCullFaceMode(glb::render::CULL_BACK);
         obj->SetDepthTestEnable(true);
         obj->SetPos(Vector(0.0f, -200.0f, 0.0f));
 
-        m_Cube = glb::scene::Scene::AddObject("cube.obj");
+        m_Cube = glb::scene::Scene::AddObject("cube_no_light.obj");
         obj = glb::scene::Scene::GetObjectById(m_Cube);
         obj->SetCullFaceEnable(true);
         obj->SetCullFaceMode(glb::render::CULL_BACK);
         obj->SetDepthTestEnable(true);
         obj->SetPos(Vector(0.0f, 0.0f, -200.0f));
 
-        m_Cube = glb::scene::Scene::AddObject("cube.obj");
+        m_Cube = glb::scene::Scene::AddObject("cube_no_light.obj");
         obj = glb::scene::Scene::GetObjectById(m_Cube);
         obj->SetCullFaceEnable(true);
         obj->SetCullFaceMode(glb::render::CULL_BACK);
@@ -87,6 +87,7 @@ public:
         obj->SetPos(Vector(0.0f, 0.0f, 200.0f));
 
         m_Cube = glb::scene::Scene::AddObject("ball.obj");
+        //m_Cube = glb::scene::Scene::AddObject("cube.obj");
         obj = glb::scene::Scene::GetObjectById(m_Cube);
         obj->SetCullFaceEnable(true);
         obj->SetCullFaceMode(glb::render::CULL_BACK);
