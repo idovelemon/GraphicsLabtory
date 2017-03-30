@@ -1,0 +1,15 @@
+标志名称                                                        含义
+GLB_COLOR_IN_VERTEX					       顶点数据中包含Color信息
+GLB_NORMAL_IN_VERTEX                                           顶点数据中包含Normal信息
+GLB_TANGENT_IN_VERTEX					       顶点数据中包含Tangent信息
+GLB_BINORMAL_IN_VERTEX					       顶点数据中包含Binormal信息
+GLB_TEXCOORD_IN_VERTEX                                         顶点数据中包含纹理坐标信息  
+GLB_ENABLE_LIGHTING                                            该Shader支持光照运算（目前只支持Phong光照）
+GLB_ENABLE_SHADOW					       该Shader支持阴影计算
+GLB_ENABLE_AO						       该Shader支持AO
+GLB_USE_PARALLEL_LIGHT                                         使用平行光进行光照计算
+GLB_ENABLE_DIFFUSE_TEX					       使用Diffuse贴图表述材质
+GLB_ENABLE_ALPHA_TEX					       使用Alpha贴图进行alpha blend
+GLB_ENABLE_NORMAL_TEX					       使用Normal贴图进行Bump mapping
+GLB_ENABLE_REFLECT_TEX					       使用Environment贴图进行Environment Reflect
+            
