@@ -8,6 +8,7 @@
 
 #include <map>
 
+#include "glbapplication.h"
 #include "glbcamera.h"
 #include "glbmacro.h"
 #include "glbmesh.h"
@@ -118,6 +119,8 @@ public:
     float GetExposureLevel();
     void SetLightAdaption(float adaption);
     float GetLightAdaption();
+    void SetHighLightBase(float base);
+    float GetHighLightBase();
 
     int32_t RequestBakeEnvMap(int32_t width, int32_t height, Object* obj);
     void CancleBakeEnvMap(Object* obj);
@@ -207,6 +210,7 @@ private:
     float                                   m_ExposureLevel;
     float                                   m_LightAdaption;
     float                                   m_PreAverageLum;
+    float                                   m_HighLightBase;
 
     // SSAO
     RenderTarget*                           m_AORenderTarget;
@@ -293,6 +297,7 @@ RenderImp::RenderImp()
 , m_ExposureLevel(0.0f)
 , m_LightAdaption(0.0f)
 , m_PreAverageLum(0.0f)
+, m_HighLightBase(0.0f)
 
 // SSAO
 , m_AORenderTarget(NULL)
@@ -542,6 +547,14 @@ float RenderImp::GetLightAdaption() {
     return m_LightAdaption;
 }
 
+void RenderImp::SetHighLightBase(float base) {
+    m_HighLightBase = base;
+}
+
+float RenderImp::GetHighLightBase() {
+    return m_HighLightBase;
+}
+
 int32_t RenderImp::RequestBakeEnvMap(int32_t width, int32_t height, Object* obj) {
     int32_t result = -1;
 
@@ -603,6 +616,9 @@ void RenderImp::PreDraw() {
 void RenderImp::DrawShadowMap() {
     // Render Target
     render::Device::SetRenderTarget(m_ShadowRenderTarget);
+
+    // Viewport
+    render::Device::SetViewport(0, 0, app::Application::GetShadowMapWidth(), app::Application::GetShadowMapHeight());
 
     // Draw Buffer
     render::Device::SetDrawColorBuffer(render::COLORBUF_NONE);
@@ -676,7 +692,8 @@ void RenderImp::DrawShadowMap() {
         }
     }
 
-    // Reset render target
+    // Reset
+    render::Device::SetViewport(0, 0, static_cast<int32_t>(m_Width), static_cast<int32_t>(m_Height));
     render::Device::SetRenderTarget(NULL);
 }
 
@@ -766,12 +783,15 @@ void RenderImp::AfterDraw() {
 }
 
 void RenderImp::PrepareShadowMap() {
+    int32_t shadow_map_width = app::Application::GetShadowMapWidth();
+    int32_t shadow_map_height = app::Application::GetShadowMapHeight();
+
     // Create shadow render target
-    m_ShadowRenderTarget = RenderTarget::Create(static_cast<int32_t>(m_Width), static_cast<int32_t>(m_Height));
+    m_ShadowRenderTarget = RenderTarget::Create(shadow_map_width, shadow_map_height);
     GLB_SAFE_ASSERT(m_ShadowRenderTarget != NULL);
 
     // Create shadow map
-    texture::Texture* shadow_map = texture::Texture::CreateFloat16DepthTexture(static_cast<int32_t>(m_Width), static_cast<int32_t>(m_Height));
+    texture::Texture* shadow_map = texture::Texture::CreateFloat16DepthTexture(shadow_map_width, shadow_map_height);
     if (shadow_map != NULL) {
         m_ShadowMap = texture::Mgr::AddTexture(shadow_map);
     } else {
@@ -783,7 +803,7 @@ void RenderImp::PrepareShadowMap() {
     }
 
     // Create shadow shader
-    m_ShadowShader = shader::Mgr::AddShader("..\\glb\\shader\\shadow.vs", "..\\glb\\shader\\shadow.ps");
+    m_ShadowShader = shader::Mgr::AddShader("..\\glb\\shader\\shadow.vs", "..\\glb\\shader\\shadow.fs");
 }
 
 void RenderImp::PrepareDepthMap() {
@@ -804,7 +824,7 @@ void RenderImp::PrepareDepthMap() {
     }
 
     // Create shader
-    m_DepthShader = shader::Mgr::AddShader("..\\glb\\shader\\depth.vs", "..\\glb\\shader\\depth.ps");
+    m_DepthShader = shader::Mgr::AddShader("..\\glb\\shader\\depth.vs", "..\\glb\\shader\\depth.fs");
 }
 
 void RenderImp::PrepareAOMap() {
@@ -842,9 +862,9 @@ void RenderImp::PrepareAOMap() {
     }
 
     // Create shader
-    m_AOShader = shader::Mgr::AddShader("..\\glb\\shader\\ssao.vs", "..\\glb\\shader\\ssao.ps");
-    m_BiBlurHShader = shader::Mgr::AddShader("..\\glb\\shader\\biblur.vs", "..\\glb\\shader\\biblurh.ps");
-    m_BiBlurVShader = shader::Mgr::AddShader("..\\glb\\shader\\biblur.vs", "..\\glb\\shader\\biblurv.ps");
+    m_AOShader = shader::Mgr::AddShader("..\\glb\\shader\\ssao.vs", "..\\glb\\shader\\ssao.fs");
+    m_BiBlurHShader = shader::Mgr::AddShader("..\\glb\\shader\\biblur.vs", "..\\glb\\shader\\biblurh.fs");
+    m_BiBlurVShader = shader::Mgr::AddShader("..\\glb\\shader\\biblur.vs", "..\\glb\\shader\\biblurv.fs");
 }
 
 void RenderImp::PrepareHDR() {
@@ -883,11 +903,11 @@ void RenderImp::PrepareHDR() {
     m_BloomHeight = m_Height / 2.0f;
 
     // Create hdr shader
-    m_LogLumShader = shader::Mgr::AddShader("..\\glb\\shader\\loglum.vs", "..\\glb\\shader\\loglum.ps");
-    m_FilterBrightnessShader = shader::Mgr::AddShader("..\\glb\\shader\\brightfilter.vs", "..\\glb\\shader\\brightfilter.ps");
-    m_BloomHShader = shader::Mgr::AddShader("..\\glb\\shader\\bloom.vs", "..\\glb\\shader\\bloomh.ps");
-    m_BloomVShader = shader::Mgr::AddShader("..\\glb\\shader\\bloom.vs", "..\\glb\\shader\\bloomv.ps");
-    m_TonemapShader = shader::Mgr::AddShader("..\\glb\\shader\\tonemap.vs", "..\\glb\\shader\\tonemap.ps");
+    m_LogLumShader = shader::Mgr::AddShader("..\\glb\\shader\\loglum.vs", "..\\glb\\shader\\loglum.fs");
+    m_FilterBrightnessShader = shader::Mgr::AddShader("..\\glb\\shader\\brightfilter.vs", "..\\glb\\shader\\brightfilter.fs");
+    m_BloomHShader = shader::Mgr::AddShader("..\\glb\\shader\\bloom.vs", "..\\glb\\shader\\bloomh.fs");
+    m_BloomVShader = shader::Mgr::AddShader("..\\glb\\shader\\bloom.vs", "..\\glb\\shader\\bloomv.fs");
+    m_TonemapShader = shader::Mgr::AddShader("..\\glb\\shader\\tonemap.vs", "..\\glb\\shader\\tonemap.fs");
 
     // Create screen mesh
     m_ScreenMesh = mesh::ScreenMesh::Create(static_cast<int32_t>(m_Width), static_cast<int32_t>(m_Height));
@@ -1007,6 +1027,11 @@ void RenderImp::DrawLightLoopCore() {
         render::Device::SetShader(program);
         render::Device::SetShaderLayout(program->GetShaderLayout());
 
+        // Common Texture
+        int32_t tex_unit = 0;
+        render::Device::SetTexture(render::TS_SHADOW, texture::Mgr::GetTextureById(m_ShadowMap), tex_unit++);
+        render::Device::SetTexture(render::TS_AO_MAP, texture::Mgr::GetTextureById(m_AOMap), tex_unit++);
+
         // Scene uniforms
         for (int32_t j = 0; j < static_cast<int32_t>(uniforms.size()); j++) {
             uniform::UniformEntry entry = uniforms[j];
@@ -1023,22 +1048,16 @@ void RenderImp::DrawLightLoopCore() {
 
             // Textures
             if (obj->GetModel()->HasDiffuseTexture()) {
-                render::Device::SetTexture(render::TS_DIFFUSE, texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(Model::MT_DIFFUSE)), 0);
+                render::Device::SetTexture(render::TS_DIFFUSE, texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(Model::MT_DIFFUSE)), tex_unit++);
             }
             if (obj->GetModel()->HasAlphaTexture()) {
-                render::Device::SetTexture(render::TS_ALPHA, texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(Model::MT_ALPHA)), 1);
+                render::Device::SetTexture(render::TS_ALPHA, texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(Model::MT_ALPHA)), tex_unit++);
             }
             if (obj->GetModel()->HasNormalTexture()) {
-                render::Device::SetTexture(render::TS_NORMAL, texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(Model::MT_NORMAL)), 2);
+                render::Device::SetTexture(render::TS_NORMAL, texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(Model::MT_NORMAL)), tex_unit++);
             }
             if (obj->GetModel()->HasReflectTexture()) {
-                render::Device::SetTexture(render::TS_REFLECT, texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(Model::MT_REFLECT)), 3);
-            }
-            if (obj->GetModel()->IsAcceptShadow()) {
-                render::Device::SetTexture(render::TS_SHADOW, texture::Mgr::GetTextureById(m_ShadowMap), 4);
-            }
-            if (obj->GetModel()->IsUseAO()) {
-                render::Device::SetTexture(render::TS_AO_MAP, texture::Mgr::GetTextureById(m_AOMap), 5);
+                render::Device::SetTexture(render::TS_REFLECT, texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(Model::MT_REFLECT)), tex_unit++);
             }
 
             // Object Uniform
@@ -1156,9 +1175,13 @@ void RenderImp::CalcAverageLum() {
     memset(pixel, 0, sizeof(pixel));
     tex->GetTextureData(pixel, m_MaxMipmapLevel);
 
-    float cur_scene_average_lum = exp(pixel[0]);
-    m_AverageLum = m_PreAverageLum + (cur_scene_average_lum - m_PreAverageLum) * m_LightAdaption;
-    m_PreAverageLum = m_AverageLum;
+    float cur_scene_average_lum = exp(pixel[0]) - 0.0001f;
+    if (m_LightAdaption > 0.0f) {
+        m_AverageLum = m_PreAverageLum + (cur_scene_average_lum - m_PreAverageLum) * m_LightAdaption;
+        m_PreAverageLum = m_AverageLum;
+    } else {
+        m_AverageLum = cur_scene_average_lum;
+    }
 }
 
 void RenderImp::FilterBrightness() {
@@ -1784,6 +1807,11 @@ void RenderImp::DrawEnvMapCore() {
                 render::Device::SetShader(program);
                 render::Device::SetShaderLayout(program->GetShaderLayout());
 
+                // Common Texture
+                int32_t tex_unit = 0;
+                render::Device::SetTexture(render::TS_SHADOW, texture::Mgr::GetTextureById(m_ShadowMap), tex_unit++);
+                render::Device::SetTexture(render::TS_AO_MAP, texture::Mgr::GetTextureById(m_AOMap), tex_unit++);
+
                 // Scene uniforms
                 for (int32_t l = 0; l < static_cast<int32_t>(uniforms.size()); l++) {
                     uniform::UniformEntry entry = uniforms[l];
@@ -1803,19 +1831,13 @@ void RenderImp::DrawEnvMapCore() {
 
                     // Textures
                     if (obj->GetModel()->HasDiffuseTexture()) {
-                        render::Device::SetTexture(render::TS_DIFFUSE, texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(Model::MT_DIFFUSE)), 0);
+                        render::Device::SetTexture(render::TS_DIFFUSE, texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(Model::MT_DIFFUSE)), tex_unit++);
                     }
                     if (obj->GetModel()->HasAlphaTexture()) {
-                        render::Device::SetTexture(render::TS_ALPHA, texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(Model::MT_ALPHA)), 1);
+                        render::Device::SetTexture(render::TS_ALPHA, texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(Model::MT_ALPHA)), tex_unit++);
                     }
                     if (obj->GetModel()->HasNormalTexture()) {
-                        render::Device::SetTexture(render::TS_NORMAL, texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(Model::MT_NORMAL)), 2);
-                    }
-                    if (obj->GetModel()->IsAcceptShadow()) {
-                        render::Device::SetTexture(render::TS_SHADOW, texture::Mgr::GetTextureById(m_ShadowMap), 3);
-                    }
-                    if (obj->GetModel()->IsUseAO()) {
-                        render::Device::SetTexture(render::TS_AO_MAP, texture::Mgr::GetTextureById(m_AOMap), 4);
+                        render::Device::SetTexture(render::TS_NORMAL, texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(Model::MT_NORMAL)), tex_unit++);
                     }
 
                     // Object Uniform
@@ -2159,6 +2181,26 @@ float Render::GetLightAdaption() {
 
     if (s_RenderImp != NULL) {
         result = s_RenderImp->GetLightAdaption();
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return result;
+}
+
+void Render::SetHighLightBase(float base) {
+    if (s_RenderImp != NULL) {
+        s_RenderImp->SetHighLightBase(base);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+}
+
+float Render::GetHighLightBase() {
+    float result = 0.0f;
+
+    if (s_RenderImp != NULL) {
+        result = s_RenderImp->GetHighLightBase();
     } else {
         GLB_SAFE_ASSERT(false);
     }

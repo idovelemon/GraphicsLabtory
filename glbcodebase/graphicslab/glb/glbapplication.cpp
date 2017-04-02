@@ -52,6 +52,8 @@ public:
     HWND GetWindowHandle();
     int32_t GetWindowWidth();
     int32_t GetWindowHeight();
+    int32_t GetShadowMapWidth();
+    int32_t GetShadowMapHeight();
 
 protected:
     bool CreateWnd(HINSTANCE hInstance, int32_t width, int32_t height, const wchar_t* caption);
@@ -177,6 +179,14 @@ int32_t ApplicationImp::GetWindowHeight() {
     return m_Config.screen_height;
 }
 
+int32_t ApplicationImp::GetShadowMapWidth() {
+    return m_Config.shadow_map_width;
+}
+
+int32_t ApplicationImp::GetShadowMapHeight() {
+    return m_Config.shadow_map_height;
+}
+
 bool ApplicationImp::CreateWnd(HINSTANCE hInstance, int32_t width, int32_t height, const wchar_t* caption) {
     // Register window class
     WNDCLASSEX wnd;
@@ -291,6 +301,28 @@ int32_t Application::GetWindowHeight() {
     int32_t result = 0;
     if (s_ApplicationImp != NULL) {
         result = s_ApplicationImp->GetWindowHeight();
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return result;
+}
+
+int32_t Application::GetShadowMapWidth() {
+    int32_t result = 0;
+    if (s_ApplicationImp != NULL) {
+        result = s_ApplicationImp->GetShadowMapWidth();
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return result;
+}
+
+int32_t Application::GetShadowMapHeight() {
+    int32_t result = 0;
+    if (s_ApplicationImp != NULL) {
+        result = s_ApplicationImp->GetShadowMapHeight();
     } else {
         GLB_SAFE_ASSERT(false);
     }

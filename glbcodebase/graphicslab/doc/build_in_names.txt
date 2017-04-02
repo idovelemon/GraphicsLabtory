@@ -36,3 +36,4 @@ glb_DepthMap							 sampler2D         场景的深度贴图
 glb_RandomRotateMap					         sampler2D	   随机旋转向量贴图（AO使用）
 glb_AOMap							 sampler2D         Ambient Occlusion Map
 glb_BiBlurMap							 sampler2D         Blur map(AO使用)
+glb_HighLightBase						 float	     	   高光过滤的基底高光

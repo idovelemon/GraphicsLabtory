@@ -123,6 +123,9 @@
     <ClInclude Include="..\glb\imp\gl\glbrenderdeviceimp.h">
       <Filter>源文件\glb\imp\gl</Filter>
     </ClInclude>
+    <ClInclude Include="..\glb\glbutil.h">
+      <Filter>源文件\glb</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\glb\glbcamera.cpp">
@@ -199,6 +202,9 @@
     </ClCompile>
     <ClCompile Include="..\glb\imp\gl\glbrenderdeivceimp.cpp">
       <Filter>源文件\glb\imp\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\glbutil.cpp">
+      <Filter>源文件\glb</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

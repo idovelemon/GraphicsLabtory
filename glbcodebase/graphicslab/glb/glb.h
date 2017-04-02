@@ -44,6 +44,7 @@
 #include "glbshader.h"
 #include "glbtexture.h"
 #include "glbtexturereader.h"
+#include "glbutil.h"
 #include "glbvector.h"
 
 #endif  // GLB_GLB_H_

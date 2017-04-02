@@ -16,6 +16,15 @@
     <Filter Include="源文件\glb">
       <UniqueIdentifier>{f59085a8-3cba-4571-b288-87780d00503c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="源文件\glb\imp">
+      <UniqueIdentifier>{80c9616a-e6b7-46ab-915a-51af1e0f498d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\glb\imp\dx11">
+      <UniqueIdentifier>{298bf727-bf0a-4e4d-9149-2b5199bebddb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\glb\imp\gl">
+      <UniqueIdentifier>{3a1c4bbc-910a-47fc-98e4-d6c4bc3a082e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\glb\comm.cpp">
@@ -77,6 +86,36 @@
     </ClCompile>
     <ClCompile Include="..\glb\glbapplication.cpp">
       <Filter>源文件\glb</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\imp\gl\glbmeshimp.cpp">
+      <Filter>源文件\glb\imp\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\imp\gl\glbrenderdeivceimp.cpp">
+      <Filter>源文件\glb\imp\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\imp\gl\glbrendertargetimp.cpp">
+      <Filter>源文件\glb\imp\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\imp\gl\glbshaderimp.cpp">
+      <Filter>源文件\glb\imp\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\imp\gl\glbtextureimp.cpp">
+      <Filter>源文件\glb\imp\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\imp\dx11\glbmeshimp.cpp">
+      <Filter>源文件\glb\imp\dx11</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\imp\dx11\glbrenderdeviceimp.cpp">
+      <Filter>源文件\glb\imp\dx11</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\imp\dx11\glbrendertargetimp.cpp">
+      <Filter>源文件\glb\imp\dx11</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\imp\dx11\glbshaderimp.cpp">
+      <Filter>源文件\glb\imp\dx11</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\imp\dx11\glbtextureimp.cpp">
+      <Filter>源文件\glb\imp\dx11</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -160,6 +199,36 @@
     </ClInclude>
     <ClInclude Include="..\glb\glbapplication.h">
       <Filter>源文件\glb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\imp\gl\glbmeshimp.h">
+      <Filter>源文件\glb\imp\gl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\imp\gl\glbrenderdeviceimp.h">
+      <Filter>源文件\glb\imp\gl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\imp\gl\glbrendertargetimp.h">
+      <Filter>源文件\glb\imp\gl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\imp\gl\glbshaderimp.h">
+      <Filter>源文件\glb\imp\gl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\imp\gl\glbtextureimp.h">
+      <Filter>源文件\glb\imp\gl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\imp\dx11\glbmeshimp.h">
+      <Filter>源文件\glb\imp\dx11</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\imp\dx11\glbrenderdeviceimp.h">
+      <Filter>源文件\glb\imp\dx11</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\imp\dx11\glbrendertargetimp.h">
+      <Filter>源文件\glb\imp\dx11</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\imp\dx11\glbshaderimp.h">
+      <Filter>源文件\glb\imp\dx11</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\imp\dx11\glbtextureimp.h">
+      <Filter>源文件\glb\imp\dx11</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

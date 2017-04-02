@@ -373,7 +373,12 @@ FragmentShader::Imp* FragmentShader::Imp::Create(std::vector<std::string> enable
                 glGetShaderInfoLog(fragment_shader, sizeof(info_log), NULL, info_log);
                 log::LogPrint("Compile fragment shader failed!");
                 log::LogPrint("Failed fragment shader name:%s", uber_shader_file_name);
-                log::LogPrint("Failed fragment shader log:%s", info_log);
+                log::LogPrint("Failed fragment shader macro:");
+                int32_t size = enable_macros.size();
+                for (int32_t i = 0; i < size; i++) {
+                    log::LogPrint("%s", enable_macros[i].c_str());
+                }
+                log::LogPrint("%s", info_log);
                 GLB_SAFE_ASSERT(false);
             } else {
                 result = new FragmentShader::Imp();
@@ -538,7 +543,7 @@ Program::Imp* Program::Imp::Create(Descriptor desc) {
     }
 
     VertexShader* vs = VertexShader::Create(enable_macros, "..\\glb\\shader\\uber.vs");
-    FragmentShader* fs = FragmentShader::Create(enable_macros, "..\\glb\\shader\\uber.ps");
+    FragmentShader* fs = FragmentShader::Create(enable_macros, "..\\glb\\shader\\uber.fs");
 
     if (vs != NULL && fs != NULL) {
         GLuint program = glCreateProgram();

@@ -55,6 +55,7 @@ enum {
     GLB_AO_TEX,
     GLB_BIBLUR_TEX,
     GLB_EXPOSURE_LEVEL,
+    GLB_HIGH_LIGHT_BASE,
 };
 
 // Uniform table
@@ -97,6 +98,7 @@ static const struct {
     {"glb_AOMap",                           GLB_AO_TEX,                         1},
     {"glb_BiBlurMap",                       GLB_BIBLUR_TEX,                     1},
     {"glb_ExposureLevel",                   GLB_EXPOSURE_LEVEL,                 1},
+    {"glb_HighLightBase",                   GLB_HIGH_LIGHT_BASE,                1},
 };
 
 // Uniform wrapper
@@ -185,6 +187,7 @@ Wrapper uniform_random_rotate_tex_picker(Object*);         // Pick glb_RandRotat
 Wrapper uniform_ao_tex_picker(Object*);                    // Pick glb_AOMap
 Wrapper uniform_biblur_tex_picker(Object*);                // Pick glb_BiBlurMap
 Wrapper uniform_exposure_level_picker(Object*);            // Pick glb_ExposureLevel
+Wrapper uniform_high_light_base_picker(Object*);           // Pick glb_HighLightBase
 
 // Uniform picker table
 static const struct {
@@ -225,6 +228,7 @@ static const struct {
     {uniform_ao_tex_picker,                     GLB_AO_TEX},
     {uniform_biblur_tex_picker,                 GLB_BIBLUR_TEX},
     {uniform_exposure_level_picker,             GLB_EXPOSURE_LEVEL},
+    {uniform_high_light_base_picker,            GLB_HIGH_LIGHT_BASE},
 };
 
 // Uniform entry

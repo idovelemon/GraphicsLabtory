@@ -184,6 +184,11 @@ Wrapper uniform_shadowm_picker(glb::Object* obj) {
     float width = (max_x - min_x) / 2.0f;
     float height = (max_y - min_y) / 2.0f;
     float depth = (max_z - min_z) / 2.0f;
+    if (width > height) {
+        height = width;
+    } else {
+        width = height;
+    }
 
     // Build shadow matrix
     Matrix orth_matrix;
@@ -506,6 +511,13 @@ Wrapper uniform_exposure_level_picker(glb::Object*) {
     Wrapper wrapper;
     wrapper.SetFormat(Wrapper::FMT_FLOAT);
     wrapper.SetFloat(render::Render::GetExposureLevel());
+    return wrapper;
+}
+
+Wrapper uniform_high_light_base_picker(glb::Object*) {
+    Wrapper wrapper;
+    wrapper.SetFormat(Wrapper::FMT_FLOAT);
+    wrapper.SetFloat(render::Render::GetHighLightBase());
     return wrapper;
 }
 };  // namespace uniform

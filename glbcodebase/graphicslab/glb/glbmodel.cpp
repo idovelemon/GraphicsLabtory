@@ -12,6 +12,7 @@
 #include "glbmaterial.h"
 #include "glbmesh.h"
 #include "glbtexture.h"
+#include "glbutil.h"
 
 namespace glb {
 
@@ -77,6 +78,7 @@ Model* Model::Create(const char* file_name) {
         float* binormal_buf = NULL;
         ModelEffectParam effect_param;
         ModelMaterialParam material_param;
+        std::string dir = util::path_get_dir(file_name);
         int32_t num_triangles = ModelFile::ExtractModelData(
             file_name,
             effect_param,
@@ -92,15 +94,18 @@ Model* Model::Create(const char* file_name) {
             mesh::Mgr::AddMesh(mesh);
 
             if (effect_param.has_diffuse_tex) {
-                diffuse_tex = texture::Mgr::LoadTexture(material_param.diffuse_tex_name);
+                std::string diffuse_tex_path = dir + material_param.diffuse_tex_name;
+                diffuse_tex = texture::Mgr::LoadTexture(diffuse_tex_path.c_str());
             }
 
             if (effect_param.has_alpha_tex) {
-                alpha_tex = texture::Mgr::LoadTexture(material_param.alpha_tex_name);
+                std::string alpha_tex_path = dir + material_param.alpha_tex_name;
+                alpha_tex = texture::Mgr::LoadTexture(alpha_tex_path.c_str());
             }
 
             if (effect_param.has_normal_tex) {
-                normal_tex = texture::Mgr::LoadTexture(material_param.normal_tex_name);
+                std::string normal_tex_path = dir + material_param.normal_tex_name;
+                normal_tex = texture::Mgr::LoadTexture(normal_tex_path.c_str());
             }
 
             ModelFile::RelaseBuf(&vertex_buf, &tex_buf, &normal_buf, &tangent_buf, &binormal_buf);

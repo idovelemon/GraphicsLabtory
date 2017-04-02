@@ -32,8 +32,19 @@ enum PlatformAPI {
 struct AppConfig {
     int32_t screen_width;
     int32_t screen_height;
+    int32_t shadow_map_width;
+    int32_t shadow_map_height;
     int32_t platform_api;
     wchar_t caption[128];
+
+    AppConfig()
+    : screen_width(0)
+    , screen_height(0)
+    , shadow_map_width(0)
+    , shadow_map_height(0)
+    , platform_api(0) {
+        memset(caption, 0, sizeof(caption));
+    }
 };
 
 class Application {
@@ -46,6 +57,8 @@ public:
     static HWND GetWindowHandle();
     static int32_t GetWindowWidth();
     static int32_t GetWindowHeight();
+    static int32_t GetShadowMapWidth();
+    static int32_t GetShadowMapHeight();
 };
 
 class ApplicationBase {

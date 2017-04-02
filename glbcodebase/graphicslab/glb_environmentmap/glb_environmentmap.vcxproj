@@ -105,6 +105,7 @@
     <ClCompile Include="..\glb\glbtexture.cpp" />
     <ClCompile Include="..\glb\glbtexturereader.cpp" />
     <ClCompile Include="..\glb\glbuniform.cpp" />
+    <ClCompile Include="..\glb\glbutil.cpp" />
     <ClCompile Include="..\glb\imp\dx11\glbmeshimp.cpp" />
     <ClCompile Include="..\glb\imp\dx11\glbrenderdeviceimp.cpp" />
     <ClCompile Include="..\glb\imp\dx11\glbrendertargetimp.cpp" />
@@ -144,6 +145,7 @@
     <ClInclude Include="..\glb\glbtexture.h" />
     <ClInclude Include="..\glb\glbtexturereader.h" />
     <ClInclude Include="..\glb\glbuniform.h" />
+    <ClInclude Include="..\glb\glbutil.h" />
     <ClInclude Include="..\glb\glbvector.h" />
     <ClInclude Include="..\glb\imp\dx11\glbmeshimp.h" />
     <ClInclude Include="..\glb\imp\dx11\glbrenderdeviceimp.h" />

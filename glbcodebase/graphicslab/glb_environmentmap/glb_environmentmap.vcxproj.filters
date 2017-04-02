@@ -117,6 +117,9 @@
     <ClCompile Include="glb_environmentmap.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="..\glb\glbutil.cpp">
+      <Filter>源文件\glb</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\glb\comm.h">
@@ -232,6 +235,9 @@
     </ClInclude>
     <ClInclude Include="glb_environmentmap.h">
       <Filter>源文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\glbutil.h">
+      <Filter>源文件\glb</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

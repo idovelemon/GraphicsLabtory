@@ -38,6 +38,7 @@ public:
         // HDR
         glb::render::Render::SetExposureLevel(0.7f);
         glb::render::Render::SetLightAdaption(0.04f);
+        glb::render::Render::SetHighLightBase(0.5f);
 
         //glb::scene::Scene::AddSkyObject("sky.obj");
 
@@ -91,6 +92,8 @@ int _stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPreInstance, LPSTR cmdLine,
     memcpy(config.caption, L"glb_hdr", sizeof(L"glb_hdr"));
     config.screen_width = 800;
     config.screen_height = 600;
+    config.shadow_map_width = 1024;
+    config.shadow_map_height = 1024;
     if (!glb::app::Application::Initialize(ApplicationHDR::Create, hInstance, config)) {
         return 0;
     }

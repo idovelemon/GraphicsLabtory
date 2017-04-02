@@ -61,6 +61,8 @@ public:
     static float GetExposureLevel();
     static void SetLightAdaption(float adaption);
     static float GetLightAdaption();
+    static void SetHighLightBase(float base);
+    static float GetHighLightBase();
 
     // Env Map
     static int32_t RequestBakeEnvMap(int32_t width, int32_t height, Object* obj);

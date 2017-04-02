@@ -182,6 +182,16 @@
     <ClCompile Include="..\glb\glbtexture.cpp" />
     <ClCompile Include="..\glb\glbtexturereader.cpp" />
     <ClCompile Include="..\glb\glbuniform.cpp" />
+    <ClCompile Include="..\glb\imp\dx11\glbmeshimp.cpp" />
+    <ClCompile Include="..\glb\imp\dx11\glbrenderdeviceimp.cpp" />
+    <ClCompile Include="..\glb\imp\dx11\glbrendertargetimp.cpp" />
+    <ClCompile Include="..\glb\imp\dx11\glbshaderimp.cpp" />
+    <ClCompile Include="..\glb\imp\dx11\glbtextureimp.cpp" />
+    <ClCompile Include="..\glb\imp\gl\glbmeshimp.cpp" />
+    <ClCompile Include="..\glb\imp\gl\glbrenderdeivceimp.cpp" />
+    <ClCompile Include="..\glb\imp\gl\glbrendertargetimp.cpp" />
+    <ClCompile Include="..\glb\imp\gl\glbshaderimp.cpp" />
+    <ClCompile Include="..\glb\imp\gl\glbtextureimp.cpp" />
     <ClCompile Include="glb_tbn_gen.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -212,6 +222,16 @@
     <ClInclude Include="..\glb\glbtexturereader.h" />
     <ClInclude Include="..\glb\glbuniform.h" />
     <ClInclude Include="..\glb\glbvector.h" />
+    <ClInclude Include="..\glb\imp\dx11\glbmeshimp.h" />
+    <ClInclude Include="..\glb\imp\dx11\glbrenderdeviceimp.h" />
+    <ClInclude Include="..\glb\imp\dx11\glbrendertargetimp.h" />
+    <ClInclude Include="..\glb\imp\dx11\glbshaderimp.h" />
+    <ClInclude Include="..\glb\imp\dx11\glbtextureimp.h" />
+    <ClInclude Include="..\glb\imp\gl\glbmeshimp.h" />
+    <ClInclude Include="..\glb\imp\gl\glbrenderdeviceimp.h" />
+    <ClInclude Include="..\glb\imp\gl\glbrendertargetimp.h" />
+    <ClInclude Include="..\glb\imp\gl\glbshaderimp.h" />
+    <ClInclude Include="..\glb\imp\gl\glbtextureimp.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\glb\glbvector.inl" />

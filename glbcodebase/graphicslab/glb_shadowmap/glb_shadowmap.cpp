@@ -90,6 +90,8 @@ int _stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPreInstance, LPSTR cmdLine,
     memcpy(config.caption, L"glb_shadowmap", sizeof(L"glb_shadowmap"));
     config.screen_width = 800;
     config.screen_height = 600;
+    config.shadow_map_width = 1024;
+    config.shadow_map_height = 1024;
     if (!glb::app::Application::Initialize(ApplicationShadowMap::Create, hInstance, config)) {
         return 0;
     }
