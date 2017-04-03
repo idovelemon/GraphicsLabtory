@@ -20,10 +20,9 @@ void main() {
 	vec4 hdr_color = texture2D(glb_HDRSceneTex, vs_texcoord);
 	vec4 bloom_color = texture2D(glb_LogLumTex, vs_texcoord);
 	float lum = hdr_color.x * 0.27 + hdr_color.y * 0.67 + hdr_color.z * 0.06;
-	float lum_after_tonemapping = (glb_ExposureLevel * lum) / glb_AverageLum;
-	lum_after_tonemapping = lum_after_tonemapping / (1.0/255 + lum_after_tonemapping);
-	color.xyz = hdr_color.xyz * lum_after_tonemapping;
-	color.xyz = color.xyz + bloom_color.xyz * bloom_color.w;
+	float lum_after_tonemapping = (glb_ExposureLevel * lum) / (glb_AverageLum + 0.0001);
+	color.xyz = hdr_color.xyz * lum_after_tonemapping / (1 + hdr_color.xyz);
+	color.xyz = color.xyz + bloom_color.xyz * 0.1;
 
 	// Gamma correction
 	color.x = pow(color.x, 1.0 / kGamma);

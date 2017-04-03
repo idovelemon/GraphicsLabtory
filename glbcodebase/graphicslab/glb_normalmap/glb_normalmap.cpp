@@ -26,7 +26,7 @@ public:
         light::Light light(light::PARALLEL_LIGHT);
         light.ambient = glb::Vector(0.1f, 0.1f, 0.1f);
         light.diffuse = glb::Vector(0.5f, 0.5f, 0.5f);
-        light.specular = glb::Vector(1.0f, 1.0f, 1.0f);
+        light.specular = glb::Vector(10.0f, 10.0f, 10.0f);
         light.dir = glb::Vector(-1.0f, -1.0f, -1.0f);
         light.dir.Normalize();
         light.pow = 100.0f;
@@ -65,7 +65,7 @@ public:
 
         // Randomly Rotate the sphere
         glb::Vector rot_v = glb::scene::Scene::GetObjectById(m_Cube)->GetRotation();
-        rot_v += glb::Vector(1.0f, 1.0f, 1.0f);
+        rot_v += glb::Vector(0.1f, 0.1f, 0.1f);
         glb::scene::Scene::GetObjectById(m_Cube)->SetRotation(rot_v);
 
         glb::scene::Scene::Update();

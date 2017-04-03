@@ -870,14 +870,14 @@ void RenderImp::PrepareAOMap() {
 void RenderImp::PrepareHDR() {
     // Create hdr render target
     m_HDRRenderTarget = RenderTarget::Create(static_cast<int32_t>(m_Width), static_cast<int32_t>(m_Height));
-    m_BloomRenderTarget = RenderTarget::Create(static_cast<int32_t>(m_Width / 2.0f), static_cast<int32_t>(m_Height / 2.0f));
+    m_BloomRenderTarget = RenderTarget::Create(static_cast<int32_t>(m_Width / 4.0f), static_cast<int32_t>(m_Height / 4.0f));
     GLB_SAFE_ASSERT(m_HDRRenderTarget != NULL);
     GLB_SAFE_ASSERT(m_BloomRenderTarget != NULL);
 
     // Create hdr texture
     texture::Texture* hdr_tex = texture::Texture::CreateFloat16Texture(static_cast<int32_t>(m_Width), static_cast<int32_t>(m_Height));
-    texture::Texture* log_lum_tex = texture::Texture::CreateFloat16Texture(static_cast<int32_t>(m_Width / 2.0f), static_cast<int32_t>(m_Height / 2.0f));
-    texture::Texture* bloom_tex = texture::Texture::CreateFloat16Texture(static_cast<int32_t>(m_Width / 2.0f), static_cast<int32_t>(m_Height / 2.0f));
+    texture::Texture* log_lum_tex = texture::Texture::CreateFloat16Texture(static_cast<int32_t>(m_Width / 4.0f), static_cast<int32_t>(m_Height / 4.0f));
+    texture::Texture* bloom_tex = texture::Texture::CreateFloat16Texture(static_cast<int32_t>(m_Width / 4.0f), static_cast<int32_t>(m_Height / 4.0f));
     if (hdr_tex != NULL && bloom_tex != NULL && log_lum_tex != NULL) {
         m_HDRSceneTex = texture::Mgr::AddTexture(hdr_tex);
         m_LogLumTex = texture::Mgr::AddTexture(log_lum_tex);
@@ -896,11 +896,11 @@ void RenderImp::PrepareHDR() {
     }
 
     // Max mipmap level
-    m_MaxMipmapLevel = static_cast<int32_t>(floor(log(max(m_Width / 2.0 * 1.0f, m_Height / 2.0 * 1.0f)) / log(2.0f)));
+    m_MaxMipmapLevel = static_cast<int32_t>(floor(log(max(m_Width / 4.0 * 1.0f, m_Height / 4.0 * 1.0f)) / log(2.0f)));
 
     // Bloom size
-    m_BloomWidth = m_Width / 2.0f;
-    m_BloomHeight = m_Height / 2.0f;
+    m_BloomWidth = m_Width / 4.0f;
+    m_BloomHeight = m_Height / 4.0f;
 
     // Create hdr shader
     m_LogLumShader = shader::Mgr::AddShader("..\\glb\\shader\\loglum.vs", "..\\glb\\shader\\loglum.fs");
@@ -1113,7 +1113,7 @@ void RenderImp::DownsamplerHDRScene() {
 
 void RenderImp::CalcLogLum() {
     // Change viewport to match render target
-    render::Device::SetViewport(0, 0, m_Width / 2, m_Height / 2);
+    render::Device::SetViewport(0, 0, m_Width / 4, m_Height / 4);
 
     // Render Target
     render::Device::SetRenderTarget(m_BloomRenderTarget);
@@ -1177,7 +1177,10 @@ void RenderImp::CalcAverageLum() {
 
     float cur_scene_average_lum = exp(pixel[0]) - 0.0001f;
     if (m_LightAdaption > 0.0f) {
-        m_AverageLum = m_PreAverageLum + (cur_scene_average_lum - m_PreAverageLum) * m_LightAdaption;
+        m_AverageLum = m_PreAverageLum + m_LightAdaption;
+        if (m_AverageLum >= cur_scene_average_lum) {
+            m_AverageLum = cur_scene_average_lum;
+        }
         m_PreAverageLum = m_AverageLum;
     } else {
         m_AverageLum = cur_scene_average_lum;
@@ -1186,7 +1189,7 @@ void RenderImp::CalcAverageLum() {
 
 void RenderImp::FilterBrightness() {
     // Change viewport to match render target
-    render::Device::SetViewport(0, 0, m_Width / 2, m_Height / 2);
+    render::Device::SetViewport(0, 0, m_Width / 4, m_Height / 4);
 
     // Render Target
     render::Device::SetRenderTarget(m_BloomRenderTarget);
@@ -1246,7 +1249,7 @@ void RenderImp::DownsamplerBrightness() {
 
 void RenderImp::BloomH() {
     // Change viewport to match render target
-    render::Device::SetViewport(0, 0, m_Width / 2, m_Height / 2);
+    render::Device::SetViewport(0, 0, m_Width / 4, m_Height / 4);
 
     // Render Target
     render::Device::SetRenderTarget(m_BloomRenderTarget);
@@ -1302,7 +1305,7 @@ void RenderImp::BloomH() {
 
 void RenderImp::BloomV() {
     // Change viewport to match render target
-    render::Device::SetViewport(0, 0, m_Width / 2, m_Height / 2);
+    render::Device::SetViewport(0, 0, m_Width / 4, m_Height / 4);
 
     // Render Target
     render::Device::SetRenderTarget(m_BloomRenderTarget);
