@@ -1,0 +1,176 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{155D51A9-C9EC-407A-B8FB-98F2489A5168}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>glb_pssm</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v110</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v110</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(SolutionDir)$(ProjectName)\</OutDir>
+    <TargetName>$(ProjectName)_DGL</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;GLB_PLATFORM_OPENGL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)\glb;$(SolutionDir)\..\glew\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(SolutionDir)\..\glew\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glew32.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\glb\comm.cpp" />
+    <ClCompile Include="..\glb\glbapplication.cpp" />
+    <ClCompile Include="..\glb\glbeditorcomm.cpp" />
+    <ClCompile Include="..\glb\glbinput.cpp" />
+    <ClCompile Include="..\glb\math\glbbv.cpp" />
+    <ClCompile Include="..\glb\math\glbmath.cpp" />
+    <ClCompile Include="..\glb\render\glbmaterial.cpp" />
+    <ClCompile Include="..\glb\render\glbmesh.cpp" />
+    <ClCompile Include="..\glb\render\glbrender.cpp" />
+    <ClCompile Include="..\glb\render\glbrenderdevice.cpp" />
+    <ClCompile Include="..\glb\render\glbrendertarget.cpp" />
+    <ClCompile Include="..\glb\render\glbshader.cpp" />
+    <ClCompile Include="..\glb\render\glbtexture.cpp" />
+    <ClCompile Include="..\glb\render\glbuniform.cpp" />
+    <ClCompile Include="..\glb\render\imp\dx11\glbmeshimp.cpp" />
+    <ClCompile Include="..\glb\render\imp\dx11\glbrenderdeviceimp.cpp" />
+    <ClCompile Include="..\glb\render\imp\dx11\glbrendertargetimp.cpp" />
+    <ClCompile Include="..\glb\render\imp\dx11\glbshaderimp.cpp" />
+    <ClCompile Include="..\glb\render\imp\dx11\glbtextureimp.cpp" />
+    <ClCompile Include="..\glb\render\imp\gl\glbmeshimp.cpp" />
+    <ClCompile Include="..\glb\render\imp\gl\glbrenderdeivceimp.cpp" />
+    <ClCompile Include="..\glb\render\imp\gl\glbrendertargetimp.cpp" />
+    <ClCompile Include="..\glb\render\imp\gl\glbshaderimp.cpp" />
+    <ClCompile Include="..\glb\render\imp\gl\glbtextureimp.cpp" />
+    <ClCompile Include="..\glb\scene\glbcamera.cpp" />
+    <ClCompile Include="..\glb\scene\glbmodel.cpp" />
+    <ClCompile Include="..\glb\scene\glbmodelfile.cpp" />
+    <ClCompile Include="..\glb\scene\glbobject.cpp" />
+    <ClCompile Include="..\glb\scene\glbscene.cpp" />
+    <ClCompile Include="..\glb\util\glblog.cpp" />
+    <ClCompile Include="..\glb\util\glbprofile.cpp" />
+    <ClCompile Include="..\glb\util\glbtexturereader.cpp" />
+    <ClCompile Include="..\glb\util\glbutil.cpp" />
+    <ClCompile Include="glb_pssm.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\glb\comm.h" />
+    <ClInclude Include="..\glb\glb.h" />
+    <ClInclude Include="..\glb\glbapplication.h" />
+    <ClInclude Include="..\glb\glbcomm.h" />
+    <ClInclude Include="..\glb\glbeditorcomm.h" />
+    <ClInclude Include="..\glb\glbinput.h" />
+    <ClInclude Include="..\glb\math\glbbv.h" />
+    <ClInclude Include="..\glb\math\glbmath.h" />
+    <ClInclude Include="..\glb\math\glbmatrix.cpp.h" />
+    <ClInclude Include="..\glb\math\glbmatrix.h" />
+    <ClInclude Include="..\glb\math\glbvector.h" />
+    <ClInclude Include="..\glb\render\glbmaterial.h" />
+    <ClInclude Include="..\glb\render\glbmesh.h" />
+    <ClInclude Include="..\glb\render\glbrender.h" />
+    <ClInclude Include="..\glb\render\glbrenderdevice.h" />
+    <ClInclude Include="..\glb\render\glbrendertarget.h" />
+    <ClInclude Include="..\glb\render\glbshader.h" />
+    <ClInclude Include="..\glb\render\glbstructs.h" />
+    <ClInclude Include="..\glb\render\glbtexture.h" />
+    <ClInclude Include="..\glb\render\glbuniform.h" />
+    <ClInclude Include="..\glb\render\imp\dx11\glbmeshimp.h" />
+    <ClInclude Include="..\glb\render\imp\dx11\glbrenderdeviceimp.h" />
+    <ClInclude Include="..\glb\render\imp\dx11\glbrendertargetimp.h" />
+    <ClInclude Include="..\glb\render\imp\dx11\glbshaderimp.h" />
+    <ClInclude Include="..\glb\render\imp\dx11\glbtextureimp.h" />
+    <ClInclude Include="..\glb\render\imp\gl\glbmeshimp.h" />
+    <ClInclude Include="..\glb\render\imp\gl\glbrenderdeviceimp.h" />
+    <ClInclude Include="..\glb\render\imp\gl\glbrendertargetimp.h" />
+    <ClInclude Include="..\glb\render\imp\gl\glbshaderimp.h" />
+    <ClInclude Include="..\glb\render\imp\gl\glbtextureimp.h" />
+    <ClInclude Include="..\glb\scene\glbcamera.h" />
+    <ClInclude Include="..\glb\scene\glblight.h" />
+    <ClInclude Include="..\glb\scene\glbmodel.h" />
+    <ClInclude Include="..\glb\scene\glbmodelfile.h" />
+    <ClInclude Include="..\glb\scene\glbobject.h" />
+    <ClInclude Include="..\glb\scene\glbscene.h" />
+    <ClInclude Include="..\glb\util\glblog.h" />
+    <ClInclude Include="..\glb\util\glbmacro.h" />
+    <ClInclude Include="..\glb\util\glbprofile.h" />
+    <ClInclude Include="..\glb\util\glbtexturereader.h" />
+    <ClInclude Include="..\glb\util\glbutil.h" />
+    <ClInclude Include="glb_pssm.h" />
+    <ClInclude Include="resource.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\glb\math\glbvector.inl" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="glb_pssm.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="glb.ico" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

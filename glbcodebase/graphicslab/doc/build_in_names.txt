@@ -8,12 +8,22 @@ glb_TexCoord	                                                 vec2	           顶
 glb_ProjM                                                        mat4              投影变换矩阵
 glb_ViewM                                                        mat4              相机变换矩阵
 glb_WorldM                                                       mat4              世界变换矩阵
-glb_ShadowM
+glb_ShadowM0							 mat4              阴影变换矩阵0
+glb_ShadowM1							 mat4              阴影变换矩阵1
+glb_ShadowM2							 mat4              阴影变换矩阵2
+glb_ShadowM3							 mat4              阴影变换矩阵3
+glb_ShadowSplit0						 float		   分割z值0
+glb_ShadowSplit1						 float		   分割z值1
+glb_ShadowSplit2						 float		   分割z值2
+glb_ShadowMIndex						 int		   当前绘制的阴影贴图下标
 glb_Trans_Inv_WorldM                                             mat4              世界变换矩阵的逆矩阵的转置矩阵
 glb_DiffuseTex                                                   sampler2D         漫反射贴图
 glb_AlphaTex						         sampler2D	   Alpha混合贴图
 glb_NormalTex							 sampler2D         法线贴图
-glb_ShadowTex						         sampler2D	   Shadow Map
+glb_ShadowTex0						         sampler2D	   Shadow Map 0
+glb_ShadowTex1							 sampler2D         Shadow Map 1
+glb_ShadowTex2							 sampler2D         Shadow Map 2
+glb_ShadowTex3							 sampler2D         Shadow Map 3
 glb_HDRSceneTex							 sampler2D         HDR贴图
 glb_HighLightTex						 sampler2D	   HDR high light texture
 glb_Bloom0							 sampler2D	   Bloom texture after h-blur
@@ -24,6 +34,7 @@ glb_Material_Specular                                            vec3           
 glb_Material_Emission                                            vec3              发光材质
 glb_Material_Pow                                                 float             镜面反射光系数
 glb_EyePos                                                       vec3              视点位置
+glb_LookAt							 vec3              相机观察方向
 glb_ParallelLight_Dir                                            vec3              平行光方向
 glb_ParallelLight_Ambient                                        vec3              平行光环境光颜色
 glb_ParallelLight_Diffuse                                        vec3              平行光漫反射颜色

@@ -5,6 +5,7 @@
 // Brief: Demostrate the environment mapping
 //----------------------------------------------------------------------
 #include "glb_environmentmap.h"
+#include "resource.h"
 
 class ApplicationEM : public glb::app::ApplicationBase {
 public:
@@ -22,15 +23,15 @@ protected:
 public:
     bool Initialize() {
         // Camera
-        camera::ModelCamera* cam = camera::ModelCamera::Create(glb::Vector(0.0f, 0.0f, 130.0f), glb::Vector(0.0f, 0.0f, 0.0));
+        scene::ModelCamera* cam = scene::ModelCamera::Create(math::Vector(0.0f, 0.0f, 130.0f), math::Vector(0.0f, 0.0f, 0.0));
         glb::scene::Scene::SetCamera(glb::scene::PRIMIAY_CAM, cam);
 
         // Light
-        light::Light light(light::PARALLEL_LIGHT);
-        light.ambient = glb::Vector(0.2f, 0.2f, 0.2f);
-        light.diffuse = glb::Vector(2.0f, 2.0f, 2.0f);
-        light.specular = glb::Vector(10.0f, 10.0f, 10.0f);
-        light.dir = glb::Vector(-1.0f, -1.0f, -1.0f);
+        scene::Light light(scene::PARALLEL_LIGHT);
+        light.ambient = math::Vector(0.2f, 0.2f, 0.2f);
+        light.diffuse = math::Vector(2.0f, 2.0f, 2.0f);
+        light.specular = math::Vector(10.0f, 10.0f, 10.0f);
+        light.dir = math::Vector(-1.0f, -1.0f, -1.0f);
         light.dir.Normalize();
         light.pow = 128.0f;
         glb::scene::Scene::SetLight(light, 0);
@@ -46,46 +47,46 @@ public:
         glb::scene::Scene::AddSkyObject("sky.obj");
 
         m_Cube = glb::scene::Scene::AddObject("cube_no_light.obj");
-        glb::Object* obj = glb::scene::Scene::GetObjectById(m_Cube);
+        scene::Object* obj = scene::Scene::GetObjectById(m_Cube);
         obj->SetCullFaceEnable(true);
         obj->SetCullFaceMode(glb::render::CULL_BACK);
         obj->SetDepthTestEnable(true);
-        obj->SetPos(Vector(-200.0f, 0.0f, 0.0f));
+        obj->SetPos(math::Vector(-200.0f, 0.0f, 0.0f));
 
         m_Cube = glb::scene::Scene::AddObject("cube_no_light.obj");
         obj = glb::scene::Scene::GetObjectById(m_Cube);
         obj->SetCullFaceEnable(true);
         obj->SetCullFaceMode(glb::render::CULL_BACK);
         obj->SetDepthTestEnable(true);
-        obj->SetPos(Vector(200.0f, 0.0f, 0.0f));
+        obj->SetPos(math::Vector(200.0f, 0.0f, 0.0f));
 
         m_Cube = glb::scene::Scene::AddObject("cube_no_light.obj");
         obj = glb::scene::Scene::GetObjectById(m_Cube);
         obj->SetCullFaceEnable(true);
         obj->SetCullFaceMode(glb::render::CULL_BACK);
         obj->SetDepthTestEnable(true);
-        obj->SetPos(Vector(0.0f, 200.0f, 0.0f));
+        obj->SetPos(math::Vector(0.0f, 200.0f, 0.0f));
 
         m_Cube = glb::scene::Scene::AddObject("cube_no_light.obj");
         obj = glb::scene::Scene::GetObjectById(m_Cube);
         obj->SetCullFaceEnable(true);
         obj->SetCullFaceMode(glb::render::CULL_BACK);
         obj->SetDepthTestEnable(true);
-        obj->SetPos(Vector(0.0f, -200.0f, 0.0f));
+        obj->SetPos(math::Vector(0.0f, -200.0f, 0.0f));
 
         m_Cube = glb::scene::Scene::AddObject("cube_no_light.obj");
         obj = glb::scene::Scene::GetObjectById(m_Cube);
         obj->SetCullFaceEnable(true);
         obj->SetCullFaceMode(glb::render::CULL_BACK);
         obj->SetDepthTestEnable(true);
-        obj->SetPos(Vector(0.0f, 0.0f, -200.0f));
+        obj->SetPos(math::Vector(0.0f, 0.0f, -200.0f));
 
         m_Cube = glb::scene::Scene::AddObject("cube_no_light.obj");
         obj = glb::scene::Scene::GetObjectById(m_Cube);
         obj->SetCullFaceEnable(true);
         obj->SetCullFaceMode(glb::render::CULL_BACK);
         obj->SetDepthTestEnable(true);
-        obj->SetPos(Vector(0.0f, 0.0f, 200.0f));
+        obj->SetPos(math::Vector(0.0f, 0.0f, 200.0f));
 
         m_Cube = glb::scene::Scene::AddObject("ball.obj");
         //m_Cube = glb::scene::Scene::AddObject("cube.obj");
@@ -93,25 +94,25 @@ public:
         obj->SetCullFaceEnable(true);
         obj->SetCullFaceMode(glb::render::CULL_BACK);
         obj->SetDepthTestEnable(true);
-        obj->SetPos(Vector(0.0f, 0.0f, 0.0f));
+        obj->SetPos(math::Vector(0.0f, 0.0f, 0.0f));
         int32_t ref_tex = glb::render::Render::RequestBakeEnvMap(1024, 1024, obj);
-        obj->SetTexWithId(glb::Model::MT_REFLECT, ref_tex);
+        obj->SetTexWithId(scene::Model::MT_REFLECT, ref_tex);
 
         return true;
     }
 
     void Update(float dt) {
-        glb::profile::ProfileTime time;
+        util::ProfileTime time;
         time.BeginProfile();
 
         // Update scene
-        camera::ModelCamera* model_cam = reinterpret_cast<camera::ModelCamera*>(scene::Scene::GetCurCamera());
+        scene::ModelCamera* model_cam = reinterpret_cast<scene::ModelCamera*>(scene::Scene::GetCurCamera());
         float rot = 1.0f;
         model_cam->Rotate(rot);
-        glb::scene::Scene::Update();
+        scene::Scene::Update();
 
         // Draw scene
-        glb::render::Render::Draw();
+        render::Render::Draw();
 
         time.EndProfile();
         char buf[128];
@@ -130,6 +131,7 @@ int _stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPreInstance, LPSTR cmdLine,
     config.screen_height = 600;
     config.shadow_map_width = 1024;
     config.shadow_map_height = 1024;
+    config.icon = IDI_ICON1;
     if (!glb::app::Application::Initialize(ApplicationEM::Create, hInstance, config)) {
         return 0;
     }

@@ -65,8 +65,34 @@ out vec4 oColor;
 #endif
 
 #ifdef GLB_ENABLE_SHADOW
-uniform sampler2D glb_ShadowTex;
-uniform mat4 glb_ShadowM;
+uniform sampler2D glb_ShadowTex0;
+uniform sampler2D glb_ShadowTex1;
+uniform sampler2D glb_ShadowTex2;
+uniform sampler2D glb_ShadowTex3;
+uniform mat4 glb_ShadowM0;
+uniform mat4 glb_ShadowM1;
+uniform mat4 glb_ShadowM2;
+uniform mat4 glb_ShadowM3;
+uniform float glb_ShadowSplit0;
+uniform float glb_ShadowSplit1;
+uniform float glb_ShadowSplit2;
+
+int calc_current_shadow_index(vec3 vtx, vec3 eye_pos, vec3 look_at, float sp0, float sp1, float sp2) {
+	int index = -1;
+	vec3 to_vtx = eye_pos - vtx;
+	float z_value = dot(to_vtx, look_at);
+	if (z_value < sp0) {
+		index = 0;
+	} else if (sp0 < z_value && z_value < sp1) {
+		index = 1;
+	} else if (sp1 < z_value && z_value < sp2) {
+		index = 2;
+	} else if (z_value > sp2) {
+		index = 3;
+	}
+
+	return index;
+}
 #endif
 
 #ifdef GLB_ENABLE_AO
@@ -85,6 +111,7 @@ uniform sampler2D glb_AOMap;
 
 #ifdef GLB_ENABLE_EYE_POS
 uniform vec3 glb_EyePos;
+uniform vec3 glb_LookAt;
 #endif
 
 uniform vec3 glb_Material_Emission;
@@ -272,14 +299,45 @@ void main() {
 
 	float is_in_shadow = 0.0;
 #ifdef GLB_ENABLE_SHADOW
-	vec4 light_space_pos = glb_ShadowM * vec4(vs_Vertex, 1.0);
-	light_space_pos.xyz /= 2.0f;
-	light_space_pos.xyz += 0.5f;
-	light_space_pos.xyz /= light_space_pos.w;
-	float factor = texture2D(glb_ShadowTex, light_space_pos.xy).z;
+	vec2 shadow_coord;
+	int index = calc_current_shadow_index(vs_Vertex, glb_EyePos, glb_LookAt, glb_ShadowSplit0, glb_ShadowSplit1, glb_ShadowSplit2);
+	vec4 light_space_pos;
+	float factor;
+	if (index == 0) {
+		light_space_pos = glb_ShadowM0 * vec4(vs_Vertex, 1.0);
+		light_space_pos.xyz /= 2.0f;
+		light_space_pos.xyz += 0.5f;
+		light_space_pos.xyz /= light_space_pos.w;
+		factor = texture2D(glb_ShadowTex0, light_space_pos.xy).z;
+	} else if (index == 1) {
+		light_space_pos = glb_ShadowM1 * vec4(vs_Vertex, 1.0);
+		light_space_pos.xyz /= 2.0f;
+		light_space_pos.xyz += 0.5f;
+		light_space_pos.xyz /= light_space_pos.w;	
+		factor = texture2D(glb_ShadowTex1, light_space_pos.xy).z;
+	} else if (index == 2) {
+		light_space_pos = glb_ShadowM2 * vec4(vs_Vertex, 1.0);
+		light_space_pos.xyz /= 2.0f;
+		light_space_pos.xyz += 0.5f;
+		light_space_pos.xyz /= light_space_pos.w;				
+		factor = texture2D(glb_ShadowTex2, light_space_pos.xy).z;
+	} else {
+		light_space_pos = glb_ShadowM3 * vec4(vs_Vertex, 1.0);
+		light_space_pos.xyz /= 2.0f;
+		light_space_pos.xyz += 0.5f;
+		light_space_pos.xyz /= light_space_pos.w;
+		factor = texture2D(glb_ShadowTex3, light_space_pos.xy).z;
+	}
 	if (factor < light_space_pos.z) {
 		is_in_shadow = 1.0;
 	}
+	if (light_space_pos.x < 0.0 || 
+		light_space_pos.x > 1.0 ||
+		light_space_pos.y < 0.0 ||
+		light_space_pos.y > 1.0) {
+		is_in_shadow = 0.0;
+	}
+	shadow_coord = light_space_pos.xy;
 #endif
 
 	vec3 normal = vec3(0.0, 0.0, 0.0);
@@ -348,7 +406,7 @@ void main() {
 
 	oColor.xyz = combine_color(light, reflect_light, brdf, vtxc);
 	oColor.xyz += emii_light;
-
+	
 #ifdef GLB_TEXCOORD_IN_VERTEX
 	#ifdef GLB_ENABLE_ALPHA_TEX
 		oColor.w = texture2D(glb_AlphaTex, vs_TexCoord).w;

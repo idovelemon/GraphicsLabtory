@@ -5,6 +5,7 @@
 // Brief: Display The Altar scene
 //----------------------------------------------------------------------
 #include "glb_altar.h"
+#include "resource.h"
 
 class ApplicationAltar : public glb::app::ApplicationBase {
 public:
@@ -23,16 +24,16 @@ protected:
 public:
     bool Initialize() {
         // Camera
-        camera::ModelCamera* cam = camera::ModelCamera::Create(glb::Vector(0.0f, 2.3f, 1.5f), glb::Vector(0.0f, 2.2f, 0.0f));
+        scene::ModelCamera* cam = scene::ModelCamera::Create(math::Vector(0.0f, 2.3f, 1.5f), math::Vector(0.0f, 2.2f, 0.0f));
         //camera::FreeCamera* cam = camera::FreeCamera::Create(glb::Vector(0.0f, 2.0f, 2.0f), glb::Vector(0.0f, 0.0f, 0.0));
         glb::scene::Scene::SetCamera(glb::scene::PRIMIAY_CAM, cam);
 
         // Light
-        light::Light light(light::PARALLEL_LIGHT);
-        light.ambient = glb::Vector(0.1f, 0.1f, 0.1f);
-        light.diffuse = glb::Vector(2.0f, 2.0f, 2.0f);
-        light.specular = glb::Vector(100.0f, 100.0f, 100.0f);
-        light.dir = glb::Vector(-1.0f, -1.0f, -1.0f);
+        scene::Light light(scene::PARALLEL_LIGHT);
+        light.ambient = math::Vector(0.1f, 0.1f, 0.1f);
+        light.diffuse = math::Vector(2.0f, 2.0f, 2.0f);
+        light.specular = math::Vector(100.0f, 100.0f, 100.0f);
+        light.dir = math::Vector(-1.0f, -1.0f, -1.0f);
         light.dir.Normalize();
         light.pow = 128.0f;
         glb::scene::Scene::SetLight(light, 0);
@@ -50,11 +51,11 @@ public:
 
         // Add ground
         int32_t ground = glb::scene::Scene::AddObject("res/ground.obj");
-        glb::Object* obj = glb::scene::Scene::GetObjectById(ground);
+        scene::Object* obj = glb::scene::Scene::GetObjectById(ground);
         obj->SetCullFaceEnable(true);
         obj->SetCullFaceMode(glb::render::CULL_BACK);
         obj->SetDepthTestEnable(true);
-        obj->SetPos(Vector(0.0f, 0.0f, 0.0f));
+        obj->SetPos(math::Vector(0.0f, 0.0f, 0.0f));
 
         // Add center base
         int32_t center_base = glb::scene::Scene::AddObject("res/center_base.obj");
@@ -62,7 +63,7 @@ public:
         obj->SetCullFaceEnable(true);
         obj->SetCullFaceMode(glb::render::CULL_BACK);
         obj->SetDepthTestEnable(true);
-        obj->SetPos(Vector(0.0f, 1.0f, 0.0f));
+        obj->SetPos(math::Vector(0.0f, 1.0f, 0.0f));
 
         // Add other base
         int32_t other_base = glb::scene::Scene::AddObject("res/other_base.obj");
@@ -70,28 +71,28 @@ public:
         obj->SetCullFaceEnable(true);
         obj->SetCullFaceMode(glb::render::CULL_BACK);
         obj->SetDepthTestEnable(true);
-        obj->SetPos(Vector(3.0f, 1.0f, 0.0f));
+        obj->SetPos(math::Vector(3.0f, 1.0f, 0.0f));
 
         other_base = glb::scene::Scene::AddObject("res/other_base.obj");
         obj = glb::scene::Scene::GetObjectById(other_base);
         obj->SetCullFaceEnable(true);
         obj->SetCullFaceMode(glb::render::CULL_BACK);
         obj->SetDepthTestEnable(true);
-        obj->SetPos(Vector(-3.0f, 1.0f, 0.0f));
+        obj->SetPos(math::Vector(-3.0f, 1.0f, 0.0f));
 
         other_base = glb::scene::Scene::AddObject("res/other_base.obj");
         obj = glb::scene::Scene::GetObjectById(other_base);
         obj->SetCullFaceEnable(true);
         obj->SetCullFaceMode(glb::render::CULL_BACK);
         obj->SetDepthTestEnable(true);
-        obj->SetPos(Vector(0.0f, 1.0f, 3.0f));
+        obj->SetPos(math::Vector(0.0f, 1.0f, 3.0f));
 
         other_base = glb::scene::Scene::AddObject("res/other_base.obj");
         obj = glb::scene::Scene::GetObjectById(other_base);
         obj->SetCullFaceEnable(true);
         obj->SetCullFaceMode(glb::render::CULL_BACK);
         obj->SetDepthTestEnable(true);
-        obj->SetPos(Vector(0.0f, 1.0f, -3.0f));
+        obj->SetPos(math::Vector(0.0f, 1.0f, -3.0f));
 
         // Add cubes
         m_Cubes[0] = glb::scene::Scene::AddObject("res/cube.obj");
@@ -99,28 +100,28 @@ public:
         obj->SetCullFaceEnable(true);
         obj->SetCullFaceMode(glb::render::CULL_BACK);
         obj->SetDepthTestEnable(true);
-        obj->SetPos(Vector(3.0f, 2.3f, 0.0f));
+        obj->SetPos(math::Vector(3.0f, 2.3f, 0.0f));
 
         m_Cubes[1] = glb::scene::Scene::AddObject("res/cube.obj");
         obj = glb::scene::Scene::GetObjectById(m_Cubes[1]);
         obj->SetCullFaceEnable(true);
         obj->SetCullFaceMode(glb::render::CULL_BACK);
         obj->SetDepthTestEnable(true);
-        obj->SetPos(Vector(-3.0f, 2.3f, 0.0f));
+        obj->SetPos(math::Vector(-3.0f, 2.3f, 0.0f));
 
         m_Cubes[2] = glb::scene::Scene::AddObject("res/cube.obj");
         obj = glb::scene::Scene::GetObjectById(m_Cubes[2]);
         obj->SetCullFaceEnable(true);
         obj->SetCullFaceMode(glb::render::CULL_BACK);
         obj->SetDepthTestEnable(true);
-        obj->SetPos(Vector(0.0f, 2.3f, 3.0f));
+        obj->SetPos(math::Vector(0.0f, 2.3f, 3.0f));
 
         m_Cubes[3] = glb::scene::Scene::AddObject("res/cube.obj");
         obj = glb::scene::Scene::GetObjectById(m_Cubes[3]);
         obj->SetCullFaceEnable(true);
         obj->SetCullFaceMode(glb::render::CULL_BACK);
         obj->SetDepthTestEnable(true);
-        obj->SetPos(Vector(0.0f, 2.3f, -3.0f));
+        obj->SetPos(math::Vector(0.0f, 2.3f, -3.0f));
 
         // Add ball
         m_Ball = glb::scene::Scene::AddObject("res/ball.obj");
@@ -128,15 +129,15 @@ public:
         obj->SetCullFaceEnable(true);
         obj->SetCullFaceMode(glb::render::CULL_BACK);
         obj->SetDepthTestEnable(true);
-        obj->SetPos(Vector(0.0f, 2.2f, 0.0f));
+        obj->SetPos(math::Vector(0.0f, 2.2f, 0.0f));
         int32_t em = glb::render::Render::RequestBakeEnvMap(256, 256, obj);
-        obj->SetTexWithId(glb::Model::MT_REFLECT, em);
+        obj->SetTexWithId(scene::Model::MT_REFLECT, em);
 
         return true;
     }
 
     void Update(float dt) {
-        glb::profile::ProfileTime time;
+        util::ProfileTime time;
         time.BeginProfile();
 
         // Update scene
@@ -154,7 +155,7 @@ public:
     }
 
     void UpdateCamera() {
-        camera::ModelCamera* model_cam = reinterpret_cast<camera::ModelCamera*>(scene::Scene::GetCurCamera());
+        scene::ModelCamera* model_cam = reinterpret_cast<scene::ModelCamera*>(scene::Scene::GetCurCamera());
         float rot = 0.5f;
         model_cam->Rotate(rot);
         //camera::FreeCamera* cam = reinterpret_cast<camera::FreeCamera*>(scene::Scene::GetCurCamera());
@@ -184,8 +185,8 @@ public:
     void UpdateObjects() {
         float rot = 1.0f;
         for (int32_t i = 0; i < 4; i++) {
-            Object* obj = glb::scene::Scene::GetObjectById(m_Cubes[i]);
-            Vector rot_v = obj->GetRotation();
+            scene::Object* obj = glb::scene::Scene::GetObjectById(m_Cubes[i]);
+            math::Vector rot_v = obj->GetRotation();
             rot_v.x += rot;
             rot_v.y += rot;
             rot_v.z += rot;
@@ -204,6 +205,7 @@ int _stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPreInstance, LPSTR cmdLine,
     config.screen_height = 600;
     config.shadow_map_width = 2048;
     config.shadow_map_height = 2048;
+    config.icon = IDI_ICON1;
     if (!glb::app::Application::Initialize(ApplicationAltar::Create, hInstance, config)) {
         return 0;
     }

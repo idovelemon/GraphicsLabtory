@@ -22,8 +22,8 @@ static const int32_t kMaxCharLen = 256;
 // CLASS DECLARATION
 //---------------------------------------------------------------------------------
 struct TangentSpace {
-    glb::Vector tangent[3];
-    glb::Vector binormal[3];
+    glb::math::Vector tangent[3];
+    glb::math::Vector binormal[3];
 };
 
 //-----------------------------------------------------------------------------------
@@ -56,9 +56,9 @@ bool glb_calc_tangent_binormal_coordinates(int32_t face_num, float* vertex_buf, 
 // @param: n0-n2 The normal of face
 // @out: space The tangent space coordinate
 //------------------------------------------------------------------
-void glb_calc_tangent_binormal(glb::Vector v0, glb::Vector v1, glb::Vector v2
-                               , glb::Vector t0, glb::Vector t1, glb::Vector t2
-                               , glb::Vector n0, glb::Vector n1, glb::Vector n2
+void glb_calc_tangent_binormal(glb::math::Vector v0, glb::math::Vector v1, glb::math::Vector v2
+                               , glb::math::Vector t0, glb::math::Vector t1, glb::math::Vector t2
+                               , glb::math::Vector n0, glb::math::Vector n1, glb::math::Vector n2
                                , TangentSpace& space);
 
 //------------------------------------------------------------------
@@ -85,17 +85,17 @@ int main(int argc,char* argv[]) {
     }
 
     // Extract face data from file
-    glb::ModelEffectParam effect_param;
-    glb::ModelMaterialParam material_param;
+    glb::scene::ModelEffectParam effect_param;
+    glb::scene::ModelMaterialParam material_param;
     float* vertex_buf = NULL;
     float* texcoord_buf = NULL;
     float* normal_buf = NULL;
     float* tangent_buf = NULL;
-    int32_t face_num = glb::ModelFile::ExtractModelData(obj_file_path, effect_param, material_param
+    int32_t face_num = glb::scene::ModelFile::ExtractModelData(obj_file_path, effect_param, material_param
         , &vertex_buf, &texcoord_buf, &normal_buf, &tangent_buf);
 
     if (vertex_buf == NULL || texcoord_buf == NULL || normal_buf == NULL) {
-        glb::ModelFile::RelaseBuf(&vertex_buf, &texcoord_buf, &normal_buf, &tangent_buf);
+        glb::scene::ModelFile::RelaseBuf(&vertex_buf, &texcoord_buf, &normal_buf, &tangent_buf);
         std::cout << "There is no texture coordinate, so there is no need for tangent-binormal coordinates!" << std::endl;
 
 #if _DEBUG
@@ -105,7 +105,7 @@ int main(int argc,char* argv[]) {
     }
 
     if (tangent_buf != NULL) {
-        glb::ModelFile::RelaseBuf(&vertex_buf, &texcoord_buf, &normal_buf, &tangent_buf);
+        glb::scene::ModelFile::RelaseBuf(&vertex_buf, &texcoord_buf, &normal_buf, &tangent_buf);
         std::cout << "There is already tangent space coordinate, so there is no need for tangent-binormal coordinates!" << std::endl;
 
 #if _DEBUG
@@ -117,7 +117,7 @@ int main(int argc,char* argv[]) {
     // Calculate tangent and binormal coordinates
     std::vector<TangentSpace> tangents;
     bool is_tangent_space_generated = glb_calc_tangent_binormal_coordinates(face_num, vertex_buf, texcoord_buf, normal_buf, tangents);
-    glb::ModelFile::RelaseBuf(&vertex_buf, &texcoord_buf);
+    glb::scene::ModelFile::RelaseBuf(&vertex_buf, &texcoord_buf);
     if (!is_tangent_space_generated) {
         std::cout << "Generate tangent space coordinate error!" << std::endl;
 
@@ -186,7 +186,7 @@ bool glb_calc_tangent_binormal_coordinates(int32_t face_num, float* vertex_buf, 
         return result;
     }
 
-    glb::Vector v0, v1, v2, t0, t1, t2, n0, n1, n2;
+    glb::math::Vector v0, v1, v2, t0, t1, t2, n0, n1, n2;
     for (int32_t i = 0; i < face_num; i++) {
          v0.x = vertex_buf[i * 3 * 3 + 0 * 3 + 0];
          v0.y = vertex_buf[i * 3 * 3 + 0 * 3 + 1];
@@ -220,27 +220,27 @@ bool glb_calc_tangent_binormal_coordinates(int32_t face_num, float* vertex_buf, 
     return result;
 }
 
-void glb_calc_tangent_binormal(glb::Vector v0, glb::Vector v1, glb::Vector v2
-                               , glb::Vector t0, glb::Vector t1, glb::Vector t2
-                               , glb::Vector n0, glb::Vector n1, glb::Vector n2
+void glb_calc_tangent_binormal(glb::math::Vector v0, glb::math::Vector v1, glb::math::Vector v2
+                               , glb::math::Vector t0, glb::math::Vector t1, glb::math::Vector t2
+                               , glb::math::Vector n0, glb::math::Vector n1, glb::math::Vector n2
                                , TangentSpace& space) {
-    glb::Vector vedge0 = v1 - v0;
-    glb::Vector vedge1 = v2 - v0;
-    glb::Vector tedge0 = t1 - t0;
-    glb::Vector tedge1 = t2 - t0;
+    glb::math::Vector vedge0 = v1 - v0;
+    glb::math::Vector vedge1 = v2 - v0;
+    glb::math::Vector tedge0 = t1 - t0;
+    glb::math::Vector tedge1 = t2 - t0;
     float temp = 1.0f / (tedge0.x * tedge1.y - tedge0.y * tedge1.x);
-    glb::Vector tangent = (vedge0 * tedge1.y - vedge1 * tedge0.y) * temp;
-    glb::Vector binormal = (vedge1 * tedge0.x - vedge0 * tedge1.x) * temp;
+    glb::math::Vector tangent = (vedge0 * tedge1.y - vedge1 * tedge0.y) * temp;
+    glb::math::Vector binormal = (vedge1 * tedge0.x - vedge0 * tedge1.x) * temp;
     tangent.Normalize();
     binormal.Normalize();
 
     // Gram-Schmidt orthogonalize
-    space.tangent[0] = tangent - n0 * glb::Dot(n0, tangent);
-    space.binormal[0] = binormal - n0 * glb::Dot(n0, binormal);
-    space.tangent[1] = tangent - n1 * glb::Dot(n1, tangent);
-    space.binormal[1] = binormal - n1 * glb::Dot(n1, binormal);
-    space.tangent[2] = tangent - n2 * glb::Dot(n2, tangent);
-    space.binormal[2] = binormal - n2 * glb::Dot(n2, binormal);
+    space.tangent[0] = tangent - n0 * glb::math::Dot(n0, tangent);
+    space.binormal[0] = binormal - n0 * glb::math::Dot(n0, binormal);
+    space.tangent[1] = tangent - n1 * glb::math::Dot(n1, tangent);
+    space.binormal[1] = binormal - n1 * glb::math::Dot(n1, binormal);
+    space.tangent[2] = tangent - n2 * glb::math::Dot(n2, tangent);
+    space.binormal[2] = binormal - n2 * glb::math::Dot(n2, binormal);
 }
 
 bool glb_write_tangent_space(char* obj_file_path, std::vector<TangentSpace> tangents) {

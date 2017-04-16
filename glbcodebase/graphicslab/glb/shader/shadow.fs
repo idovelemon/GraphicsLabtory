@@ -14,8 +14,8 @@ in vec3 vs_Normal;
 uniform vec3 glb_ParallelLight_Dir;
 
 // Constant value
-const float cMinOffset = 0.002;
-const float cMaxOffset = 0.003;
+const float cMinOffset = 0.001;
+const float cMaxOffset = 0.002;
 
 void main() {
 	vec3 normal = normalize(vs_Normal);

@@ -7,16 +7,19 @@
 #include "glbapplication.h"
 
 #include "glbeditorcomm.h"
-#include "glblog.h"
-#include "glbmacro.h"
-#include "glbmaterial.h"
-#include "glbmesh.h"
-#include "glbmodel.h"
-#include "glbrender.h"
-#include "glbrenderdevice.h"
-#include "glbscene.h"
-#include "glbshader.h"
-#include "glbtexture.h"
+
+#include "render/glbmaterial.h"
+#include "render/glbmesh.h"
+#include "render/glbrender.h"
+#include "render/glbrenderdevice.h"
+#include "render/glbshader.h"
+#include "render/glbtexture.h"
+
+#include "scene/glbmodel.h"
+#include "scene/glbscene.h"
+
+#include "util/glblog.h"
+#include "util/glbmacro.h"
 
 namespace glb {
 
@@ -56,8 +59,9 @@ public:
     int32_t GetShadowMapHeight();
 
 protected:
-    bool CreateWnd(HINSTANCE hInstance, int32_t width, int32_t height, const wchar_t* caption);
-    bool SetupGLB(int32_t width, int32_t height);
+    bool CreateWnd(HINSTANCE hInstance, int32_t width, int32_t height, const wchar_t* caption, int32_t icon);
+    bool SetupGLBBeforeUserApp(int32_t width, int32_t height);
+    bool SetupGLBAfterUserApp();
 
 private:
     ApplicationBase*                m_Application;
@@ -112,14 +116,14 @@ bool ApplicationImp::Initialize(APPLICATION_CREATOR creator, HINSTANCE hInstance
     }
 
     // Create window
-    if (!CreateWnd(hInstance, config.screen_width, config.screen_height, config.caption)) {
+    if (!CreateWnd(hInstance, config.screen_width, config.screen_height, config.caption, config.icon)) {
         result = false;
         GLB_SAFE_ASSERT(false);
         return result;
     }
 
-    // Setup glb
-    if (!SetupGLB(config.screen_width, config.screen_height)) {
+    // Setup glb before user app
+    if (!SetupGLBBeforeUserApp(config.screen_width, config.screen_height)) {
         result = false;
         GLB_SAFE_ASSERT(false);
         return result;
@@ -127,6 +131,13 @@ bool ApplicationImp::Initialize(APPLICATION_CREATOR creator, HINSTANCE hInstance
 
     // Initialize user application
     if (!m_Application->Initialize()) {
+        result = false;
+        GLB_SAFE_ASSERT(false);
+        return result;
+    }
+
+    // Setup glb aflter user app
+    if (!SetupGLBAfterUserApp()) {
         result = false;
         GLB_SAFE_ASSERT(false);
         return result;
@@ -158,13 +169,13 @@ void ApplicationImp::Destroy() {
     //EditorComm::Destroy();
     render::Render::Destroy();
     render::Device::Destroy();
-    ModelMgr::Destroy();
-    mesh::Mgr::Destroy();
-    material::Mgr::Destroy();
-    texture::Mgr::Destroy();
-    shader::Mgr::Destroy();
+    scene::ModelMgr::Destroy();
+    render::mesh::Mgr::Destroy();
+    render::material::Mgr::Destroy();
+    render::texture::Mgr::Destroy();
+    render::shader::Mgr::Destroy();
     scene::Scene::Destroy();
-    log::Destroy();
+    util::log::Destroy();
 }
 
 HWND ApplicationImp::GetWindowHandle() {
@@ -187,7 +198,7 @@ int32_t ApplicationImp::GetShadowMapHeight() {
     return m_Config.shadow_map_height;
 }
 
-bool ApplicationImp::CreateWnd(HINSTANCE hInstance, int32_t width, int32_t height, const wchar_t* caption) {
+bool ApplicationImp::CreateWnd(HINSTANCE hInstance, int32_t width, int32_t height, const wchar_t* caption, int32_t icon) {
     // Register window class
     WNDCLASSEX wnd;
     wnd.cbClsExtra = 0;
@@ -195,13 +206,14 @@ bool ApplicationImp::CreateWnd(HINSTANCE hInstance, int32_t width, int32_t heigh
     wnd.cbWndExtra = NULL;
     wnd.hbrBackground = HBRUSH(COLOR_WINDOW + 1);
     wnd.hCursor = LoadCursor(NULL, IDC_ARROW);
-    wnd.hIcon = NULL;
+    wnd.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(icon));
     wnd.hIconSm = NULL;
     wnd.hInstance = hInstance;
     wnd.lpfnWndProc = GLB_WndProc;
     wnd.lpszClassName = L"GraphicsLab";
     wnd.lpszMenuName = NULL;
     wnd.style = CS_HREDRAW | CS_VREDRAW;
+    int32_t err = GetLastError();
 
     if (!RegisterClassEx(&wnd)) {
         return false;
@@ -221,18 +233,24 @@ bool ApplicationImp::CreateWnd(HINSTANCE hInstance, int32_t width, int32_t heigh
     return true;
 }
 
-bool ApplicationImp::SetupGLB(int32_t width, int32_t height) {
-    log::Initialize();
+bool ApplicationImp::SetupGLBBeforeUserApp(int32_t width, int32_t height) {
+    util::log::Initialize();
     scene::Scene::Initialize();
-    shader::Mgr::Initialize();
-    texture::Mgr::Initialize();
-    material::Mgr::Initialize();
-    mesh::Mgr::Initialize();
-    ModelMgr::Initialize();
+    render::shader::Mgr::Initialize();
+    render::texture::Mgr::Initialize();
+    render::material::Mgr::Initialize();
+    render::mesh::Mgr::Initialize();
+    scene::ModelMgr::Initialize();
     render::Device::Initialize();
     render::Render::Initialize(width, height);
     //EditorComm::Initialize();
     //EditorComm::PostData();
+
+    return true;
+}
+
+bool ApplicationImp::SetupGLBAfterUserApp() {
+    render::Render::InitializeAfterUserApp();
 
     return true;
 }
@@ -329,6 +347,7 @@ int32_t Application::GetShadowMapHeight() {
 
     return result;
 }
+
 };  // namespace app
 
 };  // namespace glb

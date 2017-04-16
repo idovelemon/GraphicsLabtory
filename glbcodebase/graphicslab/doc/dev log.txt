@@ -18,3 +18,11 @@ brief:目前对DX11 API的集成只做到了初始化的部分，像shader，render target, texture
 #0005: Shadow Map效果不理想
 data:2017/03/31
 brief:现在只能对很小的场景作用，场景一大，就没有办法保证小物体的阴影能够被采样到，需要使用PSSM
+
+#0006: Object::GetBoundMax()和Object::GetBoundMin()函数
+data:2017/04/03
+brief:需要考虑旋转的情况，旋转的情况下，计算新的AABB包围盒
+
+#0007: OpenGL&DX11矩阵的统一表示
+data:2017/04/03
+brief:目前所有矩阵的设计都是以OpenGL为参考的，很多是和OpenGL的空间表示耦合的，所以需要处理，以支持DX11

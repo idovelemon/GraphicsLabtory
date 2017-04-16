@@ -5,6 +5,7 @@
 // Brief: Demonstrate the shadow mapping
 //---------------------------------------------------------------------
 #include "glb_shadowmap.h"
+#include "resource.h"
 
 class ApplicationShadowMap : public glb::app::ApplicationBase {
 public:
@@ -19,15 +20,15 @@ public:
 public:
     bool Initialize() {
         // Camera
-        camera::FreeCamera* cam = camera::FreeCamera::Create(glb::Vector(0.0f, 0.0f, 200.0f), glb::Vector(0.0f, 0.0f, 0.0));
+        scene::FreeCamera* cam = scene::FreeCamera::Create(math::Vector(0.0f, 0.0f, 200.0f), math::Vector(0.0f, 0.0f, 0.0));
         glb::scene::Scene::SetCamera(glb::scene::PRIMIAY_CAM, cam);
 
         // Light
-        light::Light light(light::PARALLEL_LIGHT);
-        light.ambient = glb::Vector(0.2f, 0.2f, 0.2f);
-        light.diffuse = glb::Vector(0.8f, 0.8f, 0.8f);
-        light.specular = glb::Vector(1.0f, 1.0f, 1.0f);
-        light.dir = glb::Vector(-1.0f, -1.0f, 1.0f);
+        scene::Light light(scene::PARALLEL_LIGHT);
+        light.ambient = math::Vector(0.2f, 0.2f, 0.2f);
+        light.diffuse = math::Vector(0.8f, 0.8f, 0.8f);
+        light.specular = math::Vector(1.0f, 1.0f, 1.0f);
+        light.dir = math::Vector(-1.0f, -1.0f, 1.0f);
         light.dir.Normalize();
         light.pow = 128.0f;
         glb::scene::Scene::SetLight(light, 0);
@@ -45,30 +46,30 @@ public:
         glb::scene::Scene::GetObjectById(floor)->SetCullFaceEnable(true);
         glb::scene::Scene::GetObjectById(floor)->SetCullFaceMode(glb::render::CULL_BACK);
         glb::scene::Scene::GetObjectById(floor)->SetDepthTestEnable(true);
-        glb::scene::Scene::GetObjectById(floor)->SetPos(Vector(0.0, 0.0, 0.0));
+        glb::scene::Scene::GetObjectById(floor)->SetPos(math::Vector(0.0, 0.0, 0.0));
 
         int32_t cube = glb::scene::Scene::AddObject("cube.obj");
         glb::scene::Scene::GetObjectById(cube)->SetCullFaceEnable(true);
         glb::scene::Scene::GetObjectById(cube)->SetCullFaceMode(glb::render::CULL_BACK);
         glb::scene::Scene::GetObjectById(cube)->SetDepthTestEnable(true);
-        glb::scene::Scene::GetObjectById(cube)->SetPos(Vector(70.0f, 50.0f, 0.0f));
+        glb::scene::Scene::GetObjectById(cube)->SetPos(math::Vector(70.0f, 50.0f, 0.0f));
 
         cube = glb::scene::Scene::AddObject("cube.obj");
         glb::scene::Scene::GetObjectById(cube)->SetCullFaceEnable(true);
         glb::scene::Scene::GetObjectById(cube)->SetCullFaceMode(glb::render::CULL_BACK);
         glb::scene::Scene::GetObjectById(cube)->SetDepthTestEnable(true);
-        glb::scene::Scene::GetObjectById(cube)->SetPos(Vector(-70.0f, 50.0f, 0.0f));
+        glb::scene::Scene::GetObjectById(cube)->SetPos(math::Vector(-70.0f, 50.0f, 0.0f));
         return true;
     }
 
     void Update(float dt) {
-        glb::profile::ProfileTime time;
+        util::ProfileTime time;
         time.BeginProfile();
 
         // Update scene
-        glb::light::Light lit = glb::scene::Scene::GetLight(0);
+        scene::Light lit = glb::scene::Scene::GetLight(0);
         float rotY = 1.0f;
-        Matrix rot;
+        math::Matrix rot;
         rot.MakeRotateYMatrix(rotY);
         lit.dir = rot * lit.dir;
         glb::scene::Scene::SetLight(lit, 0);
@@ -92,6 +93,7 @@ int _stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPreInstance, LPSTR cmdLine,
     config.screen_height = 600;
     config.shadow_map_width = 1024;
     config.shadow_map_height = 1024;
+    config.icon = IDI_ICON1;
     if (!glb::app::Application::Initialize(ApplicationShadowMap::Create, hInstance, config)) {
         return 0;
     }

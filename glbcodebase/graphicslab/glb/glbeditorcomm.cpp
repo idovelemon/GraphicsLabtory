@@ -13,8 +13,10 @@
 
 #include "comm.h"
 #include "glbcomm.h"
-#include "glbmacro.h"
-#include "glbmaterial.h"
+
+#include "render/glbmaterial.h"
+
+#include "util/glbmacro.h"
 
 namespace glb {
 
@@ -108,13 +110,13 @@ void EditorCommImp::AcceptData() {
             memcpy(&mat, reinterpret_cast<char*>(packet->data) + offset, sizeof(CommMaterial));
             offset += sizeof(CommMaterial);
 
-            material::Material store_mat;
-            store_mat.ambient = glb::Vector(mat.ambient_x, mat.ambient_y, mat.ambient_z);
-            store_mat.diffuse = glb::Vector(mat.diffuse_x, mat.diffuse_y, mat.diffuse_z);
-            store_mat.specular = glb::Vector(mat.specular_x, mat.specular_y, mat.specular_z);
-            store_mat.emission = glb::Vector(mat.emission_x, mat.emission_y, mat.emission_z);
+            render::material::Material store_mat;
+            store_mat.ambient = math::Vector(mat.ambient_x, mat.ambient_y, mat.ambient_z);
+            store_mat.diffuse = math::Vector(mat.diffuse_x, mat.diffuse_y, mat.diffuse_z);
+            store_mat.specular = math::Vector(mat.specular_x, mat.specular_y, mat.specular_z);
+            store_mat.emission = math::Vector(mat.emission_x, mat.emission_y, mat.emission_z);
             store_mat.specular_pow = mat.pow;
-            material::Mgr::ChangeMaterial(store_mat, mat.id);
+            render::material::Mgr::ChangeMaterial(store_mat, mat.id);
         }
     }
 }
@@ -122,11 +124,11 @@ void EditorCommImp::AcceptData() {
 void EditorCommImp::PostMaterial() {
     comm::Packet packet;
     packet.type = comm::kMaterialList;
-    int32_t mat_num = material::Mgr::GetMaterialCount();
+    int32_t mat_num = render::material::Mgr::GetMaterialCount();
     CommMaterial* mats = new CommMaterial[mat_num];
     if (mats != NULL) {
         for (int32_t i = 0; i < mat_num; i++) {
-            material::Material mat = material::Mgr::GetMaterial(i + 1);
+            render::material::Material mat = render::material::Mgr::GetMaterial(i + 1);
             mats[i].ambient_x = mat.ambient.x;
             mats[i].ambient_y = mat.ambient.y;
             mats[i].ambient_z = mat.ambient.z;
