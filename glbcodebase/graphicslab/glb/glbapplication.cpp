@@ -8,6 +8,7 @@
 
 #include "glbeditorcomm.h"
 
+#include "glbinput.h"
 #include "render/glbmaterial.h"
 #include "render/glbmesh.h"
 #include "render/glbrender.h"
@@ -53,6 +54,7 @@ public:
     virtual void Destroy();
 
     HWND GetWindowHandle();
+    HINSTANCE GetWindowInst();
     int32_t GetWindowWidth();
     int32_t GetWindowHeight();
     int32_t GetShadowMapWidth();
@@ -66,6 +68,7 @@ protected:
 private:
     ApplicationBase*                m_Application;
     HWND                            m_WndHandle;
+    HINSTANCE                       m_WndInstance;
     AppConfig                       m_Config;
 };
 
@@ -95,6 +98,7 @@ LRESULT CALLBACK GLB_WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) 
 ApplicationImp::ApplicationImp()
 : m_Application(NULL)
 , m_WndHandle(NULL)
+, m_WndInstance(NULL)
 , m_Config() {
 }
 
@@ -167,6 +171,7 @@ void ApplicationImp::Destroy() {
     }
 
     //EditorComm::Destroy();
+    Input::Destroy();
     render::Render::Destroy();
     render::Device::Destroy();
     scene::ModelMgr::Destroy();
@@ -180,6 +185,10 @@ void ApplicationImp::Destroy() {
 
 HWND ApplicationImp::GetWindowHandle() {
     return m_WndHandle;
+}
+
+HINSTANCE ApplicationImp::GetWindowInst() {
+    return m_WndInstance;
 }
 
 int32_t ApplicationImp::GetWindowWidth() {
@@ -230,6 +239,8 @@ bool ApplicationImp::CreateWnd(HINSTANCE hInstance, int32_t width, int32_t heigh
 
     ShowWindow(m_WndHandle, SW_SHOW);
 
+    m_WndInstance = hInstance;
+
     return true;
 }
 
@@ -243,6 +254,7 @@ bool ApplicationImp::SetupGLBBeforeUserApp(int32_t width, int32_t height) {
     scene::ModelMgr::Initialize();
     render::Device::Initialize();
     render::Render::Initialize(width, height);
+    Input::Initialize();
     //EditorComm::Initialize();
     //EditorComm::PostData();
 
@@ -297,6 +309,18 @@ HWND Application::GetWindowHandle() {
     HWND result = NULL;
     if (s_ApplicationImp != NULL) {
         result = s_ApplicationImp->GetWindowHandle();
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return result;
+}
+
+HINSTANCE Application::GetWindowInst() {
+    HINSTANCE result = NULL;
+
+    if (s_ApplicationImp != NULL) {
+        result = s_ApplicationImp->GetWindowInst();
     } else {
         GLB_SAFE_ASSERT(false);
     }

@@ -6,6 +6,9 @@
 //------------------------------------------------------------------
 #include "glbinput.h"
 
+#include <dinput.h>
+
+#include "glbapplication.h"
 #include "util/glbmacro.h"
 
 namespace glb {
@@ -34,17 +37,20 @@ public:
 
 public:
     void Initialize();
+    void Update();
     void Destroy();
 
-    // Mouse
-    float GetMouseMoveX();
-    float GetMouseMoveY();
-    void SetMouseMoveX(float move);
-    void SetMouseMoveY(float move);
+    int64_t GetMouseMoveX();
+    int64_t GetMouseMoveY();
+    bool IsMouseButtonPressed(ButtonMouse mouse);
+    bool IsKeyboardButtonPressed(ButtonKey key);
 
 protected:
-    float           m_MouseMoveX;
-    float           m_MouseMoveY;
+    LPDIRECTINPUT8          m_Input;
+    LPDIRECTINPUTDEVICE8    m_Mouse;
+    LPDIRECTINPUTDEVICE8    m_Keyboard;
+    DIMOUSESTATE            m_MouseState;
+    int8_t                  m_KeyboardState[256];
 };
 
 //-----------------------------------------------------------------------------------
@@ -55,33 +61,135 @@ protected:
 // InputImp DEFINITION
 //----------------------------------------------------------------------------------
 InputImp::InputImp()
-: m_MouseMoveX(0.0f)
-, m_MouseMoveY(0.0f) {
+: m_Input(NULL)
+, m_Mouse(NULL)
+, m_Keyboard(NULL)
+, m_MouseState() {
+    memset(m_KeyboardState, 0, sizeof(m_KeyboardState));
 }
 
 InputImp::~InputImp() {
 }
 
 void InputImp::Initialize() {
+    if (FAILED(DirectInput8Create(app::Application::GetWindowInst(), 0x0800, IID_IDirectInput8,
+        reinterpret_cast<void**>(&m_Input), NULL))) {
+        GLB_SAFE_ASSERT(false);
+        return;
+    }
+
+    if (FAILED(m_Input->CreateDevice(GUID_SysMouse, &m_Mouse, NULL))) {
+        GLB_SAFE_ASSERT(false);
+        return;
+    }
+
+    if (FAILED(m_Input->CreateDevice(GUID_SysKeyboard, &m_Keyboard, NULL))) {
+        GLB_SAFE_ASSERT(false);
+        return;
+    }
+
+    m_Mouse->SetDataFormat(&c_dfDIMouse);
+    m_Keyboard->SetDataFormat(&c_dfDIKeyboard);
+
+    m_Mouse->SetCooperativeLevel(app::Application::GetWindowHandle(), DISCL_BACKGROUND |DISCL_NONEXCLUSIVE);
+    m_Keyboard->SetCooperativeLevel(app::Application::GetWindowHandle(), DISCL_BACKGROUND |DISCL_NONEXCLUSIVE);
+
+    if (FAILED(m_Mouse->Acquire())) {
+        GLB_SAFE_ASSERT(false);
+        return;
+    }
+
+    if (FAILED(m_Keyboard->Acquire())) {
+        GLB_SAFE_ASSERT(false);
+        return;
+    }
+}
+
+void InputImp::Update() {
+    if (m_Mouse != NULL) {
+        if (FAILED(m_Mouse->Acquire())) {
+            GLB_SAFE_ASSERT(false);
+            return;
+        }
+
+        if (FAILED(m_Mouse->Poll())) {
+            GLB_SAFE_ASSERT(false);
+            return;
+        }
+
+        if (FAILED(m_Mouse->GetDeviceState(sizeof(DIMOUSESTATE), &m_MouseState))) {
+            GLB_SAFE_ASSERT(false);
+            return;
+        }
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    if (m_Keyboard != NULL) {
+        if (FAILED(m_Keyboard->Acquire())) {
+            GLB_SAFE_ASSERT(false);
+            return;
+        }
+
+        if (FAILED(m_Keyboard->Poll())) {
+            GLB_SAFE_ASSERT(false);
+            return;
+        }
+
+        if (FAILED(m_Keyboard->GetDeviceState(sizeof(m_KeyboardState), &m_KeyboardState))) {
+            GLB_SAFE_ASSERT(false);
+            return;
+        }
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
 }
 
 void InputImp::Destroy() {
+    if (m_Mouse != NULL) {
+        m_Mouse->Unacquire();
+        m_Mouse->Release();
+        m_Mouse = NULL;
+    }
+
+    if (m_Keyboard != NULL) {
+        m_Keyboard->Unacquire();
+        m_Keyboard->Release();
+        m_Keyboard = NULL;
+    }
+
+    if (m_Input != NULL) {
+        m_Input->Release();
+        m_Input = NULL;
+    }
 }
 
-float InputImp::GetMouseMoveX() {
-    return m_MouseMoveX;
+int64_t InputImp::GetMouseMoveX() {
+    return m_MouseState.lX;
 }
 
-float InputImp::GetMouseMoveY() {
-    return m_MouseMoveY;
+int64_t InputImp::GetMouseMoveY() {
+    return m_MouseState.lY;
 }
 
-void InputImp::SetMouseMoveX(float m) {
-    m_MouseMoveX = m;
+bool InputImp::IsMouseButtonPressed(ButtonMouse mouse) {
+    bool result = false;
+
+    if (m_MouseState.rgbButtons[mouse] & 0x80) {
+        result = true;
+    }
+
+    return result;
 }
 
-void InputImp::SetMouseMoveY(float m) {
-    m_MouseMoveY = m;
+bool InputImp::IsKeyboardButtonPressed(ButtonKey key) {
+    bool result = false;
+
+    if (m_KeyboardState[key] & 0x80) {
+        result = true;
+    }
+
+    return result;
 }
 
 //-----------------------------------------------------------------------------------
@@ -91,9 +199,18 @@ void Input::Initialize() {
     if (s_InputImp == NULL) {
         s_InputImp = new InputImp;
         if (s_InputImp != NULL) {
+            s_InputImp->Initialize();
         } else {
             GLB_SAFE_ASSERT(false);
         }
+    }
+}
+
+void Input::Update() {
+    if (s_InputImp != NULL) {
+        s_InputImp->Update();
+    } else {
+        GLB_SAFE_ASSERT(false);
     }
 }
 
@@ -106,8 +223,8 @@ void Input::Destroy() {
     }
 }
 
-float Input::GetMouseMoveX() {
-    float result = 0.0f;
+int64_t Input::GetMouseMoveX() {
+    int64_t result = 0;
 
     if (s_InputImp != NULL) {
         result = s_InputImp->GetMouseMoveX();
@@ -118,16 +235,8 @@ float Input::GetMouseMoveX() {
     return result;
 }
 
-void Input::SetMouseMoveX(float m) {
-    if (s_InputImp != NULL) {
-        s_InputImp->SetMouseMoveX(m);
-    } else {
-        GLB_SAFE_ASSERT(false);
-    }
-}
-
-float Input::GetMouseMoveY() {
-    float result = 0.0f;
+int64_t Input::GetMouseMoveY() {
+    int64_t result = 0;
 
     if (s_InputImp != NULL) {
         result = s_InputImp->GetMouseMoveY();
@@ -138,11 +247,27 @@ float Input::GetMouseMoveY() {
     return result;
 }
 
-void Input::SetMouseMoveY(float m) {
+bool Input::IsMouseButtonPressed(ButtonMouse mouse) {
+    bool result = false;
+
     if (s_InputImp != NULL) {
-        s_InputImp->SetMouseMoveY(m);
+        result = s_InputImp->IsMouseButtonPressed(mouse);
     } else {
         GLB_SAFE_ASSERT(false);
     }
+
+    return result;
+}
+
+bool Input::IsKeyboardButtonPressed(ButtonKey key) {
+    bool result = false;
+
+    if (s_InputImp != NULL) {
+        result = s_InputImp->IsKeyboardButtonPressed(key);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return result;
 }
 };  // namespace glb

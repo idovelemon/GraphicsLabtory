@@ -27,7 +27,7 @@ public:
         scene::Light light(scene::PARALLEL_LIGHT);
         light.ambient = math::Vector(0.2f, 0.2f, 0.2f);
         light.diffuse = math::Vector(2.0f, 2.0f, 2.0f);
-        light.specular = math::Vector(10.0f, 10.0f, 10.0f);
+        light.specular = math::Vector(2.0f, 2.0f, 2.0f);
         light.dir = math::Vector(-1.0f, -1.0f, 1.0f);
         light.dir.Normalize();
         light.pow = 128.0f;
@@ -39,7 +39,7 @@ public:
         // HDR
         glb::render::Render::SetExposureLevel(0.7f);
         glb::render::Render::SetLightAdaption(0.04f);
-        glb::render::Render::SetHighLightBase(0.5f);
+        glb::render::Render::SetHighLightBase(0.85f);
 
         //glb::scene::Scene::AddSkyObject("sky.obj");
 

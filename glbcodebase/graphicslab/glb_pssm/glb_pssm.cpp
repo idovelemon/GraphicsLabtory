@@ -31,9 +31,9 @@ public:
 
         // Light
         scene::Light light(scene::PARALLEL_LIGHT);
-        light.ambient = math::Vector(0.1f, 0.1f, 0.1f);
+        light.ambient = math::Vector(1.0f, 1.0f, 1.0f);
         light.diffuse = math::Vector(2.0f, 2.0f, 2.0f);
-        light.specular = math::Vector(100.0f, 100.0f, 100.0f);
+        light.specular = math::Vector(1.0f, 1.0f, 1.0f);
         light.dir = math::Vector(-1.0f, -1.0f, 0.0f);
         light.dir.Normalize();
         light.pow = 128.0f;
@@ -44,7 +44,7 @@ public:
         render::Render::SetPerspective(render::Render::SECONDARY_PERS, 69.0f, 800 * 1.0f / 600, 0.1f, 10000.0f);
 
         // HDR
-        render::Render::SetExposureLevel(0.7f);
+        render::Render::SetExposureLevel(1.0f);
         render::Render::SetLightAdaption(0.1f);
         render::Render::SetHighLightBase(0.95f);
 
@@ -56,16 +56,23 @@ public:
         obj->SetDepthTestEnable(true);
         obj->SetPos(math::Vector(0.0f, -1.0f, 0.0f));
 
-        int32_t num = 10;
+        int32_t num = 4;
         for (int32_t i = 0; i < num; i++) {
             for (int32_t j = 0; j < num; j++) {
                 // Add object
-                int32_t tree = scene::Scene::AddObject("res/tree.obj");
-                scene::Object* obj = scene::Scene::GetObjectById(tree);
+                int32_t tree_header = scene::Scene::AddObject("res/tree_header.obj");
+                scene::Object* obj = scene::Scene::GetObjectById(tree_header);
                 obj->SetCullFaceEnable(true);
                 obj->SetCullFaceMode(render::CULL_BACK);
                 obj->SetDepthTestEnable(true);
-                obj->SetPos(math::Vector(0.0f - (j - num/2) * 10.0f, 0.0f, 0.0f - (i - num/2) * 10.0f));
+                obj->SetPos(math::Vector(0.0f - (j - num/2) * 20.0f, 5.0f, 0.0f - (i - num/2) * 20.0f));
+
+                int32_t tree_trunk = scene::Scene::AddObject("res/tree_trunk.obj");
+                obj = scene::Scene::GetObjectById(tree_trunk);
+                obj->SetCullFaceEnable(true);
+                obj->SetCullFaceMode(render::CULL_BACK);
+                obj->SetDepthTestEnable(true);
+                obj->SetPos(math::Vector(0.0f - (j - num/2) * 20.0f, 0.0f, 0.0f - (i - num/2) * 20.0f));
             }
         }
 

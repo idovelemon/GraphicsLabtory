@@ -28,6 +28,7 @@
 #include "comm.h"
 #include "glbapplication.h"
 #include "glbeditorcomm.h"
+#include "glbinput.h"
 
 #include "math/glbmath.h"
 

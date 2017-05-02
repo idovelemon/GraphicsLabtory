@@ -57,6 +57,7 @@ public:
     static void Destroy();
 
     static HWND GetWindowHandle();
+    static HINSTANCE GetWindowInst();
     static int32_t GetWindowWidth();
     static int32_t GetWindowHeight();
     static int32_t GetShadowMapWidth();

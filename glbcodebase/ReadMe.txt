@@ -24,6 +24,7 @@ C/C++ Setting:
 Common->Addtional Include Directory:
 $(SolutionDir)\glb
 $(SolutionDir)\..\glew\include
+(YOUR_DX11_SDK_PATH)\Include
 
 Preprocessor->Preprocessor:
 GLB_PLATFORM_OPENGL (For opengl version graphics labtory)
@@ -31,9 +32,12 @@ GLB_PLATFORM_OPENGL (For opengl version graphics labtory)
 Linker Setting:
 Common->Addtional Library:
 $(SolutionDir)\..\glew\lib
+(YOUR_DX11_SDK_PATH)\Lib\x86
 Input->Addtional:
 glew32.lib
 opengl32.lib
+dinput8.lib
+dxguid.lib
 ***************************************************************************************/
 
 /***************************************************************************************
