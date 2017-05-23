@@ -10,11 +10,8 @@
 #include <vector>
 
 #include "glbshader.h"
-
 #include "math/glbvector.h"
-
 #include "util/glbmacro.h"
-
 #include "imp/dx11/glbmeshimp.h"
 #include "imp/gl/glbmeshimp.h"
 
