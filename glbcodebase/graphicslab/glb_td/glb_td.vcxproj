@@ -115,9 +115,12 @@
     <ClCompile Include="..\glb\util\glbprofile.cpp" />
     <ClCompile Include="..\glb\util\glbtexturereader.cpp" />
     <ClCompile Include="..\glb\util\glbutil.cpp" />
+    <ClCompile Include="entity\cameracom.cpp" />
     <ClCompile Include="entity\entity.cpp" />
     <ClCompile Include="entity\entitymgr.cpp" />
+    <ClCompile Include="entity\rendercom.cpp" />
     <ClCompile Include="entity\scriptcom.cpp" />
+    <ClCompile Include="entity\transformcom.cpp" />
     <ClCompile Include="glb_td.cpp" />
     <ClCompile Include="pyscript\pyscriptmgr.cpp" />
     <ClCompile Include="pyscript\topython_function.cpp" />
@@ -164,10 +167,13 @@
     <ClInclude Include="..\glb\util\glbprofile.h" />
     <ClInclude Include="..\glb\util\glbtexturereader.h" />
     <ClInclude Include="..\glb\util\glbutil.h" />
+    <ClInclude Include="entity\cameracom.h" />
     <ClInclude Include="entity\component.h" />
     <ClInclude Include="entity\entity.h" />
     <ClInclude Include="entity\entitymgr.h" />
+    <ClInclude Include="entity\rendercom.h" />
     <ClInclude Include="entity\scriptcom.h" />
+    <ClInclude Include="entity\transformcom.h" />
     <ClInclude Include="glb_td.h" />
     <ClInclude Include="pyscript\pyscriptmgr.h" />
     <ClInclude Include="pyscript\topython.h" />

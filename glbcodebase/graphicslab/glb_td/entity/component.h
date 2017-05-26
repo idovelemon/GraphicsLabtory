@@ -15,6 +15,9 @@ namespace entity {
 //--------------------------------------------------------------
 enum ComponentType {
     CT_UNKNOWN = -1,
+    CT_TRANSFORM,
+    CT_RENDER,
+    CT_CAMERA,
     CT_SCRIPT,
     CT_MAX,
 };

@@ -8,14 +8,16 @@
 #ifndef PYSCRIPT_TOPYTHON_FUNCTION_H_
 #define PYSCRIPT_TOPYTHON_FUNCTION_H_
 
-// Test
-void TestPrintHelloWorld();
-
 // Debug
 void DebugPrint(const char* s);
 
-// Object
-int ObjectAddObject(const char* name);
-void ObjectSetPos(int id, float x, float y, float z);
+// Entity
+int EntityCreate();
+void EntityAddTransformCom(int id,
+                           float px, float py, float pz,
+                           float rx, float ry, float rz,
+                           float sx, float sy, float sz);
+void EntityAddRenderCom(int id, const char* name);
+void EntityAddCameraCom(int id, float px, float py, float pz, float tx, float ty, float tz);
 
 #endif  // PYSCRIPT_TOPYTHON_FUNCTION_H_

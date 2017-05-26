@@ -34,6 +34,7 @@ public:
     void Update(float dt);
     void Destroy();
 
+    int32_t CreateEntity();
     int32_t AddEntity(Entity* entity);
     Entity* GetEntity(int32_t id) const;
     void RemoveEntity(int32_t id);
@@ -76,6 +77,24 @@ void EntityMgrImp::Destroy() {
             m_Entities[i] = NULL;
         }
     }
+}
+
+int32_t EntityMgrImp::CreateEntity() {
+    int32_t id = -1;
+
+    Entity* entity = new Entity;
+    if (entity != NULL) {
+        id = FindEmptyID();
+        if (id != -1) {
+            m_Entities[id] = entity;
+            entity->SetID(id);
+        } else {
+            printf("There is no empty id for entity, please add the capacity");
+            assert(false);
+        }
+    }
+
+    return id;
 }
 
 int32_t EntityMgrImp::AddEntity(Entity* entity) {
@@ -160,6 +179,16 @@ void EntityMgr::Destroy() {
         delete s_EntityMgrImp;
         s_EntityMgrImp = NULL;
     }
+}
+
+int32_t EntityMgr::CreateEntity() {
+    int32_t id = -1;
+
+    if (s_EntityMgrImp != NULL) {
+        id = s_EntityMgrImp->CreateEntity();
+    }
+
+    return id;
 }
 
 int32_t EntityMgr::AddEntity(Entity* entity) {

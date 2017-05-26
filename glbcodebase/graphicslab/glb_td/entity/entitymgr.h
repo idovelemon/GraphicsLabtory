@@ -17,6 +17,7 @@ public:
     static void Update(float dt);
     static void Destroy();
 
+    static int32_t CreateEntity();
     static int32_t AddEntity(Entity* entity);
     static Entity* GetEntity(int32_t id);
     static void RemoveEntity(int32_t id);

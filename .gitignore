@@ -28,3 +28,4 @@ glbcodebase/graphicslab_gl/glb_tbn_gen/glb_tbn_gen_D.exe
 glbcodebase/graphicslab_gl/glb_tbn_gen/glb_tbn_gen_R.exe
 *.ipch
 *.unsuccessfulbuild
+*.pyc

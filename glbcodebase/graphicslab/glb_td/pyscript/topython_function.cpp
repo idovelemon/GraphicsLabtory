@@ -13,11 +13,10 @@
 #include "scene/glbscene.h"
 #include "util/glbmacro.h"
 
-//-----------------------------------------------------------------
-// Test
-void TestPrintHelloWorld() {
-    printf("HelloWorld!\n");
-}
+#include "../entity/cameracom.h"
+#include "../entity/entitymgr.h"
+#include "../entity/rendercom.h"
+#include "../entity/transformcom.h"
 
 //-----------------------------------------------------------------
 // Debug
@@ -26,25 +25,45 @@ void DebugPrint(const char* s) {
 }
 
 //-----------------------------------------------------------------
-// Object
-int ObjectAddObject(const char* name) {
-    int object = -1;
-
-    if (name != NULL) {
-        object = glb::scene::Scene::AddObject(name);
-    } else {
-        GLB_SAFE_ASSERT(false);
-    }
-
-    return object;
+// Entity
+int EntityCreate() {
+    return entity::EntityMgr::CreateEntity();
 }
 
-void ObjectSetPos(int id, float x, float y, float z) {
-    glb::scene::Object* obj = glb::scene::Scene::GetObjectById(id);
-
-    if (obj != NULL) {
-        obj->SetPos(glb::math::Vector(x, y, z));
+void EntityAddTransformCom(int id,
+                           float px, float py, float pz,
+                           float rx, float ry, float rz,
+                           float sx, float sy, float sz) {
+    entity::Entity* ent = entity::EntityMgr::GetEntity(id);
+    if (ent != NULL) {
+        entity::Component* com = new entity::TransformCom(glb::math::Vector(px, py, pz),
+            glb::math::Vector(rx, ry, rz),
+            glb::math::Vector(sx, sy, sz));
+        ent->AddComponent(com);
     } else {
-        GLB_SAFE_ASSERT(false);
+        printf("Wrong entity id\n");
+        assert(false);
+    }
+}
+
+void EntityAddRenderCom(int id, const char* name) {
+    entity::Entity* ent = entity::EntityMgr::GetEntity(id);
+    if (ent != NULL) {
+        entity::Component* com = new entity::RenderCom(name);
+        ent->AddComponent(com);
+    } else {
+        printf("Wrong entity id\n");
+        assert(false);
+    }
+}
+
+void EntityAddCameraCom(int id, float px, float py, float pz, float tx, float ty, float tz) {
+    entity::Entity* ent = entity::EntityMgr::GetEntity(id);
+    if (ent != NULL) {
+        entity::Component* com = new entity::CameraCom(glb::math::Vector(px, py, pz), glb::math::Vector(tx, ty, tz));
+        ent->AddComponent(com);
+    } else {
+        printf("Wrong entity id\n");
+        assert(false);
     }
 }

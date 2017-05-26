@@ -162,6 +162,15 @@
     <ClCompile Include="entity\entitymgr.cpp">
       <Filter>源文件\entity</Filter>
     </ClCompile>
+    <ClCompile Include="entity\transformcom.cpp">
+      <Filter>源文件\entity</Filter>
+    </ClCompile>
+    <ClCompile Include="entity\rendercom.cpp">
+      <Filter>源文件\entity</Filter>
+    </ClCompile>
+    <ClCompile Include="entity\cameracom.cpp">
+      <Filter>源文件\entity</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\glb\comm.h">
@@ -312,6 +321,15 @@
       <Filter>源文件\entity</Filter>
     </ClInclude>
     <ClInclude Include="entity\entitymgr.h">
+      <Filter>源文件\entity</Filter>
+    </ClInclude>
+    <ClInclude Include="entity\transformcom.h">
+      <Filter>源文件\entity</Filter>
+    </ClInclude>
+    <ClInclude Include="entity\rendercom.h">
+      <Filter>源文件\entity</Filter>
+    </ClInclude>
+    <ClInclude Include="entity\cameracom.h">
       <Filter>源文件\entity</Filter>
     </ClInclude>
   </ItemGroup>

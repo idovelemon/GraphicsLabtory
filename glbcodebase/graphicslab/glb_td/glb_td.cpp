@@ -7,6 +7,7 @@
 #include "glb_td.h"
 #include "resource.h"
 
+#include "entity/entitymgr.h"
 #include "pyscript/pyscriptmgr.h"
 
 class ApplicationTd : public glb::app::ApplicationBase {
@@ -26,10 +27,6 @@ public:
         AllocConsole();
         freopen("CONOUT$", "w", stdout);
 
-        // Camera
-        scene::ModelCamera* cam = scene::ModelCamera::Create(math::Vector(0.0f, 2.3f, 1.5f), math::Vector(0.0f, 2.2f, 0.0f));
-        glb::scene::Scene::SetCamera(glb::scene::PRIMIAY_CAM, cam);
-
         // Light
         scene::Light light(scene::PARALLEL_LIGHT);
         light.ambient = math::Vector(0.1f, 0.1f, 0.1f);
@@ -48,12 +45,24 @@ public:
         glb::render::Render::SetLightAdaption(0.001f);
         glb::render::Render::SetHighLightBase(0.95f);
 
+        // Script
+        pyscript::PyScriptMgr::Initialize("res/script/");
+
+        // Entity
+        entity::EntityMgr::Initialize();
+
+        pyscript::PyScriptMgr::LoadScript("testlevel");
+        pyscript::PyScriptMgr::RunScript("testlevel");
+
         return true;
     }
 
     void Update(float dt) {
         util::ProfileTime time;
         time.BeginProfile();
+
+        // Update entity
+        entity::EntityMgr::Update(dt);
 
         // Update scene
         glb::scene::Scene::Update();
@@ -68,6 +77,8 @@ public:
     }
 
     void Destroy() {
+        entity::EntityMgr::Destroy();
+        pyscript::PyScriptMgr::Destroy();
         FreeConsole();
     }
 };
