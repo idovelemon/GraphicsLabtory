@@ -14,4 +14,8 @@ void TestPrintHelloWorld();
 // Debug
 void DebugPrint(const char* s);
 
+// Object
+int ObjectAddObject(const char* name);
+void ObjectSetPos(int id, float x, float y, float z);
+
 #endif  // PYSCRIPT_TOPYTHON_FUNCTION_H_

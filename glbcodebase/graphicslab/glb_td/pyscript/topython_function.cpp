@@ -7,6 +7,11 @@
 #include "topython_function.h"
 
 #include <stdio.h>
+#include <stdint.h>
+
+#include "scene/glbobject.h"
+#include "scene/glbscene.h"
+#include "util/glbmacro.h"
 
 //-----------------------------------------------------------------
 // Test
@@ -18,4 +23,28 @@ void TestPrintHelloWorld() {
 // Debug
 void DebugPrint(const char* s) {
     printf(s);
+}
+
+//-----------------------------------------------------------------
+// Object
+int ObjectAddObject(const char* name) {
+    int object = -1;
+
+    if (name != NULL) {
+        object = glb::scene::Scene::AddObject(name);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return object;
+}
+
+void ObjectSetPos(int id, float x, float y, float z) {
+    glb::scene::Object* obj = glb::scene::Scene::GetObjectById(id);
+
+    if (obj != NULL) {
+        obj->SetPos(glb::math::Vector(x, y, z));
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
 }

@@ -13,6 +13,8 @@
 #include <map>
 #include <string>
 
+#include <Windows.h>
+
 #include "Python.h"
 
 #include "topython.h"
@@ -29,18 +31,21 @@ static PyScriptMgrImp* s_Imp = NULL;
 // @brief: Class/Typedef
 //---------------------------------------------------------------------------
 class PyScriptMgrImp {
- public:
-     PyScriptMgrImp();
-     virtual ~PyScriptMgrImp();
+public:
+    PyScriptMgrImp();
+    virtual ~PyScriptMgrImp();
 
- public:
-     void Initialize(const char* script_root_path);
-     void LoadScript(const char* script_file_name);
-     void RunScript(const char* script_file_name);
-     void Destroy();
+public:
+    void Initialize(const char* script_root_path);
+    void LoadScript(const char* script_file_name);
+    void RunScript(const char* script_file_name);
+    void Destroy();
 
- private:
-     std::map<std::string, PyObject*> m_ScriptDatabase;
+private:
+    void PrintError();
+
+private:
+    std::map<std::string, PyObject*> m_ScriptDatabase;
 };
 
 //---------------------------------------------------------------------------
@@ -130,7 +135,13 @@ void PyScriptMgrImp::RunScript(const char* script_file_name) {
         std::map<std::string, PyObject*>::iterator it = m_ScriptDatabase.find(script_file_name);
         if (it != m_ScriptDatabase.end()) {
             PyObject* func = it->second;
-            PyObject_CallObject(func, NULL);
+            PyObject* ret = PyObject_CallObject(func, NULL);
+            if (ret == NULL) {
+                PrintError();
+                assert(false && "Failed to call python function");
+            } else {
+                Py_DECREF(ret);
+            }
             func = NULL;
         } else {
             assert(false && "Invalid script");
@@ -143,6 +154,46 @@ void PyScriptMgrImp::RunScript(const char* script_file_name) {
 void PyScriptMgrImp::Destroy() {
     m_ScriptDatabase.clear();
     Py_Finalize();
+}
+
+void PyScriptMgrImp::PrintError() {
+    PyObject* type = NULL, *value = NULL, *traceback = NULL;
+    PyErr_Fetch(&type, &value, &traceback);
+
+    if (!type) {
+        return;  // No Error happen
+    }
+
+    // Print Error Type
+    printf(PyExceptionClass_Name(type));
+
+    // Print Error Message
+    if (value) {
+        PyObject* line = PyObject_Str(value);
+        if (line && PyUnicode_Check(line)) {
+            Py_UNICODE* line_s = PyUnicode_AS_UNICODE(line);
+            int32_t num = WideCharToMultiByte(0, 0, line_s, -1, NULL, 0, NULL, NULL);
+            char *str = new char[num];
+            WideCharToMultiByte(0, 0, line_s, -1, str, num, NULL, NULL);
+            printf(": ");
+            printf(str);
+            printf("\n");
+            delete[] str;
+            str = NULL;
+            line_s = NULL;
+        }
+    }
+
+    // Print Traceback
+    if (traceback) {
+        for (PyTracebackObject* tbobj = reinterpret_cast<PyTracebackObject*>(traceback);
+            tbobj != NULL;
+            tbobj = tbobj->tb_next) {
+            char buf[32];
+            sprintf_s(buf, "Line: %d", tbobj->tb_lineno);
+            printf(buf);
+        }
+    }
 }
 
 //---------------------------------------------------------------------------

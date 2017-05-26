@@ -117,13 +117,14 @@ def parse(segments):
         # Parameters
         #for i in range(3, len(segment) - 2):
         i = 3
-        while i < len(segment) - 2: 
+        while i < len(segment) - 2:
             const_prefix = ""
             if segment[i]["type"] == TOKEN_KEYWORD and segment[i]["value"] == "const":
                 const_prefix = "const "
                 i = i + 1
             if segment[i]["type"] != TOKEN_KEYWORD or segment[i + 1]["type"] != TOKEN_IDENTITY:
                 assert("Invalid segment")
+                i = i + 1
                 continue
             else:
                 param = CParameterDesc()
@@ -251,4 +252,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+    print("Press any key to continue...")
     input()

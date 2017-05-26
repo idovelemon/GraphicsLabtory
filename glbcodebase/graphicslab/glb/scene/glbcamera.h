@@ -25,9 +25,9 @@ public:
     virtual ~CameraBase() {
     }
 
-    virtual void Clone(CameraBase** cam) = 0;
-    virtual void Restore(CameraBase** cam) = 0;
-    virtual void Update(float dt) = 0;
+    virtual void Clone(CameraBase** cam);
+    virtual void Restore(CameraBase** cam);
+    virtual void Update(float dt);
     
     virtual math::Matrix GetViewMatrix() {
         return m_ViewMatrix;

@@ -40,6 +40,9 @@
     <Filter Include="源文件\pyscript">
       <UniqueIdentifier>{d41f603d-4198-4df8-a6e5-aed30f91d44a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="源文件\entity">
+      <UniqueIdentifier>{b9bccc59-82f4-4b42-b8a3-916847e833f4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\glb\comm.cpp">
@@ -149,6 +152,15 @@
     </ClCompile>
     <ClCompile Include="pyscript\topython_function.cpp">
       <Filter>源文件\pyscript</Filter>
+    </ClCompile>
+    <ClCompile Include="entity\entity.cpp">
+      <Filter>源文件\entity</Filter>
+    </ClCompile>
+    <ClCompile Include="entity\scriptcom.cpp">
+      <Filter>源文件\entity</Filter>
+    </ClCompile>
+    <ClCompile Include="entity\entitymgr.cpp">
+      <Filter>源文件\entity</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -289,6 +301,18 @@
     </ClInclude>
     <ClInclude Include="pyscript\topython_function.h">
       <Filter>源文件\pyscript</Filter>
+    </ClInclude>
+    <ClInclude Include="entity\entity.h">
+      <Filter>源文件\entity</Filter>
+    </ClInclude>
+    <ClInclude Include="entity\component.h">
+      <Filter>源文件\entity</Filter>
+    </ClInclude>
+    <ClInclude Include="entity\scriptcom.h">
+      <Filter>源文件\entity</Filter>
+    </ClInclude>
+    <ClInclude Include="entity\entitymgr.h">
+      <Filter>源文件\entity</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

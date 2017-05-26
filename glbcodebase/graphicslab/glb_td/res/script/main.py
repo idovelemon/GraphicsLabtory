@@ -10,6 +10,8 @@ Brief: The main loop of the game
 from host_api import *
 
 def main():
-    #TestPrintHelloWorld()
-    DebugPrint("HelloWorld")
-    pass
+    NUM = 23
+    DebugPrint(str(NUM))
+    yield
+    NUM = NUM + 1
+    DebugPrint(str(NUM))

@@ -19,6 +19,49 @@ namespace scene {
 //-----------------------------------------------------------------------------------
 
 //-----------------------------------------------------------------------------------
+// CameraBase DEFINITION
+//-----------------------------------------------------------------------------------
+void CameraBase::Clone(CameraBase** cam) {
+    if (cam != NULL) {
+        if (*cam == NULL) {
+            FreeCamera* free_cam = new FreeCamera;
+            if (free_cam != NULL) {
+                free_cam->m_Pos = m_Pos;
+                free_cam->m_Target = m_Target;
+                free_cam->m_ViewMatrix = m_ViewMatrix;
+                *cam = free_cam;
+            } else {
+                GLB_SAFE_ASSERT(false);
+            }
+        } else {
+            GLB_SAFE_ASSERT(false);
+        }
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+}
+
+void CameraBase::Restore(CameraBase** cam) {
+    if (cam != NULL) {
+        if (*cam != NULL) {
+            FreeCamera* free_cam = reinterpret_cast<FreeCamera*>(*cam);
+            m_Pos = free_cam->m_Pos;
+            m_Target = free_cam->m_Target;
+            m_ViewMatrix = free_cam->m_ViewMatrix;
+            GLB_SAFE_DELETE((*cam));
+        } else {
+            GLB_SAFE_ASSERT(false);
+        }
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+}
+
+void CameraBase::Update(float dt) {
+    m_ViewMatrix.MakeViewMatrix(m_Pos, m_Target);
+}
+
+//-----------------------------------------------------------------------------------
 // FreeCamera DEFINITION
 //-----------------------------------------------------------------------------------
 FreeCamera::FreeCamera() {

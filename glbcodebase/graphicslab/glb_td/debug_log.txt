@@ -1,0 +1,4 @@
+OpenGL Version: 4.0.0 - Build 10.18.10.4425
+OpenGL Vendor: Intel
+OpenGL Render: Intel(R) HD Graphics 4000
+GLEW Version: 1.5.1

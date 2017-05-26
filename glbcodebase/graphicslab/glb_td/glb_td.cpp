@@ -28,7 +28,6 @@ public:
 
         // Camera
         scene::ModelCamera* cam = scene::ModelCamera::Create(math::Vector(0.0f, 2.3f, 1.5f), math::Vector(0.0f, 2.2f, 0.0f));
-        //camera::FreeCamera* cam = camera::FreeCamera::Create(glb::Vector(0.0f, 2.0f, 2.0f), glb::Vector(0.0f, 0.0f, 0.0));
         glb::scene::Scene::SetCamera(glb::scene::PRIMIAY_CAM, cam);
 
         // Light
@@ -49,19 +48,12 @@ public:
         glb::render::Render::SetLightAdaption(0.001f);
         glb::render::Render::SetHighLightBase(0.95f);
 
-        // Script
-        pyscript::PyScriptMgr::Initialize("res/script/");
-        pyscript::PyScriptMgr::LoadScript("main");
-
         return true;
     }
 
     void Update(float dt) {
         util::ProfileTime time;
         time.BeginProfile();
-
-        // Update script
-        pyscript::PyScriptMgr::RunScript("main");
 
         // Update scene
         glb::scene::Scene::Update();
@@ -76,7 +68,6 @@ public:
     }
 
     void Destroy() {
-        pyscript::PyScriptMgr::Destroy();
         FreeConsole();
     }
 };
