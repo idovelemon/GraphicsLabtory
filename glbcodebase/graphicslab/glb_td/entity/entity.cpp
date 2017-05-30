@@ -8,12 +8,16 @@
 
 #include <assert.h>
 
+#include "rendercom.h"
 #include "scriptcom.h"
+#include "transformcom.h"
 
 namespace entity {
 
 Entity::Entity()
-: m_ID(-1) {
+: m_IsDead(false)
+, m_ID(-1)
+, m_RefCount(0) {
     m_Components.clear();
 }
 
@@ -29,12 +33,32 @@ Entity::~Entity() {
     m_Components.clear();
 }
 
+void Entity::SetDead(bool dead) {
+    m_IsDead = dead;
+}
+
+bool Entity::IsDead() {
+    return m_IsDead;
+}
+
 void Entity::SetID(int32_t id) {
     m_ID = id;
 }
 
 int32_t Entity::GetID() const {
     return m_ID;
+}
+
+void Entity::AddRefCount() {
+    m_RefCount++;
+}
+
+void Entity::DecRefCount() {
+    m_RefCount--;
+}
+
+int32_t Entity::GetRefCount() const {
+    return m_RefCount;
 }
 
 void Entity::AddComponent(Component* com) {
@@ -46,11 +70,15 @@ void Entity::AddComponent(Component* com) {
     }
 }
 
-Component* Entity::GetComponent(ComponentType type) const {
+Component* Entity::GetComponent(ComponentType type) {
     Component* com = NULL;
 
     if (CT_UNKNOWN < type && type < CT_MAX) {
-        com = m_Components.find(type)->second;
+        ComponentPool::iterator it = m_Components.end();
+        ComponentPool::iterator com_it = m_Components.find(type);
+        if (com_it != it) {
+            com = com_it->second;
+        }
     } else {
         assert(false);
     }
@@ -81,6 +109,18 @@ void Entity::Update(float dt) {
         if (com != NULL) {
             ScriptCom* script = reinterpret_cast<ScriptCom*>(com);
             script->Update(dt);
+        }
+    }
+}
+
+void Entity::Draw() {
+    ComponentPool::iterator it_render = m_Components.find(CT_RENDER);
+    ComponentPool::iterator it_transform = m_Components.find(CT_TRANSFORM);
+    if (it_render != m_Components.end() && it_transform != m_Components.end()) {
+        if (it_render->second != NULL && it_transform->second != NULL) {
+            RenderCom* render = reinterpret_cast<RenderCom*>(it_render->second);
+            TransformCom* transform = reinterpret_cast<TransformCom*>(it_transform->second);
+            render->Render(transform);
         }
     }
 }

@@ -36,6 +36,7 @@ class Matrix {
     inline void MakeRotateXMatrix(float rotate_degree);
     inline void MakeRotateYMatrix(float rotate_degree);
     inline void MakeRotateZMatrix(float rotate_degree);
+    inline void MakeRotateXYZMatrix(float rx, float ry, float rz);
     inline void MakeRotateZXYMatrix(float rx, float ry, float rz);
     inline void MakeIdentityMatrix();
     inline void MakeRotateAxisMatrix(Vector axis, float rotate_degree);
@@ -58,6 +59,7 @@ class Matrix {
     inline void RotateX(float rotate_degree);
     inline void RotateY(float rotate_degree);
     inline void RotateZ(float rotate_degree);
+    inline void RotateXYZ(float rx, float ry, float rz);
     inline void RotateZXY(float rx, float ry, float rz);
 
     //----------------------------------------------------------------------

@@ -171,6 +171,21 @@
     <ClCompile Include="entity\cameracom.cpp">
       <Filter>源文件\entity</Filter>
     </ClCompile>
+    <ClCompile Include="gametimer.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="entity\entityfilter.cpp">
+      <Filter>源文件\entity</Filter>
+    </ClCompile>
+    <ClCompile Include="entity\rolecom.cpp">
+      <Filter>源文件\entity</Filter>
+    </ClCompile>
+    <ClCompile Include="entity\arsenalcom.cpp">
+      <Filter>源文件\entity</Filter>
+    </ClCompile>
+    <ClCompile Include="entity\datacom.cpp">
+      <Filter>源文件\entity</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\glb\comm.h">
@@ -330,6 +345,21 @@
       <Filter>源文件\entity</Filter>
     </ClInclude>
     <ClInclude Include="entity\cameracom.h">
+      <Filter>源文件\entity</Filter>
+    </ClInclude>
+    <ClInclude Include="gametimer.h">
+      <Filter>源文件</Filter>
+    </ClInclude>
+    <ClInclude Include="entity\entityfilter.h">
+      <Filter>源文件\entity</Filter>
+    </ClInclude>
+    <ClInclude Include="entity\rolecom.h">
+      <Filter>源文件\entity</Filter>
+    </ClInclude>
+    <ClInclude Include="entity\arsenalcom.h">
+      <Filter>源文件\entity</Filter>
+    </ClInclude>
+    <ClInclude Include="entity\datacom.h">
       <Filter>源文件\entity</Filter>
     </ClInclude>
   </ItemGroup>

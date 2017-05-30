@@ -30,6 +30,7 @@ class Vector {
     inline const Vector& operator*=(float v);
 
     inline float Length();
+    inline float SqureLength();
     inline void Normalize();
 
  public:
@@ -41,6 +42,7 @@ class Vector {
 
 static const Vector Cross(const Vector& v1, const Vector& v2);
 static float Dot(const Vector& v1, const Vector& v2);
+static Vector CalcRotateByLookVecZXY(const Vector& v);
 
 #include "glbvector.inl"
 

@@ -8,8 +8,8 @@
 
 namespace entity {
 
-TransformCom::TransformCom(glb::math::Vector pos, glb::math::Vector rotate, glb::math::Vector scale)
-: Component(CT_TRANSFORM)
+TransformCom::TransformCom(Entity* owner, glb::math::Vector pos, glb::math::Vector rotate, glb::math::Vector scale)
+: Component(CT_TRANSFORM, owner)
 , m_Pos(pos)
 , m_Rotate(rotate)
 , m_Scale(scale) {

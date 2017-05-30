@@ -336,6 +336,7 @@ Frustum::Frustum() {
 }
 
 Frustum::~Frustum() {
+    m_Objects.clear();
 }
 
 void Frustum::Build(math::Vector* points) {
@@ -521,6 +522,7 @@ void RenderImp::Destroy() {
     m_BiBlurVShader = -1;
 
     GLB_SAFE_DELETE(m_DebugMesh);
+    GLB_SAFE_DELETE(m_ScreenMesh);
 }
 
 void RenderImp::Draw() {
@@ -1087,7 +1089,7 @@ void RenderImp::SplitShadowReceivers() {
     std::vector<scene::Object*>::iterator it = objs.begin();
     for (; it != objs.end();) {
         scene::Object* obj = *it;
-        if (!obj->GetModel()->IsAcceptShadow()) {
+        if (!obj->GetModel()->IsAcceptShadow() || !obj->IsDrawEnable()) {
             it = objs.erase(it);
         } else {
             ++it;
@@ -1184,7 +1186,7 @@ void RenderImp::SplitShadowCasters(math::Matrix light_space_to_world_space) {
     std::vector<scene::Object*>::iterator it = objs.begin();
     for (; it != objs.end();) {
         scene::Object* obj = *it;
-        if (!obj->GetModel()->IsCastShadow()) {
+        if (!obj->GetModel()->IsCastShadow() || !obj->IsDrawEnable()) {
             it = objs.erase(it);
         } else {
             ++it;
@@ -1397,6 +1399,11 @@ void RenderImp::DrawShadowMapCore() {
         // Objects
         for (int32_t j = 0; j < static_cast<int32_t>(objs.size()); j++) {
             scene::Object* obj = objs[j];
+
+            // Check if enable draw
+            if (!obj->IsDrawEnable()) {
+                continue;
+            }
 
             // Check if cast shadow & enable depth
             if (obj->GetModel()->IsCastShadow() && obj->IsDepthTestEnable()) {
@@ -1738,6 +1745,11 @@ void RenderImp::DrawLightLoopCore() {
         // Objects
         for (int32_t j = 0; j < static_cast<int32_t>(objs.size()); j++) {
             scene::Object* obj = objs[j];
+
+            // Check if enable draw
+            if (!obj->IsDrawEnable()) {
+                continue;
+            }
 
             // Textures
             if (obj->GetModel()->HasDiffuseTexture()) {
@@ -2145,6 +2157,11 @@ void RenderImp::DrawDepthMap() {
     for (int32_t j = 0; j < static_cast<int32_t>(objs.size()); j++) {
         scene::Object* obj = objs[j];
 
+        // Check enable draw
+        if (!obj->IsDrawEnable()) {
+            continue;
+        }
+
         // Check if cast shadow & enable depth
         if (obj->GetModel()->IsCastShadow() && obj->IsDepthTestEnable()) {
             // scene::Object Uniform
@@ -2530,7 +2547,7 @@ void RenderImp::DrawEnvMapCore() {
                 // scene::Objects
                 for (int32_t l = 0; l < static_cast<int32_t>(objs.size()); l++) {
                     scene::Object* obj = objs[l];
-                    if (obj == ref_obj) {
+                    if (obj == ref_obj || !obj->IsDrawEnable()) {
                         continue;
                     }
 

@@ -7,8 +7,13 @@
 #include "glb_td.h"
 #include "resource.h"
 
+#include "gametimer.h"
 #include "entity/entitymgr.h"
 #include "pyscript/pyscriptmgr.h"
+
+#if 0
+#include "vld.h"
+#endif
 
 class ApplicationTd : public glb::app::ApplicationBase {
 public:
@@ -24,12 +29,9 @@ protected:
 
 public:
     bool Initialize() {
-        AllocConsole();
-        freopen("CONOUT$", "w", stdout);
-
         // Light
         scene::Light light(scene::PARALLEL_LIGHT);
-        light.ambient = math::Vector(0.1f, 0.1f, 0.1f);
+        light.ambient = math::Vector(1.0f, 1.0f, 1.0f);
         light.diffuse = math::Vector(2.0f, 2.0f, 2.0f);
         light.specular = math::Vector(100.0f, 100.0f, 100.0f);
         light.dir = math::Vector(-1.0f, -1.0f, -1.0f);
@@ -41,18 +43,18 @@ public:
         glb::render::Render::SetPerspective(glb::render::Render::PRIMARY_PERS, 69.0f, 800 * 1.0f / 600, 0.1f, 500.0f);
 
         // HDR
-        glb::render::Render::SetExposureLevel(0.7f);
-        glb::render::Render::SetLightAdaption(0.001f);
+        glb::render::Render::SetExposureLevel(0.3f);
+        glb::render::Render::SetLightAdaption(1.0f);
         glb::render::Render::SetHighLightBase(0.95f);
 
-        // Script
+        // Game Manager
         pyscript::PyScriptMgr::Initialize("res/script/");
-
-        // Entity
         entity::EntityMgr::Initialize();
+        td::GameTimer::Initialize();
 
         pyscript::PyScriptMgr::LoadScript("testlevel");
         pyscript::PyScriptMgr::RunScript("testlevel");
+        pyscript::PyScriptMgr::LoadScript("timeline");
 
         return true;
     }
@@ -61,13 +63,16 @@ public:
         util::ProfileTime time;
         time.BeginProfile();
 
+        glb::Input::Update();
+        pyscript::PyScriptMgr::RunScript("timeline");
+
         // Update entity
+        td::GameTimer::Update(dt);
         entity::EntityMgr::Update(dt);
+        entity::EntityMgr::Draw();
 
         // Update scene
         glb::scene::Scene::Update();
-
-        // Draw scene
         glb::render::Render::Draw();
 
         time.EndProfile();
@@ -77,13 +82,16 @@ public:
     }
 
     void Destroy() {
+        td::GameTimer::Destroy();
         entity::EntityMgr::Destroy();
         pyscript::PyScriptMgr::Destroy();
-        FreeConsole();
     }
 };
 
 int _stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPreInstance, LPSTR cmdLine, int nShowCmd) {
+    AllocConsole();
+    freopen("CONOUT$", "w", stdout);
+
     glb::app::AppConfig config;
     memcpy(config.caption, L"glb_td", sizeof(L"glb_td"));
     config.screen_width = 800;
@@ -98,6 +106,8 @@ int _stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPreInstance, LPSTR cmdLine,
     glb::app::Application::Update();
 
     glb::app::Application::Destroy();
+
+    FreeConsole();
 
     return 0;
 }

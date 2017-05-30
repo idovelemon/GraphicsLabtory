@@ -42,6 +42,9 @@ public:
         math::Vector scale = math::Vector(1.0f, 1.0f, 1.0f), math::Vector rotation = math::Vector(0.0f, 0.0f, 0.0f));
 
 public:
+    void SetDead(bool dead);
+    bool IsDead() const;
+
     void SetPos(math::Vector pos);
     math::Vector GetPos() const;
 
@@ -58,6 +61,9 @@ public:
 
     Model* GetModel();
     render::shader::Descriptor GetShaderDesc();
+
+    void SetDrawEnable(bool enable);
+    bool IsDrawEnable();
 
     void SetDepthTestEnable(bool enable);
     bool IsDepthTestEnable();
@@ -81,6 +87,7 @@ private:
     render::shader::Descriptor CalculateShaderDesc();
 
 private:
+    bool                            m_IsDead;
     Model*                          m_Model;
     math::Vector                    m_Pos;
     math::Vector                    m_Scale;
@@ -88,6 +95,7 @@ private:
     math::Matrix                    m_WorldMatrix;
     render::shader::Descriptor      m_ShaderDesc;
 
+    bool                            m_EnableDraw;
     bool                            m_EnableCullFace;
     bool                            m_EnableDepthTest;
     bool                            m_EnableAlphaBlend;

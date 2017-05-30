@@ -54,14 +54,15 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;GLB_PLATFORM_OPENGL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(PYDIR)\include;$(DXSDK_DIR)\Include;$(SolutionDir)\glb;$(SolutionDir)\..\glew\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(PYDIR)\include;$(DXSDK_DIR)\Include;$(SolutionDir)\glb;$(SolutionDir)\..\glew\include;$(SolutionDir)\..\vld;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)\..\glew\lib;$(DXSDK_DIR)\Lib\x86;$(PYDIR)\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)\..\glew\lib;$(DXSDK_DIR)\Lib\x86;$(PYDIR)\libs;$(SolutionDir)\..\vld;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>glew32.lib;opengl32.lib;dinput8.lib;dxguid.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <IgnoreSpecificDefaultLibraries>libcd.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -115,12 +116,17 @@
     <ClCompile Include="..\glb\util\glbprofile.cpp" />
     <ClCompile Include="..\glb\util\glbtexturereader.cpp" />
     <ClCompile Include="..\glb\util\glbutil.cpp" />
+    <ClCompile Include="entity\arsenalcom.cpp" />
     <ClCompile Include="entity\cameracom.cpp" />
+    <ClCompile Include="entity\datacom.cpp" />
     <ClCompile Include="entity\entity.cpp" />
+    <ClCompile Include="entity\entityfilter.cpp" />
     <ClCompile Include="entity\entitymgr.cpp" />
     <ClCompile Include="entity\rendercom.cpp" />
+    <ClCompile Include="entity\rolecom.cpp" />
     <ClCompile Include="entity\scriptcom.cpp" />
     <ClCompile Include="entity\transformcom.cpp" />
+    <ClCompile Include="gametimer.cpp" />
     <ClCompile Include="glb_td.cpp" />
     <ClCompile Include="pyscript\pyscriptmgr.cpp" />
     <ClCompile Include="pyscript\topython_function.cpp" />
@@ -167,13 +173,18 @@
     <ClInclude Include="..\glb\util\glbprofile.h" />
     <ClInclude Include="..\glb\util\glbtexturereader.h" />
     <ClInclude Include="..\glb\util\glbutil.h" />
+    <ClInclude Include="entity\arsenalcom.h" />
     <ClInclude Include="entity\cameracom.h" />
     <ClInclude Include="entity\component.h" />
+    <ClInclude Include="entity\datacom.h" />
     <ClInclude Include="entity\entity.h" />
+    <ClInclude Include="entity\entityfilter.h" />
     <ClInclude Include="entity\entitymgr.h" />
     <ClInclude Include="entity\rendercom.h" />
+    <ClInclude Include="entity\rolecom.h" />
     <ClInclude Include="entity\scriptcom.h" />
     <ClInclude Include="entity\transformcom.h" />
+    <ClInclude Include="gametimer.h" />
     <ClInclude Include="glb_td.h" />
     <ClInclude Include="pyscript\pyscriptmgr.h" />
     <ClInclude Include="pyscript\topython.h" />

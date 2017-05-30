@@ -74,6 +74,22 @@ void Matrix::MakeTranslateMatrix(float tx, float ty, float tz) {
      memcpy(&m_Matrix, m, sizeof(m));
 }
 
+void Matrix::MakeRotateXYZMatrix(float rx, float ry, float rz) {
+    Matrix rotate_x;
+    rotate_x.MakeRotateXMatrix(rx);
+
+    Matrix rotate_y;
+    rotate_y.MakeRotateYMatrix(ry);
+
+    Matrix rotate_z;
+    rotate_z.MakeRotateZMatrix(rz);
+
+    this->MakeIdentityMatrix();
+    this->Mul(rotate_z);
+    this->Mul(rotate_y);
+    this->Mul(rotate_x);
+}
+
 void Matrix::MakeRotateZXYMatrix(float rx, float ry, float rz) {
     Matrix rotate_x;
     rotate_x.MakeRotateXMatrix(rx);
@@ -295,6 +311,13 @@ void Matrix::RotateZ(float rotate_degree) {
     rotate_z.MakeRotateZMatrix(rotate_degree);
     rotate_z.Mul(*this);
     *this = rotate_z;
+}
+
+void Matrix::RotateXYZ(float rx, float ry, float rz) {
+    Matrix rotate_zxy;
+    rotate_zxy.MakeRotateXYZMatrix(rx, ry, rz);
+    rotate_zxy.Mul(*this);
+    *this = rotate_zxy;
 }
 
 void Matrix::RotateZXY(float rx, float ry, float rz) {

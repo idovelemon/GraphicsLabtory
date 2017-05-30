@@ -13,14 +13,29 @@
 
 namespace entity {
 
-RenderCom::RenderCom(const char* name)
-: Component(CT_RENDER)
+RenderCom::RenderCom(Entity* owner, const char* name)
+: Component(CT_RENDER, owner)
 , m_SceneObjID(-1) {
     m_SceneObjID = glb::scene::Scene::AddObject(name);
 }
 
 RenderCom::~RenderCom() {
+    glb::scene::Scene::DestroyObject(m_SceneObjID);
     m_SceneObjID = -1;
+}
+
+void RenderCom::SetDepthTestEnable(bool enable) {
+    glb::scene::Object* obj = glb::scene::Scene::GetObjectById(m_SceneObjID);
+    if (obj != NULL) {
+        obj->SetDepthTestEnable(enable);
+    }
+}
+
+void RenderCom::SetDrawEnable(bool enable) {
+    glb::scene::Object* obj = glb::scene::Scene::GetObjectById(m_SceneObjID);
+    if (obj != NULL) {
+        obj->SetDrawEnable(enable);
+    }
 }
 
 void RenderCom::Render(TransformCom* transform) {

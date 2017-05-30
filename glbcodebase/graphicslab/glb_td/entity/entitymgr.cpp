@@ -19,7 +19,7 @@ static EntityMgrImp* s_EntityMgrImp;
 //----------------------------------------------------------------
 // Constant
 
-static const int32_t kEntityMaxNum = 100;
+static const int32_t kEntityMaxNum = 10000;
 
 //----------------------------------------------------------------
 // Type Declaration
@@ -32,12 +32,15 @@ public:
 public:
     void Initialize();
     void Update(float dt);
+    void Draw();
     void Destroy();
 
     int32_t CreateEntity();
     int32_t AddEntity(Entity* entity);
     Entity* GetEntity(int32_t id) const;
     void RemoveEntity(int32_t id);
+
+    std::vector<Entity*> FindEntities(EntityFilter filter, std::vector<void*>& args);
 
 protected:
     int32_t FindEmptyID();
@@ -63,9 +66,28 @@ void EntityMgrImp::Initialize() {
 }
 
 void EntityMgrImp::Update(float dt) {
+    // Remove dead entities
     for (int32_t i = 0; i < kEntityMaxNum; i++) {
         if (m_Entities[i] != NULL) {
+            if (m_Entities[i]->IsDead() && m_Entities[i]->GetRefCount() <= 0) {
+                delete m_Entities[i];
+                m_Entities[i] = NULL;
+            }
+        }
+    }
+
+    // Update dead entities
+    for (int32_t i = 0; i < kEntityMaxNum; i++) {
+        if (m_Entities[i] != NULL && !m_Entities[i]->IsDead()) {
             m_Entities[i]->Update(dt);
+        }
+    }
+}
+
+void EntityMgrImp::Draw() {
+    for (int32_t i = 0; i < kEntityMaxNum; i++) {
+        if (m_Entities[i] != NULL && !m_Entities[i]->IsDead()) {
+            m_Entities[i]->Draw();
         }
     }
 }
@@ -141,6 +163,10 @@ void EntityMgrImp::RemoveEntity(int32_t id) {
    }
 }
 
+std::vector<Entity*> EntityMgrImp::FindEntities(EntityFilter filter, std::vector<void*>& args) {
+    return filter(m_Entities, kEntityMaxNum, args);
+}
+
 int32_t EntityMgrImp::FindEmptyID() {
     int32_t id = -1;
 
@@ -170,6 +196,12 @@ void EntityMgr::Initialize() {
 void EntityMgr::Update(float dt) {
     if (s_EntityMgrImp != NULL) {
         s_EntityMgrImp->Update(dt);
+    }
+}
+
+void EntityMgr::Draw() {
+    if (s_EntityMgrImp != NULL) {
+        s_EntityMgrImp->Draw();
     }
 }
 
@@ -215,5 +247,15 @@ void EntityMgr::RemoveEntity(int32_t id) {
     if (s_EntityMgrImp != NULL) {
         s_EntityMgrImp->RemoveEntity(id);
     }
+}
+
+std::vector<Entity*> EntityMgr::FindEntities(EntityFilter filter, std::vector<void*>& args) {
+    std::vector<Entity*> ents;
+
+    if (s_EntityMgrImp != NULL) {
+        ents = s_EntityMgrImp->FindEntities(filter, args);
+    }
+
+    return ents;
 }
 };  // namespace entity

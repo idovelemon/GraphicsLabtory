@@ -16,6 +16,7 @@ namespace entity {
 //----------------------------------------------------------------
 // Pre Declaration
 
+class Entity;
 class TransformCom;
 
 //----------------------------------------------------------------
@@ -23,10 +24,12 @@ class TransformCom;
 
 class RenderCom : public Component {
 public:
-    RenderCom(const char* name);
+    RenderCom(Entity* owner, const char* name);
     virtual ~RenderCom();
 
 public:
+    virtual void SetDepthTestEnable(bool enable);
+    virtual void SetDrawEnable(bool enable);
     virtual void Render(TransformCom* transform);
 
 protected:

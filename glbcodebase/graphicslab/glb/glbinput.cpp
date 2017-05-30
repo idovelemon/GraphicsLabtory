@@ -42,6 +42,8 @@ public:
 
     int64_t GetMouseMoveX();
     int64_t GetMouseMoveY();
+    int64_t GetMousePosX();
+    int64_t GetMousePosY();
     bool IsMouseButtonPressed(ButtonMouse mouse);
     bool IsKeyboardButtonPressed(ButtonKey key);
 
@@ -172,6 +174,22 @@ int64_t InputImp::GetMouseMoveY() {
     return m_MouseState.lY;
 }
 
+int64_t InputImp::GetMousePosX() {
+    POINT point;
+    GetCursorPos(&point);
+    ScreenToClient(app::Application::GetWindowHandle(), &point);
+
+    return point.x;
+}
+
+int64_t InputImp::GetMousePosY() {
+    POINT point;
+    GetCursorPos(&point);
+    ScreenToClient(app::Application::GetWindowHandle(), &point);
+
+    return point.y;
+}
+
 bool InputImp::IsMouseButtonPressed(ButtonMouse mouse) {
     bool result = false;
 
@@ -240,6 +258,30 @@ int64_t Input::GetMouseMoveY() {
 
     if (s_InputImp != NULL) {
         result = s_InputImp->GetMouseMoveY();
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return result;
+}
+
+int64_t Input::GetMousePosX() {
+    int64_t result = 0;
+
+    if (s_InputImp != NULL) {
+        result = s_InputImp->GetMousePosX();
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return result;
+}
+
+int64_t Input::GetMousePosY() {
+    int64_t result = 0;
+
+    if (s_InputImp != NULL) {
+        result = s_InputImp->GetMousePosY();
     } else {
         GLB_SAFE_ASSERT(false);
     }

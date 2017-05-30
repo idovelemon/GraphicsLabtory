@@ -83,6 +83,10 @@ float Vector::Length() {
     return sqrtf(x * x + y * y + z * z);
 }
 
+float Vector::SqureLength() {
+    return x * x + y * y + z * z;
+}
+
 void Vector::Normalize() {
     float len = this->Length();
     if (len <= 0.00001f) {
@@ -105,4 +109,39 @@ const Vector Cross(const Vector& v1, const Vector& v2) {
 
 float Dot(const Vector& v1, const Vector& v2) {
     return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
+}
+
+Vector CalcRotateByLookVecZXY(const Vector& v) {
+    // Calculate current pose
+    Vector up(0.0f, 1.0f, 0.0f);
+    Vector right = Cross(up, v);
+    right.Normalize();
+    up = Cross(v, right);
+    up.Normalize();
+
+    // Calculate rotate
+    float rx = 0.0f, ry = 0.0f, rz = 0.0f;
+    if (right.x != -1.0f && right.x != 1.0f) {
+        float theta = -asin(right.z);
+        float psi = atan2(up.z / cos(theta), v.z / cos(theta));
+        float phi = atan2(right.y / cos(theta), right.x / cos(theta));
+        rx = psi * 180.0f / 3.14159f;
+        ry = theta * 180.0f / 3.14159f;
+        rz = phi * 180.0f / 3.14159f;
+    } else {
+        float phi = 0.0f, theta = 0.0f, psi = 0.0f;
+        if (right.x == -1.0f) {
+            theta = 0.5f * 3.14159f;
+            psi = phi + atan2(up.x, v.x);
+        }
+        else {
+            theta = -0.5f * 3.14159f;
+            psi = -phi + atan2(-up.x, -v.x);
+        }
+        rx = psi * 180.0f / 3.14159f;
+        ry = theta * 180.0f / 3.14159f;
+        rz = phi * 180.0f / 3.14159f;
+    }
+
+    return Vector(rx, ry, rz);
 }

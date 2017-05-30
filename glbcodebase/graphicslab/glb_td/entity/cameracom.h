@@ -23,11 +23,16 @@ namespace scene {
 namespace entity {
 
 //-----------------------------------------------------------
+// Pre Declaration
+
+class Entity;
+
+//-----------------------------------------------------------
 // Type Declaration
 
 class CameraCom : public Component {
 public:
-    CameraCom(glb::math::Vector pos, glb::math::Vector target);
+    CameraCom(Entity* owner, glb::math::Vector pos, glb::math::Vector target);
     virtual ~CameraCom();
 
 public:

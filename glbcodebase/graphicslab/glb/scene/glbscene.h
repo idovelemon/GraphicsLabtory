@@ -57,6 +57,7 @@ public:
     static Object* GetObjectById(int32_t object_id);
     static Object* GetSkyObject();
     static void GetAllObjects(std::vector<Object*>& objs);
+    static void DestroyObject(int32_t object_id);
 
     // Light
     static void SetLight(Light light, int32_t id);

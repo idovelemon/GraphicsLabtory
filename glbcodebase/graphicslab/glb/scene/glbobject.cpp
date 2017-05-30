@@ -17,11 +17,13 @@ namespace glb {
 namespace scene {
 
 Object::Object()
-: m_Model(NULL)
+: m_IsDead(false)
+, m_Model(NULL)
 , m_Pos(0.0f, 0.0f, 0.0f)
 , m_Scale(0.0f, 0.0f, 0.0f)
 , m_Rotation(0.0f, 0.0f, 0.0f)
 , m_WorldMatrix()
+, m_EnableDraw(true)
 , m_EnableCullFace(false)
 , m_EnableDepthTest(false)
 , m_EnableAlphaBlend(false)
@@ -61,6 +63,14 @@ Object* Object::Create(const char* file_name, math::Vector pos, math::Vector sca
     }
 
     return obj;
+}
+
+void Object::SetDead(bool dead) {
+    m_IsDead = dead;
+}
+
+bool Object::IsDead() const {
+    return m_IsDead;
 }
 
 void Object::SetPos(math::Vector pos) {
@@ -109,6 +119,14 @@ Model* Object::GetModel() {
 
 render::shader::Descriptor Object::GetShaderDesc() {
     return m_ShaderDesc;
+}
+
+void Object::SetDrawEnable(bool enable) {
+    m_EnableDraw = enable;
+}
+
+bool Object::IsDrawEnable() {
+    return m_EnableDraw;
 }
 
 void Object::SetAlphaBlendEnable(bool enable) {
@@ -201,8 +219,8 @@ void Object::Update() {
     m_WorldMatrix.MakeIdentityMatrix();
     m_WorldMatrix.Scale(m_Scale.x, m_Scale.y, m_Scale.z);
 
-    // Build rotation matrix in zxy-order
-    m_WorldMatrix.RotateZXY(m_Rotation.x, m_Rotation.y, m_Rotation.z);
+    // Build rotation matrix in xyz-order
+    m_WorldMatrix.RotateXYZ(m_Rotation.x, m_Rotation.y, m_Rotation.z);
 
     m_WorldMatrix.Translate(m_Pos.x, m_Pos.y, m_Pos.z);
 }

@@ -9,18 +9,29 @@
 
 #include "entity.h"
 
+#include <vector>
+
 namespace entity {
 
+//------------------------------------------------------------
+// Type Declaration
+
+//------------------------------------------------------------
+typedef std::vector<Entity*> (*EntityFilter)(Entity**, int, std::vector<void*>&);
+
+//------------------------------------------------------------
 class EntityMgr {
 public:
     static void Initialize();
     static void Update(float dt);
+    static void Draw();
     static void Destroy();
 
     static int32_t CreateEntity();
     static int32_t AddEntity(Entity* entity);
     static Entity* GetEntity(int32_t id);
     static void RemoveEntity(int32_t id);
+    static std::vector<Entity*> FindEntities(EntityFilter filter, std::vector<void*>& args);
 };
 
 };  // namespace entity

@@ -13,9 +13,18 @@
 
 namespace entity {
 
+//-------------------------------------------------------
+// Pre Declaration
+
+class Entity;
+
+
+//-------------------------------------------------------
+// Type Declaration
+
 class ScriptCom : public Component {
 public:
-    ScriptCom(const char* file);
+    ScriptCom(Entity* owner, const char* file);
     virtual ~ScriptCom();
 
 public:

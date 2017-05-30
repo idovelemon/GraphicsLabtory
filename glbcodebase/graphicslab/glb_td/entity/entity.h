@@ -23,15 +23,23 @@ public:
     virtual ~Entity();
 
 public:
+    virtual void SetDead(bool dead);
+    virtual bool IsDead();
     virtual void SetID(int32_t id);
     virtual int32_t GetID() const;
+    virtual void AddRefCount();
+    virtual void DecRefCount();
+    virtual int32_t GetRefCount() const;
     virtual void AddComponent(Component* com);
-    virtual Component* GetComponent(ComponentType type) const;
+    virtual Component* GetComponent(ComponentType type);
     virtual void RemoveComponent(ComponentType type);
     virtual void Update(float dt);
+    virtual void Draw();
 
 protected:
+    bool            m_IsDead;
     int32_t         m_ID;
+    int32_t         m_RefCount;
     typedef std::map<ComponentType, Component*>     ComponentPool;
     ComponentPool   m_Components;
 };

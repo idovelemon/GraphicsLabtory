@@ -8,23 +8,26 @@
 
 #include <memory>
 
+#include "entity.h"
 #include "../pyscript/pyscriptmgr.h"
 
 namespace entity {
 
-ScriptCom::ScriptCom(const char* file)
-: Component(CT_SCRIPT) {
+ScriptCom::ScriptCom(Entity* owner, const char* file)
+: Component(CT_SCRIPT, owner) {
     int32_t len = strlen(file);
     len = (len > kScriptFileNameMaxLen - 1) ? (kScriptFileNameMaxLen - 1) : len;
     memcpy(m_ScriptFile, file, len);
     m_ScriptFile[len] = '\0';
+
+    pyscript::PyScriptMgr::LoadScript(m_ScriptFile);
 }
 
 ScriptCom::~ScriptCom() {
 }
 
 void ScriptCom::Update(float dt) {
-    pyscript::PyScriptMgr::RunScript(m_ScriptFile);
+    pyscript::PyScriptMgr::RunScript(m_ScriptFile, m_Entity->GetID());
 }
 
 };  // namespace entity

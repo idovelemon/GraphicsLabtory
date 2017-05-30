@@ -11,8 +11,8 @@
 
 namespace entity {
 
-CameraCom::CameraCom(glb::math::Vector pos, glb::math::Vector target)
-: Component(CT_CAMERA)
+CameraCom::CameraCom(Entity* owner, glb::math::Vector pos, glb::math::Vector target)
+: Component(CT_CAMERA, owner)
 , m_Cam(NULL) {
     m_Cam = new glb::scene::CameraBase;
     if (m_Cam != NULL) {

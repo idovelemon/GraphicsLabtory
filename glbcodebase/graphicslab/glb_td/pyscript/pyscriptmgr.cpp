@@ -39,6 +39,7 @@ public:
     void Initialize(const char* script_root_path);
     void LoadScript(const char* script_file_name);
     void RunScript(const char* script_file_name);
+    void RunScript(const char* script_file_name, int arg);
     void Destroy();
 
 private:
@@ -124,7 +125,10 @@ void PyScriptMgrImp::LoadScript(const char* script_file_name) {
             module = NULL;
             name = NULL;
         } while (false);
-        assert(has_error == false && "Something wrong");
+        if (has_error) {
+            PrintError();
+            assert(false && "Something wrong");
+        }
     } else {
         assert(false && "Invalid paramter");
     }
@@ -136,6 +140,28 @@ void PyScriptMgrImp::RunScript(const char* script_file_name) {
         if (it != m_ScriptDatabase.end()) {
             PyObject* func = it->second;
             PyObject* ret = PyObject_CallObject(func, NULL);
+            if (ret == NULL) {
+                PrintError();
+                assert(false && "Failed to call python function");
+            } else {
+                Py_DECREF(ret);
+            }
+            func = NULL;
+        } else {
+            assert(false && "Invalid script");
+        }
+    } else {
+        assert(false && "Invalid paramter");
+    }
+}
+
+void PyScriptMgrImp::RunScript(const char* script_file_name, int arg) {
+    if (script_file_name) {
+        std::map<std::string, PyObject*>::iterator it = m_ScriptDatabase.find(script_file_name);
+        if (it != m_ScriptDatabase.end()) {
+            PyObject* func = it->second;
+            PyObject* args = Py_BuildValue("(i)", arg);  // If tuple only has one argument, you must use ()
+            PyObject* ret = PyObject_CallObject(func, args);
             if (ret == NULL) {
                 PrintError();
                 assert(false && "Failed to call python function");
@@ -221,6 +247,14 @@ void PyScriptMgr::LoadScript(const char* script_file_name) {
 void PyScriptMgr::RunScript(const char* script_file_name) {
     if (s_Imp != NULL) {
         s_Imp->RunScript(script_file_name);
+    } else {
+        assert(false && "Create impelementation first");
+    }
+}
+
+void PyScriptMgr::RunScript(const char* script_file_name, int arg) {
+    if (s_Imp != NULL) {
+        s_Imp->RunScript(script_file_name, arg);
     } else {
         assert(false && "Create impelementation first");
     }

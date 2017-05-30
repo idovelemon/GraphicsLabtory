@@ -25,6 +25,7 @@ namespace scene {
 class SceneImp;
 static SceneImp* s_SceneImp = NULL;
 
+static const int32_t kObjectMaxNum = 10000;
 //-----------------------------------------------------------------------------------
 // CLASS DECLARATION
 //----------------------------------------------------------------------------------
@@ -52,6 +53,7 @@ public:
     Object* GetObjectById(int32_t id);
     Object* GetSkyObject();
     void GetAllObjects(std::vector<Object*>& objs);
+    void DestroyObject(int32_t id);
 
     // Light
     void SetLight(Light lit, int32_t id);
@@ -66,6 +68,9 @@ public:
 
     // Debug Draw
     void AddBoundBox(math::Vector color);
+
+protected:
+    int32_t FindEmptyID();
 
 private:
     int32_t              m_CurCameraType;
@@ -91,6 +96,7 @@ SceneImp::SceneImp()
 , m_BoundBoxMax(0.0f, 0.0f, 0.0f)
 , m_BoundBoxMin(0.0f, 0.0f, 0.0f) {
     memset(m_Camera, 0, sizeof(m_Camera));
+    m_ObjectDataBase.resize(10000, NULL);
 }
 
 SceneImp::~SceneImp() {
@@ -125,6 +131,16 @@ void SceneImp::Update() {
         m_SkyObject->Update();
     }
 
+    // Remove dead objects
+    for (int32_t i = 0; i < static_cast<int32_t>(m_ObjectDataBase.size()); i++) {
+        if (m_ObjectDataBase[i] != NULL) {
+            if (m_ObjectDataBase[i]->IsDead()) {
+                GLB_SAFE_DELETE(m_ObjectDataBase[i]);
+            }
+        }
+    }
+
+    // Update
     m_BoundBoxMax = math::Vector(0.0f, 0.0f, 0.0f);
     m_BoundBoxMin = math::Vector(FLT_MAX, FLT_MAX, FLT_MAX);
     for (int32_t i = 0; i < static_cast<int32_t>(m_ObjectDataBase.size()); i++) {
@@ -168,8 +184,12 @@ int32_t SceneImp::AddObject(const char* object_file) {
     if (object_file != NULL) {
         Object* obj = Object::Create(object_file);
         if (obj != NULL) {
-            id = m_ObjectDataBase.size();
-            m_ObjectDataBase.push_back(obj);
+            id = FindEmptyID();
+            if (id != -1) {
+                m_ObjectDataBase[id] = obj;
+            } else {
+                GLB_SAFE_ASSERT(false);
+            }
         } else {
             GLB_SAFE_ASSERT(false);
         }
@@ -220,7 +240,17 @@ Object* SceneImp::GetSkyObject() {
 
 void SceneImp::GetAllObjects(std::vector<Object*>& objs) {
     for (int32_t i = 0; i < static_cast<int32_t>(m_ObjectDataBase.size()); i++) {
-        objs.push_back(m_ObjectDataBase[i]);
+        if (m_ObjectDataBase[i] != NULL && !m_ObjectDataBase[i]->IsDead()) {
+            objs.push_back(m_ObjectDataBase[i]);
+        }
+    }
+}
+
+void SceneImp::DestroyObject(int32_t object_id) {
+    if (0 <= object_id && object_id < static_cast<int32_t>(m_ObjectDataBase.size())) {
+        if (m_ObjectDataBase[object_id] != NULL) {
+            m_ObjectDataBase[object_id]->SetDead(true);
+        }
     }
 }
 
@@ -299,6 +329,19 @@ void SceneImp::AddBoundBox(math::Vector color) {
     render::Render::AddLine(view_space_points[render::Render::NLU], view_space_points[render::Render::FLU], color);
     render::Render::AddLine(view_space_points[render::Render::NRU], view_space_points[render::Render::FRU], color);
     render::Render::AddLine(view_space_points[render::Render::NRD], view_space_points[render::Render::FRD], color);
+}
+
+int32_t SceneImp::FindEmptyID() {
+    int32_t id = -1;
+
+    for (int32_t i = 0; i < static_cast<int32_t>(m_ObjectDataBase.size()); i++) {
+        if (m_ObjectDataBase[i] == NULL) {
+            id  = i;
+            break;
+        }
+    }
+
+    return id;
 }
 //-----------------------------------------------------------------------------------
 // Scene DEFINITION
@@ -406,6 +449,14 @@ Object* Scene::GetSkyObject() {
 void Scene::GetAllObjects(std::vector<Object*>& objs) {
     if (s_SceneImp != NULL) {
         s_SceneImp->GetAllObjects(objs);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+}
+
+void Scene::DestroyObject(int32_t object_id) {
+    if (s_SceneImp != NULL) {
+        s_SceneImp->DestroyObject(object_id);
     } else {
         GLB_SAFE_ASSERT(false);
     }

@@ -29,6 +29,7 @@ public:
      // @brief: Run the script with script name
      //---------------------------------------------------------------
      static void RunScript(const char* script_file_name);
+     static void RunScript(const char* script_file_name, int arg);
 
      static void Destroy();
 };

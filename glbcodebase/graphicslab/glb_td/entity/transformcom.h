@@ -13,9 +13,17 @@
 
 namespace entity {
 
+//-------------------------------------------------------
+// Pre Declaration
+
+class Entity;
+
+//-------------------------------------------------------
+// Type Declaration
+
 class TransformCom : public Component {
 public:
-    TransformCom(glb::math::Vector pos, glb::math::Vector rotate, glb::math::Vector scale);
+    TransformCom(Entity* owner, glb::math::Vector pos, glb::math::Vector rotate, glb::math::Vector scale);
     virtual ~TransformCom();
 
 public:
