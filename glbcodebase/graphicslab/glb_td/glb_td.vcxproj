@@ -116,6 +116,8 @@
     <ClCompile Include="..\glb\util\glbprofile.cpp" />
     <ClCompile Include="..\glb\util\glbtexturereader.cpp" />
     <ClCompile Include="..\glb\util\glbutil.cpp" />
+    <ClCompile Include="dynamic\dynamicobject.cpp" />
+    <ClCompile Include="dynamic\dynamicworld.cpp" />
     <ClCompile Include="entity\arsenalcom.cpp" />
     <ClCompile Include="entity\cameracom.cpp" />
     <ClCompile Include="entity\datacom.cpp" />
@@ -173,6 +175,8 @@
     <ClInclude Include="..\glb\util\glbprofile.h" />
     <ClInclude Include="..\glb\util\glbtexturereader.h" />
     <ClInclude Include="..\glb\util\glbutil.h" />
+    <ClInclude Include="dynamic\dynamicobject.h" />
+    <ClInclude Include="dynamic\dynamicworld.h" />
     <ClInclude Include="entity\arsenalcom.h" />
     <ClInclude Include="entity\cameracom.h" />
     <ClInclude Include="entity\component.h" />

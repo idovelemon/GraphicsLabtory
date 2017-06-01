@@ -43,6 +43,9 @@
     <Filter Include="源文件\entity">
       <UniqueIdentifier>{b9bccc59-82f4-4b42-b8a3-916847e833f4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="源文件\dynamic">
+      <UniqueIdentifier>{c2964a69-1a97-4e2c-ba19-451fe3ee772d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\glb\comm.cpp">
@@ -185,6 +188,12 @@
     </ClCompile>
     <ClCompile Include="entity\datacom.cpp">
       <Filter>源文件\entity</Filter>
+    </ClCompile>
+    <ClCompile Include="dynamic\dynamicworld.cpp">
+      <Filter>源文件\dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="dynamic\dynamicobject.cpp">
+      <Filter>源文件\dynamic</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -361,6 +370,12 @@
     </ClInclude>
     <ClInclude Include="entity\datacom.h">
       <Filter>源文件\entity</Filter>
+    </ClInclude>
+    <ClInclude Include="dynamic\dynamicworld.h">
+      <Filter>源文件\dynamic</Filter>
+    </ClInclude>
+    <ClInclude Include="dynamic\dynamicobject.h">
+      <Filter>源文件\dynamic</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

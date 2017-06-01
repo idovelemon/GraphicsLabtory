@@ -11,7 +11,8 @@ from config import *
 from host_api import *
 
 def main(id):
-    EntityMoveToTarget(id, E01_SPEED, 0.0, 0.0, 0.0)
+    speed = EntityGetFloatData(id, "speed")
+    EntityMoveToTarget(id, speed, 0.0, 0.0, 0.0)
 
     # Check if dead
     hp = EntityGetFloatData(id, "hp")

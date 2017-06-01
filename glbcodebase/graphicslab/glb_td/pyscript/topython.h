@@ -33,6 +33,7 @@ static struct{
     {"RST_BULLET_MACHINEGUN", 4},
 
     {"RST_E01", 101},  // Enemy Start
+    {"RST_E02", 102},
 
     {"RST_PLACER", 201},  // Operator Start
 

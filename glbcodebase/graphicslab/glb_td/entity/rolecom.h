@@ -36,6 +36,7 @@ enum RoleSubType {
 
     // Enemy Begin
     RST_E01,
+    RST_E02,
     RST_ENEMY_END = 200,
 
     // Operator Begin

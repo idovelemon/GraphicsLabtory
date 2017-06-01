@@ -15,7 +15,7 @@ from host_api import *
 def IsTimeMatch(time):
     return TimeGetPrevGameTime() < time and time <= TimeGetCurGameTime()
 
-def CreateTestEnemy():
+def createE01():
     is_lr = True
     sx = 0.0
     sy = 0.0
@@ -49,14 +49,51 @@ def CreateTestEnemy():
     EntityAddDataCom(enemy)
     EntityAddFloatData(enemy, "hp", E01_HP)
     EntityAddIntData(enemy, "coin", E01_COIN)
+    EntityAddFloatData(enemy, "speed", E01_SPEED)
+
+def createE02():
+    is_lr = True
+    sx = 0.0
+    sy = 0.0
+    sz = 0.0
+    if random.random() > 0.5:
+        is_lr = False
+    if is_lr is True:
+        is_left = True
+        if random.random() > 0.5:
+            is_left = False
+        if is_left is True:
+            sx = -1.0 * GAME_WORLD_WIDTH / 2 - 0.5
+        else:
+            sx = 1.0 * GAME_WORLD_WIDTH / 2 + 0.5
+        sz = -1.0 * GAME_WORLD_DEPTH / 2 + random.randint(0, GAME_WORLD_DEPTH) * 1.0
+    else:
+        is_up = True
+        if random.random() > 0.5:
+            is_up = False
+        if is_up is True:
+            sz = 1.0 * GAME_WORLD_DEPTH / 2 + 0.5
+        else:
+            sz = -1.0 * GAME_WORLD_DEPTH / 2 - 0.5
+        sx = -1.0 * GAME_WORLD_WIDTH / 2 + random.randint(0, GAME_WORLD_WIDTH) * 1.0
+
+    enemy = EntityCreate()
+    EntityAddTransformCom(enemy, sx, sy, sz, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0)
+    EntityAddRenderCom(enemy, "res\model\Enemy\TD_E02.obj")
+    EntityAddScriptCom(enemy, "testenemy")
+    EntityAddRoleCom(enemy, RMT_ENEMY, RST_E02)
+    EntityAddDataCom(enemy)
+    EntityAddFloatData(enemy, "hp", E02_HP)
+    EntityAddIntData(enemy, "coin", E02_COIN)
+    EntityAddFloatData(enemy, "speed", E02_SPEED)
 
 def main():
     pre = TimeGetPrevGameTime()
     cur = TimeGetCurGameTime()
-    pre = math.floor(pre / 30.0)
-    cur = math.floor(cur / 30.0)
+    pre = math.floor(pre / 60.0)
+    cur = math.floor(cur / 60.0)
     if pre != cur:
-        CreateTestEnemy()
-        CreateTestEnemy()
-        CreateTestEnemy()
-        CreateTestEnemy()
+        createE01()
+        createE01()
+        createE01()
+        createE02()
