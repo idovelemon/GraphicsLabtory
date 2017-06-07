@@ -235,6 +235,67 @@ void EntitySetPos(int id, float x, float y, float z) {
     }
 }
 
+float EntityGetScaleX(int id) {
+    float x = 1.0f;
+    entity::Entity* ent = entity::EntityMgr::GetEntity(id);
+    if (ent != NULL) {
+        entity::TransformCom* com = reinterpret_cast<entity::TransformCom*>(ent->GetComponent(entity::CT_TRANSFORM));
+        if (com != NULL) {
+            x = com->GetScale().x;
+        }
+    } else {
+        printf("Wrong entity id\n");
+        assert(false);
+    }
+
+    return x;
+}
+
+float EntityGetScaleY(int id) {
+    float y = 1.0f;
+    entity::Entity* ent = entity::EntityMgr::GetEntity(id);
+    if (ent != NULL) {
+        entity::TransformCom* com = reinterpret_cast<entity::TransformCom*>(ent->GetComponent(entity::CT_TRANSFORM));
+        if (com != NULL) {
+            y = com->GetScale().y;
+        }
+    } else {
+        printf("Wrong entity id\n");
+        assert(false);
+    }
+
+    return y;
+}
+
+float EntityGetScaleZ(int id) {
+    float z = 1.0f;
+    entity::Entity* ent = entity::EntityMgr::GetEntity(id);
+    if (ent != NULL) {
+        entity::TransformCom* com = reinterpret_cast<entity::TransformCom*>(ent->GetComponent(entity::CT_TRANSFORM));
+        if (com != NULL) {
+            z = com->GetScale().z;
+        }
+    } else {
+        printf("Wrong entity id\n");
+        assert(false);
+    }
+
+    return z;
+}
+
+void EntitySetScale(int id, float x, float y, float z) {
+    entity::Entity* ent = entity::EntityMgr::GetEntity(id);
+    if (ent != NULL) {
+        entity::TransformCom* com = reinterpret_cast<entity::TransformCom*>(ent->GetComponent(entity::CT_TRANSFORM));
+        if (com != NULL) {
+            com->SetScale(glb::math::Vector(x, y, z));
+        }
+    } else {
+        printf("Wrong entity id\n");
+        assert(false);
+    }
+}
+
 void EntityAddWeapon(int id, int wt, const char* script) {
     entity::Entity* ent = entity::EntityMgr::GetEntity(id);
     if (ent != NULL) {
@@ -531,6 +592,40 @@ void EntitySetDrawEnable(int id, int enable) {
         printf("Wrong entity id\n");
         assert(false);
     }
+}
+
+void EntityBeginIterate() {
+    entity::EntityMgr::BeginIterate();
+}
+
+int EntityIterate() {
+    return entity::EntityMgr::Iterate();
+}
+
+void EntityEndIterate() {
+    entity::EntityMgr::EndIterate();
+}
+
+int EntityIsMainType(int id, int main_type) {
+    int result = 0;
+
+    entity::Entity* ent = entity::EntityMgr::GetEntity(id);
+    if (ent != NULL) {
+        entity::RoleCom* com = reinterpret_cast<entity::RoleCom*>(ent->GetComponent(entity::CT_ROLETYPE));
+        if (com != NULL) {
+            if (com->GetMainType() == main_type) {
+                result = 1;
+            }
+        } // else {
+        //    assert(false);  // No role type component
+        //}
+        // TODO: Some entities do not have role type now
+    } else {
+        printf("Wrong entity id\n");
+        assert(false);
+    }
+
+    return result;
 }
 
 //-----------------------------------------------------------------

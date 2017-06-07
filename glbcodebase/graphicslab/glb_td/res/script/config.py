@@ -40,5 +40,9 @@ SUBTOWER_COST_COIN = 5
 MAIN_TOWER_MOVE_SPEED = 0.1
 MAIN_TOWER_PRESS_DELTA = 10.0
 
+# Bomb
+BOMB_SCALE_SPEED = 0.5
+BOMB_MAX_SCALE = 20.0
+
 if __name__ == "__main__":
     pass

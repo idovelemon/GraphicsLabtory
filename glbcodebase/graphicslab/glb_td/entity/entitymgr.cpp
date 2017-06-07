@@ -42,10 +42,15 @@ public:
 
     std::vector<Entity*> FindEntities(EntityFilter filter, std::vector<void*>& args);
 
+    void BeginIterate();
+    int32_t Iterate();
+    void EndIterate();
+
 protected:
     int32_t FindEmptyID();
 
 protected:
+    int32_t         m_Iterator;
     Entity*         m_Entities[kEntityMaxNum];
 };
 
@@ -54,7 +59,8 @@ protected:
 
 //----------------------------------------------------------------
 
-EntityMgrImp::EntityMgrImp() {
+EntityMgrImp::EntityMgrImp()
+: m_Iterator(0) {
     memset(m_Entities, 0, sizeof(m_Entities));
 }
 
@@ -167,6 +173,34 @@ std::vector<Entity*> EntityMgrImp::FindEntities(EntityFilter filter, std::vector
     return filter(m_Entities, kEntityMaxNum, args);
 }
 
+void EntityMgrImp::BeginIterate() {
+    m_Iterator = 0;
+}
+
+int32_t EntityMgrImp::Iterate() {
+    int32_t result = -1;
+
+    while (true) {
+        if (m_Entities[m_Iterator] != NULL) {
+            result = m_Iterator;
+            m_Iterator++;
+            break;
+        }
+
+        m_Iterator++;
+
+        if (m_Iterator >= kEntityMaxNum) {
+            break;
+        }
+    }
+
+    return result;
+}
+
+void EntityMgrImp::EndIterate() {
+    m_Iterator = 0;
+}
+
 int32_t EntityMgrImp::FindEmptyID() {
     int32_t id = -1;
 
@@ -258,4 +292,27 @@ std::vector<Entity*> EntityMgr::FindEntities(EntityFilter filter, std::vector<vo
 
     return ents;
 }
+
+void EntityMgr::BeginIterate() {
+    if (s_EntityMgrImp != NULL) {
+        s_EntityMgrImp->BeginIterate();
+    }
+}
+
+int32_t EntityMgr::Iterate() {
+    int32_t id = -1;
+
+    if (s_EntityMgrImp != NULL) {
+        id = s_EntityMgrImp->Iterate();
+    }
+
+    return id;
+}
+
+void EntityMgr::EndIterate() {
+    if (s_EntityMgrImp != NULL) {
+        s_EntityMgrImp->EndIterate();
+    }
+}
+
 };  // namespace entity

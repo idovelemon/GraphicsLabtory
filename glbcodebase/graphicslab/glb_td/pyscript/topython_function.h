@@ -31,6 +31,10 @@ float EntityGetPosX(int id);
 float EntityGetPosY(int id);
 float EntityGetPosZ(int id);
 void EntitySetPos(int id, float x, float y, float z);
+float EntityGetScaleX(int id);
+float EntityGetScaleY(int id);
+float EntityGetScaleZ(int id);
+void EntitySetScale(int id, float x, float y, float z);
 void EntityAddWeapon(int id, int wt, const char* script);
 void EntityActiveWeapon(int id, int wt);
 int EntityGetWeaponBulletNum(int id);
@@ -48,6 +52,10 @@ void EntitySetRotateByLookVec(int id, float x, float y, float z);
 void EntitySetScaleByLookVec(int id, float x, float y, float z);
 float EntityCalcDistBetweenEntities(int e0, int e1);
 void EntitySetDrawEnable(int id, int display);
+void EntityBeginIterate();
+int EntityIterate();
+void EntityEndIterate();
+int EntityIsMainType(int id, int main_type);
 
 // Time
 float TimeGetPrevGameTime();

@@ -177,6 +177,48 @@ static PyObject* EntitySetPos(PyObject* self, PyObject* args) {
 	return Py_BuildValue("");
 }
 
+static PyObject* EntityGetScaleX(PyObject* self, PyObject* args) {
+	int id;
+	float ret;
+	if (!PyArg_ParseTuple(args, "i", &id)) {
+		 return NULL;
+	}
+	ret = EntityGetScaleX(id);
+	return Py_BuildValue("f", ret);
+}
+
+static PyObject* EntityGetScaleY(PyObject* self, PyObject* args) {
+	int id;
+	float ret;
+	if (!PyArg_ParseTuple(args, "i", &id)) {
+		 return NULL;
+	}
+	ret = EntityGetScaleY(id);
+	return Py_BuildValue("f", ret);
+}
+
+static PyObject* EntityGetScaleZ(PyObject* self, PyObject* args) {
+	int id;
+	float ret;
+	if (!PyArg_ParseTuple(args, "i", &id)) {
+		 return NULL;
+	}
+	ret = EntityGetScaleZ(id);
+	return Py_BuildValue("f", ret);
+}
+
+static PyObject* EntitySetScale(PyObject* self, PyObject* args) {
+	int id;
+	float x;
+	float y;
+	float z;
+	if (!PyArg_ParseTuple(args, "ifff", &id, &x, &y, &z)) {
+		 return NULL;
+	}
+	EntitySetScale(id, x, y, z);
+	return Py_BuildValue("");
+}
+
 static PyObject* EntityAddWeapon(PyObject* self, PyObject* args) {
 	int id;
 	int wt;
@@ -361,6 +403,33 @@ static PyObject* EntitySetDrawEnable(PyObject* self, PyObject* args) {
 	return Py_BuildValue("");
 }
 
+static PyObject* EntityBeginIterate(PyObject* self, PyObject* args) {
+	EntityBeginIterate();
+	return Py_BuildValue("");
+}
+
+static PyObject* EntityIterate(PyObject* self, PyObject* args) {
+	int ret;
+	ret = EntityIterate();
+	return Py_BuildValue("i", ret);
+}
+
+static PyObject* EntityEndIterate(PyObject* self, PyObject* args) {
+	EntityEndIterate();
+	return Py_BuildValue("");
+}
+
+static PyObject* EntityIsMainType(PyObject* self, PyObject* args) {
+	int id;
+	int main_type;
+	int ret;
+	if (!PyArg_ParseTuple(args, "ii", &id, &main_type)) {
+		 return NULL;
+	}
+	ret = EntityIsMainType(id, main_type);
+	return Py_BuildValue("i", ret);
+}
+
 static PyObject* TimeGetPrevGameTime(PyObject* self, PyObject* args) {
 	float ret;
 	ret = TimeGetPrevGameTime();
@@ -435,6 +504,10 @@ static PyMethodDef s_HostAPI_MethodDef[] = {
 	{"EntityGetPosY", EntityGetPosY, METH_VARARGS, NULL},
 	{"EntityGetPosZ", EntityGetPosZ, METH_VARARGS, NULL},
 	{"EntitySetPos", EntitySetPos, METH_VARARGS, NULL},
+	{"EntityGetScaleX", EntityGetScaleX, METH_VARARGS, NULL},
+	{"EntityGetScaleY", EntityGetScaleY, METH_VARARGS, NULL},
+	{"EntityGetScaleZ", EntityGetScaleZ, METH_VARARGS, NULL},
+	{"EntitySetScale", EntitySetScale, METH_VARARGS, NULL},
 	{"EntityAddWeapon", EntityAddWeapon, METH_VARARGS, NULL},
 	{"EntityActiveWeapon", EntityActiveWeapon, METH_VARARGS, NULL},
 	{"EntityGetWeaponBulletNum", EntityGetWeaponBulletNum, METH_VARARGS, NULL},
@@ -452,6 +525,10 @@ static PyMethodDef s_HostAPI_MethodDef[] = {
 	{"EntitySetScaleByLookVec", EntitySetScaleByLookVec, METH_VARARGS, NULL},
 	{"EntityCalcDistBetweenEntities", EntityCalcDistBetweenEntities, METH_VARARGS, NULL},
 	{"EntitySetDrawEnable", EntitySetDrawEnable, METH_VARARGS, NULL},
+	{"EntityBeginIterate", EntityBeginIterate, METH_VARARGS, NULL},
+	{"EntityIterate", EntityIterate, METH_VARARGS, NULL},
+	{"EntityEndIterate", EntityEndIterate, METH_VARARGS, NULL},
+	{"EntityIsMainType", EntityIsMainType, METH_VARARGS, NULL},
 	{"TimeGetPrevGameTime", TimeGetPrevGameTime, METH_VARARGS, NULL},
 	{"TimeGetCurGameTime", TimeGetCurGameTime, METH_VARARGS, NULL},
 	{"TimeGetGameFrameSpeed", TimeGetGameFrameSpeed, METH_VARARGS, NULL},

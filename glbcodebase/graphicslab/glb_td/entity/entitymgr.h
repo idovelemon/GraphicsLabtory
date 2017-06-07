@@ -32,6 +32,9 @@ public:
     static Entity* GetEntity(int32_t id);
     static void RemoveEntity(int32_t id);
     static std::vector<Entity*> FindEntities(EntityFilter filter, std::vector<void*>& args);
+    static void BeginIterate();
+    static int32_t Iterate();
+    static void EndIterate();
 };
 
 };  // namespace entity
