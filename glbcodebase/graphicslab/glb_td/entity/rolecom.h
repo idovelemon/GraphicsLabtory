@@ -32,6 +32,7 @@ enum RoleSubType {
     RST_WALL,
     RST_BULLET_LASER,
     RST_BULLET_MACHINEGUN,
+    RST_BULLET_BOMB,
     RST_PLAYER_END = 100,
 
     // Enemy Begin

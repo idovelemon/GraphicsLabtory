@@ -17,9 +17,10 @@ def main(id):
     enemy = EntityGetIntData(id, "target")
     if EntityIsDead(enemy) == 0:  # Enemy is not dead
         # Update transform
-        cur_px = EntityGetPosX(id)
-        cur_py = EntityGetPosY(id)
-        cur_pz = EntityGetPosZ(id)        
+        cur_px = EntityGetPosX(attacker)
+        cur_py = EntityGetPosY(attacker)
+        cur_pz = EntityGetPosZ(attacker)   
+        EntitySetPos(id, cur_px, cur_py, cur_pz)
         enemy_px = EntityGetPosX(enemy)
         enemy_py = EntityGetPosY(enemy)
         enemy_pz = EntityGetPosZ(enemy)

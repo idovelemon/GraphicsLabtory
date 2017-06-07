@@ -36,5 +36,9 @@ MACHINE_GUN_TOTAL_DELTA = 5.0
 # Subtower cost coin
 SUBTOWER_COST_COIN = 5
 
+# Main tower
+MAIN_TOWER_MOVE_SPEED = 0.1
+MAIN_TOWER_PRESS_DELTA = 10.0
+
 if __name__ == "__main__":
     pass

@@ -31,6 +31,7 @@ static struct{
     {"RST_WALL", 2},
     {"RST_BULLET_LASER", 3},
     {"RST_BULLET_MACHINEGUN", 4},
+    {"RST_BULLET_BOMB", 5},
 
     {"RST_E01", 101},  // Enemy Start
     {"RST_E02", 102},
@@ -49,6 +50,10 @@ static struct{
 
     // Button Key
     {"BK_1", 0x02},
+    {"BK_UP", 0xC8},
+    {"BK_LEFT", 0xCB},
+    {"BK_RIGHT", 0xCD},
+    {"BK_DOWN", 0xD0},
 };
 
 static void PyInit_IntConstant(PyObject* module) {
