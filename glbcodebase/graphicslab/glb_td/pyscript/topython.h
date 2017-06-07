@@ -22,7 +22,8 @@ static struct{
     {"RMT_PLAYER", 0},
     {"RMT_ENEMY", 1},
     {"RMT_OPERATOR", 2},
-    {"RMT_MAX", 3},
+    {"RMT_ITEM", 3},
+    {"RMT_MAX", 4},
 
     // RoleSubType
     {"RST_NONE", -1},
@@ -32,11 +33,14 @@ static struct{
     {"RST_BULLET_LASER", 3},
     {"RST_BULLET_MACHINEGUN", 4},
     {"RST_BULLET_BOMB", 5},
+    {"RST_CRYSTAL", 6},
 
     {"RST_E01", 101},  // Enemy Start
     {"RST_E02", 102},
 
     {"RST_PLACER", 201},  // Operator Start
+
+    {"RST_ITEM_BOMB", 301},  // Item Start
 
     // WeaponType
     {"WT_NONE", -1},

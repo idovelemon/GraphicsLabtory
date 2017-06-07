@@ -21,6 +21,7 @@ enum RoleMainType {
     RMT_PLAYER,
     RMT_ENEMY,
     RMT_OPERATOR,
+    RMT_ITEM,
     RMT_MAX
 };
 
@@ -33,6 +34,7 @@ enum RoleSubType {
     RST_BULLET_LASER,
     RST_BULLET_MACHINEGUN,
     RST_BULLET_BOMB,
+    RST_CRYSTAL,
     RST_PLAYER_END = 100,
 
     // Enemy Begin
@@ -42,6 +44,11 @@ enum RoleSubType {
 
     // Operator Begin
     RST_PLACER,
+    RST_OPERATOR_END = 300,
+
+    // Item Begin
+    RST_ITEM_BOMB,
+    RST_ITEM_END = 400,
 };
 
 //-------------------------------------------------------------

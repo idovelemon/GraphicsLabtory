@@ -44,5 +44,8 @@ MAIN_TOWER_PRESS_DELTA = 10.0
 BOMB_SCALE_SPEED = 0.5
 BOMB_MAX_SCALE = 20.0
 
+# Crystal
+CRYSTAL_GEN_ITEM_TIME = 10 * 60
+
 if __name__ == "__main__":
     pass
