@@ -120,6 +120,7 @@
     <ClCompile Include="dynamic\dynamicworld.cpp" />
     <ClCompile Include="entity\arsenalcom.cpp" />
     <ClCompile Include="entity\cameracom.cpp" />
+    <ClCompile Include="entity\collisioncom.cpp" />
     <ClCompile Include="entity\datacom.cpp" />
     <ClCompile Include="entity\entity.cpp" />
     <ClCompile Include="entity\entityfilter.cpp" />
@@ -179,6 +180,7 @@
     <ClInclude Include="dynamic\dynamicworld.h" />
     <ClInclude Include="entity\arsenalcom.h" />
     <ClInclude Include="entity\cameracom.h" />
+    <ClInclude Include="entity\collisioncom.h" />
     <ClInclude Include="entity\component.h" />
     <ClInclude Include="entity\datacom.h" />
     <ClInclude Include="entity\entity.h" />

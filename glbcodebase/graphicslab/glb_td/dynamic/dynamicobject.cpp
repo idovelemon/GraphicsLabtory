@@ -12,7 +12,8 @@ namespace dynamic {
 
 //-----------------------------------------------------------------
 DTAabb::DTAabb(glb::math::Vector max, glb::math::Vector min, glb::math::Vector pos)
-: m_Max(max)
+: DynamicObject(DOT_AABB)
+, m_Max(max)
 , m_Min(min)
 , m_Pos(pos) {
 }
@@ -37,6 +38,12 @@ bool DTAabb::IsIntersection(DynamicObject* object) {
     return result;
 }
 
+void DTAabb::Update(glb::math::Vector max, glb::math::Vector min, glb::math::Vector center) {
+    m_Max = max;
+    m_Min = min;
+    m_Pos = center;
+}
+
 bool DTAabb::IsIntersectionWithAABB(DTAabb* object) {
     if (object == nullptr) return false;
 
@@ -46,8 +53,8 @@ bool DTAabb::IsIntersectionWithAABB(DTAabb* object) {
     glb::math::Vector min0 = m_Min + diff0;
     glb::math::Vector center1 = (object->m_Max + object->m_Min) * 0.5f;
     glb::math::Vector diff1 = object->m_Pos - center1;
-    glb::math::Vector max1 = object->m_Max - diff1;
-    glb::math::Vector min1 = object->m_Min - diff1;
+    glb::math::Vector max1 = object->m_Max + diff1;
+    glb::math::Vector min1 = object->m_Min + diff1;
 
     if (max0.x < min1.x) return false;
     if (max0.y < min1.y) return false;

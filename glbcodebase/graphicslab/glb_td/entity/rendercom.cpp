@@ -38,6 +38,26 @@ void RenderCom::SetDrawEnable(bool enable) {
     }
 }
 
+glb::math::Vector RenderCom::GetBoundBoxMax() {
+    glb::math::Vector result(0.0f, 0.0f, 0.0f);
+    glb::scene::Object* obj = glb::scene::Scene::GetObjectById(m_SceneObjID);
+    if (obj != NULL) {
+        result = obj->GetBoundBoxMax();
+    }
+
+    return result;
+}
+
+glb::math::Vector RenderCom::GetBoundBoxMin() {
+    glb::math::Vector result(0.0f, 0.0f, 0.0f);
+    glb::scene::Object* obj = glb::scene::Scene::GetObjectById(m_SceneObjID);
+    if (obj != NULL) {
+        result = obj->GetBoundBoxMin();
+    }
+
+    return result;
+}
+
 void RenderCom::Render(TransformCom* transform) {
     if (transform != NULL) {
         glb::scene::Object* obj = glb::scene::Scene::GetObjectById(m_SceneObjID);

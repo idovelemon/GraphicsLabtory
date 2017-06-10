@@ -8,6 +8,7 @@
 #define DYNAMIC_DYNAMICWORLD_H_
 
 #include <stdint.h>
+#include <vector>
 
 namespace dynamic {
 
@@ -28,6 +29,8 @@ public:
     static int32_t AddDynamicObject(DynamicObject* object);
     static void RemoveDynamicObject(int32_t id);
     static DynamicObject* GetDynamicObject(int32_t id);
+
+    static void CheckCollision(int32_t id, std::vector<int32_t>& coll_ids);
 };
 
 };  // namespace dynamic

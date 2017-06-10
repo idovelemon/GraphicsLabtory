@@ -11,6 +11,8 @@
 
 #include <stdint.h>
 
+#include "math/glbvector.h"
+
 namespace entity {
 
 //----------------------------------------------------------------
@@ -30,6 +32,8 @@ public:
 public:
     virtual void SetDepthTestEnable(bool enable);
     virtual void SetDrawEnable(bool enable);
+    virtual glb::math::Vector GetBoundBoxMax();
+    virtual glb::math::Vector GetBoundBoxMin();
     virtual void Render(TransformCom* transform);
 
 protected:

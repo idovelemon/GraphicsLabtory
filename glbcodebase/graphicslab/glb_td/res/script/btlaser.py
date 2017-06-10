@@ -37,7 +37,6 @@ def main(id):
             attacker_coin = EntityGetIntData(attacker, "coin")
             attacker_coin = attacker_coin + enemy_coin
             EntitySetIntData(attacker, "coin", attacker_coin)
-            DebugPrint("Cur Coins:%d\n" % attacker_coin)
             is_dead = 1
 
         # Check if out of range

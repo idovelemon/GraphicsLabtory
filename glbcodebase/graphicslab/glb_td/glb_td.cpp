@@ -8,6 +8,7 @@
 #include "resource.h"
 
 #include "gametimer.h"
+#include "dynamic/dynamicworld.h"
 #include "entity/entitymgr.h"
 #include "pyscript/pyscriptmgr.h"
 
@@ -48,6 +49,7 @@ public:
         glb::render::Render::SetHighLightBase(0.95f);
 
         // Game Manager
+        dynamic::DynamicWorld::Initialize();
         pyscript::PyScriptMgr::Initialize("res/script/");
         entity::EntityMgr::Initialize();
         td::GameTimer::Initialize();
@@ -67,6 +69,7 @@ public:
         pyscript::PyScriptMgr::RunScript("timeline");
 
         // Update entity
+        dynamic::DynamicWorld::Update();
         td::GameTimer::Update(dt);
         entity::EntityMgr::Update(dt);
         entity::EntityMgr::Draw();
@@ -85,6 +88,7 @@ public:
         td::GameTimer::Destroy();
         entity::EntityMgr::Destroy();
         pyscript::PyScriptMgr::Destroy();
+        dynamic::DynamicWorld::Destroy();
     }
 };
 

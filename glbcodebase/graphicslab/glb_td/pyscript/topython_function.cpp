@@ -18,6 +18,7 @@
 
 #include "../entity/arsenalcom.h"
 #include "../entity/cameracom.h"
+#include "../entity/collisioncom.h"
 #include "../entity/datacom.h"
 #include "../entity/entitymgr.h"
 #include "../entity/entityfilter.h"
@@ -164,6 +165,17 @@ void EntityAddDataCom(int id) {
     entity::Entity* ent = entity::EntityMgr::GetEntity(id);
     if (ent != NULL) {
         entity::DataCom* com = new entity::DataCom(ent);
+        ent->AddComponent(com);
+    } else {
+        printf("Wrong entity id\n");
+        assert(false);
+    }
+}
+
+void EntityAddCollisionCom(int id) {
+    entity::Entity* ent = entity::EntityMgr::GetEntity(id);
+    if (ent != NULL) {
+        entity::CollisionCom* com = new entity::CollisionCom(ent);
         ent->AddComponent(com);
     } else {
         printf("Wrong entity id\n");
@@ -626,6 +638,97 @@ int EntityIsMainType(int id, int main_type) {
     }
 
     return result;
+}
+
+int EntityIsSubType(int id, int sub_type) {
+    int result = 0;
+
+    entity::Entity* ent = entity::EntityMgr::GetEntity(id);
+    if (ent != NULL) {
+        entity::RoleCom* com = reinterpret_cast<entity::RoleCom*>(ent->GetComponent(entity::CT_ROLETYPE));
+        if (com != NULL) {
+            if (com->GetSubType() == sub_type) {
+                result = 1;
+            }
+        } // else {
+        //    assert(false);  // No role type component
+        //}
+        // TODO: Some entities do not have role type now
+    } else {
+        printf("Wrong entity id\n");
+        assert(false);
+    }
+
+    return result;
+}
+
+void EntityUpdateCollision(int id) {
+    entity::Entity* ent = entity::EntityMgr::GetEntity(id);
+    if (ent != NULL) {
+        entity::CollisionCom* com = reinterpret_cast<entity::CollisionCom*>(ent->GetComponent(entity::CT_COLLISION));
+        if (com != NULL) {
+            com->Update();
+        }
+    } else {
+        printf("Wrong entity id\n");
+        assert(false);
+    }
+}
+
+void EntityCheckCollision(int id) {
+    entity::Entity* ent = entity::EntityMgr::GetEntity(id);
+    if (ent != NULL) {
+        entity::CollisionCom* com = reinterpret_cast<entity::CollisionCom*>(ent->GetComponent(entity::CT_COLLISION));
+        if (com != NULL) {
+            com->CheckCollision();
+        }
+    } else {
+        printf("Wrong entity id\n");
+        assert(false);
+    }
+}
+
+void EntityCollisionBeginIterate(int id) {
+    entity::Entity* ent = entity::EntityMgr::GetEntity(id);
+    if (ent != NULL) {
+        entity::CollisionCom* com = reinterpret_cast<entity::CollisionCom*>(ent->GetComponent(entity::CT_COLLISION));
+        if (com != NULL) {
+            com->BeginIterate();
+        }
+    } else {
+        printf("Wrong entity id\n");
+        assert(false);
+    }
+}
+
+int EntityCollisionIterate(int id) {
+    int result = -1;
+
+    entity::Entity* ent = entity::EntityMgr::GetEntity(id);
+    if (ent != NULL) {
+        entity::CollisionCom* com = reinterpret_cast<entity::CollisionCom*>(ent->GetComponent(entity::CT_COLLISION));
+        if (com != NULL) {
+            result = com->Iterate();
+        }
+    } else {
+        printf("Wrong entity id\n");
+        assert(false);
+    }
+
+    return result;
+}
+
+void EntityCollisionEndIterate(int id) {
+    entity::Entity* ent = entity::EntityMgr::GetEntity(id);
+    if (ent != NULL) {
+        entity::CollisionCom* com = reinterpret_cast<entity::CollisionCom*>(ent->GetComponent(entity::CT_COLLISION));
+        if (com != NULL) {
+            com->EndIterate();
+        }
+    } else {
+        printf("Wrong entity id\n");
+        assert(false);
+    }
 }
 
 //-----------------------------------------------------------------

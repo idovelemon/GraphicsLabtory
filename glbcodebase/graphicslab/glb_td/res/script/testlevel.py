@@ -55,6 +55,8 @@ def main():
     EntityAddArsenalCom(player)
     EntityAddWeapon(player, WT_LASER, "wplaser")
     EntityActiveWeapon(player, WT_LASER)
+    EntityAddCollisionCom(player)
+    EntityUpdateCollision(player)
     DebugPrint("Create Player: OK\n")
 
     # Create crystal
@@ -65,6 +67,8 @@ def main():
     EntityAddScriptCom(crystal, "crystal")
     EntityAddDataCom(crystal)
     EntityAddFloatData(crystal, "delta", 0.0)
+    EntityAddCollisionCom(crystal)
+    EntityUpdateCollision(crystal)
     DebugPrint("Create Crystal: OK\n")
 
     # Create placer entity

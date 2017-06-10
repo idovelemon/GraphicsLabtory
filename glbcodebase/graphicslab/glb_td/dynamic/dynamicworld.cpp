@@ -36,6 +36,7 @@ public:
     int32_t AddDynamicObject(DynamicObject* object);
     void RemoveDynamicObject(int32_t id);
     DynamicObject* GetDynamicObject(int32_t id);
+    void CheckCollision(int32_t id, std::vector<int32_t>& coll_ids);
 
 protected:
     int32_t FindEmptyId();
@@ -95,6 +96,21 @@ DynamicObject* DynamicWorldImp::GetDynamicObject(int32_t id) {
     return object;
 }
 
+void DynamicWorldImp::CheckCollision(int32_t id, std::vector<int32_t>& coll_ids) {
+    coll_ids.clear();
+
+    DynamicObject* a = m_DynamicObjects[id];
+    for (int32_t i = 0; i < kMaxDynamicObject; i++) {
+        DynamicObject* b = m_DynamicObjects[i];
+        if (i != id && b != nullptr) {
+            if (a->IsIntersection(b)) {
+                int32_t entityid = reinterpret_cast<int32_t>(b->GetUserData());
+                coll_ids.push_back(entityid);
+            }
+        }
+    }
+}
+
 int32_t DynamicWorldImp::FindEmptyId() {
     int32_t id = -1;
     for (int32_t i = 0; i < kMaxDynamicObject; i++) {
@@ -134,7 +150,7 @@ int32_t DynamicWorld::AddDynamicObject(DynamicObject* object) {
     int32_t id = -1;
 
     if (s_DynamicWorldImp != nullptr) {
-        s_DynamicWorldImp->AddDynamicObject(object);
+        id = s_DynamicWorldImp->AddDynamicObject(object);
     }
 
     return id;
@@ -154,5 +170,11 @@ DynamicObject* DynamicWorld::GetDynamicObject(int32_t id) {
     }
 
     return object;
+}
+
+void DynamicWorld::CheckCollision(int id, std::vector<int32_t>& coll_ids) {
+    if (s_DynamicWorldImp != nullptr) {
+        s_DynamicWorldImp->CheckCollision(id, coll_ids);
+    }
 }
 };  // namespace dynamic

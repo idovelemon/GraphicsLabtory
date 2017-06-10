@@ -27,6 +27,7 @@ void EntityAddScriptCom(int id, const char* script);
 void EntityAddRoleCom(int id, int mt, int st);
 void EntityAddArsenalCom(int id);
 void EntityAddDataCom(int id);
+void EntityAddCollisionCom(int id);
 float EntityGetPosX(int id);
 float EntityGetPosY(int id);
 float EntityGetPosZ(int id);
@@ -56,6 +57,12 @@ void EntityBeginIterate();
 int EntityIterate();
 void EntityEndIterate();
 int EntityIsMainType(int id, int main_type);
+int EntityIsSubType(int id, int sub_type);
+void EntityUpdateCollision(int id);
+void EntityCheckCollision(int id);
+void EntityCollisionBeginIterate(int id);
+int EntityCollisionIterate(int id);
+void EntityCollisionEndIterate(int id);
 
 // Time
 float TimeGetPrevGameTime();

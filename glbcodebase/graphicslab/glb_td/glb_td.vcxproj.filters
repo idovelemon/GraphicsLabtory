@@ -195,6 +195,9 @@
     <ClCompile Include="dynamic\dynamicobject.cpp">
       <Filter>源文件\dynamic</Filter>
     </ClCompile>
+    <ClCompile Include="entity\collisioncom.cpp">
+      <Filter>源文件\entity</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\glb\comm.h">
@@ -376,6 +379,9 @@
     </ClInclude>
     <ClInclude Include="dynamic\dynamicobject.h">
       <Filter>源文件\dynamic</Filter>
+    </ClInclude>
+    <ClInclude Include="entity\collisioncom.h">
+      <Filter>源文件\entity</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -18,11 +18,23 @@ def create_bomb(id, px, py, pz):
     EntityAddScriptCom(bomb, "btbomb")
     DebugPrint("Throw a bomb!\n")
 
+def collision_response(id):
+    EntityCollisionBeginIterate(id)
+    while True:
+        coll_id = EntityCollisionIterate(id)
+        if coll_id == -1:
+            break
+        if EntityIsMainType(coll_id, RMT_PLAYER):
+            if EntityIsSubType(coll_id, RST_CRYSTAL):
+                DebugPrint("Collision With Crystal\n")
+                break
+    EntityCollisionEndIterate(id)
+
 def main(id):
-    # 普通攻击（自动）
+    # Normal Attack(Auto)
     EntityShoot(id)
 
-    # 移动
+    # Movement
     px = EntityGetPosX(id)
     py = EntityGetPosY(id)
     pz = EntityGetPosZ(id)
@@ -37,6 +49,11 @@ def main(id):
     elif InputHasKeyPressed(BK_RIGHT):
         px = px + speed * time
     EntitySetPos(id, px, py, pz)
+
+    # Collision
+    EntityUpdateCollision(id)
+    EntityCheckCollision(id)
+    collision_response(id)
 
     # Bomb
     delta = EntityGetFloatData(id, "press_delta")

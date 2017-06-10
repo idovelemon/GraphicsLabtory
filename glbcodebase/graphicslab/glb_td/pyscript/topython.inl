@@ -135,6 +135,15 @@ static PyObject* EntityAddDataCom(PyObject* self, PyObject* args) {
 	return Py_BuildValue("");
 }
 
+static PyObject* EntityAddCollisionCom(PyObject* self, PyObject* args) {
+	int id;
+	if (!PyArg_ParseTuple(args, "i", &id)) {
+		 return NULL;
+	}
+	EntityAddCollisionCom(id);
+	return Py_BuildValue("");
+}
+
 static PyObject* EntityGetPosX(PyObject* self, PyObject* args) {
 	int id;
 	float ret;
@@ -430,6 +439,63 @@ static PyObject* EntityIsMainType(PyObject* self, PyObject* args) {
 	return Py_BuildValue("i", ret);
 }
 
+static PyObject* EntityIsSubType(PyObject* self, PyObject* args) {
+	int id;
+	int sub_type;
+	int ret;
+	if (!PyArg_ParseTuple(args, "ii", &id, &sub_type)) {
+		 return NULL;
+	}
+	ret = EntityIsSubType(id, sub_type);
+	return Py_BuildValue("i", ret);
+}
+
+static PyObject* EntityUpdateCollision(PyObject* self, PyObject* args) {
+	int id;
+	if (!PyArg_ParseTuple(args, "i", &id)) {
+		 return NULL;
+	}
+	EntityUpdateCollision(id);
+	return Py_BuildValue("");
+}
+
+static PyObject* EntityCheckCollision(PyObject* self, PyObject* args) {
+	int id;
+	if (!PyArg_ParseTuple(args, "i", &id)) {
+		 return NULL;
+	}
+	EntityCheckCollision(id);
+	return Py_BuildValue("");
+}
+
+static PyObject* EntityCollisionBeginIterate(PyObject* self, PyObject* args) {
+	int id;
+	if (!PyArg_ParseTuple(args, "i", &id)) {
+		 return NULL;
+	}
+	EntityCollisionBeginIterate(id);
+	return Py_BuildValue("");
+}
+
+static PyObject* EntityCollisionIterate(PyObject* self, PyObject* args) {
+	int id;
+	int ret;
+	if (!PyArg_ParseTuple(args, "i", &id)) {
+		 return NULL;
+	}
+	ret = EntityCollisionIterate(id);
+	return Py_BuildValue("i", ret);
+}
+
+static PyObject* EntityCollisionEndIterate(PyObject* self, PyObject* args) {
+	int id;
+	if (!PyArg_ParseTuple(args, "i", &id)) {
+		 return NULL;
+	}
+	EntityCollisionEndIterate(id);
+	return Py_BuildValue("");
+}
+
 static PyObject* TimeGetPrevGameTime(PyObject* self, PyObject* args) {
 	float ret;
 	ret = TimeGetPrevGameTime();
@@ -500,6 +566,7 @@ static PyMethodDef s_HostAPI_MethodDef[] = {
 	{"EntityAddRoleCom", EntityAddRoleCom, METH_VARARGS, NULL},
 	{"EntityAddArsenalCom", EntityAddArsenalCom, METH_VARARGS, NULL},
 	{"EntityAddDataCom", EntityAddDataCom, METH_VARARGS, NULL},
+	{"EntityAddCollisionCom", EntityAddCollisionCom, METH_VARARGS, NULL},
 	{"EntityGetPosX", EntityGetPosX, METH_VARARGS, NULL},
 	{"EntityGetPosY", EntityGetPosY, METH_VARARGS, NULL},
 	{"EntityGetPosZ", EntityGetPosZ, METH_VARARGS, NULL},
@@ -529,6 +596,12 @@ static PyMethodDef s_HostAPI_MethodDef[] = {
 	{"EntityIterate", EntityIterate, METH_VARARGS, NULL},
 	{"EntityEndIterate", EntityEndIterate, METH_VARARGS, NULL},
 	{"EntityIsMainType", EntityIsMainType, METH_VARARGS, NULL},
+	{"EntityIsSubType", EntityIsSubType, METH_VARARGS, NULL},
+	{"EntityUpdateCollision", EntityUpdateCollision, METH_VARARGS, NULL},
+	{"EntityCheckCollision", EntityCheckCollision, METH_VARARGS, NULL},
+	{"EntityCollisionBeginIterate", EntityCollisionBeginIterate, METH_VARARGS, NULL},
+	{"EntityCollisionIterate", EntityCollisionIterate, METH_VARARGS, NULL},
+	{"EntityCollisionEndIterate", EntityCollisionEndIterate, METH_VARARGS, NULL},
 	{"TimeGetPrevGameTime", TimeGetPrevGameTime, METH_VARARGS, NULL},
 	{"TimeGetCurGameTime", TimeGetCurGameTime, METH_VARARGS, NULL},
 	{"TimeGetGameFrameSpeed", TimeGetGameFrameSpeed, METH_VARARGS, NULL},

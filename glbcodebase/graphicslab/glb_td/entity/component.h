@@ -29,6 +29,7 @@ enum ComponentType {
     CT_SCRIPT,
     CT_ARSENAL,
     CT_DATA,
+    CT_COLLISION,
     CT_MAX,
 };
 

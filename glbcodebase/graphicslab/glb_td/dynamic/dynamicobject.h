@@ -24,7 +24,8 @@ enum DynamicObjectType {
 class DynamicObject {
 public:
     DynamicObject(DynamicObjectType type)
-    : m_Type(type) {
+    : m_Type(type)
+    , m_UserData(nullptr) {
     }
     virtual ~DynamicObject() {
     }
@@ -32,19 +33,23 @@ public:
 public:
     virtual DynamicObjectType GetType() const { return m_Type; }
     virtual bool IsIntersection(DynamicObject* object) = 0;
+    virtual void SetUserData(void* data) { m_UserData = data; }
+    virtual void* GetUserData() { return m_UserData; }
 
 protected:
     DynamicObjectType   m_Type;
+    void*               m_UserData;
 };
 
 //---------------------------------------------------------
-class DTAabb {
+class DTAabb : public DynamicObject {
 public:
     DTAabb(glb::math::Vector max, glb::math::Vector min, glb::math::Vector pos);
     virtual ~DTAabb();
 
 public:
     virtual bool IsIntersection(DynamicObject* object);
+    virtual void Update(glb::math::Vector max, glb::math::Vector min, glb::math::Vector center);
 
 protected:
     bool IsIntersectionWithAABB(DTAabb* aabb);
