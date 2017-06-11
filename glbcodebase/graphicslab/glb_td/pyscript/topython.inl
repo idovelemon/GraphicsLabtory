@@ -525,6 +525,17 @@ static PyObject* EntityGetCollisionLength(PyObject* self, PyObject* args) {
 	return Py_BuildValue("f", ret);
 }
 
+static PyObject* EntityFindEntity(PyObject* self, PyObject* args) {
+	int main;
+	int sub;
+	int ret;
+	if (!PyArg_ParseTuple(args, "ii", &main, &sub)) {
+		 return NULL;
+	}
+	ret = EntityFindEntity(main, sub);
+	return Py_BuildValue("i", ret);
+}
+
 static PyObject* TimeGetPrevGameTime(PyObject* self, PyObject* args) {
 	float ret;
 	ret = TimeGetPrevGameTime();
@@ -633,6 +644,7 @@ static PyMethodDef s_HostAPI_MethodDef[] = {
 	{"EntityCollisionEndIterate", EntityCollisionEndIterate, METH_VARARGS, NULL},
 	{"EntityGetCollisionWidth", EntityGetCollisionWidth, METH_VARARGS, NULL},
 	{"EntityGetCollisionLength", EntityGetCollisionLength, METH_VARARGS, NULL},
+	{"EntityFindEntity", EntityFindEntity, METH_VARARGS, NULL},
 	{"TimeGetPrevGameTime", TimeGetPrevGameTime, METH_VARARGS, NULL},
 	{"TimeGetCurGameTime", TimeGetCurGameTime, METH_VARARGS, NULL},
 	{"TimeGetGameFrameSpeed", TimeGetGameFrameSpeed, METH_VARARGS, NULL},

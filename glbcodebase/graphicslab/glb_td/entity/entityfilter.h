@@ -18,6 +18,7 @@ class Entity;
 //--------------------------------------------------------------
 // Function Declaration
 std::vector<Entity*> ClosestEnemyFilter(Entity** entity, int num, std::vector<void*>& args);
+std::vector<Entity*> MatchTypeEntityFilter(Entity** entity, int num, std::vector<void*>& args);
 
 };  // namespace entity
 

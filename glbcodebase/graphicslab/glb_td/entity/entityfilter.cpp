@@ -48,4 +48,23 @@ std::vector<Entity*> ClosestEnemyFilter(Entity** entity, int32_t num, std::vecto
     return result;
 }
 
+std::vector<Entity*> MatchTypeEntityFilter(Entity** entity, int32_t num, std::vector<void*>& args) {
+    std::vector<Entity*> result;
+
+    int main_type = reinterpret_cast<int>(args[0]);
+    int sub_type = reinterpret_cast<int>(args[1]);
+
+    for (int32_t i = 0; i < num; i++) {
+        if (entity[i] != NULL) {
+            RoleCom* role_com = reinterpret_cast<RoleCom*>(entity[i]->GetComponent(CT_ROLETYPE));
+            if (role_com == NULL) continue;
+            if (role_com->GetMainType() == main_type && role_com->GetSubType() == sub_type) {
+                result.push_back(entity[i]);
+            }
+        }
+    }
+
+    return result;
+}
+
 };  // namespace entity

@@ -770,6 +770,20 @@ float EntityGetCollisionLength(int id) {
     return result;
 }
 
+int EntityFindEntity(int main, int sub) {
+    int result = -1;
+
+    std::vector<void*> args;
+    args.push_back(reinterpret_cast<void*>(main));
+    args.push_back(reinterpret_cast<void*>(sub));
+    std::vector<entity::Entity*> entities = entity::EntityMgr::FindEntities(entity::MatchTypeEntityFilter, args);
+    if (entities.size() > 0) {
+        result = entities[0]->GetID();
+    }
+
+    return result;
+}
+
 //-----------------------------------------------------------------
 // Time
 float TimeGetPrevGameTime() {

@@ -68,6 +68,7 @@ int EntityCollisionIterate(int id);
 void EntityCollisionEndIterate(int id);
 float EntityGetCollisionWidth(int id);
 float EntityGetCollisionLength(int id);
+int EntityFindEntity(int main, int sub);
 
 // Time
 float TimeGetPrevGameTime();

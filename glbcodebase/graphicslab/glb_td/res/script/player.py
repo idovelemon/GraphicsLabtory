@@ -56,8 +56,9 @@ def collision_response(id):
     EntityCollisionEndIterate(id)
 
 def main(id):
-    # Normal Attack(Auto)
-    EntityShoot(id)
+    # Normal Attack
+    if InputHasKeyPressed(BK_Z):
+        EntityShoot(id)
 
     # Movement
     px = EntityGetPosX(id)

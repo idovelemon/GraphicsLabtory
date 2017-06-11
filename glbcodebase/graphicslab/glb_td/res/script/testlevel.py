@@ -18,12 +18,6 @@ def main():
     EntityAddCameraCom(cam, 0.0, 11.0, 0.1, 0.0, 0.0, 0.0)
     DebugPrint("Create Camera Entity: OK\n")
 
-    # Create ground entity
-    # ground = EntityCreate()
-    # EntityAddTransformCom(ground, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0)
-    # EntityAddRenderCom(ground, "res\model\TD_L1\Ground\TD_L1_Ground.obj")
-    # DebugPrint("Create Ground Entity: OK\n")
-
     # Create ground block entity
     # TEST: This is only for test, in the final game, you can not use too many entities just for ground
     sx = -1.0 * GAME_WORLD_WIDTH / 2 + 0.5
@@ -52,6 +46,7 @@ def main():
     EntityAddFloatData(player, "speed", MAIN_TOWER_MOVE_SPEED)
     EntityAddFloatData(player, "press_delta", MAIN_TOWER_PRESS_DELTA)
     EntityAddFloatData(player, "cur_press_delta", 0.0)
+    EntityAddFloatData(player, "hp", MAIN_TOWER_HP)
     EntityAddArsenalCom(player)
     EntityAddWeapon(player, WT_LASER, "wplaser")
     EntityActiveWeapon(player, WT_LASER)
@@ -69,18 +64,6 @@ def main():
     EntityAddFloatData(crystal, "delta", 0.0)
     EntityAddCollisionCom(crystal)
     EntityUpdateCollision(crystal)
-    DebugPrint("Create Crystal: OK\n")
-
-    # Create placer entity
-    # placer = EntityCreate()
-    # EntityAddScriptCom(placer, "placer")
-    # EntityAddRoleCom(placer, RMT_OPERATOR, RST_PLACER)
-    # EntityAddTransformCom(placer, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0)
-    # EntityAddRenderCom(placer, "res\model\TD_Placer.obj")
-    # EntityAddDataCom(placer)
-    # EntityAddIntData(placer, "maintower", main_tower)
-    # EntityAddIntData(placer, "enable", 0)
-    # EntityAddRefCount(main_tower)
-    # # EntitySetDrawEnable(placer, 0)    
+    DebugPrint("Create Crystal: OK\n") 
 
     DebugPrint("-----------------testlevel End-----------------\n")

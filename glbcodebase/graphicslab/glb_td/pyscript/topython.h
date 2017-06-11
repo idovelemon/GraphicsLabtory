@@ -54,6 +54,7 @@ static struct{
 
     // Button Key
     {"BK_1", 0x02},
+    {"BK_Z", 0x2C},
     {"BK_UP", 0xC8},
     {"BK_LEFT", 0xCB},
     {"BK_RIGHT", 0xCD},

@@ -44,12 +44,19 @@ def createE01():
     enemy = EntityCreate()
     EntityAddTransformCom(enemy, sx, sy, sz, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0)
     EntityAddRenderCom(enemy, "res\model\Enemy\TD_EnemyTest.obj", sx, sy, sz, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0)
-    EntityAddScriptCom(enemy, "testenemy")
+    EntityAddScriptCom(enemy, "e01")
     EntityAddRoleCom(enemy, RMT_ENEMY, RST_E01)
     EntityAddDataCom(enemy)
     EntityAddFloatData(enemy, "hp", E01_HP)
     EntityAddIntData(enemy, "coin", E01_COIN)
     EntityAddFloatData(enemy, "speed", E01_SPEED)
+    player = EntityFindEntity(RMT_PLAYER, RST_MAINTOWER)
+    EntityAddIntData(enemy, "target", player)
+    EntityAddIntData(enemy, "state", 0)
+    EntityAddFloatData(enemy, "prepare_attack_time", 0.0)
+    EntityAddFloatData(enemy, "attack_time", 0.0)
+    EntityAddFloatData(enemy, "finish_attack_time", 0.0)
+    EntityAddIntData(enemy, "has_attack", 0)
 
 def createE02():
     is_lr = True
@@ -80,12 +87,14 @@ def createE02():
     enemy = EntityCreate()
     EntityAddTransformCom(enemy, sx, sy, sz, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0)
     EntityAddRenderCom(enemy, "res\model\Enemy\TD_E02.obj", sx, sy, sz, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0)
-    EntityAddScriptCom(enemy, "testenemy")
+    EntityAddScriptCom(enemy, "e02")
     EntityAddRoleCom(enemy, RMT_ENEMY, RST_E02)
     EntityAddDataCom(enemy)
     EntityAddFloatData(enemy, "hp", E02_HP)
     EntityAddIntData(enemy, "coin", E02_COIN)
     EntityAddFloatData(enemy, "speed", E02_SPEED)
+    player = EntityFindEntity(RMT_PLAYER, RST_MAINTOWER)
+    EntityAddIntData(enemy, "target", player)    
 
 def main():
     pre = TimeGetPrevGameTime()
