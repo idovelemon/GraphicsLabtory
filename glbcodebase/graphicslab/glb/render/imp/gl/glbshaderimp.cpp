@@ -46,7 +46,7 @@ namespace shader {
 char* glbLoadShaderBufferFromFile(const char* file_name) {
     char* shader_str = NULL;
     if (file_name != NULL) {
-        // @TD:Must use rb mode to read shader string, otherwise it will encounter some weird compile error.
+        // @TODO:Must use rb mode to read shader string, otherwise it will encounter some weird compile error.
         // Don't know why now.
         FILE* shader_file = fopen(file_name, "rb");
 
@@ -54,12 +54,13 @@ char* glbLoadShaderBufferFromFile(const char* file_name) {
             fseek(shader_file, 0, SEEK_END);
             int32_t size = ftell(shader_file);
 
-            shader_str = new char[size];
+            shader_str = new char[size + 1];
             if (shader_str != NULL) {
                 memset(shader_str, 0, size);
 
                 fseek(shader_file, 0, SEEK_SET);
                 fread(shader_str, sizeof(char), size, shader_file);
+                shader_str[size] = '\0';  // @Warning:Must have a null-terminator
             } else {
                 GLB_SAFE_ASSERT(false);
             }
@@ -179,7 +180,8 @@ VertexShader::Imp* VertexShader::Imp::Create(std::vector<std::string> enable_mac
             shader_buf[enable_macros.size()][lens_array[enable_macros.size()] - 1] = '\0';
 
             // Pass shader string
-            glShaderSource(vertex_shader, enable_macros.size() + 1, const_cast<const GLchar**>(shader_buf), lens_array);
+            // @Warning: Should use glShaderSource(xxx, xxx, xxx, NULLL). It means string will be null-terminator.
+            glShaderSource(vertex_shader, enable_macros.size() + 1, const_cast<const GLchar**>(shader_buf), NULL);
             glCompileShader(vertex_shader);
 
             GLint success = 0;
@@ -367,7 +369,8 @@ FragmentShader::Imp* FragmentShader::Imp::Create(std::vector<std::string> enable
             shader_buf[enable_macros.size()][lens_array[enable_macros.size()] - 1] = '\0';
 
             // Pass shader string
-            glShaderSource(fragment_shader, enable_macros.size() + 1, const_cast<const GLchar**>(shader_buf), lens_array);
+            // @Warning: Should use glShaderSource(xxx, xxx, xxx, NULLL). It means string will be null-terminator.
+            glShaderSource(fragment_shader, enable_macros.size() + 1, const_cast<const GLchar**>(shader_buf), NULL);
             glCompileShader(fragment_shader);
 
             GLint success = 0;
@@ -512,6 +515,7 @@ Program::Imp* Program::Imp::Create(const char* vertex_shader_file, const char* f
                 GLchar info_log[256];
                 glGetProgramInfoLog(program, sizeof(info_log), NULL, info_log);
                 util::log::LogPrint("%s", info_log);
+                GLB_SAFE_ASSERT(false);
             } else {
                 // Save all the valid objects
                 shader_program = new Program::Imp();

@@ -537,7 +537,7 @@ void RenderImp::Draw() {
     AfterDraw();
 
 #ifdef GLB_PLATFORM_OPENGL
-    GLB_CHECK_GL_ERROR;
+    //GLB_CHECK_GL_ERROR;
 #endif
 }
 
@@ -1728,8 +1728,6 @@ void RenderImp::DrawLightLoopCore() {
         render::Device::SetTexture(render::TS_SHADOW3, texture::Mgr::GetTextureById(m_ShadowMap[3]), tex_unit++);
         render::Device::SetTexture(render::TS_AO_MAP, texture::Mgr::GetTextureById(m_AOMap), tex_unit++);
 
-        GLB_CHECK_GL_ERROR;
-
         // Scene uniforms
         for (int32_t j = 0; j < static_cast<int32_t>(uniforms.size()); j++) {
             uniform::UniformEntry entry = uniforms[j];
@@ -1739,8 +1737,6 @@ void RenderImp::DrawLightLoopCore() {
                 SetUniform(entry.location, uniform_wrapper);
             }
         }
-
-        GLB_CHECK_GL_ERROR;
 
         // Objects
         for (int32_t j = 0; j < static_cast<int32_t>(objs.size()); j++) {
@@ -1765,8 +1761,6 @@ void RenderImp::DrawLightLoopCore() {
                 render::Device::SetTexture(render::TS_REFLECT, texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(scene::Model::MT_REFLECT)), tex_unit++);
             }
 
-            GLB_CHECK_GL_ERROR;
-
             // Object Uniform
             for (int32_t k = 0; k < static_cast<int32_t>(uniforms.size()); k++) {
                 uniform::UniformEntry entry = uniforms[k];
@@ -1776,8 +1770,6 @@ void RenderImp::DrawLightLoopCore() {
                     SetUniform(entry.location, uniform_wrapper);
                 }
             }
-
-            GLB_CHECK_GL_ERROR;
 
             // Vertex Buffer
             int32_t mesh_id = obj->GetModel()->GetMeshId();
@@ -1809,8 +1801,6 @@ void RenderImp::DrawLightLoopCore() {
 
             // Draw
             render::Device::Draw(render::PT_TRIANGLES, 0, num);
-
-            GLB_CHECK_GL_ERROR;
         }
     }
 

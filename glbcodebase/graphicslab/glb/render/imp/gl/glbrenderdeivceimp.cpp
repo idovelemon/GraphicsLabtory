@@ -522,8 +522,6 @@ void DeviceImp::SetupVertexLayout() {
                 if (location != -1) {
                     glEnableVertexAttribArray(location);
                     glVertexAttribPointer(location, 3, GL_FLOAT, GL_FALSE, 0, reinterpret_cast<GLvoid*>(m_VertexLayout.layouts[i].offset));
-                } else {
-                    GLB_SAFE_ASSERT(false);
                 }
             }
             break;

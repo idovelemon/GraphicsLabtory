@@ -15,10 +15,15 @@ uniform sampler2D glb_AOMap;
 uniform float glb_ScreenWidth;
 uniform float glb_FarClip;
 
-const float kGaussNum[2] = {
+// const float kGaussNum[2] = {
+// 0.36166444368093026,
+// 0.3191677781595349,
+// };
+float kGaussNum[2] = float[]
+(
 0.36166444368093026,
-0.3191677781595349,
-};
+0.3191677781595349
+);
 
 void main() {
     float cur_pixel_depth = texture2D(glb_DepthMap, vs_texcoord).r * glb_FarClip;

@@ -19,16 +19,17 @@ uniform float glb_FarClip;
 // Output
 out vec3 oColor;
 
-const vec3 kCubeCorner[8] = {
-    vec3(1.0, 1.0, 1.0),
-    vec3(1.0, 1.0, -1.0),
-    vec3(1.0, -1.0, -1.0),
-    vec3(1.0, -1.0, 1.0),
-    vec3(-1.0, 1.0, 1.0),
-    vec3(-1.0, 1.0, -1.0),
-    vec3(-1.0, -1.0, 1.0),
-    vec3(-1.0, -1.0, -1.0),
-};
+// const vec3 kCubeCorner[8] = vec3[]
+// (
+//     vec3(1.0, 1.0, 1.0),
+//     vec3(1.0, 1.0, -1.0),
+//     vec3(1.0, -1.0, -1.0),
+//     vec3(1.0, -1.0, 1.0),
+//     vec3(-1.0, 1.0, 1.0),
+//     vec3(-1.0, 1.0, -1.0),
+//     vec3(-1.0, -1.0, 1.0),
+//     vec3(-1.0, -1.0, -1.0)
+// );
 
 void main() {
     // Calculate rotate matrix
@@ -61,11 +62,23 @@ void main() {
     float offset = 0.01f;
     const float offset_scale = 1.0 + 2.4 / 16;
     float accessibility = 0.0;
+
+    vec3 kCubeCorner[8] = vec3[]
+    (
+        vec3(1.0, 1.0, 1.0),
+        vec3(1.0, 1.0, -1.0),
+        vec3(1.0, -1.0, -1.0),
+        vec3(1.0, -1.0, 1.0),
+        vec3(-1.0, 1.0, 1.0),
+        vec3(-1.0, 1.0, -1.0),
+        vec3(-1.0, -1.0, 1.0),
+        vec3(-1.0, -1.0, -1.0)
+    );
     
     for (int i = 0; i < 2; i++) {
         for (int j = 0; j < 8; j++) {
-            vec3 sampler_v = kCubeCorner[j];
-            sampler_v = (rot_zxy * vec4(sampler_v, 0.0)).xyz;
+            //vec3 sampler_v = kCubeCorner[j];
+            vec3 sampler_v = (rot_zxy * vec4(kCubeCorner[j], 0.0)).xyz;
             sampler_v = normalize(sampler_v);
             sampler_v *= offset;
             offset *= offset_scale;

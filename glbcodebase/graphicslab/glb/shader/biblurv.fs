@@ -13,10 +13,15 @@ out vec3 color;
 uniform sampler2D glb_BiBlurMap;
 uniform float glb_ScreenHeight;
 
-const float kGaussNum[2] = {
+// const float kGaussNum[2] = {
+// 0.36166444368093026,
+// 0.3191677781595349,
+// };
+float kGaussNum[2] = float[]
+(
 0.36166444368093026,
-0.3191677781595349,
-};
+0.3191677781595349
+);
 
 void main() {
     color = texture2D(glb_BiBlurMap, vs_texcoord).xyz * kGaussNum[0];
