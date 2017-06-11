@@ -43,7 +43,7 @@ public:
     void Destroy();
 
 private:
-    void PrintError();
+    void PrintError(const char* script_file_name);
 
 private:
     std::map<std::string, PyObject*> m_ScriptDatabase;
@@ -126,7 +126,7 @@ void PyScriptMgrImp::LoadScript(const char* script_file_name) {
             name = NULL;
         } while (false);
         if (has_error) {
-            PrintError();
+            PrintError(script_file_name);
             assert(false && "Something wrong");
         }
     } else {
@@ -141,7 +141,7 @@ void PyScriptMgrImp::RunScript(const char* script_file_name) {
             PyObject* func = it->second;
             PyObject* ret = PyObject_CallObject(func, NULL);
             if (ret == NULL) {
-                PrintError();
+                PrintError(script_file_name);
                 assert(false && "Failed to call python function");
             } else {
                 Py_DECREF(ret);
@@ -163,7 +163,7 @@ void PyScriptMgrImp::RunScript(const char* script_file_name, int arg) {
             PyObject* args = Py_BuildValue("(i)", arg);  // If tuple only has one argument, you must use ()
             PyObject* ret = PyObject_CallObject(func, args);
             if (ret == NULL) {
-                PrintError();
+                PrintError(script_file_name);
                 assert(false && "Failed to call python function");
             } else {
                 Py_DECREF(ret);
@@ -182,7 +182,7 @@ void PyScriptMgrImp::Destroy() {
     Py_Finalize();
 }
 
-void PyScriptMgrImp::PrintError() {
+void PyScriptMgrImp::PrintError(const char* script_file_name) {
     PyObject* type = NULL, *value = NULL, *traceback = NULL;
     PyErr_Fetch(&type, &value, &traceback);
 
@@ -191,6 +191,9 @@ void PyScriptMgrImp::PrintError() {
     }
 
     // Print Error Type
+    printf("[Script:");
+    printf(script_file_name);
+    printf(".py]: ");
     printf(PyExceptionClass_Name(type));
 
     // Print Error Message

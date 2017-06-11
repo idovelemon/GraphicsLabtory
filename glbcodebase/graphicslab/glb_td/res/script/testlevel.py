@@ -36,15 +36,15 @@ def main():
             block = EntityCreate()
             EntityAddTransformCom(block, sx + j * 1.0, sy, sz - i * 1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0)
             if ((i + j) % 2) == 0:
-                EntityAddRenderCom(block, white_block)
+                EntityAddRenderCom(block, white_block, sx + j * 1.0, sy, sz - i * 1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0)
             else:
-                EntityAddRenderCom(block, gray_block)
+                EntityAddRenderCom(block, gray_block, sx + j * 1.0, sy, sz - i * 1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0)
     DebugPrint("Create Ground Blocks Entity: OK\n")
 
     # Create player
     player = EntityCreate()
     EntityAddTransformCom(player, 2.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0)
-    EntityAddRenderCom(player, "res\model\Player\TD_Player.obj")
+    EntityAddRenderCom(player, "res\model\Player\TD_Player.obj", 2.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0)
     EntityAddRoleCom(player, RMT_PLAYER, RST_MAINTOWER)
     EntityAddScriptCom(player, "player")
     EntityAddDataCom(player)
@@ -63,7 +63,7 @@ def main():
     crystal = EntityCreate()
     EntityAddTransformCom(crystal, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0)
     EntityAddRoleCom(crystal, RMT_PLAYER, RST_CRYSTAL)
-    EntityAddRenderCom(crystal, "res\model\Crystal\TD_Crystal.obj")
+    EntityAddRenderCom(crystal, "res\model\Crystal\TD_Crystal.obj", 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0)
     EntityAddScriptCom(crystal, "crystal")
     EntityAddDataCom(crystal)
     EntityAddFloatData(crystal, "delta", 0.0)

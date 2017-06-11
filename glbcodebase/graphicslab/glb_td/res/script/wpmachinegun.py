@@ -23,7 +23,7 @@ def main(id):
             btposz = EntityGetPosZ(id)
             EntityAddTransformCom(btmachinegun, btposx, btposy, btposz, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0)
             EntityAddRoleCom(btmachinegun, RMT_PLAYER, RST_BULLET_MACHINEGUN)
-            EntityAddRenderCom(btmachinegun, "res\model\Bullet\TD_Bullet_MachineGun.obj")
+            EntityAddRenderCom(btmachinegun, "res\model\Bullet\TD_Bullet_MachineGun.obj", btposx, btposy, btposz, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0)
             EntityAddScriptCom(btmachinegun, "btmachinegun")
             EntityAddDataCom(btmachinegun)
             EntityAddIntData(btmachinegun, "attacker", id)

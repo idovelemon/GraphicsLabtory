@@ -24,7 +24,7 @@ def main(id):
             py = EntityGetPosY(id)
             pz = EntityGetPosZ(id)
             EntityAddTransformCom(btlaser, px, py, pz, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0)
-            EntityAddRenderCom(btlaser, "res\model\Bullet\TD_Bullet_Laser.obj")
+            EntityAddRenderCom(btlaser, "res\model\Bullet\TD_Bullet_Laser.obj", px, py, pz, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0)
             EntityAddRoleCom(btlaser, RMT_PLAYER, RST_BULLET_LASER)
             EntityAddScriptCom(btlaser, "btlaser")
             EntityAddDataCom(btlaser)

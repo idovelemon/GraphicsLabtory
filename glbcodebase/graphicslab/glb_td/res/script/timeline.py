@@ -43,7 +43,7 @@ def createE01():
 
     enemy = EntityCreate()
     EntityAddTransformCom(enemy, sx, sy, sz, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0)
-    EntityAddRenderCom(enemy, "res\model\Enemy\TD_EnemyTest.obj")
+    EntityAddRenderCom(enemy, "res\model\Enemy\TD_EnemyTest.obj", sx, sy, sz, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0)
     EntityAddScriptCom(enemy, "testenemy")
     EntityAddRoleCom(enemy, RMT_ENEMY, RST_E01)
     EntityAddDataCom(enemy)
@@ -79,7 +79,7 @@ def createE02():
 
     enemy = EntityCreate()
     EntityAddTransformCom(enemy, sx, sy, sz, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0)
-    EntityAddRenderCom(enemy, "res\model\Enemy\TD_E02.obj")
+    EntityAddRenderCom(enemy, "res\model\Enemy\TD_E02.obj", sx, sy, sz, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0)
     EntityAddScriptCom(enemy, "testenemy")
     EntityAddRoleCom(enemy, RMT_ENEMY, RST_E02)
     EntityAddDataCom(enemy)

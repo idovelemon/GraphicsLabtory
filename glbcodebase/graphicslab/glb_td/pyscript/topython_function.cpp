@@ -105,10 +105,13 @@ void EntityAddTransformCom(int id,
     }
 }
 
-void EntityAddRenderCom(int id, const char* name) {
+void EntityAddRenderCom(int id, const char* name,
+                        float px, float py, float pz,
+                        float rx, float ry, float rz,
+                        float sx, float sy, float sz) {
     entity::Entity* ent = entity::EntityMgr::GetEntity(id);
     if (ent != NULL) {
-        entity::RenderCom* com = new entity::RenderCom(ent, name);
+        entity::RenderCom* com = new entity::RenderCom(ent, name, glb::math::Vector(px, py, pz), glb::math::Vector(rx, ry, rz), glb::math::Vector(sx, sy, sz));
         com->SetDepthTestEnable(true);
         ent->AddComponent(com);
     } else {
@@ -729,6 +732,42 @@ void EntityCollisionEndIterate(int id) {
         printf("Wrong entity id\n");
         assert(false);
     }
+}
+
+float EntityGetCollisionWidth(int id) {
+    float result = 0.0f;
+
+    entity::Entity* ent = entity::EntityMgr::GetEntity(id);
+    if (ent != NULL) {
+        entity::CollisionCom* com = reinterpret_cast<entity::CollisionCom*>(ent->GetComponent(entity::CT_COLLISION));
+        if (com != NULL) {
+            com->EndIterate();
+            result = com->GetWidth();
+        }
+    } else {
+        printf("Wrong entity id\n");
+        assert(false);
+    }
+
+    return result;
+}
+
+float EntityGetCollisionLength(int id) {
+    float result = 0.0f;
+
+    entity::Entity* ent = entity::EntityMgr::GetEntity(id);
+    if (ent != NULL) {
+        entity::CollisionCom* com = reinterpret_cast<entity::CollisionCom*>(ent->GetComponent(entity::CT_COLLISION));
+        if (com != NULL) {
+            com->EndIterate();
+            result = com->GetLength();
+        }
+    } else {
+        printf("Wrong entity id\n");
+        assert(false);
+    }
+
+    return result;
 }
 
 //-----------------------------------------------------------------

@@ -13,10 +13,17 @@
 
 namespace entity {
 
-RenderCom::RenderCom(Entity* owner, const char* name)
+RenderCom::RenderCom(Entity* owner, const char* name, glb::math::Vector pos, glb::math::Vector rot, glb::math::Vector scale)
 : Component(CT_RENDER, owner)
 , m_SceneObjID(-1) {
     m_SceneObjID = glb::scene::Scene::AddObject(name);
+    //glb::scene::Object* obj = glb::scene::Scene::GetObjectById(m_SceneObjID);
+    //if (obj != NULL) {
+    //    obj->SetPos(pos);
+    //    obj->SetRotation(rot);
+    //    obj->SetScale(scale);
+    //    obj->Update();
+    //}
 }
 
 RenderCom::~RenderCom() {

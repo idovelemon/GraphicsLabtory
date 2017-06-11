@@ -8,15 +8,40 @@ Brief: Test level player AI
 """
 
 from config import *
+from common import *
 from host_api import *
 
 def create_bomb(id, px, py, pz):
     bomb = EntityCreate()
     EntityAddTransformCom(bomb, px, py, pz, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0)
     EntityAddRoleCom(bomb, RMT_PLAYER, RST_BULLET_BOMB)
-    EntityAddRenderCom(bomb, "res\model\Bullet\TD_Bullet_Bomb.obj")
+    EntityAddRenderCom(bomb, "res\model\Bullet\TD_Bullet_Bomb.obj", px, py, pz, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0)
     EntityAddScriptCom(bomb, "btbomb")
     DebugPrint("Throw a bomb!\n")
+
+def col_with_crystal(id, crystal):
+    px = EntityGetPosX(id)
+    py = EntityGetPosY(id)
+    pz = EntityGetPosZ(id)
+    pw = EntityGetCollisionWidth(id)
+    pl = EntityGetCollisionLength(id)
+    cx = EntityGetPosX(crystal)
+    cy = EntityGetPosY(crystal)
+    cz = EntityGetPosZ(crystal)
+    cw = EntityGetCollisionWidth(crystal)
+    cl = EntityGetCollisionLength(crystal)
+    direction = query_collision_direction(cx, cz, px, pz, pw, pl)
+    if direction is COLLISION_DIRECTION_LEFT:
+        px = cx - cw / 2.0 - pw / 2.0 - COLLISION_RESPONSE_EP
+    elif direction is COLLISION_DIRECTION_RIGHT:
+        px = cx + cw / 2.0 + pw / 2.0 + COLLISION_RESPONSE_EP
+    elif direction is COLLISION_DIRECTION_UP:
+        pz = cz - cl / 2.0 - pl / 2.0 - COLLISION_RESPONSE_EP
+    elif direction is COLLISION_DIRECTION_DOWN:
+        pz = cz + cl / 2.0 + pl / 2.0 + COLLISION_RESPONSE_EP
+    EntitySetPos(id, px, py, pz)
+    EntityUpdateCollision(id)
+    DebugPrint("coll craystal\n")
 
 def collision_response(id):
     EntityCollisionBeginIterate(id)
@@ -26,7 +51,7 @@ def collision_response(id):
             break
         if EntityIsMainType(coll_id, RMT_PLAYER):
             if EntityIsSubType(coll_id, RST_CRYSTAL):
-                DebugPrint("Collision With Crystal\n")
+                col_with_crystal(id, coll_id)
                 break
     EntityCollisionEndIterate(id)
 

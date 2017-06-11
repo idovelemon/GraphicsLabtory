@@ -25,6 +25,7 @@ class Vector {
     inline Vector operator+(const Vector& v);
     inline Vector operator-(const Vector& v);
     inline Vector operator*(float v);
+    inline Vector operator*(const Vector& v);
     inline const Vector& operator+=(const Vector& v);
     inline const Vector& operator/=(float v);
     inline const Vector& operator*=(float v);

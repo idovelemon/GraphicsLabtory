@@ -10,6 +10,7 @@
 
 #include "entity.h"
 #include "rendercom.h"
+#include "transformcom.h"
 #include "../dynamic/dynamicobject.h"
 #include "../dynamic/dynamicworld.h"
 
@@ -18,10 +19,20 @@ namespace entity {
 CollisionCom::CollisionCom(Entity* owner)
 : Component(CT_COLLISION, owner)
 , m_DynamicObjectID(-1)
-, m_Iterate(-1) {
+, m_Iterate(-1)
+, m_OriMax(0.0f, 0.0f, 0.0f)
+, m_OriMin(0.0f, 0.0f, 0.0f) {
     dynamic::DTAabb* object = new dynamic::DTAabb(glb::math::Vector(0.0f, 0.0f, 0.0f), glb::math::Vector(0.0f, 0.0f, 0.0f), glb::math::Vector(0.0f, 0.0f, 0.0f));
     m_DynamicObjectID = dynamic::DynamicWorld::AddDynamicObject(object);
     object->SetUserData(reinterpret_cast<void*>(m_Entity->GetID()));
+
+    RenderCom* com = reinterpret_cast<RenderCom*>(m_Entity->GetComponent(CT_RENDER));
+    if (com != NULL) {
+        m_OriMax = com->GetBoundBoxMax();
+        m_OriMin = com->GetBoundBoxMin();
+    } else {
+        assert(false && "Must have render component");
+    }
 }
 
 CollisionCom::~CollisionCom() {
@@ -30,11 +41,14 @@ CollisionCom::~CollisionCom() {
 }
 
 void CollisionCom::Update() {
-    RenderCom* com = reinterpret_cast<RenderCom*>(m_Entity->GetComponent(CT_RENDER));
+    TransformCom* com = reinterpret_cast<TransformCom*>(m_Entity->GetComponent(CT_TRANSFORM));
     if (com != NULL) {
-        glb::math::Vector max = com->GetBoundBoxMax();
-        glb::math::Vector min = com->GetBoundBoxMin();
-        glb::math::Vector center = (max + min) * 0.5f;
+        glb::math::Vector cur_pos = com->GetPos();
+        glb::math::Vector cur_scale = com->GetScale();
+        glb::math::Vector center = (m_OriMax + m_OriMin) * 0.5f;
+        center = center + cur_pos;
+        glb::math::Vector max = m_OriMax * cur_scale + cur_pos;
+        glb::math::Vector min = m_OriMin * cur_scale + cur_pos;
         dynamic::DTAabb* aabb = reinterpret_cast<dynamic::DTAabb*>(dynamic::DynamicWorld::GetDynamicObject(m_DynamicObjectID));
         if (aabb != NULL) {
             aabb->Update(max - center, min - center, center);
@@ -64,6 +78,28 @@ int CollisionCom::Iterate() {
 
 void CollisionCom::EndIterate() {
     m_Iterate = 0;
+}
+
+float CollisionCom::GetWidth() {
+    float result = 0.0f;
+
+    dynamic::DynamicObject* object = dynamic::DynamicWorld::GetDynamicObject(m_DynamicObjectID);
+    if (object != NULL) {
+        result = object->GetWidth();
+    }
+
+    return result;
+}
+
+float CollisionCom::GetLength() {
+    float result = 0.0f;
+
+    dynamic::DynamicObject* object = dynamic::DynamicWorld::GetDynamicObject(m_DynamicObjectID);
+    if (object != NULL) {
+        result = object->GetLength();
+    }
+
+    return result;
 }
 
 };  // namespace entity

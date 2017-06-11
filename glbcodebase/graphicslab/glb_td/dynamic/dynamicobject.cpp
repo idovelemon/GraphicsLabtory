@@ -44,6 +44,14 @@ void DTAabb::Update(glb::math::Vector max, glb::math::Vector min, glb::math::Vec
     m_Pos = center;
 }
 
+float DTAabb::GetWidth() {
+    return (m_Max.x - m_Min.x);
+}
+
+float DTAabb::GetLength() {
+    return (m_Max.z - m_Min.z);
+}
+
 bool DTAabb::IsIntersectionWithAABB(DTAabb* object) {
     if (object == nullptr) return false;
 

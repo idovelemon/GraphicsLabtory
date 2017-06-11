@@ -14,7 +14,7 @@ def create_random_item():
     item = EntityCreate()
     EntityAddTransformCom(item, 0.0, 2.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0)
     EntityAddRoleCom(item, RMT_ITEM, RST_ITEM_BOMB)
-    EntityAddRenderCom(item, "res\model\Item\TD_Item_Bomb.obj")
+    EntityAddRenderCom(item, "res\model\Item\TD_Item_Bomb.obj", 0.0, 2.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0)
     EntityAddScriptCom(item, "itembomb")
 
 def main(id):

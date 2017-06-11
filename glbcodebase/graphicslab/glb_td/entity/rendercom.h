@@ -26,7 +26,7 @@ class TransformCom;
 
 class RenderCom : public Component {
 public:
-    RenderCom(Entity* owner, const char* name);
+    RenderCom(Entity* owner, const char* name, glb::math::Vector pos, glb::math::Vector rot, glb::math::Vector scale);
     virtual ~RenderCom();
 
 public:

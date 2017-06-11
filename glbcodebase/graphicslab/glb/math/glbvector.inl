@@ -58,6 +58,15 @@ Vector Vector::operator*(float v) {
     return result;
 }
 
+Vector Vector::operator*(const Vector& v) {
+    Vector result(0.0f, 0.0f, 0.0f);
+    result.x = this->x * v.x;
+    result.y = this->y * v.y;
+    result.z = this->z * v.z;
+
+    return result;
+}
+
 const Vector& Vector::operator+=(const Vector& v) {
     this->x += v.x;
     this->y += v.y;

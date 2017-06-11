@@ -21,7 +21,10 @@ void EntityAddTransformCom(int id,
                            float px, float py, float pz,
                            float rx, float ry, float rz,
                            float sx, float sy, float sz);
-void EntityAddRenderCom(int id, const char* name);
+void EntityAddRenderCom(int id, const char* name,
+                        float px, float py, float pz,
+                        float rx, float ry, float rz,
+                        float sx, float sy, float sz);
 void EntityAddCameraCom(int id, float px, float py, float pz, float tx, float ty, float tz);
 void EntityAddScriptCom(int id, const char* script);
 void EntityAddRoleCom(int id, int mt, int st);
@@ -63,6 +66,8 @@ void EntityCheckCollision(int id);
 void EntityCollisionBeginIterate(int id);
 int EntityCollisionIterate(int id);
 void EntityCollisionEndIterate(int id);
+float EntityGetCollisionWidth(int id);
+float EntityGetCollisionLength(int id);
 
 // Time
 float TimeGetPrevGameTime();

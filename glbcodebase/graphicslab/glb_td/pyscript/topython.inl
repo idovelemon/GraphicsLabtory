@@ -74,10 +74,19 @@ static PyObject* EntityAddTransformCom(PyObject* self, PyObject* args) {
 static PyObject* EntityAddRenderCom(PyObject* self, PyObject* args) {
 	int id;
 	const char* name;
-	if (!PyArg_ParseTuple(args, "is", &id, &name)) {
+	float px;
+	float py;
+	float pz;
+	float rx;
+	float ry;
+	float rz;
+	float sx;
+	float sy;
+	float sz;
+	if (!PyArg_ParseTuple(args, "isfffffffff", &id, &name, &px, &py, &pz, &rx, &ry, &rz, &sx, &sy, &sz)) {
 		 return NULL;
 	}
-	EntityAddRenderCom(id, name);
+	EntityAddRenderCom(id, name, px, py, pz, rx, ry, rz, sx, sy, sz);
 	return Py_BuildValue("");
 }
 
@@ -496,6 +505,26 @@ static PyObject* EntityCollisionEndIterate(PyObject* self, PyObject* args) {
 	return Py_BuildValue("");
 }
 
+static PyObject* EntityGetCollisionWidth(PyObject* self, PyObject* args) {
+	int id;
+	float ret;
+	if (!PyArg_ParseTuple(args, "i", &id)) {
+		 return NULL;
+	}
+	ret = EntityGetCollisionWidth(id);
+	return Py_BuildValue("f", ret);
+}
+
+static PyObject* EntityGetCollisionLength(PyObject* self, PyObject* args) {
+	int id;
+	float ret;
+	if (!PyArg_ParseTuple(args, "i", &id)) {
+		 return NULL;
+	}
+	ret = EntityGetCollisionLength(id);
+	return Py_BuildValue("f", ret);
+}
+
 static PyObject* TimeGetPrevGameTime(PyObject* self, PyObject* args) {
 	float ret;
 	ret = TimeGetPrevGameTime();
@@ -602,6 +631,8 @@ static PyMethodDef s_HostAPI_MethodDef[] = {
 	{"EntityCollisionBeginIterate", EntityCollisionBeginIterate, METH_VARARGS, NULL},
 	{"EntityCollisionIterate", EntityCollisionIterate, METH_VARARGS, NULL},
 	{"EntityCollisionEndIterate", EntityCollisionEndIterate, METH_VARARGS, NULL},
+	{"EntityGetCollisionWidth", EntityGetCollisionWidth, METH_VARARGS, NULL},
+	{"EntityGetCollisionLength", EntityGetCollisionLength, METH_VARARGS, NULL},
 	{"TimeGetPrevGameTime", TimeGetPrevGameTime, METH_VARARGS, NULL},
 	{"TimeGetCurGameTime", TimeGetCurGameTime, METH_VARARGS, NULL},
 	{"TimeGetGameFrameSpeed", TimeGetGameFrameSpeed, METH_VARARGS, NULL},

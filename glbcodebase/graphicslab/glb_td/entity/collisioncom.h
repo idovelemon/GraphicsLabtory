@@ -11,6 +11,7 @@
 #include <vector>
 
 #include "component.h"
+#include "math/glbvector.h"
 
 namespace entity {
 
@@ -33,11 +34,15 @@ public:
     void BeginIterate();
     int Iterate();
     void EndIterate();
+    float GetWidth();
+    float GetLength();
 
 protected:
     int32_t                     m_DynamicObjectID;
     std::vector<int32_t>        m_CollIDs;
     int32_t                     m_Iterate;
+    glb::math::Vector           m_OriMax;
+    glb::math::Vector           m_OriMin;
 };
 
 };  // namespace entity

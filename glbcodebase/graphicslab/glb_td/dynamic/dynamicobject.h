@@ -33,6 +33,8 @@ public:
 public:
     virtual DynamicObjectType GetType() const { return m_Type; }
     virtual bool IsIntersection(DynamicObject* object) = 0;
+    virtual float GetWidth() = 0;
+    virtual float GetLength() = 0;
     virtual void SetUserData(void* data) { m_UserData = data; }
     virtual void* GetUserData() { return m_UserData; }
 
@@ -50,6 +52,8 @@ public:
 public:
     virtual bool IsIntersection(DynamicObject* object);
     virtual void Update(glb::math::Vector max, glb::math::Vector min, glb::math::Vector center);
+    virtual float GetWidth();
+    virtual float GetLength();
 
 protected:
     bool IsIntersectionWithAABB(DTAabb* aabb);
