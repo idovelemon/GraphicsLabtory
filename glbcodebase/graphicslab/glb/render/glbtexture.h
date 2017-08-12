@@ -9,6 +9,8 @@
 
 #include <stdint.h>
 
+#include "util/glbtextureinfo.h"
+
 namespace glb {
 
 namespace render {
@@ -41,9 +43,11 @@ public:
     };
 
     enum Format {
-        FMT_RGBA = 0,
-        FMT_RGBA16F,
-        FMT_DEPTH16F,
+        FMT_R8G8B8 = 0,
+        FMT_R8G8B8A8,
+        FMT_R16G16,
+        FMT_R32G32B32A32F,
+        FMT_DEPTH32F,
     };
 
 public:
@@ -52,15 +56,16 @@ public:
 
     static Texture* Create(const char* texture_name, int32_t type = TEX_2D);
     static Texture* Create(int32_t width, int32_t height);
-    static Texture* CreateFloat16Texture(int32_t width, int32_t height);
-    static Texture* CreateFloat16DepthTexture(int32_t width, int32_t height);
-    static Texture* CreateFloat16CubeTexture(int32_t width, int32_t height);
+    static Texture* CreateFloat32Texture(int32_t width, int32_t height);
+    static Texture* CreateFloat32DepthTexture(int32_t width, int32_t height);
+    static Texture* CreateFloat32CubeTexture(int32_t width, int32_t height);
 
 public:
     int32_t GetID();
     void SetID(int32_t id);
     int32_t GetWidth();
     int32_t GetHeight();
+    int32_t GetBPP();
     const char* GetName();
     int32_t GetType();
     void* GetNativeTex();
@@ -69,6 +74,8 @@ public:
     void UpdateTextureData(const void* pixel, int32_t miplevel = 0);
     void GetTextureData(void* pixel, int32_t miplevel = 0);
     void GenerateMipmap();
+
+    void Save(const char* file_name, util::TEXTURE_FILE_TYPE file_type);
 
 private:
     class Imp;

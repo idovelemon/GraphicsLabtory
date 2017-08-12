@@ -107,9 +107,9 @@ Texture* Texture::Create(int32_t width, int32_t height) {
     return tex;
 }
 
-Texture* Texture::CreateFloat16Texture(int32_t width, int32_t height) {
+Texture* Texture::CreateFloat32Texture(int32_t width, int32_t height) {
     Texture* tex = NULL;
-    Texture::Imp* imp = Texture::Imp::CreateFloat16Texture(width, height);
+    Texture::Imp* imp = Texture::Imp::CreateFloat32Texture(width, height);
 
     if (imp != NULL) {
         tex = new Texture;
@@ -125,9 +125,9 @@ Texture* Texture::CreateFloat16Texture(int32_t width, int32_t height) {
     return tex;
 }
 
-Texture* Texture::CreateFloat16DepthTexture(int32_t width, int32_t height) {
+Texture* Texture::CreateFloat32DepthTexture(int32_t width, int32_t height) {
     Texture* tex = NULL;
-    Texture::Imp* imp = Texture::Imp::CreateFloat16DepthTexture(width, height);
+    Texture::Imp* imp = Texture::Imp::CreateFloat32DepthTexture(width, height);
 
     if (imp != NULL) {
         tex = new Texture;
@@ -143,9 +143,9 @@ Texture* Texture::CreateFloat16DepthTexture(int32_t width, int32_t height) {
     return tex;
 }
 
-Texture* Texture::CreateFloat16CubeTexture(int32_t width, int32_t height) {
+Texture* Texture::CreateFloat32CubeTexture(int32_t width, int32_t height) {
     Texture* tex = NULL;
-    Texture::Imp* imp = Texture::Imp::CreateFloat16CubeTexture(width, height);
+    Texture::Imp* imp = Texture::Imp::CreateFloat32CubeTexture(width, height);
 
     if (imp != NULL) {
         tex = new Texture;
@@ -187,6 +187,14 @@ void Texture::GetTextureData(void* pixels, int32_t miplevel) {
 void Texture::GenerateMipmap() {
     if (m_Imp != NULL) {
         m_Imp->GenerateMipmap();
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+}
+
+void Texture::Save(const char* file_name, util::TEXTURE_FILE_TYPE file_type) {
+    if (m_Imp != NULL) {
+        m_Imp->Save(file_name, file_type);
     } else {
         GLB_SAFE_ASSERT(false);
     }
@@ -234,6 +242,18 @@ int32_t Texture::GetHeight() {
     }
 
     return height;
+}
+
+int32_t Texture::GetBPP() {
+    int32_t bpp = 0;
+
+    if (m_Imp != NULL) {
+        bpp = m_Imp->GetBPP();
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return bpp;
 }
 
 const char* Texture::GetName() {

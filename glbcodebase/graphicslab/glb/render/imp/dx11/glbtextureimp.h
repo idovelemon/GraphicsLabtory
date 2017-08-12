@@ -45,6 +45,7 @@ public:
      void SetID(int32_t id);
      int32_t GetWidth();
      int32_t GetHeight();
+     int32_t GetBPP();
      const char* GetName();
      int32_t GetNativeTex();
 
@@ -52,6 +53,8 @@ public:
      void UpdateTextureData(const void* pixel, int32_t miplevel);
      void GetTextureData(void* pixel, int32_t miplevel);
      void GenerateMipmap();
+
+     void Save(const char* file_name, util::TEXTURE_FILE_TYPE file_type);
 
  private:
      int32_t m_Type;                    // The type of the texture

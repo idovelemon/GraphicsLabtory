@@ -29,6 +29,7 @@ public:
     virtual ~RenderTarget();
 
     static RenderTarget* Create(int32_t width, int32_t height);
+    static RenderTarget* DefaultRenderTarget();
 
 public:
     void AttachDepthTexture(texture::Texture* depth_tex);

@@ -712,7 +712,7 @@ int32_t RenderImp::RequestBakeEnvMap(int32_t width, int32_t height, scene::Objec
     int32_t result = -1;
 
     RenderTarget* rt = RenderTarget::Create(width, height);
-    texture::Texture* env_map = texture::Texture::CreateFloat16CubeTexture(width, height);
+    texture::Texture* env_map = texture::Texture::CreateFloat32CubeTexture(width, height);
     if (rt != NULL && env_map != NULL && obj != NULL) {
         DrawColorBuffer attach_pos[6] = {
             COLORBUF_COLOR_ATTACHMENT0,
@@ -927,7 +927,7 @@ void RenderImp::PrepareShadowMap() {
         GLB_SAFE_ASSERT(m_ShadowRenderTarget[i] != NULL);
 
         // Create shadow map
-        texture::Texture* shadow_map = texture::Texture::CreateFloat16DepthTexture(shadow_map_width, shadow_map_height);
+        texture::Texture* shadow_map = texture::Texture::CreateFloat32DepthTexture(shadow_map_width, shadow_map_height);
         if (shadow_map != NULL) {
             m_ShadowMap[i] = texture::Mgr::AddTexture(shadow_map);
         } else {
@@ -945,7 +945,7 @@ void RenderImp::PrepareShadowMap() {
 
 void RenderImp::PrepareDepthMap() {
     // Create depth map
-    texture::Texture* depth_map = texture::Texture::CreateFloat16DepthTexture(static_cast<int32_t>(m_Width), static_cast<int32_t>(m_Height));
+    texture::Texture* depth_map = texture::Texture::CreateFloat32DepthTexture(static_cast<int32_t>(m_Width), static_cast<int32_t>(m_Height));
     if (depth_map != NULL) {
         m_DepthMap = texture::Mgr::AddTexture(depth_map);
     } else {
@@ -966,7 +966,7 @@ void RenderImp::PrepareDepthMap() {
 
 void RenderImp::PrepareAOMap() {
     // Create random rotate map
-    texture::Texture* random_rotate_map = texture::Texture::CreateFloat16Texture(4, 4);
+    texture::Texture* random_rotate_map = texture::Texture::CreateFloat32Texture(4, 4);
     if (random_rotate_map != NULL) {
         m_RandRotateMap = texture::Mgr::AddTexture(random_rotate_map);
     } else {
@@ -974,7 +974,7 @@ void RenderImp::PrepareAOMap() {
     }
 
     // Create ao map
-    texture::Texture* ao_map = texture::Texture::CreateFloat16Texture(static_cast<int32_t>(m_Width), static_cast<int32_t>(m_Height));
+    texture::Texture* ao_map = texture::Texture::CreateFloat32Texture(static_cast<int32_t>(m_Width), static_cast<int32_t>(m_Height));
     if (ao_map != NULL) {
         m_AOMap = texture::Mgr::AddTexture(ao_map);
     } else {
@@ -982,7 +982,7 @@ void RenderImp::PrepareAOMap() {
     }
 
     // Create temp biblur map
-    texture::Texture* biblur_map = texture::Texture::CreateFloat16Texture(static_cast<int32_t>(m_Width), static_cast<int32_t>(m_Height));
+    texture::Texture* biblur_map = texture::Texture::CreateFloat32Texture(static_cast<int32_t>(m_Width), static_cast<int32_t>(m_Height));
     if (biblur_map != NULL) {
         m_BiBlurMap = texture::Mgr::AddTexture(biblur_map);
     } else {
@@ -1012,9 +1012,9 @@ void RenderImp::PrepareHDR() {
     GLB_SAFE_ASSERT(m_BloomRenderTarget != NULL);
 
     // Create hdr texture
-    texture::Texture* hdr_tex = texture::Texture::CreateFloat16Texture(static_cast<int32_t>(m_Width), static_cast<int32_t>(m_Height));
-    texture::Texture* log_lum_tex = texture::Texture::CreateFloat16Texture(static_cast<int32_t>(m_Width / 4.0f), static_cast<int32_t>(m_Height / 4.0f));
-    texture::Texture* bloom_tex = texture::Texture::CreateFloat16Texture(static_cast<int32_t>(m_Width / 4.0f), static_cast<int32_t>(m_Height / 4.0f));
+    texture::Texture* hdr_tex = texture::Texture::CreateFloat32Texture(static_cast<int32_t>(m_Width), static_cast<int32_t>(m_Height));
+    texture::Texture* log_lum_tex = texture::Texture::CreateFloat32Texture(static_cast<int32_t>(m_Width / 4.0f), static_cast<int32_t>(m_Height / 4.0f));
+    texture::Texture* bloom_tex = texture::Texture::CreateFloat32Texture(static_cast<int32_t>(m_Width / 4.0f), static_cast<int32_t>(m_Height / 4.0f));
     if (hdr_tex != NULL && bloom_tex != NULL && log_lum_tex != NULL) {
         m_HDRSceneTex = texture::Mgr::AddTexture(hdr_tex);
         m_LogLumTex = texture::Mgr::AddTexture(log_lum_tex);

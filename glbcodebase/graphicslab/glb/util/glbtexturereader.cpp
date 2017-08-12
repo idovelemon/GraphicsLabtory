@@ -3,8 +3,8 @@
 // Author: i_dovelemon[1322600812@qq.com]
 // Date: 2016/06/20
 // Brief: Read the texture data from file.
-// The supprted format has showed below:
-// .bmp -- 24bit
+// Add BMP
+// Add DDS RGB
 //----------------------------------------------------------------------------
 #include "glbtexturereader.h"
 
@@ -15,6 +15,8 @@
 #include <Windows.h>
 #include <wingdi.h>
 
+#include "glbddsformat.h"
+#include "glbtextureinfo.h"
 #include "glbmacro.h"
 
 namespace glb {
@@ -31,37 +33,61 @@ const int32_t kBmpRGBABit = 32;
 //--------------------------------------------------------------------------------
 // DECLARATION
 //--------------------------------------------------------------------------------
+
+//--------------------------------------------------------------------------
+
 class TextureReaderBase {
- public:
-     TextureReaderBase() {
-     }
+public:
+    TextureReaderBase() {
+    }
 
-     virtual ~TextureReaderBase() {
-     }
+    virtual ~TextureReaderBase() {
+    }
 
- public:
-     virtual int32_t ReadTexture(const char* file_name, int8_t** texture_data, int32_t& tex_width, int32_t& tex_height) = 0;
+public:
+    virtual int32_t ReadTexture(const char* file_name, int8_t** texture_data, int32_t& tex_width, int32_t& tex_height, int32_t& pixel_format) = 0;
 };
 
-class BmpTextureReader:public TextureReaderBase {
- public:
-     BmpTextureReader();
-     virtual ~BmpTextureReader();
+//--------------------------------------------------------------------------
 
- public:
-     virtual int32_t ReadTexture(const char* file_name, int8_t** texture_data, int32_t& tex_width, int32_t& tex_height);
+class BmpTextureReader:public TextureReaderBase {
+public:
+    BmpTextureReader();
+    virtual ~BmpTextureReader();
+
+public:
+    virtual int32_t ReadTexture(const char* file_name, int8_t** texture_data, int32_t& tex_width, int32_t& tex_height, int32_t& pixel_format);
+};
+
+//--------------------------------------------------------------------------
+
+class DDSTextureReader : public TextureReaderBase {
+public:
+    DDSTextureReader();
+    virtual ~DDSTextureReader();
+
+public:
+    virtual int32_t ReadTexture(const char* file_name, int8_t** texture_data, int32_t& tex_width, int32_t& tex_height, int32_t& pixel_format);
+
+protected:
+    TEXTURE_PIXEL_FORMAT_TYPE GetPixelType(DDSSurfaceDesc desc);
+    void ReorganizeRGBAData(int8_t* data, TEXTURE_PIXEL_FORMAT_TYPE type);
+    TEXTURE_PIXEL_FORMAT_TYPE ReorganizeRGBAFormat(TEXTURE_PIXEL_FORMAT_TYPE type);
 };
 
 //--------------------------------------------------------------------------------
 // DEFINITION
 //--------------------------------------------------------------------------------
+
+//--------------------------------------------------------------------------------
+
 BmpTextureReader::BmpTextureReader() {
 }
 
 BmpTextureReader::~BmpTextureReader() {
 }
 
-int32_t BmpTextureReader::ReadTexture(const char* file_name, int8_t** texture_data, int32_t& tex_width, int32_t& tex_height) {
+int32_t BmpTextureReader::ReadTexture(const char* file_name, int8_t** texture_data, int32_t& tex_width, int32_t& tex_height, int32_t& pixel_format) {
     int32_t result = 0;
 
     if (file_name != NULL && texture_data != NULL) {
@@ -119,7 +145,7 @@ int32_t BmpTextureReader::ReadTexture(const char* file_name, int8_t** texture_da
 
             tex_width = info_header.biWidth;
             tex_height = info_header.biHeight;
-
+            pixel_format = TPFT_R8G8B8A8;
             result = 1;
 
             fclose(file);
@@ -133,7 +159,169 @@ int32_t BmpTextureReader::ReadTexture(const char* file_name, int8_t** texture_da
     return result;
 }
 
-int32_t TextureReader::ReadTexture(const char* file_name, int8_t** data, int32_t& tex_width, int32_t& tex_height) {
+//--------------------------------------------------------------------------------
+
+DDSTextureReader::DDSTextureReader() {
+}
+
+DDSTextureReader::~DDSTextureReader() {
+}
+
+int32_t DDSTextureReader::ReadTexture(const char* file_name, int8_t** texture_data, int32_t& tex_width, int32_t& tex_height, int32_t& pixel_format) {
+    int32_t result = 0;
+
+    if (file_name != NULL && texture_data != NULL) {
+        FILE* file = fopen(file_name, "rb");
+
+        if (file) {
+            DDSFile dds;
+            fread(&dds.magic_num, sizeof(dds.magic_num), 1, file);
+            fread(&dds.desc, sizeof(dds.desc), 1, file);
+            TEXTURE_PIXEL_FORMAT_TYPE pixel_type = GetPixelType(dds.desc);
+            GLB_SAFE_ASSERT(pixel_type != TPFT_UNKOWN);
+
+            if (dds.desc.format.flag & DDS_PF_RGB) {
+                // Read uncompressed RGB pixel format dds file
+                int32_t rgb_bytes = dds.desc.format.rgb_bit_count / 8;
+                int32_t width = dds.desc.width;
+                int32_t height = dds.desc.height;
+                int32_t total_line_bytes = width * rgb_bytes, useful_line_bytes = width * rgb_bytes;
+
+                // Check if has DDS_DESC_PITCH
+                if (dds.desc.flag & DDS_SD_PITCH) {
+                    total_line_bytes = dds.desc.pitch_or_linear_size;
+                }
+
+                *texture_data = new int8_t[width * height * rgb_bytes];
+
+                int8_t* data = new int8_t[total_line_bytes];
+
+                // Copy data
+                for (int32_t i = 0; i < height; i++) {
+                    fread(data, sizeof(int8_t), total_line_bytes, file);
+
+                    // Flip data upside down
+                    memcpy((*texture_data) + (height - 1 - i) * width * rgb_bytes, data, useful_line_bytes);
+                }
+
+                // Reorgnize data to RGBA format
+                for (int32_t i = 0; i < height; i++) {
+                    for (int32_t j = 0; j < width; j++) {
+                        ReorganizeRGBAData(*(texture_data) + i * width * rgb_bytes + j * rgb_bytes, pixel_type);
+                    }
+                }
+
+                tex_width = width;
+                tex_height = height;
+                pixel_format = ReorganizeRGBAFormat(pixel_type);
+
+                delete[] data;
+                data = NULL;
+
+                result = 1;
+            } else {
+                // TODO: Only support uncompressed RGB format now
+                GLB_SAFE_ASSERT(false);
+            }
+
+            fclose(file);
+            file = NULL;
+        } else {
+            GLB_SAFE_ASSERT(false);
+        }
+    }
+
+    return result;
+}
+
+TEXTURE_PIXEL_FORMAT_TYPE DDSTextureReader::GetPixelType(DDSSurfaceDesc desc) {
+    TEXTURE_PIXEL_FORMAT_TYPE pixel_format = TPFT_UNKOWN;
+
+    if (desc.format.flag & DDS_PF_RGB) {
+        // Uncompressed image
+        struct {
+            TEXTURE_PIXEL_FORMAT_TYPE pixel_type;
+            int32_t bit_count;
+            uint32_t red_mask_bit;
+            uint32_t green_mask_bit;
+            uint32_t blue_mask_bit;
+            uint32_t alpha_mask_bit;
+        } pixel_format_tbl[] = {
+            {TPFT_R8G8B8, 24, 0xff0000, 0x00ff00, 0x0000ff, 0x0},
+            {TPFT_A8R8G8B8, 32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000},
+            {TPFT_R8G8B8A8, 32, 0xff000000, 0x00ff0000, 0x0000ff00, 0x000000ff},
+            {TPFT_R16G16, 32, 0xffff0000, 0x0000ffff, 0x0, 0x0},
+            {TPFT_G16R16, 32, 0x0000ffff, 0xffff0000, 0x0, 0x0},
+        };
+        static_assert(GLB_ARRAY_SIZE(pixel_format_tbl) == util::TPFT_UNKOWN, "");
+
+        for (int32_t i = 0; i < GLB_ARRAY_SIZE(pixel_format_tbl); i++) {
+            if (desc.format.rgb_bit_count == pixel_format_tbl[i].bit_count
+                && desc.format.red_bit_mask == pixel_format_tbl[i].red_mask_bit
+                && desc.format.green_bit_mask == pixel_format_tbl[i].green_mask_bit
+                && desc.format.blue_bit_mask == pixel_format_tbl[i].blue_mask_bit
+                && desc.format.alpha_bit_mask == pixel_format_tbl[i].alpha_mask_bit) {
+                pixel_format = pixel_format_tbl[i].pixel_type;
+                break;
+            }
+        }
+    } else {
+        // TODO: do not support compressed image now
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return pixel_format;
+}
+
+void DDSTextureReader::ReorganizeRGBAData(int8_t* data, TEXTURE_PIXEL_FORMAT_TYPE type) {
+    if (data != NULL) {
+        if (type == TPFT_R8G8B8) {
+            // Do nothing
+        } else if (type == TPFT_A8R8G8B8) {
+            uint32_t value = *(reinterpret_cast<uint32_t*>(data));
+            data[0] = (value & 0x00ff0000) >> 16;  // Red
+            data[1] = (value & 0x0000ff00) >> 8;  // Green
+            data[2] = value & 0x000000ff;  // Blue
+            data[3] = (value & 0xff000000) >> 24;  // Alpha
+        } else if (type == TPFT_G16R16) {
+            uint32_t value = *(reinterpret_cast<uint32_t*>(data));
+            uint16_t* data16 = reinterpret_cast<uint16_t*>(data);
+            data16[0] = value & 0x0000ffff;  //  Red
+            data16[1] = (value & 0xffff0000) >> 16;  // Green
+        }
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+}
+
+TEXTURE_PIXEL_FORMAT_TYPE DDSTextureReader::ReorganizeRGBAFormat(TEXTURE_PIXEL_FORMAT_TYPE type) {
+    struct {
+        TEXTURE_PIXEL_FORMAT_TYPE before;
+        TEXTURE_PIXEL_FORMAT_TYPE after;
+    } reformat_pixel_tbl[] = {
+        {TPFT_R8G8B8, TPFT_R8G8B8},
+        {TPFT_A8R8G8B8, TPFT_R8G8B8A8},
+        {TPFT_R8G8B8A8, TPFT_R8G8B8A8},
+        {TPFT_R16G16, TPFT_R16G16},
+        {TPFT_G16R16, TPFT_R16G16},
+    };
+    static_assert(GLB_ARRAY_SIZE(reformat_pixel_tbl) == util::TPFT_UNKOWN, "");
+
+    TEXTURE_PIXEL_FORMAT_TYPE result = TPFT_UNKOWN;
+
+    for (int32_t i = 0; i < GLB_ARRAY_SIZE(reformat_pixel_tbl); i++) {
+        if (type == reformat_pixel_tbl[i].before) {
+            result = reformat_pixel_tbl[i].after;
+            break;
+        }
+    }
+
+    return result;
+}
+
+//--------------------------------------------------------------------------------
+
+int32_t TextureReader::ReadTexture(const char* file_name, int8_t** data, int32_t& tex_width, int32_t& tex_height, int32_t& pixel_format) {
     int32_t result = 0;
 
     if (file_name != NULL) {
@@ -153,7 +341,10 @@ int32_t TextureReader::ReadTexture(const char* file_name, int8_t** data, int32_t
         // Check format
         if (!strcmp(postfix, ".bmp")) {
             BmpTextureReader bmp_reader;
-            result = bmp_reader.ReadTexture(file_name, data, tex_width, tex_height);
+            result = bmp_reader.ReadTexture(file_name, data, tex_width, tex_height, pixel_format);
+        } else if (!strcmp(postfix, ".dds")) {
+            DDSTextureReader dds_reader;
+            result = dds_reader.ReadTexture(file_name, data, tex_width, tex_height, pixel_format);
         } else {
             GLB_SAFE_ASSERT(false);
         }

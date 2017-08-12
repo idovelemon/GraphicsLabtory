@@ -67,4 +67,6 @@
     _class_name_(_class_name_&); \
     const _class_name_& operator=(const _class_name_&);
 
+#define GLB_ARRAY_SIZE(_array_) (sizeof(_array_) / sizeof(_array_[0]))
+
 #endif  // GLB_GLBMACRO_H_

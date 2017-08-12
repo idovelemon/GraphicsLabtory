@@ -192,6 +192,9 @@ void Texture::Imp::GetTextureData(void* pixel, int32_t miplevel) {
 void Texture::Imp::GenerateMipmap() {
 }
 
+void Texture::Imp::Save(const char* file_name, util::TEXTURE_FILE_TYPE file_type) {
+}
+
 int32_t Texture::Imp::GetID() {
     return m_TexID;
 }
@@ -206,6 +209,10 @@ int32_t Texture::Imp::GetWidth() {
 
 int32_t Texture::Imp::GetHeight() {
     return m_Height;
+}
+
+int32_t Texture::Imp::GetBPP() {
+    return m_BPP;
 }
 
 const char* Texture::Imp::GetName() {

@@ -40,6 +40,10 @@ RenderTarget* RenderTarget::Create(int32_t width, int32_t height) {
     return target;
 }
 
+RenderTarget* RenderTarget::DefaultRenderTarget() {
+    return NULL;
+}
+
 void RenderTarget::AttachDepthTexture(texture::Texture* depth_tex) {
     if (m_Imp != NULL) {
         m_Imp->AttachDepthTexture(depth_tex);
