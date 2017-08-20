@@ -39,7 +39,7 @@ public:
     Imp();
     virtual ~Imp();
 
-    static Imp* Create(const char* texture_name, int32_t type = TEX_2D);
+    static Imp* Create(const char* texture_name);
     static Imp* Create(int32_t width, int32_t height);
     static Imp* CreateFloat32Texture(int32_t width, int32_t height);
     static Imp* CreateFloat32DepthTexture(int32_t width, int32_t height);
@@ -47,6 +47,7 @@ public:
 
 protected:
     static void CreateGLTexture2D(int32_t tex_obj, int32_t width, int32_t height, int8_t* texture_data, int32_t texture_pixel_format);
+    static void CreateGLTextureCube(int32_t tex_obj, int32_t width, int32_t height, int8_t* texture_data, int32_t texture_pixel_format);
     static void SetTexturePixelFormat(Texture::Imp* texture, int32_t texture_pixel_format);
 
 public:

@@ -29,6 +29,20 @@ namespace texture {
 //-----------------------------------------------------------------------------------
 // CONSTANT VALUE
 //-----------------------------------------------------------------------------------
+struct {
+    int32_t pixel_format;
+    int32_t internel_format;
+    int32_t data_format;
+    int32_t data_type;
+    int32_t bpp;
+} kGLPixelFormatTbl[] = {
+    {util::TPFT_R8G8B8, GL_RGB8, GL_RGB, GL_UNSIGNED_BYTE, 3},
+    {util::TPFT_A8R8G8B8, GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, 4},
+    {util::TPFT_R8G8B8A8, GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, 4},
+    {util::TPFT_R16G16, GL_RG16, GL_RG, GL_UNSIGNED_SHORT, 4},
+    {util::TPFT_G16R16, GL_RG16, GL_RG, GL_UNSIGNED_SHORT, 4},
+};
+static_assert(GLB_ARRAY_SIZE(kGLPixelFormatTbl) == util::TPFT_UNKOWN, "");
 
 //-----------------------------------------------------------------------------------
 // TYPE DECLARATION
@@ -61,21 +75,22 @@ Texture::Imp::~Imp() {
     Destroy();
 }
 
-Texture::Imp* Texture::Imp::Create(const char* texture_name, int32_t type) {
+Texture::Imp* Texture::Imp::Create(const char* texture_name) {
     Texture::Imp* tex = NULL;
 
     if (texture_name != NULL) {
         int8_t* texture_data = NULL;
         int32_t texture_width = 0;
         int32_t texture_height = 0;
+        int32_t texture_type = util::TT_UNKOWN;
         int32_t texture_pixel_format = util::TPFT_UNKOWN;
-        if (util::TextureReader::ReadTexture(texture_name, &texture_data, texture_width, texture_height, texture_pixel_format)) {
+        if (util::TextureReader::ReadTexture(texture_name, &texture_data, texture_width, texture_height, texture_type, texture_pixel_format)) {
             GLuint tex_obj = 0;
             glGenTextures(1, &tex_obj);
 
-            if (type == TEX_2D) {
+            if (texture_type == util::TT_2D) {
                 CreateGLTexture2D(tex_obj, texture_width, texture_height, texture_data, texture_pixel_format);
-            } else if (type == TEX_3D) {
+            } else if (texture_type == util::TT_3D) {
                 glBindTexture(GL_TEXTURE_3D, tex_obj);
                 glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA8, texture_width, texture_width, texture_width, 0, GL_RGBA, GL_UNSIGNED_BYTE, texture_data);
                 glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -85,26 +100,36 @@ Texture::Imp* Texture::Imp::Create(const char* texture_name, int32_t type) {
                 glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
                 glGenerateMipmap(GL_TEXTURE_3D);
                 glBindTexture(GL_TEXTURE_3D, 0);
+            } else if (texture_type == util::TT_CUBE) {
+                CreateGLTextureCube(tex_obj, texture_width, texture_height, texture_data, texture_pixel_format);
             }
 
             util::TextureReader::ReleaseData(&texture_data);
 
             tex = new Texture::Imp();
-            tex->m_Type = type;
             tex->m_TexObj = tex_obj;
             memcpy(tex->m_TexName, texture_name, strlen(texture_name));
             tex->m_TexName[strlen(texture_name)] = 0;
 
-            if (type == TEX_2D) {
+            if (texture_type == util::TT_2D) {
+                tex->m_Type = TEX_2D;
                 tex->m_Width = texture_width;
                 tex->m_Height = texture_height;
                 tex->m_Depth = 0;
                 SetTexturePixelFormat(tex, texture_pixel_format);
-            }
-            else if (type == TEX_3D) {
+            } else if (texture_type == util::TT_3D) {
+                tex->m_Type = TEX_3D;
                 tex->m_Width = texture_width;
                 tex->m_Height = texture_width;
                 tex->m_Depth = texture_width;
+            } else if (texture_type == util::TT_CUBE) {
+                tex->m_Type = TEX_CUBE;
+                tex->m_Width = texture_width;
+                tex->m_Height = texture_height;
+                tex->m_Depth = 0;
+                SetTexturePixelFormat(tex, texture_pixel_format);
+            } else {
+                GLB_SAFE_ASSERT(false);
             }
         } else {
             GLB_SAFE_ASSERT(false);
@@ -250,28 +275,48 @@ Texture::Imp* Texture::Imp::CreateFloat32CubeTexture(int32_t width, int32_t heig
 }
 
 void Texture::Imp::CreateGLTexture2D(int32_t tex_obj, int32_t width, int32_t height, int8_t* texture_data, int32_t texture_pixel_format) {
-    struct {
-        int32_t pixel_format;
-        int32_t internel_format;
-        int32_t data_format;
-        int32_t data_type;
-    } gl_pixel_format_tbl[] = {
-        {util::TPFT_R8G8B8, GL_RGB8, GL_RGB, GL_UNSIGNED_BYTE},
-        {util::TPFT_A8R8G8B8, GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE},
-        {util::TPFT_R8G8B8A8, GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE},
-        {util::TPFT_R16G16, GL_RG16, GL_RG, GL_UNSIGNED_SHORT},
-        {util::TPFT_G16R16, GL_RG16, GL_RG, GL_UNSIGNED_SHORT},
-    };
-    static_assert(GLB_ARRAY_SIZE(gl_pixel_format_tbl) == util::TPFT_UNKOWN, "");
-
-    for (int32_t i = 0; i < GLB_ARRAY_SIZE(gl_pixel_format_tbl); i++) {
-        if (gl_pixel_format_tbl[i].pixel_format == texture_pixel_format) {
+    for (int32_t i = 0; i < GLB_ARRAY_SIZE(kGLPixelFormatTbl); i++) {
+        if (kGLPixelFormatTbl[i].pixel_format == texture_pixel_format) {
             glBindTexture(GL_TEXTURE_2D, tex_obj);
-            glTexImage2D(GL_TEXTURE_2D, 0, gl_pixel_format_tbl[i].internel_format, width, height, 0, gl_pixel_format_tbl[i].data_format, gl_pixel_format_tbl[i].data_type, texture_data);
+            glTexImage2D(GL_TEXTURE_2D, 0, kGLPixelFormatTbl[i].internel_format, width, height, 0, kGLPixelFormatTbl[i].data_format, kGLPixelFormatTbl[i].data_type, texture_data);
             glGenerateMipmap(GL_TEXTURE_2D);
             glBindTexture(GL_TEXTURE_2D, 0);
             break;
         }
+    }
+}
+
+void Texture::Imp::CreateGLTextureCube(int32_t tex_obj, int32_t width, int32_t height, int8_t* texture_data, int32_t texture_pixel_format) {
+    // Warning: The cube map's 6 texture must be square and have the same size
+    if (width > 0 && height > 0 && width == height) {
+        glBindTexture(GL_TEXTURE_CUBE_MAP, tex_obj);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP);
+
+        for (int32_t i = 0; i < GLB_ARRAY_SIZE(kGLPixelFormatTbl); i++) {
+            if (kGLPixelFormatTbl[i].pixel_format == texture_pixel_format) {
+                int32_t gl_faces[] = {
+                    GL_TEXTURE_CUBE_MAP_POSITIVE_X,
+                    GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
+                    GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,  // Flip Y
+                    GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
+                    GL_TEXTURE_CUBE_MAP_POSITIVE_Z,
+                    GL_TEXTURE_CUBE_MAP_NEGATIVE_Z,
+                };
+                for(int32_t j = 0; j < 6; j++) {
+                    glTexImage2D(gl_faces[j], 0, kGLPixelFormatTbl[i].internel_format, width, height, 0, kGLPixelFormatTbl[i].data_format, kGLPixelFormatTbl[i].data_type, texture_data + j * height * width * kGLPixelFormatTbl[i].bpp);
+                }
+                break;
+            }
+        }
+
+        glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+    } else {
+        GLB_SAFE_ASSERT(false);
     }
 }
 

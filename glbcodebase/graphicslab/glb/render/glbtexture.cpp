@@ -71,9 +71,9 @@ Texture::~Texture() {
     Destroy();
 }
 
-Texture* Texture::Create(const char* texture_name, int32_t type) {
+Texture* Texture::Create(const char* texture_name) {
     Texture* tex = NULL;
-    Texture::Imp* imp = Texture::Imp::Create(texture_name, type);
+    Texture::Imp* imp = Texture::Imp::Create(texture_name);
 
     if (imp != NULL) {
         tex = new Texture;

@@ -17,6 +17,14 @@ enum TEXTURE_FILE_TYPE {
     TFT_UNKOWN,
 };
 
+// Texture type
+enum TEXTURE_TYPE {
+    TT_2D = 0,
+    TT_3D,
+    TT_CUBE,
+    TT_UNKOWN,
+};
+
 // Texture pixel's format type
 enum TEXTURE_PIXEL_FORMAT_TYPE {
     TPFT_R8G8B8 = 0,

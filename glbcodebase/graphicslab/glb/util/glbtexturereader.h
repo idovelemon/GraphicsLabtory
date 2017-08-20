@@ -23,10 +23,11 @@ class TextureReader {
      // @param: texture_data The pointer of the memory to hold the texture data
      // @param: texture_width The with of the texture
      // @param: texture_height The height of the texture
+     // @param: texture_type The type of the texture, 2D, 3D, Cubemap
      // @param: pixel_format The pixel format of the texture
      // @return: If failed, return 0.
      //--------------------------------------------------------------------------------------------
-     static int32_t ReadTexture(const char* texture_file_name, int8_t** texture_data, int32_t& texture_width, int32_t& texture_height, int32_t& pixel_format);
+     static int32_t ReadTexture(const char* texture_file_name, int8_t** texture_data, int32_t& texture_width, int32_t& texture_height, int32_t& texture_type, int32_t& pixel_format);
 
      //--------------------------------------------------------------------------------------------
      // @brief: After you read the texture, call this method to release the texture buffer

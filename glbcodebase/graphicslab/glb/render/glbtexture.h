@@ -54,7 +54,7 @@ public:
     Texture();
     virtual ~Texture();
 
-    static Texture* Create(const char* texture_name, int32_t type = TEX_2D);
+    static Texture* Create(const char* texture_name);
     static Texture* Create(int32_t width, int32_t height);
     static Texture* CreateFloat32Texture(int32_t width, int32_t height);
     static Texture* CreateFloat32DepthTexture(int32_t width, int32_t height);
