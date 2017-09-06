@@ -28,21 +28,8 @@ namespace render {
 
 namespace shader {
 
-//-----------------------------------------------------------------------------------
-// CONSTANT VALUE
-//-----------------------------------------------------------------------------------
-
-//-----------------------------------------------------------------------------------
-// TYPE DECLARATION
-//-----------------------------------------------------------------------------------
-
-//-----------------------------------------------------------------------------------
-// CLASS DECLARATION
-//-----------------------------------------------------------------------------------
-
 //----------------------------------------------------------------------------------
-// HELP METHOD
-//----------------------------------------------------------------------------------
+
 char* glbLoadShaderBufferFromFile(const char* file_name) {
     char* shader_str = NULL;
     if (file_name != NULL) {
@@ -89,13 +76,8 @@ void glbReleaseBuffer(char** buffer) {
     }
 }
 
-//-----------------------------------------------------------------------------------
-// CLASS DEFINITION
-//-----------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------
 
-//--------------------------------------------------------------------------------------
-// VertexShader::Imp DEFINITION
-//--------------------------------------------------------------------------------------
 VertexShader::Imp::Imp()
 :m_VertexShader(0) {
 }
@@ -125,7 +107,13 @@ VertexShader::Imp* VertexShader::Imp::Create(const char* vertex_shader_name) {
             glGetShaderiv(vertex_shader, GL_COMPILE_STATUS, &success);
             if (success == 0) {
                 GLchar info_log[256];
-                glGetShaderInfoLog(vertex_shader, sizeof(info_log), NULL, info_log);
+
+                strcpy(info_log, vertex_shader_name);
+                int32_t vertex_shader_name_len = strlen(vertex_shader_name);
+                info_log[vertex_shader_name_len++] = ' ';
+
+                glGetShaderInfoLog(vertex_shader, sizeof(info_log) - vertex_shader_name_len, NULL, info_log + vertex_shader_name_len);
+
                 printf(reinterpret_cast<char*>(info_log));
                 GLB_SAFE_ASSERT(false);
             } else {
@@ -221,8 +209,7 @@ uint32_t VertexShader::Imp::GetHandle() const {
 }
 
 //--------------------------------------------------------------------------------------
-// GeometryShader::Imp DEFINITION
-//--------------------------------------------------------------------------------------
+
 GeometryShader::Imp::Imp()
 : m_GeometryShader(0) {
 }
@@ -280,9 +267,9 @@ GeometryShader::Imp* GeometryShader::Imp::Create(const char* geometry_shader_nam
 uint32_t GeometryShader::Imp::GetHandle() const {
     return m_GeometryShader;
 }
+
 //--------------------------------------------------------------------------------------
-// FragmentShader::Imp DEFINITION
-//--------------------------------------------------------------------------------------
+
 FragmentShader::Imp::Imp()
 : m_FragmentShader(0) {
 }
@@ -417,9 +404,8 @@ uint32_t FragmentShader::Imp::GetHandle() const {
 }
 
 //-----------------------------------------------------------------------------------
-// Program::Imp DEFINITION
-//-----------------------------------------------------------------------------------
-Program::Imp::Imp()
+
+UberProgram::Imp::Imp()
 : m_ID(-1)
 , m_Program(0)
 , m_VertexShader(0)
@@ -429,7 +415,7 @@ Program::Imp::Imp()
     memset(&m_ShaderLayout, 0, sizeof(m_ShaderLayout));
 }
 
-Program::Imp::~Imp() {
+UberProgram::Imp::~Imp() {
     if (m_VertexShader != NULL) {
         GLB_SAFE_DELETE(m_VertexShader);
     }
@@ -444,8 +430,8 @@ Program::Imp::~Imp() {
     }
 }
 
-Program::Imp* Program::Imp::Create(const char* vertex_shader_file, const char* fragment_shader_file, const char* geometry_shader_file) {
-    Program::Imp* shader_program = NULL;
+UberProgram::Imp* UberProgram::Imp::Create(const char* vertex_shader_file, const char* fragment_shader_file, const char* geometry_shader_file) {
+    UberProgram::Imp* shader_program = NULL;
     VertexShader* vertex_shader = VertexShader::Create(vertex_shader_file);
     FragmentShader* fragment_shader = FragmentShader::Create(fragment_shader_file);
     GeometryShader* geometry_shader = NULL;
@@ -477,7 +463,7 @@ Program::Imp* Program::Imp::Create(const char* vertex_shader_file, const char* f
                 GLenum type = 0;
                 GLchar name[kMaxVertexAttributeName];
                 glGetActiveAttrib(program, i, kMaxVertexAttributeName, &length, &size, &type, name);
-                layout.layouts[i].attriType = Program::GetVertexAttribute(name);
+                layout.layouts[i].attriType = UberProgram::GetVertexAttribute(name);
                 layout.layouts[i].location = glGetAttribLocation(program, name);
                 memcpy(layout.layouts[i].name, name, length);
             }
@@ -518,7 +504,7 @@ Program::Imp* Program::Imp::Create(const char* vertex_shader_file, const char* f
                 GLB_SAFE_ASSERT(false);
             } else {
                 // Save all the valid objects
-                shader_program = new Program::Imp();
+                shader_program = new UberProgram::Imp();
                 if (shader_program != NULL) {
                     shader_program->m_Program = program;
                     shader_program->m_VertexShader = vertex_shader;
@@ -539,8 +525,8 @@ Program::Imp* Program::Imp::Create(const char* vertex_shader_file, const char* f
     return shader_program;
 }
 
-Program::Imp* Program::Imp::Create(Descriptor desc) {
-    Program::Imp* shader_program = NULL;
+UberProgram::Imp* UberProgram::Imp::Create(Descriptor desc) {
+    UberProgram::Imp* shader_program = NULL;
 
     std::vector<std::string> enable_macros;
     enable_macros.push_back("#version 330 core\n");
@@ -574,7 +560,7 @@ Program::Imp* Program::Imp::Create(Descriptor desc) {
                 GLenum type = 0;
                 GLchar name[kMaxVertexAttributeName];
                 glGetActiveAttrib(program, i, kMaxVertexAttributeName, &length, &size, &type, name);
-                layout.layouts[i].attriType = Program::GetVertexAttribute(name);
+                layout.layouts[i].attriType = UberProgram::GetVertexAttribute(name);
                 layout.layouts[i].location = glGetAttribLocation(program, name);
                 memcpy(layout.layouts[i].name, name, length);
             }
@@ -613,7 +599,7 @@ Program::Imp* Program::Imp::Create(Descriptor desc) {
                 GLB_SAFE_ASSERT(false);
             } else {
                 // Save all the valid objects
-                shader_program = new Program::Imp();
+                shader_program = new UberProgram::Imp();
                 if (shader_program != NULL) {
                     shader_program->m_Program = program;
                     shader_program->m_VertexShader = vs;
@@ -635,24 +621,149 @@ Program::Imp* Program::Imp::Create(Descriptor desc) {
     return shader_program;
 }
 
-void Program::Imp::SetID(int32_t shader_id) {
+void UberProgram::Imp::SetID(int32_t shader_id) {
     m_ID = shader_id;
 }
 
-ShaderLayout Program::Imp::GetShaderLayout() {
+void UberProgram::Imp::SetProgramType(int32_t type) {
+    m_Type = type;
+}
+
+int32_t UberProgram::Imp::GetProgramType() {
+    return m_Type;
+}
+
+ShaderLayout UberProgram::Imp::GetShaderLayout() {
     return m_ShaderLayout;
 }
 
-Descriptor Program::Imp::GetShaderDescriptor() {
+Descriptor UberProgram::Imp::GetShaderDescriptor() {
     return m_ShaderDescptor;
 }
 
-void* Program::Imp::GetNativeShader() {
+void* UberProgram::Imp::GetNativeShader() {
     return reinterpret_cast<void*>(m_Program);
 }
 
-std::vector<uniform::UniformEntry>& Program::Imp::GetUniforms() {
+std::vector<uniform::UniformEntry>& UberProgram::Imp::GetUniforms() {
     return m_Uniforms;
+}
+
+//------------------------------------------------------------------------------
+
+UserProgram::Imp::Imp()
+: m_ID(-1)
+, m_Program(0)
+, m_VertexShader(0)
+, m_FragmentShader(0)
+, m_ShaderLayout() {
+    memset(&m_ShaderLayout, 0, sizeof(m_ShaderLayout));
+}
+
+UserProgram::Imp::~Imp() {
+    if (m_VertexShader != NULL) {
+        GLB_SAFE_DELETE(m_VertexShader);
+    }
+
+    if (m_FragmentShader != NULL) {
+        GLB_SAFE_DELETE(m_FragmentShader);
+    }
+
+    if (m_Program != 0) {
+        glDeleteProgram(m_Program);
+        m_Program = 0;
+    }
+}
+
+UserProgram::Imp* UserProgram::Imp::Create(const char* vertex_shader_file, const char* fragment_shader_file, const char* geometry_shader_file) {
+    UserProgram::Imp* shader_program = NULL;
+    VertexShader* vertex_shader = VertexShader::Create(vertex_shader_file);
+    FragmentShader* fragment_shader = FragmentShader::Create(fragment_shader_file);
+    GeometryShader* geometry_shader = NULL;
+    if (geometry_shader) {
+        geometry_shader = GeometryShader::Create(geometry_shader_file);
+    }
+
+    if (vertex_shader != NULL && fragment_shader != NULL) {
+        GLuint program = glCreateProgram();
+
+        if (program != 0) {
+            glAttachShader(program, vertex_shader->GetHandle());
+            glAttachShader(program, fragment_shader->GetHandle());
+            if (geometry_shader) {
+                glAttachShader(program, geometry_shader->GetHandle());
+            }
+
+            glLinkProgram(program);
+
+            // Get layout attributes
+            GLint attributes_num = 0;
+            glGetProgramiv(program, GL_ACTIVE_ATTRIBUTES, &attributes_num);
+            ShaderLayout layout;
+            memset(&layout, 0, sizeof(layout));
+            layout.count = attributes_num;
+            for (int32_t i = 0; i < attributes_num; i++) {
+                GLsizei length = 0;
+                GLint size = 0;
+                GLenum type = 0;
+                GLchar name[kMaxVertexAttributeName];
+                glGetActiveAttrib(program, i, kMaxVertexAttributeName, &length, &size, &type, name);
+                layout.layouts[i].attriType = UserProgram::GetVertexAttribute(name);
+                layout.layouts[i].location = glGetAttribLocation(program, name);
+                memcpy(layout.layouts[i].name, name, length);
+            }
+
+            GLint success = 0;
+            glGetProgramiv(program, GL_LINK_STATUS, &success);
+            if (success == 0) {
+                GLchar info_log[256];
+                glGetProgramInfoLog(program, sizeof(info_log), NULL, info_log);
+                util::log::LogPrint("%s", info_log);
+                GLB_SAFE_ASSERT(false);
+            } else {
+                // Save all the valid objects
+                shader_program = new UserProgram::Imp();
+                if (shader_program != NULL) {
+                    shader_program->m_Program = program;
+                    shader_program->m_VertexShader = vertex_shader;
+                    shader_program->m_FragmentShader = fragment_shader;
+                    memcpy(&shader_program->m_ShaderLayout, &layout, sizeof(layout));
+                } else {
+                    GLB_SAFE_ASSERT(false);
+                }
+            }
+        } else {
+            GLB_SAFE_ASSERT(false);
+        }
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return shader_program;
+}
+
+void UserProgram::Imp::SetID(int32_t shader_id) {
+    m_ID = shader_id;
+}
+
+void UserProgram::Imp::SetProgramType(int32_t type) {
+    m_Type = type;
+}
+
+int32_t UserProgram::Imp::GetProgramType() {
+    return m_Type;
+}
+
+ShaderLayout UserProgram::Imp::GetShaderLayout() {
+    return m_ShaderLayout;
+}
+
+void* UserProgram::Imp::GetNativeShader() {
+    return reinterpret_cast<void*>(m_Program);
+}
+
+int32_t UserProgram::Imp::GetUniformLocation(const char* uniform_name) {
+    return glGetUniformLocation(m_Program, uniform_name);
 }
 
 };  // namespace shader

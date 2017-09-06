@@ -81,6 +81,7 @@ class Matrix {
     // @brief: Override operator
     //----------------------------------------------------------------------
     inline const Vector operator*(const Vector& v);
+    inline Matrix operator*(const Matrix& m);
 
     //----------------------------------------------------------------------
     // @brief: Return the data of the matrix

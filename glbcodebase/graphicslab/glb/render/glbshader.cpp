@@ -16,18 +16,12 @@ namespace render {
 namespace shader {
 
 //-----------------------------------------------------------------------------------
-// CONSTANT VALUE
-//-----------------------------------------------------------------------------------
 
-//-----------------------------------------------------------------------------------
-// TYPE DECLARATION
-//-----------------------------------------------------------------------------------
 class MgrImp;
 static MgrImp* s_MgrImp = NULL;
 
 //-----------------------------------------------------------------------------------
-// CLASS DECLARATION
-//-----------------------------------------------------------------------------------
+
 class MgrImp {
 public:
     MgrImp();
@@ -38,24 +32,16 @@ public:
     void Destroy();
 
 public:
-    void SetCurShader(int32_t cur_shader_id);
-    int32_t GetCurShader();
-    int32_t AddShader(const char* vertex_shader_file, const char* fragment_shader_file, const char* geometry_shader_file);
+    int32_t AddUberShader(const char* vertex_shader_file, const char* fragment_shader_file, const char* geometry_shader_file);
     Program* GetShader(int32_t shader_id);
-    int32_t GetShader(Descriptor desc);
+    int32_t GetUberShaderID(Descriptor desc);
 
 private:
     std::vector<Program*> m_ShaderDataBase;
-    int32_t               m_CurShader;
 };
 
 //---------------------------------------------------------------------------------------------------
-// CLASS DEFINITION
-//---------------------------------------------------------------------------------------------------
 
-//-----------------------------------------------------------------------------------
-// VertexShader DEFINITION
-//-----------------------------------------------------------------------------------
 VertexShader::VertexShader()
 : m_Imp(NULL) {
 }
@@ -111,8 +97,7 @@ uint32_t VertexShader::GetHandle() const {
 }
 
 //-----------------------------------------------------------------------------------
-// GeometryShader DEFINITION
-//-----------------------------------------------------------------------------------
+
 GeometryShader::GeometryShader()
 : m_Imp(NULL) {
 }
@@ -149,9 +134,9 @@ uint32_t GeometryShader::GetHandle() const {
 
     return handle;
 }
+
 //-----------------------------------------------------------------------------------
-// FragmentShader DEFINITION
-//-----------------------------------------------------------------------------------
+
 FragmentShader::FragmentShader()
 : m_Imp(NULL) {
 }
@@ -207,21 +192,20 @@ uint32_t FragmentShader::GetHandle() const {
 }
 
 //-----------------------------------------------------------------------------------
-// Program DEFINITION
-//-----------------------------------------------------------------------------------
-Program::Program()
+
+UberProgram::UberProgram()
 : m_Imp(NULL) {
 }
 
-Program::~Program() {
+UberProgram::~UberProgram() {
     GLB_SAFE_DELETE(m_Imp);
 }
 
-Program* Program::Create(const char* vertex_shader_file, const char* fragment_shader_file, const char* geometry_shader_file) {
-    Program* shader_program = NULL;
-    Program::Imp* imp = Program::Imp::Create(vertex_shader_file, fragment_shader_file, geometry_shader_file);
+UberProgram* UberProgram::Create(const char* vertex_shader_file, const char* fragment_shader_file, const char* geometry_shader_file) {
+    UberProgram* shader_program = NULL;
+    UberProgram::Imp* imp = UberProgram::Imp::Create(vertex_shader_file, fragment_shader_file, geometry_shader_file);
     if (imp != NULL) {
-        shader_program = new Program;
+        shader_program = new UberProgram;
         if (shader_program != NULL) {
             shader_program->m_Imp = imp;
         } else {
@@ -234,12 +218,12 @@ Program* Program::Create(const char* vertex_shader_file, const char* fragment_sh
     return shader_program;
 }
 
-Program* Program::Create(Descriptor desc) {
-    Program* shader_program = NULL;
-    Program::Imp* imp = Program::Imp::Create(desc);
+UberProgram* UberProgram::Create(Descriptor desc) {
+    UberProgram* shader_program = NULL;
+    UberProgram::Imp* imp = UberProgram::Imp::Create(desc);
 
     if (imp != NULL) {
-        shader_program = new Program;
+        shader_program = new UberProgram;
         if (shader_program != NULL) {
             shader_program->m_Imp = imp;
         } else {
@@ -252,7 +236,7 @@ Program* Program::Create(Descriptor desc) {
     return shader_program;
 }
 
-void Program::SetID(int32_t shader_id) {
+void UberProgram::SetID(int32_t shader_id) {
     if (m_Imp != NULL) {
         m_Imp->SetID(shader_id);
     } else {
@@ -260,7 +244,27 @@ void Program::SetID(int32_t shader_id) {
     }
 }
 
-ShaderLayout Program::GetShaderLayout() {
+int32_t UberProgram::GetProgramType() {
+    int32_t type = Program::UNKOWN_PROGRAM;
+
+    if (m_Imp != NULL) {
+        type = m_Imp->GetProgramType();
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return type;
+}
+
+void UberProgram::SetProgramType(int32_t type) {
+    if (m_Imp != NULL) {
+        m_Imp->SetProgramType(type);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+}
+
+ShaderLayout UberProgram::GetShaderLayout() {
     ShaderLayout layout;
 
     if (m_Imp != NULL) {
@@ -272,7 +276,7 @@ ShaderLayout Program::GetShaderLayout() {
     return layout;
 }
 
-Descriptor Program::GetShaderDescriptor() {
+Descriptor UberProgram::GetShaderDescriptor() {
     Descriptor desc;
 
     if (m_Imp != NULL) {
@@ -284,7 +288,7 @@ Descriptor Program::GetShaderDescriptor() {
     return desc;
 }
 
-void* Program::GetNativeShader() {
+void* UberProgram::GetNativeShader() {
     void* shader = NULL;
 
     if (m_Imp != NULL) {
@@ -296,11 +300,11 @@ void* Program::GetNativeShader() {
     return shader;
 }
 
-std::vector<uniform::UniformEntry>& Program::GetUniforms() {
+std::vector<uniform::UniformEntry>& UberProgram::GetUniforms() {
     return m_Imp->GetUniforms();
 }
 
-VertexAttribute Program::GetVertexAttribute(const char* attribute_name) {
+VertexAttribute UberProgram::GetVertexAttribute(const char* attribute_name) {
     VertexAttribute result = VA_UNKNOWN;
 
     if (attribute_name != NULL) {
@@ -327,8 +331,124 @@ VertexAttribute Program::GetVertexAttribute(const char* attribute_name) {
 }
 
 //-----------------------------------------------------------------------------------
-// Descriptor DEFINITION
+
+UserProgram::UserProgram()
+: m_Imp(NULL) {
+}
+
+UserProgram::~UserProgram() {
+    GLB_SAFE_DELETE(m_Imp);
+}
+
+UserProgram* UserProgram::Create(const char* vertex_shader_file, const char* fragment_shader_file, const char* geometry_shader_file) {
+    UserProgram* shader_program = NULL;
+    UserProgram::Imp* imp = UserProgram::Imp::Create(vertex_shader_file, fragment_shader_file, geometry_shader_file);
+    if (imp != NULL) {
+        shader_program = new UserProgram;
+        if (shader_program != NULL) {
+            shader_program->m_Imp = imp;
+        } else {
+            GLB_SAFE_ASSERT(false);
+        }
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return shader_program;
+}
+
+void UserProgram::SetID(int32_t shader_id) {
+    if (m_Imp != NULL) {
+        m_Imp->SetID(shader_id);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+}
+
+int32_t UserProgram::GetProgramType() {
+    int32_t type = Program::UNKOWN_PROGRAM;
+
+    if (m_Imp != NULL) {
+        type = m_Imp->GetProgramType();
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return type;
+}
+
+void UserProgram::SetProgramType(int32_t type) {
+    if (m_Imp != NULL) {
+        m_Imp->SetProgramType(type);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+}
+
+ShaderLayout UserProgram::GetShaderLayout() {
+    ShaderLayout layout;
+
+    if (m_Imp != NULL) {
+        layout = m_Imp->GetShaderLayout();
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return layout;
+}
+
+void* UserProgram::GetNativeShader() {
+    void* shader = NULL;
+
+    if (m_Imp != NULL) {
+        shader = m_Imp->GetNativeShader();
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return shader;
+}
+
+int32_t UserProgram::GetUniformLocation(const char* uniform_name) {
+    int32_t location = -1;
+
+    if (m_Imp != NULL) {
+        location = m_Imp->GetUniformLocation(uniform_name);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return location;
+}
+
+VertexAttribute UserProgram::GetVertexAttribute(const char* attribute_name) {
+    VertexAttribute result = VA_UNKNOWN;
+
+    if (attribute_name != NULL) {
+        if (!strcmp("glb_Pos", attribute_name)) {
+            result = VA_POS;
+        } else if (!strcmp("glb_Color", attribute_name)) {
+            result = VA_COLOR;
+        } else if (!strcmp("glb_TexCoord", attribute_name)) {
+            result = VA_TEXCOORD;
+        } else if (!strcmp("glb_Normal", attribute_name)) {
+            result = VA_NORMAL;
+        } else if (!strcmp("glb_Tangent", attribute_name)) {
+            result = VA_TANGENT;
+        } else if (!strcmp("glb_Binormal", attribute_name)) {
+            result = VA_BINORMAL;
+        } else {
+            GLB_SAFE_ASSERT(false);
+        }
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return result;
+}
+
 //-----------------------------------------------------------------------------------
+
 Descriptor::Descriptor() {
     memset(m_ShaderFlag, 0, sizeof(m_ShaderFlag));
 }
@@ -388,10 +508,8 @@ std::string Descriptor::GetString() {
 }
 
 //-----------------------------------------------------------------------------------
-// MgrImp DEFINITION
-//-----------------------------------------------------------------------------------
-MgrImp::MgrImp()
-: m_CurShader(-1) {
+
+MgrImp::MgrImp() {
 }
 
 MgrImp::~MgrImp() {
@@ -406,21 +524,12 @@ void MgrImp::Destroy() {
         GLB_SAFE_DELETE(m_ShaderDataBase[i]);
     }
     m_ShaderDataBase.clear();
-    m_CurShader = -1;
 }
 
-void MgrImp::SetCurShader(int32_t cur_shader_id) {
-    m_CurShader = cur_shader_id;
-}
-
-int32_t MgrImp::GetCurShader() {
-    return m_CurShader;
-}
-
-int32_t MgrImp::AddShader(const char* vertex_shader_file, const char* fragment_shader_file, const char* geometry_shader_file) {
+int32_t MgrImp::AddUberShader(const char* vertex_shader_file, const char* fragment_shader_file, const char* geometry_shader_file) {
     int32_t id = -1;
 
-    Program* program = Program::Create(vertex_shader_file, fragment_shader_file, geometry_shader_file);
+    UberProgram* program = UberProgram::Create(vertex_shader_file, fragment_shader_file, geometry_shader_file);
     if (program != NULL) {
         id = m_ShaderDataBase.size();
         program->SetID(id);
@@ -444,13 +553,16 @@ Program* MgrImp::GetShader(int32_t shader_id) {
     return program;
 }
 
-int32_t MgrImp::GetShader(Descriptor desc) {
+int32_t MgrImp::GetUberShaderID(Descriptor desc) {
     int32_t result = -1;
 
     // Find the shader
     bool find_shader = false;
     for (int32_t i = 0; i < static_cast<int32_t>(m_ShaderDataBase.size()); i++) {
-        if (desc.Equal(m_ShaderDataBase[i]->GetShaderDescriptor())) {
+        if (m_ShaderDataBase[i]->GetProgramType() != Program::UBER_PROGRAM) continue;
+
+        UberProgram* uber = static_cast<UberProgram*>(m_ShaderDataBase[i]);
+        if (desc.Equal(uber->GetShaderDescriptor())) {
             result = i;
             find_shader = true;
             break;
@@ -459,8 +571,8 @@ int32_t MgrImp::GetShader(Descriptor desc) {
 
     // Check if we need generate new shader
     if (find_shader == false) {
-        Program* program = NULL;
-        program = Program::Create(desc);
+        UberProgram* program = NULL;
+        program = UberProgram::Create(desc);
         result = m_ShaderDataBase.size();
         m_ShaderDataBase.push_back(program);
     }
@@ -469,8 +581,7 @@ int32_t MgrImp::GetShader(Descriptor desc) {
 }
 
 //-----------------------------------------------------------------------------------
-// Mgr DEFINITION
-//-----------------------------------------------------------------------------------
+
 void Mgr::Initialize() {
     if (s_MgrImp == NULL) {
         s_MgrImp = new MgrImp;
@@ -491,31 +602,11 @@ void Mgr::Destroy() {
     }
 }
 
-void Mgr::SetCurShader(int32_t cur_shader_id) {
-    if (s_MgrImp != NULL) {
-        s_MgrImp->SetCurShader(cur_shader_id);
-    } else {
-        GLB_SAFE_ASSERT(false);
-    }
-}
-
-int32_t Mgr::GetCurShader() {
+int32_t Mgr::AddUberShader(const char* vertex_shader_file, const char* fragment_shader_file, const char* geometry_shader_file) {
     int32_t result = -1;
 
     if (s_MgrImp != NULL) {
-        result = s_MgrImp->GetCurShader();
-    } else {
-        GLB_SAFE_ASSERT(false);
-    }
-
-    return result;
-}
-
-int32_t Mgr::AddShader(const char* vertex_shader_file, const char* fragment_shader_file, const char* geometry_shader_file) {
-    int32_t result = -1;
-
-    if (s_MgrImp != NULL) {
-        result = s_MgrImp->AddShader(vertex_shader_file, fragment_shader_file, geometry_shader_file);
+        result = s_MgrImp->AddUberShader(vertex_shader_file, fragment_shader_file, geometry_shader_file);
     } else {
         GLB_SAFE_ASSERT(false);
     }
@@ -535,11 +626,11 @@ Program* Mgr::GetShader(int32_t shader_id) {
     return program;
 }
 
-int32_t Mgr::GetShader(Descriptor desc) {
+int32_t Mgr::GetUberShaderID(Descriptor desc) {
     int32_t program = -1;
 
     if (s_MgrImp != NULL) {
-        program = s_MgrImp->GetShader(desc);
+        program = s_MgrImp->GetUberShaderID(desc);
     } else {
         GLB_SAFE_ASSERT(false);
     }

@@ -19,6 +19,8 @@ namespace render {
 
 namespace shader {
 
+//--------------------------------------------------------------------
+
 enum {
     GLB_COLOR_IN_VERTEX = 0,
     GLB_NORMAL_IN_VERTEX,
@@ -35,6 +37,8 @@ enum {
     GLB_ENABLE_REFLECT_TEX,
 };
 
+//--------------------------------------------------------------------
+
 static const char* kEnableMacros[] = {
     "#define GLB_COLOR_IN_VERTEX\n",
     "#define GLB_NORMAL_IN_VERTEX\n",
@@ -50,6 +54,8 @@ static const char* kEnableMacros[] = {
     "#define GLB_ENABLE_AO\n",
     "#define GLB_ENABLE_REFLECT_TEX\n",
 };
+
+//--------------------------------------------------------------------
 
 class Descriptor {
 public:
@@ -69,6 +75,8 @@ private:
     char m_ShaderFlag[16];  // 128 bit flag
 };
 
+//--------------------------------------------------------------------
+
 class VertexShader {
 public:
     virtual ~VertexShader();
@@ -86,6 +94,8 @@ private:
     Imp*    m_Imp;
 };
 
+//--------------------------------------------------------------------
+
 class GeometryShader {
 public:
     virtual ~GeometryShader();
@@ -101,6 +111,8 @@ private:
     class Imp;
     Imp*    m_Imp;
 };
+
+//--------------------------------------------------------------------
 
 class FragmentShader {
 public:
@@ -119,21 +131,47 @@ private:
     Imp*    m_Imp;
 };
 
+//--------------------------------------------------------------------
+
 class Program {
 public:
-    virtual ~Program();
-    static Program* Create(const char* vertex_shader_file, const char* fragment_shader_file, const char* geometry_shader = NULL);
-    static Program* Create(Descriptor desc);
+    Program() {}
+    virtual ~Program() {}
 
 public:
-    void SetID(int32_t id);
-    ShaderLayout GetShaderLayout();
+    enum {
+        UBER_PROGRAM = 0,
+        USER_PROGRAM,
+        UNKOWN_PROGRAM,
+    };
+
+    virtual void SetProgramType(int32_t type) = 0;
+    virtual int32_t GetProgramType() = 0;
+    virtual void SetID(int32_t id) = 0;
+    virtual ShaderLayout GetShaderLayout() = 0;
+    virtual void* GetNativeShader() = 0;
+};
+
+//--------------------------------------------------------------------
+
+class UberProgram : public Program {
+public:
+    virtual ~UberProgram();
+    static UberProgram* Create(const char* vertex_shader_file, const char* fragment_shader_file, const char* geometry_shader = NULL);
+    static UberProgram* Create(Descriptor desc);
+
+public:
+    virtual void SetID(int32_t id);
+    virtual void SetProgramType(int32_t type);
+    virtual int32_t GetProgramType();
+    virtual ShaderLayout GetShaderLayout();
+    virtual void* GetNativeShader();
+
     Descriptor GetShaderDescriptor();
-    void* GetNativeShader();
     std::vector<uniform::UniformEntry>& GetUniforms();
 
 protected:
-    Program();
+    UberProgram();
 
     //--------------------------------------------------------------------------------------------
     // @brief: Get vertex layout attribute type according to the attribute name
@@ -146,17 +184,47 @@ private:
     Imp*    m_Imp;
 };
 
+//--------------------------------------------------------------------
+
+class UserProgram : public Program {
+public:
+    virtual ~UserProgram();
+    static UserProgram* Create(const char* vertex_shader_file, const char* fragment_shader_file, const char* geometry_shader = NULL);
+
+public:
+    virtual void SetID(int32_t id);
+    virtual void SetProgramType(int32_t type);
+    virtual int32_t GetProgramType();
+    virtual ShaderLayout GetShaderLayout();
+    virtual void* GetNativeShader();
+
+    int32_t GetUniformLocation(const char* uniform_name);
+
+protected:
+    UserProgram();
+
+    //--------------------------------------------------------------------------------------------
+    // @brief: Get vertex layout attribute type according to the attribute name
+    // @param: If failed, return VA_UNKNOWN. Otherwise return VertexAttribute
+    //--------------------------------------------------------------------------------------------
+    static VertexAttribute GetVertexAttribute(const char* attribute_name);
+
+private:
+    class Imp;
+    Imp*    m_Imp;
+};
+
+//--------------------------------------------------------------------
+
 class Mgr {
 public:
     static void Initialize();
     static void Destroy();
 
 public:
-    static void SetCurShader(int32_t cur_shader_id);
-    static int32_t GetCurShader();
-    static int32_t AddShader(const char* vertex_shader_file, const char* fragment_shader_file, const char* geometry_shader_file = NULL);
+    static int32_t AddUberShader(const char* vertex_shader_file, const char* fragment_shader_file, const char* geometry_shader_file = NULL);
     static Program* GetShader(int32_t shader_id);
-    static int32_t GetShader(Descriptor desc);
+    static int32_t GetUberShaderID(Descriptor desc);
 };
 
 };  // namespace shader

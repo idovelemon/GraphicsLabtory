@@ -413,6 +413,12 @@ const Vector Matrix::operator*(const Vector& v) {
     return result;
 }
 
+Matrix Matrix::operator*(const Matrix& m) {
+    Matrix result = *this;
+    result.Mul(m);
+    return result;
+}
+
 const float* Matrix::GetData() {
     return m_Matrix.v;
 }

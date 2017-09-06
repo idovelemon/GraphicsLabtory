@@ -17,21 +17,8 @@ namespace render {
 
 namespace shader {
 
-//-----------------------------------------------------------------------------------
-// CONSTANT VALUE
-//-----------------------------------------------------------------------------------
-
-//-----------------------------------------------------------------------------------
-// TYPE DECLARATION
-//-----------------------------------------------------------------------------------
-
-//-----------------------------------------------------------------------------------
-// CLASS DECLARATION
 //----------------------------------------------------------------------------------
 
-//-----------------------------------------------------------------------------------
-// VertexShader::Imp DECLARATION
-//----------------------------------------------------------------------------------
 class VertexShader::Imp {
 public:
     virtual ~Imp();
@@ -48,9 +35,8 @@ private:
     uint32_t m_VertexShader;
 };
 
-//-----------------------------------------------------------------------------------
-// GeometryShader::Imp DECLARATION
 //----------------------------------------------------------------------------------
+
 class GeometryShader::Imp {
 public:
     virtual ~Imp();
@@ -66,9 +52,8 @@ private:
     uint32_t m_GeometryShader;
 };
 
-//-----------------------------------------------------------------------------------
-// FragmentShader::Imp DECLARATION
 //----------------------------------------------------------------------------------
+
 class FragmentShader::Imp {
 public:
     virtual ~Imp();
@@ -85,20 +70,23 @@ private:
     uint32_t m_FragmentShader;
 };
 
-//-----------------------------------------------------------------------------------
-// Program::Imp DECLARATION
+
 //----------------------------------------------------------------------------------
-class Program::Imp {
+
+class UberProgram::Imp {
 public:
     virtual ~Imp();
-    static Program::Imp* Create(const char* vertex_shader_file, const char* fragment_shader_file, const char* geometry_shader_file = NULL);
-    static Program::Imp* Create(Descriptor desc);
+    static UberProgram::Imp* Create(const char* vertex_shader_file, const char* fragment_shader_file, const char* geometry_shader_file = NULL);
+    static UberProgram::Imp* Create(Descriptor desc);
 
 public:
     void SetID(int32_t id);
+    void SetProgramType(int32_t type);
+    int32_t GetProgramType();
     ShaderLayout GetShaderLayout();
-    Descriptor GetShaderDescriptor();
     void* GetNativeShader();
+
+    Descriptor GetShaderDescriptor();
     std::vector<uniform::UniformEntry>& GetUniforms();
 
 protected:
@@ -106,12 +94,41 @@ protected:
 
 private:
     int32_t                              m_ID;
+    int32_t                              m_Type;
     uint32_t                             m_Program;
     VertexShader*                        m_VertexShader;
     FragmentShader*                      m_FragmentShader;
     ShaderLayout                         m_ShaderLayout;
     Descriptor                           m_ShaderDescptor;
     std::vector<uniform::UniformEntry>   m_Uniforms;
+};
+
+//----------------------------------------------------------------------------------
+
+class UserProgram::Imp {
+public:
+    virtual ~Imp();
+    static UserProgram::Imp* Create(const char* vertex_shader_file, const char* fragment_shader_file, const char* geometry_shader_file = NULL);
+
+public:
+    void SetID(int32_t id);
+    void SetProgramType(int32_t type);
+    int32_t GetProgramType();
+    ShaderLayout GetShaderLayout();
+    void* GetNativeShader();
+
+    int32_t GetUniformLocation(const char* uniform_name);
+
+protected:
+    Imp();
+
+private:
+    int32_t                              m_ID;
+    int32_t                              m_Type;
+    uint32_t                             m_Program;
+    VertexShader*                        m_VertexShader;
+    FragmentShader*                      m_FragmentShader;
+    ShaderLayout                         m_ShaderLayout;
 };
 
 };  // namespace shader

@@ -857,8 +857,8 @@ void RenderImp::DrawDebug() {
     render::Device::SetDrawColorBuffer(render::COLORBUF_COLOR_ATTACHMENT0);
 
     // Shader
-    int32_t shader_id = shader::Mgr::GetShader(m_DebugMesh->GetShaderDesc());
-    shader::Program* program = shader::Mgr::GetShader(shader_id);
+    int32_t shader_id = shader::Mgr::GetUberShaderID(m_DebugMesh->GetShaderDesc());
+    shader::UberProgram* program = static_cast<shader::UberProgram*>(shader::Mgr::GetShader(shader_id));
     render::Device::SetShader(program);
     render::Device::SetShaderLayout(program->GetShaderLayout());
 
@@ -939,8 +939,8 @@ void RenderImp::PrepareShadowMap() {
         }
     }
 
-    // Create shadow shader
-    m_ShadowShader = shader::Mgr::AddShader("..\\glb\\shader\\shadow.vs", "..\\glb\\shader\\shadow.fs");
+    // Create shadow shader TODO: Use UserShader
+    m_ShadowShader = shader::Mgr::AddUberShader("..\\glb\\shader\\shadow.vs", "..\\glb\\shader\\shadow.fs");
 }
 
 void RenderImp::PrepareDepthMap() {
@@ -960,8 +960,8 @@ void RenderImp::PrepareDepthMap() {
         GLB_SAFE_ASSERT(false);
     }
 
-    // Create shader
-    m_DepthShader = shader::Mgr::AddShader("..\\glb\\shader\\depth.vs", "..\\glb\\shader\\depth.fs");
+    // Create shader TODO: Use UserShader
+    m_DepthShader = shader::Mgr::AddUberShader("..\\glb\\shader\\depth.vs", "..\\glb\\shader\\depth.fs");
 }
 
 void RenderImp::PrepareAOMap() {
@@ -998,10 +998,10 @@ void RenderImp::PrepareAOMap() {
         GLB_SAFE_ASSERT(false);
     }
 
-    // Create shader
-    m_AOShader = shader::Mgr::AddShader("..\\glb\\shader\\ssao.vs", "..\\glb\\shader\\ssao.fs");
-    m_BiBlurHShader = shader::Mgr::AddShader("..\\glb\\shader\\biblur.vs", "..\\glb\\shader\\biblurh.fs");
-    m_BiBlurVShader = shader::Mgr::AddShader("..\\glb\\shader\\biblur.vs", "..\\glb\\shader\\biblurv.fs");
+    // Create shader TODO: Use UserShader
+    m_AOShader = shader::Mgr::AddUberShader("..\\glb\\shader\\ssao.vs", "..\\glb\\shader\\ssao.fs");
+    m_BiBlurHShader = shader::Mgr::AddUberShader("..\\glb\\shader\\biblur.vs", "..\\glb\\shader\\biblurh.fs");
+    m_BiBlurVShader = shader::Mgr::AddUberShader("..\\glb\\shader\\biblur.vs", "..\\glb\\shader\\biblurv.fs");
 }
 
 void RenderImp::PrepareHDR() {
@@ -1039,12 +1039,12 @@ void RenderImp::PrepareHDR() {
     m_BloomWidth = m_Width / 4.0f;
     m_BloomHeight = m_Height / 4.0f;
 
-    // Create hdr shader
-    m_LogLumShader = shader::Mgr::AddShader("..\\glb\\shader\\loglum.vs", "..\\glb\\shader\\loglum.fs");
-    m_FilterBrightnessShader = shader::Mgr::AddShader("..\\glb\\shader\\brightfilter.vs", "..\\glb\\shader\\brightfilter.fs");
-    m_BloomHShader = shader::Mgr::AddShader("..\\glb\\shader\\bloom.vs", "..\\glb\\shader\\bloomh.fs");
-    m_BloomVShader = shader::Mgr::AddShader("..\\glb\\shader\\bloom.vs", "..\\glb\\shader\\bloomv.fs");
-    m_TonemapShader = shader::Mgr::AddShader("..\\glb\\shader\\tonemap.vs", "..\\glb\\shader\\tonemap.fs");
+    // Create hdr shader TODO: Use UserShader
+    m_LogLumShader = shader::Mgr::AddUberShader("..\\glb\\shader\\loglum.vs", "..\\glb\\shader\\loglum.fs");
+    m_FilterBrightnessShader = shader::Mgr::AddUberShader("..\\glb\\shader\\brightfilter.vs", "..\\glb\\shader\\brightfilter.fs");
+    m_BloomHShader = shader::Mgr::AddUberShader("..\\glb\\shader\\bloom.vs", "..\\glb\\shader\\bloomh.fs");
+    m_BloomVShader = shader::Mgr::AddUberShader("..\\glb\\shader\\bloom.vs", "..\\glb\\shader\\bloomv.fs");
+    m_TonemapShader = shader::Mgr::AddUberShader("..\\glb\\shader\\tonemap.vs", "..\\glb\\shader\\tonemap.fs");
 
     // Create screen mesh
     m_ScreenMesh = mesh::ScreenMesh::Create(static_cast<int32_t>(m_Width), static_cast<int32_t>(m_Height));
@@ -1373,7 +1373,7 @@ void RenderImp::DrawShadowMapCore() {
         render::Device::Clear(CLEAR_DEPTH);
 
         // Shader
-        shader::Program* program = shader::Mgr::GetShader(m_ShadowShader);
+        shader::UberProgram* program = static_cast<shader::UberProgram*>(shader::Mgr::GetShader(m_ShadowShader));
         std::vector<uniform::UniformEntry>& uniforms = program->GetUniforms();
         render::Device::SetShader(program);
         render::Device::SetShaderLayout(program->GetShaderLayout());
@@ -1636,7 +1636,7 @@ void RenderImp::PreDrawLightLoop() {
                 it->second.AddObject(objs[i]);
             } else {
                 shader::Descriptor desc = objs[i]->GetShaderDesc();
-                shader::Program* program = shader::Mgr::GetShader(shader::Mgr::GetShader(desc));
+                shader::Program* program = shader::Mgr::GetShader(shader::Mgr::GetUberShaderID(desc));
                 ShaderGroup new_group(desc, program);
                 new_group.AddObject(objs[i]);
                 opaque_group.insert(std::pair<std::string, ShaderGroup>(new_group.GetShaderDesc().GetString(), new_group));
@@ -1672,7 +1672,7 @@ void RenderImp::PreDrawLightLoop() {
         for (int32_t i = 0; i < static_cast<int32_t>(transparent_objs.size()); i++) {
             if (transparent_group.size() == 0) {
                 shader::Descriptor desc = transparent_objs[i]->GetShaderDesc();
-                ShaderGroup new_group(desc, shader::Mgr::GetShader(shader::Mgr::GetShader(desc)));
+                ShaderGroup new_group(desc, shader::Mgr::GetShader(shader::Mgr::GetUberShaderID(desc)));
                 new_group.AddObject(transparent_objs[i]);
                 transparent_group.push_back(new_group);
             } else {
@@ -1681,7 +1681,7 @@ void RenderImp::PreDrawLightLoop() {
                     transparent_group[transparent_group.size() - 1].AddObject(transparent_objs[i]);
                 } else {
                     shader::Descriptor desc = transparent_objs[i]->GetShaderDesc();
-                    ShaderGroup new_group(desc, shader::Mgr::GetShader(shader::Mgr::GetShader(desc)));
+                    ShaderGroup new_group(desc, shader::Mgr::GetShader(shader::Mgr::GetUberShaderID(desc)));
                     new_group.AddObject(transparent_objs[i]);
                     transparent_group.push_back(new_group);
                 }
@@ -1713,7 +1713,7 @@ void RenderImp::DrawLightLoopCore() {
     for (int32_t i = 0; i < static_cast<int32_t>(m_ShaderGroups.size()); i++) {
         std::vector<scene::Object*> objs = m_ShaderGroups[i].GetObjects();
         shader::Descriptor desc = m_ShaderGroups[i].GetShaderDesc();
-        shader::Program* program = m_ShaderGroups[i].GetShaderProgram();
+        shader::UberProgram* program = static_cast<shader::UberProgram*>(m_ShaderGroups[i].GetShaderProgram());
         std::vector<uniform::UniformEntry>& uniforms = program->GetUniforms();
 
         // Shader
@@ -1828,7 +1828,7 @@ void RenderImp::CalcLogLum() {
     render::Device::Clear(CLEAR_COLOR | CLEAR_DEPTH);
 
     // Shader
-    shader::Program* program = shader::Mgr::GetShader(m_LogLumShader);
+    shader::UberProgram* program = static_cast<shader::UberProgram*>(shader::Mgr::GetShader(m_LogLumShader));
     render::Device::SetShader(program);
     render::Device::SetShaderLayout(program->GetShaderLayout());
 
@@ -1904,7 +1904,7 @@ void RenderImp::FilterBrightness() {
     render::Device::Clear(CLEAR_COLOR | CLEAR_DEPTH);
 
     // Shader
-    shader::Program* program = shader::Mgr::GetShader(m_FilterBrightnessShader);
+    shader::UberProgram* program = static_cast<shader::UberProgram*>(shader::Mgr::GetShader(m_FilterBrightnessShader));
     render::Device::SetShader(program);
     render::Device::SetShaderLayout(program->GetShaderLayout());
 
@@ -1964,7 +1964,7 @@ void RenderImp::BloomH() {
     render::Device::Clear(CLEAR_COLOR | CLEAR_DEPTH);
 
     // Shader
-    shader::Program* program = shader::Mgr::GetShader(m_BloomHShader);
+    shader::UberProgram* program = static_cast<shader::UberProgram*>(shader::Mgr::GetShader(m_BloomHShader));
     render::Device::SetShader(program);
     render::Device::SetShaderLayout(program->GetShaderLayout());
 
@@ -2020,7 +2020,7 @@ void RenderImp::BloomV() {
     render::Device::Clear(CLEAR_COLOR | CLEAR_DEPTH);
 
     // Shader
-    shader::Program* program = shader::Mgr::GetShader(m_BloomVShader);
+    shader::UberProgram* program = static_cast<shader::UberProgram*>(shader::Mgr::GetShader(m_BloomVShader));
     render::Device::SetShader(program);
     render::Device::SetShaderLayout(program->GetShaderLayout());
 
@@ -2070,7 +2070,7 @@ void RenderImp::BlendHDRScene() {
     render::Device::Clear(CLEAR_COLOR | CLEAR_DEPTH);
 
     // Shader
-    shader::Program* program = shader::Mgr::GetShader(m_TonemapShader);
+    shader::UberProgram* program = static_cast<shader::UberProgram*>(shader::Mgr::GetShader(m_TonemapShader));
     render::Device::SetShader(program);
     render::Device::SetShaderLayout(program->GetShaderLayout());
 
@@ -2120,7 +2120,7 @@ void RenderImp::DrawDepthMap() {
     render::Device::Clear(CLEAR_DEPTH);
 
     // Shader
-    shader::Program* program = shader::Mgr::GetShader(m_DepthShader);
+    shader::UberProgram* program = static_cast<shader::UberProgram*>(shader::Mgr::GetShader(m_DepthShader));
     std::vector<uniform::UniformEntry>& uniforms = program->GetUniforms();
     render::Device::SetShader(program);
     render::Device::SetShaderLayout(program->GetShaderLayout());
@@ -2240,7 +2240,7 @@ void RenderImp::DrawAO() {
     render::Device::Clear(CLEAR_DEPTH | CLEAR_COLOR);
 
     // Shader
-    shader::Program* program = shader::Mgr::GetShader(m_AOShader);
+    shader::UberProgram* program = static_cast<shader::UberProgram*>(shader::Mgr::GetShader(m_AOShader));
     std::vector<uniform::UniformEntry>& uniforms = program->GetUniforms();
     render::Device::SetShader(program);
     render::Device::SetShaderLayout(program->GetShaderLayout());
@@ -2285,7 +2285,7 @@ void RenderImp::BiBlurH() {
     render::Device::Clear(CLEAR_DEPTH | CLEAR_COLOR);
 
     // Shader
-    shader::Program* program = shader::Mgr::GetShader(m_BiBlurHShader);
+    shader::UberProgram* program = static_cast<shader::UberProgram*>(shader::Mgr::GetShader(m_BiBlurHShader));
     std::vector<uniform::UniformEntry>& uniforms = program->GetUniforms();
     render::Device::SetShader(program);
     render::Device::SetShaderLayout(program->GetShaderLayout());
@@ -2330,7 +2330,7 @@ void RenderImp::BiBlurV() {
     render::Device::Clear(CLEAR_DEPTH | CLEAR_COLOR);
 
     // Shader
-    shader::Program* program = shader::Mgr::GetShader(m_BiBlurVShader);
+    shader::UberProgram* program = static_cast<shader::UberProgram*>(shader::Mgr::GetShader(m_BiBlurVShader));
     std::vector<uniform::UniformEntry>& uniforms = program->GetUniforms();
     render::Device::SetShader(program);
     render::Device::SetShaderLayout(program->GetShaderLayout());
@@ -2389,7 +2389,7 @@ void RenderImp::PreDrawEnvMap() {
             if (it != opaque_group.end()) {
                 it->second.AddObject(objs[i]);
             } else {
-                shader::Program* program = shader::Mgr::GetShader(shader::Mgr::GetShader(desc));
+                shader::Program* program = shader::Mgr::GetShader(shader::Mgr::GetUberShaderID(desc));
                 ShaderGroup new_group(desc, program);
                 new_group.AddObject(objs[i]);
                 opaque_group.insert(std::pair<std::string, ShaderGroup>(new_group.GetShaderDesc().GetString(), new_group));
@@ -2426,7 +2426,7 @@ void RenderImp::PreDrawEnvMap() {
             if (transparent_group.size() == 0) {
                 shader::Descriptor desc = transparent_objs[i]->GetShaderDesc();
                 desc.SetFlag(shader::GLB_ENABLE_REFLECT_TEX, false);
-                ShaderGroup new_group(desc, shader::Mgr::GetShader(shader::Mgr::GetShader(desc)));
+                ShaderGroup new_group(desc, shader::Mgr::GetShader(shader::Mgr::GetUberShaderID(desc)));
                 new_group.AddObject(transparent_objs[i]);
                 transparent_group.push_back(new_group);
             } else {
@@ -2437,7 +2437,7 @@ void RenderImp::PreDrawEnvMap() {
                 if (desc2.Equal(desc)) {
                     transparent_group[transparent_group.size() - 1].AddObject(transparent_objs[i]);
                 } else {
-                    ShaderGroup new_group(desc, shader::Mgr::GetShader(shader::Mgr::GetShader(desc)));
+                    ShaderGroup new_group(desc, shader::Mgr::GetShader(shader::Mgr::GetUberShaderID(desc)));
                     new_group.AddObject(transparent_objs[i]);
                     transparent_group.push_back(new_group);
                 }
@@ -2509,7 +2509,7 @@ void RenderImp::DrawEnvMapCore() {
             for (int32_t k = 0; k < static_cast<int32_t>(m_ShaderGroups.size()); k++) {
                 std::vector<scene::Object*> objs = m_ShaderGroups[k].GetObjects();
                 shader::Descriptor desc = m_ShaderGroups[k].GetShaderDesc();
-                shader::Program* program = m_ShaderGroups[k].GetShaderProgram();
+                shader::UberProgram* program = static_cast<shader::UberProgram*>(m_ShaderGroups[k].GetShaderProgram());
                 std::vector<uniform::UniformEntry>& uniforms = program->GetUniforms();
 
                 // Shader
@@ -2534,7 +2534,7 @@ void RenderImp::DrawEnvMapCore() {
                     }
                 }
 
-                // scene::Objects
+                // Objects
                 for (int32_t l = 0; l < static_cast<int32_t>(objs.size()); l++) {
                     scene::Object* obj = objs[l];
                     if (obj == ref_obj || !obj->IsDrawEnable()) {
@@ -2552,7 +2552,7 @@ void RenderImp::DrawEnvMapCore() {
                         render::Device::SetTexture(render::TS_NORMAL, texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(scene::Model::MT_NORMAL)), tex_unit++);
                     }
 
-                    // scene::Object Uniform
+                    // Object Uniform
                     for (int32_t m = 0; m < static_cast<int32_t>(uniforms.size()); m++) {
                         uniform::UniformEntry entry = uniforms[m];
                         if (!entry.flag) {
