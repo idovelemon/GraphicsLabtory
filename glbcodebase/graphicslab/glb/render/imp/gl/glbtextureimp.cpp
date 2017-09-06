@@ -301,7 +301,7 @@ void Texture::Imp::CreateGLTextureCube(int32_t tex_obj, int32_t width, int32_t h
                 int32_t gl_faces[] = {
                     GL_TEXTURE_CUBE_MAP_POSITIVE_X,
                     GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
-                    GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,  // Flip Y
+                    GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,  // TODO: Just flip y, i do not know why
                     GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
                     GL_TEXTURE_CUBE_MAP_POSITIVE_Z,
                     GL_TEXTURE_CUBE_MAP_NEGATIVE_Z,

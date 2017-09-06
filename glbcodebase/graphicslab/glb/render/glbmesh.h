@@ -112,7 +112,7 @@ private:
 class ScreenMesh {
 public:
     virtual ~ScreenMesh();
-    static ScreenMesh* Create(int32_t width, int32_t height);
+    static ScreenMesh* Create(int32_t width = 1, int32_t height = 1);
 
 public:
     VertexLayout GetVertexLayout();
