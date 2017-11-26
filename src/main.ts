@@ -2,7 +2,7 @@
 class GameMain{
     constructor()
     {
-        Laya.init(600,400);
+        new GameStart();
     }
 }
 new GameMain();
