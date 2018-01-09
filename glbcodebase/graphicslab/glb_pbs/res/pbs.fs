@@ -48,7 +48,7 @@ float calc_Geometry_Smith(vec3 n, vec3 v, vec3 l, float roughness) {
 
 vec3 calc_lighting_direct(vec3 n, vec3 v, vec3 l, vec3 h, vec3 albedo, float roughness, float metalic, vec3 light) {
     vec3 F0 = mix(vec3(0.04, 0.04, 0.04), albedo, metalic);
-    vec3 F = calc_frenel(n, v, F0);
+    vec3 F = calc_frenel(h, v, F0);
 
     vec3 T = vec3(1.0, 1.0, 1.0) - F;
     vec3 kD = T * (1.0 - metalic);
