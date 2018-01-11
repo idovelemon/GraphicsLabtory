@@ -44,7 +44,10 @@ DeviceImp::DeviceImp()
 , m_ClearG(0.0f)
 , m_ClearB(0.0f)
 , m_ClearDepth(0.0f) {
-    memset(m_Texture, 0, sizeof(m_Texture));
+    for (int32_t i = 0; i < TS_MAX; i++) {
+        m_Texture[i].tex_obj = -1;
+        m_Texture[i].tex_unit = -1;
+    }
 }
 
 DeviceImp::~DeviceImp() {
@@ -343,7 +346,8 @@ void DeviceImp::SetupRenderState() {
     SetupVertexLayout();
 
     // Texture
-    SetupTexture();
+    // note: Use SetUniformSampler2D, SetUniformSamplerCube
+    // SetupTexture();
 }
 
 GLenum DeviceImp::GetPrimitiveTypeGL(PrimitiveType type) {
@@ -607,12 +611,12 @@ void DeviceImp::SetupVertexLayout() {
 }
 
 void DeviceImp::SetupTexture() {
-    //for (int32_t i = 0; i < TS_MAX; i++) {
-    //    if (m_Texture[i] != -1) {
-    //        glActiveTexture(GL_TEXTURE0 + i);
-    //        glBindTexture(GL_TEXTURE_2D, m_Texture[i]);
-    //    }
-    //}
+    for (int32_t i = 0; i < TS_MAX; i++) {
+        if (m_Texture[i].tex_unit != -1 && m_Texture[i].tex_obj != -1) {
+            glActiveTexture(GL_TEXTURE0 + i);
+            glBindTexture(GL_TEXTURE_2D, m_Texture[i].tex_obj);
+        }
+    }
 }
 
 };  // namespace render

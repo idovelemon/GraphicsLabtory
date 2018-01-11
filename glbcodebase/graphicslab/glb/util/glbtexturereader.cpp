@@ -152,6 +152,7 @@ int32_t BmpTextureReader::ReadTexture(const char* file_name, int8_t** texture_da
 
             tex_width = info_header.biWidth;
             tex_height = info_header.biHeight;
+            texture_type = util::TT_2D;
             pixel_format = TPFT_R8G8B8A8;
             result = 1;
 
