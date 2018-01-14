@@ -327,6 +327,13 @@ void Matrix::RotateZXY(float rx, float ry, float rz) {
     *this = rotate_zxy;
 }
 
+void Matrix::RotateAxis(Vector axis, float rotate_degree) {
+    Matrix rotate_axis;
+    rotate_axis.MakeRotateAxisMatrix(axis, rotate_degree);
+    rotate_axis.Mul(*this);
+    *this = rotate_axis;
+}
+
 void Matrix::Translate(float tx, float ty, float tz) {
     Matrix trans;
     trans.MakeTranslateMatrix(tx, ty, tz);

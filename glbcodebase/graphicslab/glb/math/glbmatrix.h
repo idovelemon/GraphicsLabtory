@@ -61,6 +61,7 @@ class Matrix {
     inline void RotateZ(float rotate_degree);
     inline void RotateXYZ(float rx, float ry, float rz);
     inline void RotateZXY(float rx, float ry, float rz);
+    inline void RotateAxis(Vector axis, float rotate_degree);
 
     //----------------------------------------------------------------------
     // @brief: Multiply a matrix and save result
