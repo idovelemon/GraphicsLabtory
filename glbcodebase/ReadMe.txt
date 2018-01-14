@@ -25,6 +25,7 @@ Common->Addtional Include Directory:
 $(SolutionDir)\glb
 $(SolutionDir)\..\glew\include
 $(DXSDK_DIR)\Include
+输出文件->对象文件名:$(IntDir)/%(RelativeDir)/
 
 Preprocessor->Preprocessor:
 GLB_PLATFORM_OPENGL (For opengl version graphics labtory)
