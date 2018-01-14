@@ -46,7 +46,9 @@ public:
         FMT_R8G8B8 = 0,
         FMT_R8G8B8A8,
         FMT_R16G16,
+        FMT_R16G16B16A16F,
         FMT_R32G32B32A32F,
+        FMT_R16G16B16F,
         FMT_DEPTH32F,
     };
 
@@ -59,6 +61,7 @@ public:
     static Texture* CreateFloat32Texture(int32_t width, int32_t height);
     static Texture* CreateFloat32DepthTexture(int32_t width, int32_t height);
     static Texture* CreateFloat32CubeTexture(int32_t width, int32_t height);
+    static Texture* CreateFloat16CubeTexture(int32_t width, int32_t height);
 
 public:
     int32_t GetID();

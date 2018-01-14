@@ -161,6 +161,25 @@ Texture* Texture::CreateFloat32CubeTexture(int32_t width, int32_t height) {
     return tex;
 }
 
+Texture* Texture::CreateFloat16CubeTexture(int32_t width, int32_t height) {
+    Texture* tex = NULL;
+    Texture::Imp* imp = Texture::Imp::CreateFloat16CubeTexture(width, height);
+
+    if (imp != NULL) {
+        tex = new Texture;
+        if (tex != NULL) {
+            tex->m_Imp = imp;
+        } else {
+            GLB_SAFE_ASSERT(false);
+        }
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return tex;
+
+}
+
 void Texture::Destroy() {
     if (m_Imp != NULL) {
         m_Imp->Destroy();

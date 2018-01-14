@@ -6,6 +6,7 @@
 // Add BMP
 // Add DDS RGB
 // Add DDS Cubemap
+// Add HDR
 //----------------------------------------------------------------------------
 #include "glbtexturereader.h"
 
@@ -19,6 +20,10 @@
 #include "glbddsformat.h"
 #include "glbtextureinfo.h"
 #include "glbmacro.h"
+
+#define STB_IMAGE_IMPLEMENTATION
+#include "thirdparty/stb_image/std_image.h"
+
 
 namespace glb {
 
@@ -51,7 +56,7 @@ public:
 
 //--------------------------------------------------------------------------
 
-class BmpTextureReader:public TextureReaderBase {
+class BmpTextureReader : public TextureReaderBase {
 public:
     BmpTextureReader();
     virtual ~BmpTextureReader();
@@ -80,6 +85,17 @@ protected:
 
     void ReorganizeRGBAData(int8_t* data, TEXTURE_PIXEL_FORMAT_TYPE type);
     TEXTURE_PIXEL_FORMAT_TYPE ReorganizeRGBAFormat(TEXTURE_PIXEL_FORMAT_TYPE type);
+};
+
+//--------------------------------------------------------------------------
+
+class HDRTextureReader : public TextureReaderBase {
+public:
+    HDRTextureReader();
+    virtual~HDRTextureReader();
+
+public:
+    virtual int32_t ReadTexture(const char* file_name, int8_t** texture_data, int32_t& tex_width, int32_t& tex_height, int32_t& texture_type, int32_t& pixel_format);
 };
 
 //--------------------------------------------------------------------------------
@@ -233,6 +249,7 @@ TEXTURE_PIXEL_FORMAT_TYPE DDSTextureReader::GetPixelType(DDSSurfaceDesc desc) {
             {TPFT_R8G8B8A8, 32, 0xff000000, 0x00ff0000, 0x0000ff00, 0x000000ff},
             {TPFT_R16G16, 32, 0xffff0000, 0x0000ffff, 0x0, 0x0},
             {TPFT_G16R16, 32, 0x0000ffff, 0xffff0000, 0x0, 0x0},
+            {TPFT_R16G16B16F, 32, 0x0000ffff, 0xffff0000, 0x0, 0x0},  // not use
         };
         static_assert(GLB_ARRAY_SIZE(pixel_format_tbl) == util::TPFT_UNKOWN, "");
 
@@ -395,6 +412,7 @@ TEXTURE_PIXEL_FORMAT_TYPE DDSTextureReader::ReorganizeRGBAFormat(TEXTURE_PIXEL_F
         {TPFT_R8G8B8A8, TPFT_R8G8B8A8},
         {TPFT_R16G16, TPFT_R16G16},
         {TPFT_G16R16, TPFT_R16G16},
+        {TPFT_R16G16B16F, TPFT_R16G16B16F},  // not use
     };
     static_assert(GLB_ARRAY_SIZE(reformat_pixel_tbl) == util::TPFT_UNKOWN, "");
 
@@ -410,6 +428,30 @@ TEXTURE_PIXEL_FORMAT_TYPE DDSTextureReader::ReorganizeRGBAFormat(TEXTURE_PIXEL_F
     return result;
 }
 
+//--------------------------------------------------------------------------------
+
+HDRTextureReader::HDRTextureReader() {
+}
+
+HDRTextureReader::~HDRTextureReader() {
+}
+
+int32_t HDRTextureReader::ReadTexture(const char* file_name, int8_t** texture_data, int32_t& tex_width, int32_t& tex_height, int32_t& texture_type, int32_t& pixel_format) {
+    TEXTURE_PIXEL_FORMAT_TYPE result = TPFT_UNKOWN;
+
+    if (file_name == NULL || texture_data == NULL) return result;
+
+    stbi_set_flip_vertically_on_load(true);
+    int32_t width = 0, height = 0, component = 0;
+    float* data = stbi_loadf(file_name, &width, &height, &component, 0);
+    *texture_data = reinterpret_cast<int8_t*>(data);
+    tex_width = width;
+    tex_height = height;
+    texture_type = util::TT_2D;
+    pixel_format = result = TPFT_R16G16B16F;
+
+    return result;
+}
 //--------------------------------------------------------------------------------
 
 int32_t TextureReader::ReadTexture(const char* file_name, int8_t** data, int32_t& tex_width, int32_t& tex_height, int32_t& texture_type, int32_t& pixel_format) {
@@ -436,6 +478,9 @@ int32_t TextureReader::ReadTexture(const char* file_name, int8_t** data, int32_t
         } else if (!strcmp(postfix, ".dds")) {
             DDSTextureReader dds_reader;
             result = dds_reader.ReadTexture(file_name, data, tex_width, tex_height, texture_type, pixel_format);
+        } else if (!strcmp(postfix, ".hdr")) {
+            HDRTextureReader hdr_reader;
+            result = hdr_reader.ReadTexture(file_name, data, tex_width, tex_height, texture_type, pixel_format);
         } else {
             GLB_SAFE_ASSERT(false);
         }

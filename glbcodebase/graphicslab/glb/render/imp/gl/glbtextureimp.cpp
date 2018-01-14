@@ -41,6 +41,7 @@ struct {
     {util::TPFT_R8G8B8A8, GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, 4},
     {util::TPFT_R16G16, GL_RG16, GL_RG, GL_UNSIGNED_SHORT, 4},
     {util::TPFT_G16R16, GL_RG16, GL_RG, GL_UNSIGNED_SHORT, 4},
+    {util::TPFT_R16G16B16F, GL_RGB16F, GL_RGB, GL_FLOAT, 3},
 };
 static_assert(GLB_ARRAY_SIZE(kGLPixelFormatTbl) == util::TPFT_UNKOWN, "");
 
@@ -274,12 +275,60 @@ Texture::Imp* Texture::Imp::CreateFloat32CubeTexture(int32_t width, int32_t heig
     return tex;
 }
 
+Texture::Imp* Texture::Imp::CreateFloat16CubeTexture(int32_t width, int32_t height) {
+    Texture::Imp* tex = NULL;
+
+    // Warning: The cube map's 6 texture must be square and have the same size
+    if (width > 0 && height > 0 && width == height) {
+        int32_t tex_id = 0;
+        glGenTextures(1, reinterpret_cast<GLuint*>(&tex_id));
+        glBindTexture(GL_TEXTURE_CUBE_MAP, tex_id);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP);
+
+        for(int32_t i = 0; i < 6; i++) {
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_UNSIGNED_SHORT, NULL);
+        }
+
+        tex = new Texture::Imp;
+        if (tex != NULL) {
+            tex->m_Type = TEX_CUBE;
+            tex->m_Depth = 0;
+            tex->m_Height = height;
+            static char default_name[] = "DefaultEmpty";
+            memcpy(tex->m_TexName, default_name, sizeof(default_name));
+            tex->m_TexObj = tex_id;
+            tex->m_Width = width;
+            tex->m_Format = FMT_R16G16B16A16F;
+            tex->m_BPP = 8;
+        } else {
+            GLB_SAFE_ASSERT(false);
+        }
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return tex;
+}
+
 void Texture::Imp::CreateGLTexture2D(int32_t tex_obj, int32_t width, int32_t height, int8_t* texture_data, int32_t texture_pixel_format) {
     for (int32_t i = 0; i < GLB_ARRAY_SIZE(kGLPixelFormatTbl); i++) {
         if (kGLPixelFormatTbl[i].pixel_format == texture_pixel_format) {
             glBindTexture(GL_TEXTURE_2D, tex_obj);
-            glTexImage2D(GL_TEXTURE_2D, 0, kGLPixelFormatTbl[i].internel_format, width, height, 0, kGLPixelFormatTbl[i].data_format, kGLPixelFormatTbl[i].data_type, texture_data);
+            if (kGLPixelFormatTbl[i].data_type == GL_FLOAT) {
+                float* data = reinterpret_cast<float*>(texture_data);
+                glTexImage2D(GL_TEXTURE_2D, 0, kGLPixelFormatTbl[i].internel_format, width, height, 0, kGLPixelFormatTbl[i].data_format, kGLPixelFormatTbl[i].data_type, data);
+            } else {
+                glTexImage2D(GL_TEXTURE_2D, 0, kGLPixelFormatTbl[i].internel_format, width, height, 0, kGLPixelFormatTbl[i].data_format, kGLPixelFormatTbl[i].data_type, texture_data);
+            }
             glGenerateMipmap(GL_TEXTURE_2D);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
             glBindTexture(GL_TEXTURE_2D, 0);
             break;
         }
@@ -332,6 +381,7 @@ void Texture::Imp::SetTexturePixelFormat(Texture::Imp* texture, int32_t texture_
             {util::TPFT_R8G8B8A8, FMT_R8G8B8A8, 4},
             {util::TPFT_R16G16, FMT_R16G16, 4},
             {util::TPFT_G16R16, FMT_R16G16, 4},
+            {util::TPFT_R16G16B16F, FMT_R16G16B16F, 3},
         };
         static_assert(GLB_ARRAY_SIZE(pixel_format) == util::TPFT_UNKOWN, "");
 
@@ -392,6 +442,18 @@ void Texture::Imp::GetTextureData(void* pixel, int32_t miplevel) {
             glGetTexImage(GL_TEXTURE_2D, miplevel, GL_RGBA, GL_UNSIGNED_BYTE, pixel);
         } else if (m_Format == FMT_R32G32B32A32F) {
             glGetTexImage(GL_TEXTURE_2D, miplevel, GL_RGBA, GL_FLOAT, pixel);
+        } else {
+            GLB_SAFE_ASSERT(false);
+        }
+        break;
+
+    case TEX_CUBE:
+        glEnable(GL_TEXTURE_CUBE_MAP);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, m_TexObj);
+        if (m_Format == FMT_R16G16B16A16F) {
+            glGetTexImage(GL_TEXTURE_CUBE_MAP, miplevel, GL_RGBA, GL_UNSIGNED_SHORT, pixel);
+        } else {
+            GLB_SAFE_ASSERT(false);
         }
         break;
 
@@ -429,7 +491,9 @@ void Texture::Imp::Save(const char* file_name, util::TEXTURE_FILE_TYPE file_type
 
         GetTextureData(pixel, 0);
 
-        util::TextureWriter::Write(file_name, pixel, m_Width, m_Height, pixel_format, m_BPP, file_type);
+        // util::TextureWriter::Write(file_name, pixel, m_Width, m_Height, pixel_format, m_BPP, file_type);
+    } else if (m_Type == TEX_CUBE) {
+
     } else {
         // TODO: Only save 2D texture now
         GLB_SAFE_ASSERT(false);
