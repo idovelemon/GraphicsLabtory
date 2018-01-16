@@ -61,8 +61,8 @@ vec3 calc_lighting_direct(vec3 n, vec3 v, vec3 l, vec3 h, vec3 albedo, float rou
     float t = 4.0 * max(dot(n, v), 0.0) * max(dot(n, l), 0.0) + 0.001;
     vec3 Specular = D * F * G * vec3(1.0 / t, 1.0 / t, 1.0 / t);
 
-    float ndotv = max(dot(n, v), 0.0);
-    return (Diffuse + Specular) * light * vec3(ndotv, ndotv, ndotv);
+    float ndotl = max(dot(n, l), 0.0);
+    return (Diffuse + Specular) * light * vec3(ndotl, ndotl, ndotl);
 }
 
 void main() {
