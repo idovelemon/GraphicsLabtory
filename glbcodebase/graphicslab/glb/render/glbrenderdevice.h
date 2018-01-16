@@ -126,6 +126,7 @@ public:
 
     // Render State
     static void SetDepthTestEnable(bool enable);
+    static void SetDepthWriteEnable(bool enable);
 
     static void SetAlphaBlendEnable(bool enable);
     static void SetAlphaBlendFunc(AlphaBlendFactor factor, AlphaBlendFunc func);

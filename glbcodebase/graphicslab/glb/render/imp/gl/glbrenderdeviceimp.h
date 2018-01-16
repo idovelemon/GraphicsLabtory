@@ -71,6 +71,7 @@ public:
 
     // Render State
     void SetDepthTestEnable(bool enable);
+    void SetDepthWriteEnable(bool enable);
 
     void SetAlphaBlendEnable(bool enable);
     void SetAlphaBlendFunc(AlphaBlendFactor factor, AlphaBlendFunc func);
@@ -121,6 +122,7 @@ private:
 
     // Render State
     bool                m_EnableDepthTest;
+    bool                m_EnableDepthWrite;
     bool                m_EnableAlphaBlend;
     bool                m_EnableCullFace;
     CullMode            m_CullMode;

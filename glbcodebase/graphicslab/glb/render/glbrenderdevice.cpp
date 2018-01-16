@@ -151,6 +151,14 @@ void Device::SetDepthTestEnable(bool enable) {
     }
 }
 
+void Device::SetDepthWriteEnable(bool enable) {
+    if (s_DeviceImp != NULL) {
+        s_DeviceImp->SetDepthWriteEnable(enable);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+}
+
 void Device::SetAlphaBlendEnable(bool enable) {
     if (s_DeviceImp != NULL) {
         s_DeviceImp->SetAlphaBlendEnable(enable);

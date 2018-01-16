@@ -35,6 +35,7 @@ DeviceImp::DeviceImp()
 , m_VertexLayout()
 , m_ShaderLayout()
 , m_EnableDepthTest(false)
+, m_EnableDepthWrite(false)
 , m_EnableAlphaBlend(false)
 , m_EnableCullFace(false)
 , m_CullMode(CULL_NONE)
@@ -229,6 +230,10 @@ void DeviceImp::SetDepthTestEnable(bool enable) {
     m_EnableDepthTest = enable;
 }
 
+void DeviceImp::SetDepthWriteEnable(bool enable) {
+    m_EnableDepthWrite = enable;
+}
+
 void DeviceImp::SetAlphaBlendEnable(bool enable) {
     m_EnableAlphaBlend = enable;
 }
@@ -326,6 +331,11 @@ void DeviceImp::SetupRenderState() {
         glEnable(GL_DEPTH_TEST);
     } else {
         glDisable(GL_DEPTH_TEST);
+    }
+    if (m_EnableDepthWrite) {
+        // TODO:
+    } else {
+        // TODO:
     }
 
     // Alpha

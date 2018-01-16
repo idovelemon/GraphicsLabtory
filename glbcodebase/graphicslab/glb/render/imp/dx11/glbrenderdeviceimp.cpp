@@ -190,6 +190,10 @@ void DeviceImp::SetDepthTestEnable(bool enable) {
     m_EnableDepthTest = enable;
 }
 
+void DeviceImp::SetDepthTestEnable(bool enable) {
+    // TODO:
+}
+
 void DeviceImp::SetAlphaBlendEnable(bool enable) {
     m_EnableAlphaBlend = enable;
 }
