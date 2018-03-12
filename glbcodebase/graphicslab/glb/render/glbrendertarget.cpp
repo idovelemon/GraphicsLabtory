@@ -52,17 +52,17 @@ void RenderTarget::AttachDepthTexture(texture::Texture* depth_tex) {
     }
 }
 
-void RenderTarget::AttachColorTexture(render::DrawColorBuffer index, texture::Texture* color_tex) {
+void RenderTarget::AttachColorTexture(render::DrawColorBuffer index, texture::Texture* color_tex, int32_t level) {
     if (m_Imp != NULL) {
-        m_Imp->AttachColorTexture(index, color_tex);
+        m_Imp->AttachColorTexture(index, color_tex, level);
     } else {
         GLB_SAFE_ASSERT(false);
     }
 }
 
-void RenderTarget::AttachCubeTexture(render::DrawColorBuffer* index, texture::Texture* cube_tex) {
+void RenderTarget::AttachCubeTexture(render::DrawColorBuffer* index, texture::Texture* cube_tex, int32_t level) {
     if (m_Imp != NULL) {
-        m_Imp->AttachCubeTexture(index, cube_tex);
+        m_Imp->AttachCubeTexture(index, cube_tex, level);
     } else {
         GLB_SAFE_ASSERT(false);
     }

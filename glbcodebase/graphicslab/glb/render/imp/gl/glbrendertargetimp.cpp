@@ -103,19 +103,19 @@ void RenderTarget::Imp::AttachDepthTexture(texture::Texture* depth_tex) {
     }
 }
 
-void RenderTarget::Imp::AttachColorTexture(render::DrawColorBuffer index, texture::Texture* color_tex) {
+void RenderTarget::Imp::AttachColorTexture(render::DrawColorBuffer index, texture::Texture* color_tex, int32_t level) {
     if (render::COLORBUF_COLOR_ATTACHMENT0 <= index && index <= render::COLORBUF_COLOR_ATTACHMENT7
         && color_tex != NULL) {
         glBindFramebuffer(GL_FRAMEBUFFER, m_FBO);
         glBindTexture(GL_TEXTURE_2D, reinterpret_cast<GLuint>(color_tex->GetNativeTex()));
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index - render::COLORBUF_COLOR_ATTACHMENT0, GL_TEXTURE_2D, reinterpret_cast<GLuint>(color_tex->GetNativeTex()), 0);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index - render::COLORBUF_COLOR_ATTACHMENT0, GL_TEXTURE_2D, reinterpret_cast<GLuint>(color_tex->GetNativeTex()), level);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     } else {
         GLB_SAFE_ASSERT(false);
     }
 }
 
-void RenderTarget::Imp::AttachCubeTexture(render::DrawColorBuffer* index, texture::Texture* cube_tex) {
+void RenderTarget::Imp::AttachCubeTexture(render::DrawColorBuffer* index, texture::Texture* cube_tex, int32_t level) {
     if (cube_tex != NULL) {
         GLuint tex_obj = reinterpret_cast<GLuint>(cube_tex->GetNativeTex());
         if (cube_tex->GetType() == texture::Texture::TEX_CUBE) {
@@ -132,7 +132,7 @@ void RenderTarget::Imp::AttachCubeTexture(render::DrawColorBuffer* index, textur
             for (int32_t i = 0; i < 6; i++) {
                 if (render::COLORBUF_COLOR_ATTACHMENT0 <= index[i] && index[i] <= render::COLORBUF_COLOR_ATTACHMENT7) {
                     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index[i] - render::COLORBUF_COLOR_ATTACHMENT0
-                    , face[i], tex_obj, 0);
+                    , face[i], tex_obj, level);
                 } else {
                     GLB_SAFE_ASSERT(false);
                 }
