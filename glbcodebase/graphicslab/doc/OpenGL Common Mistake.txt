@@ -9,3 +9,7 @@ c库中log函数，表示的是以10为底数的。
 int32_t max_level = log(max(width,height)) / log(2);
 
 (4)Cube Map的贴图必须要是正方形的，且尺寸一致
+
+(5)glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);用于开启贴图的Mipmap功能
+
+(6)开启了mipmap功能的贴图，当作为render target的时候，绘制完毕，另外的mipmap level 需要调用glGenerateMipmap来生成
