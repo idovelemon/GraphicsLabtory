@@ -4,10 +4,13 @@
 in vec3 vs_Vertex;
 in vec2 vs_Texcoord;
 in vec3 vs_Normal;
+in vec3 vs_Tangent;
+in vec3 vs_Binormal;
 
-uniform sampler2D glb_Albedo;
-uniform sampler2D glb_Roughness;
-uniform sampler2D glb_Metallic;
+uniform sampler2D glb_AlbedoMap;
+uniform sampler2D glb_RoughnessMap;
+uniform sampler2D glb_MetallicMap;
+uniform sampler2D glb_NormalMap;
 uniform vec3 glb_EyePos;
 uniform samplerCube glb_IrradianceMap;
 uniform samplerCube glb_PerfilterEnvMap;
@@ -106,7 +109,21 @@ vec3 calc_ibl(vec3 n, vec3 v, vec3 albedo, float roughness, float metalic) {
     return diffuse + specular;
 }
 
-void main() {
+vec3 calc_normal() {
+	vec3 normal = vec3(0.0, 0.0, 0.0);
+
+	normal = texture2D(glb_NormalMap, vs_Texcoord).xyz;
+	normal -= vec3(0.5, 0.5, 0.5);
+	normal *= 2.0;
+
+	mat3 tbn = mat3(vs_Tangent, vs_Binormal, vs_Normal);
+	normal = tbn * normal;
+	normalize(normal);
+
+	return normal;	
+}
+
+void main() {    
     vec3 view = glb_EyePos - vs_Vertex;
     view = normalize(view);
 
@@ -116,15 +133,17 @@ void main() {
 
     vec3 half = normalize(view + light);
 
-    vec3 albedo = texture(glb_Albedo, vs_Texcoord).xyz;
-    float roughness = texture(glb_Roughness, vs_Texcoord).x;
-    float metallic = texture(glb_Metallic, vs_Texcoord).x;
+    vec3 albedo = texture(glb_AlbedoMap, vs_Texcoord).xyz;
+    float roughness = texture(glb_RoughnessMap, vs_Texcoord).x;
+    float metallic = texture(glb_MetallicMap, vs_Texcoord).x;
 
-    vec3 colorDirect = calc_lighting_direct(normalize(vs_Normal), view, light, half, albedo, roughness, metallic, vec3(2.5, 2.5, 2.5));
-    vec3 colorIBL = calc_ibl(normalize(vs_Normal), view, albedo, roughness, metallic);
+    vec3 normal = calc_normal();
+    vec3 colorDirect = calc_lighting_direct(normalize(normal), view, light, half, albedo, roughness, metallic, vec3(2.5, 2.5, 2.5));
+    vec3 colorIBL = calc_ibl(normalize(normal), view, albedo, roughness, metallic);
 
     //vec3 color = colorDirect + colorIBL;
     vec3 color = colorIBL;
+    //vec3 color = colorDirect;
 
     // base tone mapping
     color = color / (color + vec3(1.0, 1.0, 1.0));

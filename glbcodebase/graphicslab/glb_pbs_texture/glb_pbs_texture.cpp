@@ -40,6 +40,7 @@ public:
     , m_PBSProgram_AlbedoLoc(-1)
     , m_PBSProgram_RoughnessLoc(-1)
     , m_PBSProgram_MetallicLoc(-1)
+    , m_PBSProgram_NormalLoc(-1)
     , m_PBSProgram_EyePosLoc(-1)
     , m_PBSProgram_IrradianceMapLoc(-1)
     , m_PBSProgram_PrefilterEnvMapLoc(-1)
@@ -106,9 +107,10 @@ public:
         m_PBSProgram_WVPLoc = m_PBSProgram->GetUniformLocation("glb_WVP");
         m_PBSProgram_WorldLoc = m_PBSProgram->GetUniformLocation("glb_World");
         m_PBSProgram_InvTransWorldMLoc = m_PBSProgram->GetUniformLocation("glb_InvTransWorldM");
-        m_PBSProgram_AlbedoLoc = m_PBSProgram->GetUniformLocation("glb_Albedo");
-        m_PBSProgram_RoughnessLoc = m_PBSProgram->GetUniformLocation("glb_Roughness");
-        m_PBSProgram_MetallicLoc = m_PBSProgram->GetUniformLocation("glb_Metallic");
+        m_PBSProgram_AlbedoLoc = m_PBSProgram->GetUniformLocation("glb_AlbedoMap");
+        m_PBSProgram_RoughnessLoc = m_PBSProgram->GetUniformLocation("glb_RoughnessMap");
+        m_PBSProgram_MetallicLoc = m_PBSProgram->GetUniformLocation("glb_MetallicMap");
+        m_PBSProgram_NormalLoc = m_PBSProgram->GetUniformLocation("glb_NormalMap");
         m_PBSProgram_EyePosLoc = m_PBSProgram->GetUniformLocation("glb_EyePos");
         m_PBSProgram_IrradianceMapLoc = m_PBSProgram->GetUniformLocation("glb_IrradianceMap");
         m_PBSProgram_PrefilterEnvMapLoc = m_PBSProgram->GetUniformLocation("glb_PerfilterEnvMap");
@@ -123,16 +125,19 @@ public:
         m_ScreenMesh = render::mesh::ScreenMesh::Create();
 
         // Create texture
-        m_ERMap = render::texture::Texture::Create("res/ermap2.hdr");
+        m_ERMap = render::texture::Texture::Create("res/ermap.hdr");
         m_AlbedoMap[0] = render::texture::Texture::Create("res/rustediron_basecolor.dds");
         m_RoughnessMap[0] = render::texture::Texture::Create("res/rustediron_roughness.dds");
         m_MetalicMap[0] = render::texture::Texture::Create("res/rustediron_metallic.dds");
+        m_NormalMap[0] = render::texture::Texture::Create("res/rustediron_normal.dds");
         m_AlbedoMap[1] = render::texture::Texture::Create("res/streakedmarble_basecolor.dds");
         m_RoughnessMap[1] = render::texture::Texture::Create("res/streakedmarble_roughness.dds");
         m_MetalicMap[1] = render::texture::Texture::Create("res/streakedmarble_metallic.dds");
+        m_NormalMap[1] = render::texture::Texture::Create("res/streakedmarble_normal.dds");
         m_AlbedoMap[2] = render::texture::Texture::Create("res/bathroomtile_basecolor.dds");
         m_RoughnessMap[2] = render::texture::Texture::Create("res/bathroomtile_roughness.dds");
         m_MetalicMap[2] = render::texture::Texture::Create("res/bathroomtile_metallic.dds");
+        m_NormalMap[2] = render::texture::Texture::Create("res/bathroomtile_normal.dds");
 
         // Create Camera
         m_Camera = scene::ModelCamera::Create(math::Vector(0.0f, 0.0f, 320.0f), math::Vector(0.0f, 0.0f, 0.0f));
@@ -205,6 +210,7 @@ public:
             GLB_SAFE_DELETE(m_AlbedoMap[i]);
             GLB_SAFE_DELETE(m_RoughnessMap[i]);
             GLB_SAFE_DELETE(m_MetalicMap[i]);
+            GLB_SAFE_DELETE(m_NormalMap[i]);
         }
         GLB_SAFE_DELETE(m_Sphere);
         GLB_SAFE_DELETE(m_ScreenMesh);
@@ -551,6 +557,7 @@ public:
             render::Device::SetTexture(3, m_AlbedoMap[i], 3);
             render::Device::SetTexture(4, m_RoughnessMap[i], 4);
             render::Device::SetTexture(5, m_MetalicMap[i], 5);
+            render::Device::SetTexture(6, m_NormalMap[i], 6);
 
             // Setup uniform
             math::Matrix world;
@@ -574,6 +581,7 @@ public:
             render::Device::SetUniformSampler2D(m_PBSProgram_AlbedoLoc, 3);
             render::Device::SetUniformSampler2D(m_PBSProgram_RoughnessLoc, 4);
             render::Device::SetUniformSampler2D(m_PBSProgram_MetallicLoc, 5);
+            render::Device::SetUniformSampler2D(m_PBSProgram_NormalLoc, 6);
 
             // Draw
             render::Device::Draw(render::PT_TRIANGLES, 0, render::mesh::Mgr::GetMeshById(m_Sphere->GetMeshId())->GetVertexNum());
@@ -599,6 +607,7 @@ protected:
     render::texture::Texture*       m_AlbedoMap[3];
     render::texture::Texture*       m_RoughnessMap[3];
     render::texture::Texture*       m_MetalicMap[3];
+    render::texture::Texture*       m_NormalMap[3];
     scene::Model*                   m_Sphere;
     render::mesh::ScreenMesh*       m_ScreenMesh;
     scene::CameraBase*              m_Camera;
@@ -621,6 +630,7 @@ protected:
     int32_t                         m_PBSProgram_AlbedoLoc;
     int32_t                         m_PBSProgram_RoughnessLoc;
     int32_t                         m_PBSProgram_MetallicLoc;
+    int32_t                         m_PBSProgram_NormalLoc;
     int32_t                         m_PBSProgram_EyePosLoc;
     int32_t                         m_PBSProgram_IrradianceMapLoc;
     int32_t                         m_PBSProgram_PrefilterEnvMapLoc;
