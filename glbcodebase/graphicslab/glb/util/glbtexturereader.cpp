@@ -384,7 +384,10 @@ void DDSTextureReader::ReadTextureCube(FILE* file, TEXTURE_PIXEL_FORMAT_TYPE pix
 void DDSTextureReader::ReorganizeRGBAData(int8_t* data, TEXTURE_PIXEL_FORMAT_TYPE type) {
     if (data != NULL) {
         if (type == TPFT_R8G8B8) {
-            // Do nothing
+            uint32_t value  = (uint32_t(data[0]) << 0) + (uint32_t(data[1]) << 8) + (uint32_t(data[2]) << 16);
+            data[0] = (value & 0x00ff0000) >> 16;  // Red
+            data[1] = (value & 0x0000ff00) >> 8;  // Green
+            data[2] = (value & 0x000000ff);  // Blue
         } else if (type == TPFT_A8R8G8B8) {
             uint32_t value = *(reinterpret_cast<uint32_t*>(data));
             data[0] = (value & 0x00ff0000) >> 16;  // Red
