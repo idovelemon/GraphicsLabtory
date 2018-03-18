@@ -12,3 +12,4 @@ glbcodebase/graphicslab/glb_application/Debug/glb_application.lastbuildstate
 *.lastbuildstate
 *.aps
 *.pch
+/glbcodebase/graphicslab/glb_ibl_specular_epic/debug_log.txt

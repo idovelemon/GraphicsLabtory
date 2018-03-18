@@ -32,7 +32,7 @@ GLB_PLATFORM_OPENGL (For opengl version graphics labtory)
 
 Linker Setting:
 Common->Addtional Library:
-$(SolutionDir)\..\glew\lib
+$(SolutionDir)\..\glew\lib\Release\Win32
 $(DXSDK_DIR)\Lib\x86
 Input->Addtional:
 glew32.lib
