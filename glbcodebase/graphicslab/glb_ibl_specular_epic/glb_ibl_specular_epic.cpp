@@ -73,9 +73,9 @@ public:
         m_DiffuseCubeMap = render::texture::Texture::CreateFloat16CubeTexture(32, 32);
         m_DiffuseCubeMapRT->AttachCubeTexture(drawBuffer, m_DiffuseCubeMap);
 
-        m_SpecularLDCubeMap = render::texture::Texture::CreateFloat16CubeTexture(128, 128);
-        int32_t width = 128, height = 128;
-        for (int32_t i = 0; i < 8; i++) {
+        m_SpecularLDCubeMap = render::texture::Texture::CreateFloat16CubeTexture(256, 256);
+        int32_t width = 256, height = 256;
+        for (int32_t i = 0; i < 9; i++) {
             m_SpecularLDCubeMapRT[i] = render::RenderTarget::Create(width, height);
             m_SpecularLDCubeMapRT[i]->AttachCubeTexture(drawBuffer, m_SpecularLDCubeMap, i);
             width /= 2;
@@ -179,7 +179,7 @@ public:
         GLB_SAFE_DELETE(m_CubeMap);
         GLB_SAFE_DELETE(m_DiffuseCubeMapRT);
         GLB_SAFE_DELETE(m_DiffuseCubeMap);
-        for (int32_t i = 0; i < 8; i++) {
+        for (int32_t i = 0; i < 9; i++) {
             GLB_SAFE_DELETE(m_SpecularLDCubeMapRT[i]);
         }
         GLB_SAFE_DELETE(m_SpecularLDCubeMap);
@@ -322,9 +322,9 @@ public:
         render::Device::SetCullFaceEnable(true);
         render::Device::SetCullFaceMode(render::CULL_BACK);
 
-        int32_t miplevels = log(128) / log(2) + 1;
+        int32_t miplevels = log(256) / log(2) + 1;
         float roughnessStep = 1.0f / miplevels;
-        int32_t width = 128, height = 128;
+        int32_t width = 256, height = 256;
         for (int32_t j = 0; j < miplevels; j++) {
             // Render Target
             render::Device::SetRenderTarget(m_SpecularLDCubeMapRT[j]);
@@ -570,7 +570,7 @@ protected:
     render::texture::Texture*       m_CubeMap;
     render::RenderTarget*           m_DiffuseCubeMapRT;
     render::texture::Texture*       m_DiffuseCubeMap;
-    render::RenderTarget*           m_SpecularLDCubeMapRT[8];
+    render::RenderTarget*           m_SpecularLDCubeMapRT[9];
     render::texture::Texture*       m_SpecularLDCubeMap;
     render::RenderTarget*           m_SpecularDFGCubeMapRT;
     render::texture::Texture*       m_SpecularDFGCubeMap;

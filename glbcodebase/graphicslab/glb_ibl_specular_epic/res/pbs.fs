@@ -98,7 +98,7 @@ vec3 calc_ibl(vec3 n, vec3 v, vec3 albedo, float roughness, float metalic) {
     // Specular part
     float ndotv = max(0.0, dot(n, v));
     vec3 r = 2.0 * ndotv * n - v;
-    vec3 ld = filtering_cube_map_lod(glb_PerfilterEnvMap, r, roughness);
+    vec3 ld = filtering_cube_map_lod(glb_PerfilterEnvMap, r, roughness * 9.0);
     vec2 dfg = textureLod(glb_IntegrateBRDFMap, vec2(ndotv, roughness), 0.0).xy;
     vec3 specular = ld * (F0 * dfg.x + dfg.y);
 
