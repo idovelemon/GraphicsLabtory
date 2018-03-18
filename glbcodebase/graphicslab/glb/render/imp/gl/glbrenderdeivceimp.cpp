@@ -109,6 +109,9 @@ void DeviceImp::Initialize() {
     // Initialize opengl extension
     glewInit();
 
+    // Enable some feature
+    glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);  // For cubemap seamless filtering
+
     const GLubyte* version = glGetString(GL_VERSION);
     util::log::LogPrint("OpenGL Version: %s", reinterpret_cast<LPCSTR>(version));
 
