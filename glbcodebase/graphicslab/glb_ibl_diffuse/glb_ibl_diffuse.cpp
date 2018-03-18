@@ -113,7 +113,10 @@ public:
         static bool isIrradianceMapGenerated = false;
         if (!isIrradianceMapGenerated) {
             DrawCubeMap();
+            m_CubeMap->GenerateMipmap();
+
             DrawConvolutionCubeMap();
+            m_ConvolutionCubeMap->GenerateMipmap();
 
             isIrradianceMapGenerated = true;
         }

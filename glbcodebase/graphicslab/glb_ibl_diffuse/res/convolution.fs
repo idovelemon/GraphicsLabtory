@@ -74,7 +74,7 @@ vec3 convolution_cube_map(samplerCube cube, int faceIndex, vec2 uv) {
         for (float theta = 0.0; theta < 0.5 * PI; theta = theta + samplingStep) {
             vec3 d = calc_cartesian(phi, theta);  // Transform spherical coordinate to cartesian coordinate
             d = d.x * r + d.y * u + d.z * n;  // Transform tangent space coordinate to world space coordinate
-            l = l + filtering_cube_map(glb_CubeMap, normalize(d)) * cos(theta) * sin(theta);  // L * (ndotv) * sin(theta) d(theta)d(phi)
+            l = l + filtering_cube_map(glb_CubeMap, normalize(d)) * cos(theta) * sin(theta);  // L * (ndotl) * sin(theta) d(theta)d(phi)
             sampler = sampler + 1;
         }
     }
@@ -86,4 +86,5 @@ vec3 convolution_cube_map(samplerCube cube, int faceIndex, vec2 uv) {
 void main() {
     vec3 color = convolution_cube_map(glb_CubeMap, glb_FaceIndex, vs_TexCoord);
     oColor = color / (1.0 + color);
+    //oColor = color;
 }

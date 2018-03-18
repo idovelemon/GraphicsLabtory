@@ -101,8 +101,8 @@ void main() {
 
     vec3 colorDirect = calc_lighting_direct(normalize(vs_Normal), view, light, half, glb_Albedo, glb_Roughness, glb_Metalic, vec3(2.5, 2.5, 2.5));
     vec3 colorIBL = calc_ibl(normalize(vs_Normal), view, glb_Albedo, glb_Roughness, glb_Metalic);
-    vec3 color = colorDirect + colorIBL;
-    //vec3 color = colorDirect;
+    //vec3 color = colorDirect + colorIBL;
+    vec3 color = colorIBL;
 
     // base tone mapping
     color = color / (color + vec3(1.0, 1.0, 1.0));
