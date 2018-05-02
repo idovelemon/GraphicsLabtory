@@ -68,6 +68,14 @@ void RenderTarget::AttachCubeTexture(render::DrawColorBuffer* index, texture::Te
     }
 }
 
+void RenderTarget::Attach3DColorTexture(render::DrawColorBuffer index, texture::Texture* color_tex_3d, int32_t layer, int32_t level) {
+    if (m_Imp != NULL) {
+        m_Imp->Attach3DColorTexture(index, color_tex_3d, layer, level);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+}
+
 void RenderTarget::EnableDrawColorBuffer(render::DrawColorBuffer index) {
     if (m_Imp != NULL) {
         m_Imp->EnableDrawColorBuffer(index);

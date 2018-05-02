@@ -198,6 +198,14 @@ void DeviceImp::SetUniform3f(int32_t location, const math::Vector& v) {
     }
 }
 
+void DeviceImp::SetUniform4f(int32_t location, const math::Vector& v) {
+    if (location > -1) {
+        glUniform4f(location, v.x, v.y, v.z, v.w);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+}
+
 void DeviceImp::SetUniformMatrix(int32_t location, math::Matrix& m) {
     if (location > -1) {
         glUniformMatrix4fv(location, 1, true, m.GetData());
@@ -211,6 +219,17 @@ void DeviceImp::SetUniformSampler2D(int32_t location, int32_t slot) {
         glEnable(GL_TEXTURE_2D);
         glActiveTexture(GL_TEXTURE0 + m_Texture[slot].tex_unit);
         glBindTexture(GL_TEXTURE_2D, m_Texture[slot].tex_obj);
+        glUniform1i(location, m_Texture[slot].tex_unit);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+}
+
+void DeviceImp::SetUniformSampler3D(int32_t location, int32_t slot) {
+    if (location > -1 && 0 <= slot && slot < TS_MAX) {
+        glEnable(GL_TEXTURE_3D);
+        glActiveTexture(GL_TEXTURE0 + m_Texture[slot].tex_unit);
+        glBindTexture(GL_TEXTURE_3D, m_Texture[slot].tex_obj);
         glUniform1i(location, m_Texture[slot].tex_unit);
     } else {
         GLB_SAFE_ASSERT(false);
@@ -282,6 +301,14 @@ void DeviceImp::SetViewport(int32_t x, int32_t y, int32_t width, int32_t height)
 void DeviceImp::SetDrawColorBuffer(DrawColorBuffer buffer) {
     GLenum draw_buf = GetDrawColorBufferGL(buffer);
     glDrawBuffer(draw_buf);
+}
+
+void DeviceImp::SetDrawMultiColorBuffer(DrawColorBuffer* buffer, int32_t num) {
+    GLenum draw_bufs[8] = {GL_NONE, GL_NONE, GL_NONE, GL_NONE, GL_NONE, GL_NONE, GL_NONE, GL_NONE};
+    for (int32_t i = 0; i < num; i++) {
+        draw_bufs[i] = GetDrawColorBufferGL(buffer[i]);
+    }
+    glDrawBuffers(num, draw_bufs);
 }
 
 void DeviceImp::SetClearColor(float r, float g, float b) {

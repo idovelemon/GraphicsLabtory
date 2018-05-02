@@ -145,6 +145,22 @@ void RenderTarget::Imp::AttachCubeTexture(render::DrawColorBuffer* index, textur
     }
 }
 
+void RenderTarget::Imp::Attach3DColorTexture(render::DrawColorBuffer index, texture::Texture* color_tex, int32_t layer, int32_t level) {
+    if (render::COLORBUF_COLOR_ATTACHMENT0 <= index && index <= render::COLORBUF_COLOR_ATTACHMENT7
+        && color_tex != NULL) {
+        GLuint tex_obj = reinterpret_cast<GLuint>(color_tex->GetNativeTex());
+        if (color_tex->GetType() == texture::Texture::TEX_3D) {
+            glBindFramebuffer(GL_FRAMEBUFFER, m_FBO);
+            glBindTexture(GL_TEXTURE_3D, tex_obj);
+            glFramebufferTexture3D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index - render::COLORBUF_COLOR_ATTACHMENT0, GL_TEXTURE_3D, tex_obj, level, layer);
+        } else {
+            GLB_SAFE_ASSERT(false);
+        }
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+}
+
 void RenderTarget::Imp::EnableDrawColorBuffer(render::DrawColorBuffer index) {
     if (render::COLORBUF_COLOR_ATTACHMENT0 <= index && index <= render::COLORBUF_COLOR_ATTACHMENT7) {
         m_bDrawColorBuffers[index - render::COLORBUF_COLOR_ATTACHMENT0] = true;

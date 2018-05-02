@@ -62,6 +62,7 @@ public:
     static Texture* CreateFloat32DepthTexture(int32_t width, int32_t height);
     static Texture* CreateFloat32CubeTexture(int32_t width, int32_t height);
     static Texture* CreateFloat16CubeTexture(int32_t width, int32_t height);
+    static Texture* CreateFloat323DTexture(int32_t width, int32_t height, int32_t depth);
 
 public:
     int32_t GetID();

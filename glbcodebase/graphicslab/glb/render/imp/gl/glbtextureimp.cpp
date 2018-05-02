@@ -314,6 +314,42 @@ Texture::Imp* Texture::Imp::CreateFloat16CubeTexture(int32_t width, int32_t heig
     return tex;
 }
 
+Texture::Imp* Texture::Imp::CreateFloat323DTexture(int32_t width, int32_t height, int32_t depth) {
+    Texture::Imp* tex = NULL;
+
+    if (width > 0 && height > 0 && depth > 0) {
+        int32_t tex_id = 0;
+        glGenTextures(1, reinterpret_cast<GLuint*>(&tex_id));
+        glBindTexture(GL_TEXTURE_3D, tex_id);
+        glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+        glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+
+        glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA32F, width, height, depth, 0, GL_RGBA, GL_FLOAT, NULL);
+        glGenerateMipmap(GL_TEXTURE_3D);
+
+        tex = new Texture::Imp;
+        if (tex != NULL) {
+            tex->m_Type = TEX_3D;
+            tex->m_Depth = depth;
+            tex->m_Height = height;
+            static char default_name[] = "DefaultEmpty";
+            memcpy(tex->m_TexName, default_name, sizeof(default_name));
+            tex->m_TexObj = tex_id;
+            tex->m_Width = width;
+            tex->m_Format = FMT_R32G32B32A32F;
+            tex->m_BPP = 16;
+        } else {
+            GLB_SAFE_ASSERT(false);
+        }
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return tex;
+}
+
 void Texture::Imp::CreateGLTexture2D(int32_t tex_obj, int32_t width, int32_t height, int8_t* texture_data, int32_t texture_pixel_format) {
     for (int32_t i = 0; i < GLB_ARRAY_SIZE(kGLPixelFormatTbl); i++) {
         if (kGLPixelFormatTbl[i].pixel_format == texture_pixel_format) {

@@ -119,6 +119,14 @@ void Device::SetUniform3f(int32_t location, const math::Vector& v) {
     }
 }
 
+void Device::SetUniform4f(int32_t location, const math::Vector& v) {
+    if (s_DeviceImp != NULL) {
+        s_DeviceImp->SetUniform4f(location, v);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+}
+
 void Device::SetUniformMatrix(int32_t location, const math::Matrix& m) {
     if (s_DeviceImp != NULL) {
         s_DeviceImp->SetUniformMatrix(location, const_cast<math::Matrix&>(m));
@@ -130,6 +138,14 @@ void Device::SetUniformMatrix(int32_t location, const math::Matrix& m) {
 void Device::SetUniformSampler2D(int32_t location, int32_t sampler) {
     if (s_DeviceImp != NULL) {
         s_DeviceImp->SetUniformSampler2D(location, sampler);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+}
+
+void Device::SetUniformSampler3D(int32_t location, int32_t slot) {
+    if (s_DeviceImp != NULL) {
+        s_DeviceImp->SetUniformSampler3D(location, slot);
     } else {
         GLB_SAFE_ASSERT(false);
     }
@@ -210,6 +226,14 @@ void Device::SetViewport(int32_t x, int32_t y, int32_t width, int32_t height) {
 void Device::SetDrawColorBuffer(DrawColorBuffer buffer) {
     if (s_DeviceImp != NULL) {
         s_DeviceImp->SetDrawColorBuffer(buffer);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+}
+
+void Device::SetDrawMultiColorBuffer(DrawColorBuffer* buffers, int32_t num) {
+    if (s_DeviceImp != NULL) {
+        s_DeviceImp->SetDrawMultiColorBuffer(buffers, num);
     } else {
         GLB_SAFE_ASSERT(false);
     }

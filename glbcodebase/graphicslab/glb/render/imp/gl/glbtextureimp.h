@@ -45,6 +45,7 @@ public:
     static Imp* CreateFloat32DepthTexture(int32_t width, int32_t height);
     static Imp* CreateFloat32CubeTexture(int32_t width, int32_t height);
     static Imp* CreateFloat16CubeTexture(int32_t width, int32_t height);
+    static Imp* CreateFloat323DTexture(int32_t width, int32_t height, int32_t depth);
 
 protected:
     static void CreateGLTexture2D(int32_t tex_obj, int32_t width, int32_t height, int8_t* texture_data, int32_t texture_pixel_format);

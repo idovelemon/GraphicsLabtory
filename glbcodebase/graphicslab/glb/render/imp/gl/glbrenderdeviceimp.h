@@ -65,8 +65,10 @@ public:
     void SetUniform1i(int32_t location, int32_t v);
     void SetUniform1f(int32_t location, float v);
     void SetUniform3f(int32_t location, const math::Vector& v);
+    void SetUniform4f(int32_t location, const math::Vector& v);
     void SetUniformMatrix(int32_t location, math::Matrix& m);
     void SetUniformSampler2D(int32_t location, int32_t slot);
+    void SetUniformSampler3D(int32_t location, int32_t slot);
     void SetUniformSamplerCube(int32_t location, int32_t slot);
 
     // Render State
@@ -87,6 +89,7 @@ public:
 
     // Draw
     void SetDrawColorBuffer(DrawColorBuffer buffer);
+    void SetDrawMultiColorBuffer(DrawColorBuffer* buffers, int32_t num);
     void SetClearColor(float r, float g, float b);
     void SetClearDepth(float depth);
     void Clear(int32_t clear_flag);

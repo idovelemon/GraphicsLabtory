@@ -40,6 +40,7 @@ public:
     void AttachDepthTexture(texture::Texture* depth_tex);
     void AttachColorTexture(render::DrawColorBuffer index, texture::Texture* color_tex, int32_t level);
     void AttachCubeTexture(render::DrawColorBuffer* index, texture::Texture* cube_tex, int32_t level);
+    void Attach3DColorTexture(render::DrawColorBuffer index, texture::Texture* color_tex, int32_t layer, int32_t level);
 
     void EnableDrawColorBuffer(render::DrawColorBuffer index);
     void DisableDrawColorBuffer(render::DrawColorBuffer index);
