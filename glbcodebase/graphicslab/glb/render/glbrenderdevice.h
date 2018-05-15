@@ -149,6 +149,7 @@ public:
     static void SetClearDepth(float depth);
     static void Clear(int32_t clear_flag);
     static void Draw(PrimitiveType type, int32_t first, int32_t size);
+    static void SetupVSync(bool enable);
     static void SwapBuffer();
 };
 

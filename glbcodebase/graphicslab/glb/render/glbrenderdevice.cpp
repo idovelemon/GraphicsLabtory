@@ -271,6 +271,14 @@ void Device::Draw(PrimitiveType type, int32_t first, int32_t count) {
     }
 }
 
+void Device::SetupVSync(bool enable) {
+    if (s_DeviceImp != NULL) {
+        s_DeviceImp->SetupVSync(enable);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+}
+
 void Device::SwapBuffer() {
     if (s_DeviceImp != NULL) {
         s_DeviceImp->SwapBuffer();

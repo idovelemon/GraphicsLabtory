@@ -21,6 +21,13 @@ namespace glb {
 namespace render {
 
 //-----------------------------------------------------------------------------------
+// FUNCTION DEFINITION
+//-----------------------------------------------------------------------------------
+
+typedef void (APIENTRY *PFNWGLEXTSWAPCONTROLPROC) (int);
+PFNWGLEXTSWAPCONTROLPROC wglSwapIntervalEXT = NULL;
+
+//-----------------------------------------------------------------------------------
 // CLASS DEFINITION
 //-----------------------------------------------------------------------------------
 
@@ -112,6 +119,13 @@ void DeviceImp::Initialize() {
     // Enable some feature
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);  // For cubemap seamless filtering
 
+    // Get wglSwapIntervalEXT for vsync
+    const char* extensions = reinterpret_cast<const char*>(glGetString(GL_EXTENSIONS));
+    if (strstr(extensions, "WGL_EXT_swap_control")) {
+        wglSwapIntervalEXT = (PFNWGLEXTSWAPCONTROLPROC)wglGetProcAddress("wglSwapIntervalEXT");
+    }
+
+    // Log some version information
     const GLubyte* version = glGetString(GL_VERSION);
     util::log::LogPrint("OpenGL Version: %s", reinterpret_cast<LPCSTR>(version));
 
@@ -349,8 +363,18 @@ void DeviceImp::Draw(PrimitiveType type, int32_t first, int32_t size) {
     glBindVertexArray(0);
 }
 
+void DeviceImp::SetupVSync(bool enable) {
+    if (wglSwapIntervalEXT) {
+        if (enable) {
+            wglSwapIntervalEXT(1);
+        } else {
+            wglSwapIntervalEXT(0);
+        }
+    }
+}
+
 void DeviceImp::SwapBuffer() {
-    glFlush();
+    // glFlush();
     SwapBuffers(m_WindowDC);
 }
 
