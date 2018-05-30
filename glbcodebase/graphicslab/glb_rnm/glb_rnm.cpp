@@ -39,14 +39,12 @@ public:
     , m_WeightMapLoc(-1)
     , m_LightPatchProgram(NULL)
     , m_LightPatchMVPLoc(-1)
-    , m_LightPatchTransInvWLoc(-1)
     , m_LightPatchLightValueLoc(-1)
     , m_NormlaizeWeightMapLoc(-1)
     , m_LightPatchNormalMapLoc(-1)
     , m_LightPatchFaceLoc(-1)
     , m_DrawProgram(NULL)
     , m_DrawMVPLoc(-1)
-    , m_DrawTransInvWLoc(-1)
     , m_DrawNormalMapLoc(-1) {
         for (int32_t j = 0; j < 5; j++) {
             m_WeightMap[j] = NULL;
@@ -177,15 +175,6 @@ public:
 
                     math::Matrix tbn;
                     tbn.MakeIdentityMatrix();
-                    //tbn.m_Matrix.m[0][0] = tangent.x;
-                    //tbn.m_Matrix.m[0][1] = tangent.y;
-                    //tbn.m_Matrix.m[0][2] = tangent.z;
-                    //tbn.m_Matrix.m[1][0] = binormal.x;
-                    //tbn.m_Matrix.m[1][1] = binormal.y;
-                    //tbn.m_Matrix.m[1][2] = binormal.z;
-                    //tbn.m_Matrix.m[2][0] = normal.x;
-                    //tbn.m_Matrix.m[2][1] = normal.y;
-                    //tbn.m_Matrix.m[2][2] = normal.z;
                     tbn.m_Matrix.m[0][0] = tangent.x;
                     tbn.m_Matrix.m[1][0] = tangent.y;
                     tbn.m_Matrix.m[2][0] = tangent.z;
@@ -266,7 +255,6 @@ public:
         // Create Shader
         m_LightPatchProgram = render::shader::UserProgram::Create("res/lightPatch.vs", "res/lightPatch.fs");
         m_LightPatchMVPLoc = m_LightPatchProgram->GetUniformLocation("glb_MVP");
-        m_LightPatchTransInvWLoc = m_LightPatchProgram->GetUniformLocation("glb_TransInvWorld");
         m_LightPatchLightValueLoc = m_LightPatchProgram->GetUniformLocation("glb_LightColor");
         m_NormlaizeWeightMapLoc = m_LightPatchProgram->GetUniformLocation("glb_NormalizeWeightMap");
         m_LightMapLoc[0] = m_LightPatchProgram->GetUniformLocation("glb_LightMap[0]");
@@ -286,7 +274,6 @@ public:
 
         m_DrawProgram = render::shader::UserProgram::Create("res/draw.vs", "res/draw.fs");
         m_DrawMVPLoc = m_DrawProgram->GetUniformLocation("glb_MVP");
-        m_DrawTransInvWLoc = m_DrawProgram->GetUniformLocation("glb_TransInvWorld");
         m_DrawLightMapLoc[0] = m_DrawProgram->GetUniformLocation("glb_LightMap[0]");
         m_DrawLightMapLoc[1] = m_DrawProgram->GetUniformLocation("glb_LightMap[1]");
         m_DrawLightMapLoc[2] = m_DrawProgram->GetUniformLocation("glb_LightMap[2]");
@@ -303,6 +290,7 @@ public:
         m_LightMap[1] = render::texture::Texture::CreateFloat32Texture(kLightMapWidth, kLightMapHeight);
         m_LightMap[2] = render::texture::Texture::CreateFloat32Texture(kLightMapWidth, kLightMapHeight);
         m_NormalMap = render::texture::Texture::Create("res/plane_DefaultMaterial_normal_gl.bmp");
+        //m_NormalMap = render::texture::Texture::Create("res/scene_Material_normal_gl.bmp");
 
         // Create Camera
         m_Camera = scene::ModelCamera::Create(math::Vector(0.0f, 250.0f, 150.0f), math::Vector(0.0f, 0.0f, 0.0f));
@@ -599,7 +587,6 @@ public:
                     world.Inverse();
                     world.Transpose();
                     render::Device::SetUniformMatrix(m_LightPatchMVPLoc, m_Proj * views[j]);
-                    render::Device::SetUniformMatrix(m_LightPatchTransInvWLoc, world);
                     render::Device::SetUniform3f(m_LightPatchLightValueLoc, math::Vector(0.0f, 0.0f, 0.0f));
                     render::Device::SetUniformSampler2D(m_NormlaizeWeightMapLoc, j);
                     render::Device::SetUniformSampler2D(m_LightMapLoc[0], 5);
@@ -621,11 +608,6 @@ public:
                 //    math::Matrix world;
                 //    world.MakeScaleMatrix(5000.0f, 5000.0f, 5000.0f);
                 //    render::Device::SetUniformMatrix(m_LightPatchMVPLoc, m_Proj * views[j] * world);
-                //    math::Matrix transInvW;
-                //    transInvW = world;
-                //    transInvW.Inverse();
-                //    transInvW.Transpose();
-                //    render::Device::SetUniformMatrix(m_LightPatchTransInvWLoc, transInvW);
                 //    render::Device::SetUniform3f(m_LightPatchLightValueLoc, math::Vector(6.0f, 6.0f, 3.0f));
                 //    render::Device::SetUniformSampler2D(m_NormlaizeWeightMapLoc, j);
                 //    render::Device::SetUniformSampler2D(m_LightMapLoc[0], 5);
@@ -647,13 +629,8 @@ public:
                     // Setup Uniform
                     math::Matrix world;
                     world.MakeScaleMatrix(0.1f, 0.1f, 0.1f);
-                    world.Translate(1.0f, 1.0f, 0.0f);
+                    world.Translate(0.0f, 1.0f, 0.0f);
                     render::Device::SetUniformMatrix(m_LightPatchMVPLoc, m_Proj * views[j] * world);
-                    math::Matrix transInvW;
-                    transInvW = world;
-                    transInvW.Inverse();
-                    transInvW.Transpose();
-                    render::Device::SetUniformMatrix(m_LightPatchTransInvWLoc, transInvW);
                     render::Device::SetUniform3f(m_LightPatchLightValueLoc, math::Vector(300.0f, 300.0f, 300.0f));
                     render::Device::SetUniformSampler2D(m_NormlaizeWeightMapLoc, j);
                     render::Device::SetUniformSampler2D(m_LightMapLoc[0], 5);
@@ -674,10 +651,6 @@ public:
                     //world.MakeScaleMatrix(0.5f, 0.5f, 0.5f);
                     //world.Translate(0.0f, 30.0f, 50.0f);
                     //render::Device::SetUniformMatrix(m_LightPatchMVPLoc, m_Proj * views[j] * world);
-                    //transInvW = world;
-                    //transInvW.Inverse();
-                    //transInvW.Transpose();
-                    //render::Device::SetUniformMatrix(m_LightPatchTransInvWLoc, transInvW);
                     //render::Device::SetUniform3f(m_LightPatchLightValueLoc, math::Vector(600.0f, 0.0f, 0.0f));
                     //render::Device::SetUniformSampler2D(m_NormlaizeWeightMapLoc, j);
                     //render::Device::SetUniformSampler2D(m_LightMapLoc[0], 5);
@@ -694,10 +667,6 @@ public:
                     //world.MakeScaleMatrix(0.5f, 0.5f, 0.5f);
                     //world.Translate(0.0f, 30.0f, -50.0f);
                     //render::Device::SetUniformMatrix(m_LightPatchMVPLoc, m_Proj * views[j] * world);
-                    //transInvW = world;
-                    //transInvW.Inverse();
-                    //transInvW.Transpose();
-                    //render::Device::SetUniformMatrix(m_LightPatchTransInvWLoc, transInvW);
                     //render::Device::SetUniform3f(m_LightPatchLightValueLoc, math::Vector(0.0f, 600.0f, 0.0f));
                     //render::Device::SetUniformSampler2D(m_NormlaizeWeightMapLoc, j);
                     //render::Device::SetUniformSampler2D(m_LightMapLoc[0], 5);
@@ -714,10 +683,6 @@ public:
                     //world.MakeScaleMatrix(0.5f, 0.5f, 0.5f);
                     //world.Translate(-50.0f, 30.0f, 0.0f);
                     //render::Device::SetUniformMatrix(m_LightPatchMVPLoc, m_Proj * views[j] * world);
-                    //transInvW = world;
-                    //transInvW.Inverse();
-                    //transInvW.Transpose();
-                    //render::Device::SetUniformMatrix(m_LightPatchTransInvWLoc, transInvW);
                     //render::Device::SetUniform3f(m_LightPatchLightValueLoc, math::Vector(0.0f, 0.0f, 600.0f));
                     //render::Device::SetUniformSampler2D(m_NormlaizeWeightMapLoc, j);
                     //render::Device::SetUniformSampler2D(m_LightMapLoc[0], 5);
@@ -798,8 +763,8 @@ public:
         // Setup Texture
         render::Device::ClearTexture();
         render::Device::SetTexture(0, m_LightMap[0], 0);
-        render::Device::SetTexture(1, m_LightMap[0], 1);
-        render::Device::SetTexture(2, m_LightMap[0], 2);
+        render::Device::SetTexture(1, m_LightMap[1], 1);
+        render::Device::SetTexture(2, m_LightMap[2], 2);
         render::Device::SetTexture(3, m_NormalMap, 3);
 
         // Clear
@@ -814,11 +779,6 @@ public:
             math::Matrix proj;
             proj.MakeProjectionMatrix(800.0f / 600.0f, 75.0f, 0.001f, 10000.0f);
             render::Device::SetUniformMatrix(m_DrawMVPLoc, proj * m_View);
-            math::Matrix transInvW;
-            transInvW.MakeIdentityMatrix();
-            transInvW.Inverse();
-            transInvW.Transpose();
-            render::Device::SetUniformMatrix(m_DrawTransInvWLoc, transInvW);
             render::Device::SetUniformSampler2D(m_DrawLightMapLoc[0], 0);
             render::Device::SetUniformSampler2D(m_DrawLightMapLoc[1], 1);
             render::Device::SetUniformSampler2D(m_DrawLightMapLoc[2], 2);
@@ -837,8 +797,8 @@ protected:
     render::texture::Texture*       m_LightMap[3];
     render::texture::Texture*       m_NormalMap;
 
-    static const int32_t kLightMapWidth = 32;
-    static const int32_t kLightMapHeight = 32;
+    static const int32_t kLightMapWidth = 128;
+    static const int32_t kLightMapHeight = 128;
     struct LightPatch {
         math::Vector uv;
         math::Vector pos;
@@ -881,7 +841,6 @@ protected:
     render::texture::Texture*       m_LightPatchMap[3][5];
     render::shader::UserProgram*    m_LightPatchProgram;
     int32_t                         m_LightPatchMVPLoc;
-    int32_t                         m_LightPatchTransInvWLoc;
     int32_t                         m_LightPatchLightValueLoc;
     int32_t                         m_NormlaizeWeightMapLoc;
     int32_t                         m_LightMapLoc[3];
@@ -890,7 +849,6 @@ protected:
 
     render::shader::UserProgram*    m_DrawProgram;
     int32_t                         m_DrawMVPLoc;
-    int32_t                         m_DrawTransInvWLoc;
     int32_t                         m_DrawLightMapLoc[3];
     int32_t                         m_DrawNormalMapLoc;
 };

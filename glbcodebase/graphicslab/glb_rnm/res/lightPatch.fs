@@ -2,9 +2,6 @@
 
 in vec2 vsTexCoord;
 in vec3 vsVertex;
-in vec3 vsNormal;
-in vec3 vsTangent;
-in vec3 vsBinormal;
 
 out vec3 oColor;
 
@@ -15,21 +12,16 @@ uniform vec3 glb_LightColor;
 uniform int glb_Face;
 
 vec3 calc_radiosity_normal_map_color(vec2 uv) {
-    // Build TBN
-    mat3 tbn = mat3(vsTangent, vsBinormal, vsNormal);
-
     // Calculate normal
     vec3 normal = texture(glb_NormalMap, uv).xyz;
     normal -= vec3(0.5, 0.5, 0.5);  
     normal *= 2.0;
- 
-    normal = tbn * normal;
     normalize(normal);
 
     // Calculate bais
-    vec3 bais0 = tbn * vec3(sqrt(2.0 / 3.0), 0.0, sqrt(1.0 / 3.0));
-    vec3 bais1 = tbn * vec3(-sqrt(1.0 / 6.0), sqrt(1.0 / 2.0), sqrt(1.0 / 3.0));
-    vec3 bais2 = tbn * vec3(-sqrt(1.0 / 6.0), -sqrt(1.0 / 2.0), sqrt(1.0 / 3.0));
+    vec3 bais0 = vec3(sqrt(2.0 / 3.0), 0.0, sqrt(1.0 / 3.0));
+    vec3 bais1 = vec3(-sqrt(1.0 / 6.0), sqrt(1.0 / 2.0), sqrt(1.0 / 3.0));
+    vec3 bais2 = vec3(-sqrt(1.0 / 6.0), -sqrt(1.0 / 2.0), sqrt(1.0 / 3.0));
     normalize(bais0);
     normalize(bais1);
     normalize(bais2);

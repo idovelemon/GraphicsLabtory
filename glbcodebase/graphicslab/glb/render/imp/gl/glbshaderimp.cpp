@@ -115,6 +115,8 @@ VertexShader::Imp* VertexShader::Imp::Create(const char* vertex_shader_name) {
                 glGetShaderInfoLog(vertex_shader, sizeof(info_log) - vertex_shader_name_len, NULL, info_log + vertex_shader_name_len);
 
                 printf(reinterpret_cast<char*>(info_log));
+                util::log::LogPrint(info_log);
+
                 GLB_SAFE_ASSERT(false);
             } else {
                 result = new VertexShader::Imp();
