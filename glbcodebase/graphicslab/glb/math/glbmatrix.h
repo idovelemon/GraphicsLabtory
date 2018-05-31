@@ -90,7 +90,7 @@ class Matrix {
     inline const float* GetData();
     inline float GetElement(int32_t x, int32_t y);
 
- private:
+ public:
     union {
         float m[4][4];
         float v[16];
