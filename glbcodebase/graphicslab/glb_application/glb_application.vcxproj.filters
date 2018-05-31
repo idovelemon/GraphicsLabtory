@@ -14,41 +14,41 @@
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
     <Filter Include="源文件\glb">
-      <UniqueIdentifier>{dd2791d1-db33-4db6-b40d-fe2de54d4c9a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="源文件\glb\math">
-      <UniqueIdentifier>{35a0f5c5-e601-4c55-bb83-ea3b5efab1f7}</UniqueIdentifier>
+      <UniqueIdentifier>{5ef6aa46-d53c-4519-b936-cda79b451ad6}</UniqueIdentifier>
     </Filter>
     <Filter Include="源文件\glb\render">
-      <UniqueIdentifier>{9e6b9d1e-c1b6-4cff-b215-02c17155c60c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="源文件\glb\render\imp">
-      <UniqueIdentifier>{50183061-5bbe-4e96-be98-510e1a960cc7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="源文件\glb\render\imp\dx11">
-      <UniqueIdentifier>{9e39bac0-1280-4389-b424-8a4665405569}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="源文件\glb\render\imp\gl">
-      <UniqueIdentifier>{9d8c4019-361c-4d14-9cd7-efa99d21f0ae}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="源文件\glb\scene">
-      <UniqueIdentifier>{e6f2b349-f990-4280-9b60-4194d76e7845}</UniqueIdentifier>
+      <UniqueIdentifier>{2e871803-b947-49bd-9365-20d4895763de}</UniqueIdentifier>
     </Filter>
     <Filter Include="源文件\glb\util">
-      <UniqueIdentifier>{09fe185e-33b9-4e46-a0d3-40d6ac9d2176}</UniqueIdentifier>
+      <UniqueIdentifier>{f10d450a-3abd-40ec-8b0e-54aad5dc6d59}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\glb\thirdparty">
+      <UniqueIdentifier>{dae2067e-7441-4272-821c-09ea65fb4217}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\glb\scene">
+      <UniqueIdentifier>{cf089ef9-02ed-4670-b442-63b7d8534fa8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\glb\math">
+      <UniqueIdentifier>{06732332-1247-46a3-aa31-6438b46cd714}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\glb\thirdparty\stb_image">
+      <UniqueIdentifier>{e3d6a748-6db1-4ef8-8045-eb6454aeee5d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\glb\render\imp">
+      <UniqueIdentifier>{604b93a8-0085-4301-8bbb-fa4181a996d0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\glb\render\imp\dx11">
+      <UniqueIdentifier>{8efad9d2-f7c8-45f3-9799-9c822d9f6fe0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\glb\render\imp\gl">
+      <UniqueIdentifier>{fd48d213-bc90-4c43-b31b-50248c2a0e26}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="glb_application.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\glb\comm.cpp">
-      <Filter>源文件\glb</Filter>
-    </ClCompile>
     <ClCompile Include="..\glb\glbapplication.cpp">
-      <Filter>源文件\glb</Filter>
-    </ClCompile>
-    <ClCompile Include="..\glb\glbeditorcomm.cpp">
       <Filter>源文件\glb</Filter>
     </ClCompile>
     <ClCompile Include="..\glb\glbinput.cpp">
@@ -59,60 +59,6 @@
     </ClCompile>
     <ClCompile Include="..\glb\math\glbmath.cpp">
       <Filter>源文件\glb\math</Filter>
-    </ClCompile>
-    <ClCompile Include="..\glb\render\glbmaterial.cpp">
-      <Filter>源文件\glb\render</Filter>
-    </ClCompile>
-    <ClCompile Include="..\glb\render\glbmesh.cpp">
-      <Filter>源文件\glb\render</Filter>
-    </ClCompile>
-    <ClCompile Include="..\glb\render\glbrender.cpp">
-      <Filter>源文件\glb\render</Filter>
-    </ClCompile>
-    <ClCompile Include="..\glb\render\glbrenderdevice.cpp">
-      <Filter>源文件\glb\render</Filter>
-    </ClCompile>
-    <ClCompile Include="..\glb\render\glbrendertarget.cpp">
-      <Filter>源文件\glb\render</Filter>
-    </ClCompile>
-    <ClCompile Include="..\glb\render\glbshader.cpp">
-      <Filter>源文件\glb\render</Filter>
-    </ClCompile>
-    <ClCompile Include="..\glb\render\glbtexture.cpp">
-      <Filter>源文件\glb\render</Filter>
-    </ClCompile>
-    <ClCompile Include="..\glb\render\glbuniform.cpp">
-      <Filter>源文件\glb\render</Filter>
-    </ClCompile>
-    <ClCompile Include="..\glb\render\imp\dx11\glbmeshimp.cpp">
-      <Filter>源文件\glb\render\imp\dx11</Filter>
-    </ClCompile>
-    <ClCompile Include="..\glb\render\imp\dx11\glbrenderdeviceimp.cpp">
-      <Filter>源文件\glb\render\imp\dx11</Filter>
-    </ClCompile>
-    <ClCompile Include="..\glb\render\imp\dx11\glbrendertargetimp.cpp">
-      <Filter>源文件\glb\render\imp\dx11</Filter>
-    </ClCompile>
-    <ClCompile Include="..\glb\render\imp\dx11\glbshaderimp.cpp">
-      <Filter>源文件\glb\render\imp\dx11</Filter>
-    </ClCompile>
-    <ClCompile Include="..\glb\render\imp\dx11\glbtextureimp.cpp">
-      <Filter>源文件\glb\render\imp\dx11</Filter>
-    </ClCompile>
-    <ClCompile Include="..\glb\render\imp\gl\glbmeshimp.cpp">
-      <Filter>源文件\glb\render\imp\gl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\glb\render\imp\gl\glbrenderdeivceimp.cpp">
-      <Filter>源文件\glb\render\imp\gl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\glb\render\imp\gl\glbrendertargetimp.cpp">
-      <Filter>源文件\glb\render\imp\gl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\glb\render\imp\gl\glbshaderimp.cpp">
-      <Filter>源文件\glb\render\imp\gl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\glb\render\imp\gl\glbtextureimp.cpp">
-      <Filter>源文件\glb\render\imp\gl</Filter>
     </ClCompile>
     <ClCompile Include="..\glb\scene\glbcamera.cpp">
       <Filter>源文件\glb\scene</Filter>
@@ -138,27 +84,78 @@
     <ClCompile Include="..\glb\util\glbtexturereader.cpp">
       <Filter>源文件\glb\util</Filter>
     </ClCompile>
+    <ClCompile Include="..\glb\util\glbtexturewriter.cpp">
+      <Filter>源文件\glb\util</Filter>
+    </ClCompile>
     <ClCompile Include="..\glb\util\glbutil.cpp">
       <Filter>源文件\glb\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\render\glbmaterial.cpp">
+      <Filter>源文件\glb\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\render\glbmesh.cpp">
+      <Filter>源文件\glb\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\render\glbrender.cpp">
+      <Filter>源文件\glb\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\render\glbrenderdevice.cpp">
+      <Filter>源文件\glb\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\render\glbrendertarget.cpp">
+      <Filter>源文件\glb\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\render\glbshader.cpp">
+      <Filter>源文件\glb\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\render\glbtexture.cpp">
+      <Filter>源文件\glb\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\render\glbuniform.cpp">
+      <Filter>源文件\glb\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\render\imp\gl\glbmeshimp.cpp">
+      <Filter>源文件\glb\render\imp\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\render\imp\gl\glbrenderdeivceimp.cpp">
+      <Filter>源文件\glb\render\imp\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\render\imp\gl\glbrendertargetimp.cpp">
+      <Filter>源文件\glb\render\imp\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\render\imp\gl\glbshaderimp.cpp">
+      <Filter>源文件\glb\render\imp\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\render\imp\gl\glbtextureimp.cpp">
+      <Filter>源文件\glb\render\imp\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\render\imp\dx11\glbmeshimp.cpp">
+      <Filter>源文件\glb\render\imp\dx11</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\render\imp\dx11\glbrenderdeviceimp.cpp">
+      <Filter>源文件\glb\render\imp\dx11</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\render\imp\dx11\glbrendertargetimp.cpp">
+      <Filter>源文件\glb\render\imp\dx11</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\render\imp\dx11\glbshaderimp.cpp">
+      <Filter>源文件\glb\render\imp\dx11</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\render\imp\dx11\glbtextureimp.cpp">
+      <Filter>源文件\glb\render\imp\dx11</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="glb_application.h">
       <Filter>源文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\glb\comm.h">
-      <Filter>源文件\glb</Filter>
+    <ClInclude Include="resource.h">
+      <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="..\glb\glb.h">
       <Filter>源文件\glb</Filter>
     </ClInclude>
     <ClInclude Include="..\glb\glbapplication.h">
-      <Filter>源文件\glb</Filter>
-    </ClInclude>
-    <ClInclude Include="..\glb\glbcomm.h">
-      <Filter>源文件\glb</Filter>
-    </ClInclude>
-    <ClInclude Include="..\glb\glbeditorcomm.h">
       <Filter>源文件\glb</Filter>
     </ClInclude>
     <ClInclude Include="..\glb\glbinput.h">
@@ -178,6 +175,51 @@
     </ClInclude>
     <ClInclude Include="..\glb\math\glbvector.h">
       <Filter>源文件\glb\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\scene\glbcamera.h">
+      <Filter>源文件\glb\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\scene\glblight.h">
+      <Filter>源文件\glb\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\scene\glbmodel.h">
+      <Filter>源文件\glb\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\scene\glbmodelfile.h">
+      <Filter>源文件\glb\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\scene\glbobject.h">
+      <Filter>源文件\glb\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\scene\glbscene.h">
+      <Filter>源文件\glb\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\thirdparty\stb_image\std_image.h">
+      <Filter>源文件\glb\thirdparty\stb_image</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\util\glbddsformat.h">
+      <Filter>源文件\glb\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\util\glblog.h">
+      <Filter>源文件\glb\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\util\glbmacro.h">
+      <Filter>源文件\glb\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\util\glbprofile.h">
+      <Filter>源文件\glb\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\util\glbtextureinfo.h">
+      <Filter>源文件\glb\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\util\glbtexturereader.h">
+      <Filter>源文件\glb\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\util\glbtexturewriter.h">
+      <Filter>源文件\glb\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\util\glbutil.h">
+      <Filter>源文件\glb\util</Filter>
     </ClInclude>
     <ClInclude Include="..\glb\render\glbmaterial.h">
       <Filter>源文件\glb\render</Filter>
@@ -206,21 +248,6 @@
     <ClInclude Include="..\glb\render\glbuniform.h">
       <Filter>源文件\glb\render</Filter>
     </ClInclude>
-    <ClInclude Include="..\glb\render\imp\dx11\glbmeshimp.h">
-      <Filter>源文件\glb\render\imp\dx11</Filter>
-    </ClInclude>
-    <ClInclude Include="..\glb\render\imp\dx11\glbrenderdeviceimp.h">
-      <Filter>源文件\glb\render\imp\dx11</Filter>
-    </ClInclude>
-    <ClInclude Include="..\glb\render\imp\dx11\glbrendertargetimp.h">
-      <Filter>源文件\glb\render\imp\dx11</Filter>
-    </ClInclude>
-    <ClInclude Include="..\glb\render\imp\dx11\glbshaderimp.h">
-      <Filter>源文件\glb\render\imp\dx11</Filter>
-    </ClInclude>
-    <ClInclude Include="..\glb\render\imp\dx11\glbtextureimp.h">
-      <Filter>源文件\glb\render\imp\dx11</Filter>
-    </ClInclude>
     <ClInclude Include="..\glb\render\imp\gl\glbmeshimp.h">
       <Filter>源文件\glb\render\imp\gl</Filter>
     </ClInclude>
@@ -236,47 +263,21 @@
     <ClInclude Include="..\glb\render\imp\gl\glbtextureimp.h">
       <Filter>源文件\glb\render\imp\gl</Filter>
     </ClInclude>
-    <ClInclude Include="..\glb\scene\glbcamera.h">
-      <Filter>源文件\glb\scene</Filter>
+    <ClInclude Include="..\glb\render\imp\dx11\glbmeshimp.h">
+      <Filter>源文件\glb\render\imp\dx11</Filter>
     </ClInclude>
-    <ClInclude Include="..\glb\scene\glblight.h">
-      <Filter>源文件\glb\scene</Filter>
+    <ClInclude Include="..\glb\render\imp\dx11\glbrenderdeviceimp.h">
+      <Filter>源文件\glb\render\imp\dx11</Filter>
     </ClInclude>
-    <ClInclude Include="..\glb\scene\glbmodel.h">
-      <Filter>源文件\glb\scene</Filter>
+    <ClInclude Include="..\glb\render\imp\dx11\glbrendertargetimp.h">
+      <Filter>源文件\glb\render\imp\dx11</Filter>
     </ClInclude>
-    <ClInclude Include="..\glb\scene\glbmodelfile.h">
-      <Filter>源文件\glb\scene</Filter>
+    <ClInclude Include="..\glb\render\imp\dx11\glbshaderimp.h">
+      <Filter>源文件\glb\render\imp\dx11</Filter>
     </ClInclude>
-    <ClInclude Include="..\glb\scene\glbobject.h">
-      <Filter>源文件\glb\scene</Filter>
+    <ClInclude Include="..\glb\render\imp\dx11\glbtextureimp.h">
+      <Filter>源文件\glb\render\imp\dx11</Filter>
     </ClInclude>
-    <ClInclude Include="..\glb\scene\glbscene.h">
-      <Filter>源文件\glb\scene</Filter>
-    </ClInclude>
-    <ClInclude Include="..\glb\util\glblog.h">
-      <Filter>源文件\glb\util</Filter>
-    </ClInclude>
-    <ClInclude Include="..\glb\util\glbmacro.h">
-      <Filter>源文件\glb\util</Filter>
-    </ClInclude>
-    <ClInclude Include="..\glb\util\glbprofile.h">
-      <Filter>源文件\glb\util</Filter>
-    </ClInclude>
-    <ClInclude Include="..\glb\util\glbtexturereader.h">
-      <Filter>源文件\glb\util</Filter>
-    </ClInclude>
-    <ClInclude Include="..\glb\util\glbutil.h">
-      <Filter>源文件\glb\util</Filter>
-    </ClInclude>
-    <ClInclude Include="resource.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\glb\math\glbvector.inl">
-      <Filter>源文件\glb\math</Filter>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="glb_application.rc">
@@ -293,5 +294,10 @@
     <Image Include="res\glb.ico">
       <Filter>资源文件</Filter>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\glb\math\glbvector.inl">
+      <Filter>源文件\glb\math</Filter>
+    </None>
   </ItemGroup>
 </Project>
