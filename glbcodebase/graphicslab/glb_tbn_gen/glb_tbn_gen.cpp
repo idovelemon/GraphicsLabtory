@@ -73,16 +73,20 @@ bool glb_write_tangent_space(char* obj_file_path, std::vector<TangentSpace> tang
 // FUNCTION DEFINITION
 //-----------------------------------------------------------------------------------
 int main(int argc,char* argv[]) {
-    // Check if arguments is valid
+    // Get the input from user
     char obj_file_path[kMaxFilePathLen];
+    std::cout << ".obj File Name: ";
+    std::cin >> obj_file_path;
+
+    // Check if arguments is valid
     bool is_valid_arguments = glb_check_args(argc, argv, obj_file_path);
     if (!is_valid_arguments) {
         std::cout << "Invalid arguments!" << std::endl;
-#if _DEBUG
         system("pause");
-#endif
         return 0;
     }
+
+    //char obj_file_path[kMaxFilePathLen] = "envBall.obj";
 
     // Extract face data from file
     glb::scene::ModelEffectParam effect_param;
@@ -97,20 +101,14 @@ int main(int argc,char* argv[]) {
     if (vertex_buf == NULL || texcoord_buf == NULL || normal_buf == NULL) {
         glb::scene::ModelFile::RelaseBuf(&vertex_buf, &texcoord_buf, &normal_buf, &tangent_buf);
         std::cout << "There is no texture coordinate, so there is no need for tangent-binormal coordinates!" << std::endl;
-
-#if _DEBUG
         system("pause");
-#endif
         return 0;
     }
 
     if (tangent_buf != NULL) {
         glb::scene::ModelFile::RelaseBuf(&vertex_buf, &texcoord_buf, &normal_buf, &tangent_buf);
         std::cout << "There is already tangent space coordinate, so there is no need for tangent-binormal coordinates!" << std::endl;
-
-#if _DEBUG
         system("pause");
-#endif
         return 0;
     }
 
@@ -120,10 +118,7 @@ int main(int argc,char* argv[]) {
     glb::scene::ModelFile::RelaseBuf(&vertex_buf, &texcoord_buf);
     if (!is_tangent_space_generated) {
         std::cout << "Generate tangent space coordinate error!" << std::endl;
-
-#if _DEBUG
         system("pause");
-#endif
         return 0;
     }
 
@@ -131,17 +126,12 @@ int main(int argc,char* argv[]) {
     bool is_write_new_file_ok = glb_write_tangent_space(obj_file_path, tangents);
     if (!is_write_new_file_ok) {
         std::cout << "Write new data to file error!" << std::endl;
-#if _DEBUG
         system("pause");
-#endif
         return 0;
     }
 
     std::cout << "New tangent space coordinate has generated successfully!" << std::endl;
-
-#if _DEBUG
     system("pause");
-#endif
 
     return 0;
 }
@@ -149,31 +139,20 @@ int main(int argc,char* argv[]) {
 bool glb_check_args(int argc, char* argv[], char* file_path) {
     bool result = true;
 
-    if (argc <= 1) {
-        result = false;
-        return result;
-    }
-
-    if (argv == NULL) {
-        result = false;
-        return false;
-    }
-
-    int32_t len = strlen(argv[1]);
+    int32_t len = strlen(file_path);
     if (len >= kMaxFilePathLen) {
         result = false;
         return result;
     }
 
     std::ifstream input;
-    input.open(argv[1]);
+    input.open(file_path);
     if (input.fail()) {
         result = false;
         return result;
     }
     input.close();
 
-    memcpy(file_path, argv[1], len);
     file_path[len] = '\0';
 
     return result;
@@ -339,9 +318,8 @@ bool glb_write_tangent_space(char* obj_file_path, std::vector<TangentSpace> tang
     }
 
     while (true) {
-        if (data[last_normal_pos] == '\n'
-            && data[last_normal_pos + 1] == '\n') {
-            last_normal_pos += 2;
+        if (data[last_normal_pos] == '\n') {
+            last_normal_pos += 1;
             break;
         } else {
             last_normal_pos++;
@@ -403,7 +381,7 @@ bool glb_write_tangent_space(char* obj_file_path, std::vector<TangentSpace> tang
 
         // Insert tan2, bi2
         while (true) {
-            if (data[face_pos] == ' ') {
+            if (data[face_pos] == '\n') {
                 memset(temp, 0, sizeof(temp));
                 sprintf(temp, "%d", i * 3 + 3);
                 int32_t len = strlen(temp);
@@ -419,8 +397,7 @@ bool glb_write_tangent_space(char* obj_file_path, std::vector<TangentSpace> tang
         }
     }
 
-    face_pos += 1;
-    data.insert(face_pos, "# Reorganize by glb_tbn_gen\n");
+    data.insert(data.size(), "# Reorganize by glb_tbn_gen\n");
 
     // Open file to write new obj data
     std::ofstream output;
