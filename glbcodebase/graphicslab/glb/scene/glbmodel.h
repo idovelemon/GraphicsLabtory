@@ -17,7 +17,9 @@ namespace scene {
 class Model {
 public:
     enum {
-        MT_DIFFUSE = 0,
+        MT_ALBEDO = 0,
+        MT_ROUGHNESS,
+        MT_METALLIC,
         MT_ALPHA,
         MT_NORMAL,
         MT_REFLECT,
@@ -31,28 +33,30 @@ public:
     static Model* Create(const char* file_name);
 
 public:
-    std::string GetName();
-    int32_t GetMeshId();
-    int32_t GetTexId(int32_t slot);
-    int32_t GetMaterial();
-    math::Vector GetBoundBoxMax();
-    math::Vector GetBoundBoxMin();
+    std::string GetName() const;
+    int32_t GetMeshId() const;
+    int32_t GetTexId(int32_t slot) const;
+    int32_t GetMaterial() const;
+    math::Vector GetBoundBoxMax() const;
+    math::Vector GetBoundBoxMin() const;
 
-    bool HasDiffuseTexture();
-    bool HasAlphaTexture();
-    bool HasNormalTexture();
-    bool HasReflectTexture();
-    bool HasTexCoord();
-    bool HasNormal();
-    bool HasTangent();
-    bool HasBinormal();
-    bool IsAcceptLight();
+    bool HasAlbedoTexture() const;
+    bool HasRoughnessTexture() const;
+    bool HasMettalicTexture() const;
+    bool HasAlphaTexture() const;
+    bool HasNormalTexture() const;
+    bool HasReflectTexture() const;
+    bool HasTexCoord() const;
+    bool HasNormal() const;
+    bool HasTangent() const;
+    bool HasBinormal() const;
+    bool IsAcceptLight() const;
     void SetAcceptLight(bool accept);
-    bool IsAcceptShadow();
+    bool IsAcceptShadow() const;
     void SetAcceptShadow(bool accept);
-    bool IsCastShadow();
+    bool IsCastShadow() const;
     void SetCastShadow(bool cast);
-    bool IsUseAO();
+    bool IsUseAO() const;
 
     void SetTexWithId(int32_t slot, int32_t tex_id);
 

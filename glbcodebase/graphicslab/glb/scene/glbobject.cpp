@@ -232,8 +232,16 @@ render::shader::Descriptor Object::CalculateShaderDesc() {
         desc.SetFlag(render::shader::GLB_TEXCOORD_IN_VERTEX, true);
     }
 
-    if (m_Model->HasDiffuseTexture()) {
-        desc.SetFlag(render::shader::GLB_ENABLE_DIFFUSE_TEX, true);
+    if (m_Model->HasAlbedoTexture()) {
+        desc.SetFlag(render::shader::GLB_ENABLE_ALBEDO_TEX, true);
+    }
+
+    if (m_Model->HasRoughnessTexture()) {
+        desc.SetFlag(render::shader::GLB_ENABLE_ROUGHNESS_TEX, true);
+    }
+
+    if (m_Model->HasMettalicTexture()) {
+        desc.SetFlag(render::shader::GLB_ENABLE_METALLIC_TEX, true);
     }
 
     if (m_Model->HasAlphaTexture()) {
@@ -258,14 +266,15 @@ render::shader::Descriptor Object::CalculateShaderDesc() {
 
     if (m_Model->IsAcceptLight()) {
         desc.SetFlag(render::shader::GLB_ENABLE_LIGHTING, true);
-        switch(scene::Scene::GetLight(0).type) {
-        case scene::PARALLEL_LIGHT:
-            desc.SetFlag(render::shader::GLB_USE_PARALLEL_LIGHT, true);
-            break;
 
-        default:
-            GLB_SAFE_ASSERT(false);
-            break;
+        for (int32_t i = 0; i < scene::kMaxLight; i++) {
+            scene::Light lit = scene::Scene::GetLight(i);
+
+            switch(lit.type) {
+            case scene::PARALLEL_LIGHT:
+                desc.SetFlag(render::shader::GLB_USE_PARALLEL_LIGHT, true);
+                break;
+            }
         }
     }
 

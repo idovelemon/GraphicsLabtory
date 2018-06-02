@@ -91,6 +91,7 @@ void MgrImp::ChangeMaterial(Material mat, int32_t id) {
         it->second.specular = mat.specular;
         it->second.emission = mat.emission;
         it->second.specular_pow = mat.specular_pow;
+        it->second.roughness = mat.roughness;
     }
 }
 

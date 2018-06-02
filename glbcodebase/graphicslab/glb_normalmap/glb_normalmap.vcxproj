@@ -94,13 +94,14 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;GLB_PLATFORM_OPENGL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)\glb;$(SolutionDir)\..\glew\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ObjectFileName>$(IntDir)/%(RelativeDir)/</ObjectFileName>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)\..\glew\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)\..\glew\lib\Release\Win32;$(DXSDK_DIR)\Lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ImageHasSafeExceptionHandlers>true</ImageHasSafeExceptionHandlers>
-      <AdditionalDependencies>glew32.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glew32.lib;opengl32.lib;dinput8.lib;dxguid.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug_DX|Win32'">
@@ -161,9 +162,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\glb\comm.cpp" />
     <ClCompile Include="..\glb\glbapplication.cpp" />
-    <ClCompile Include="..\glb\glbeditorcomm.cpp" />
     <ClCompile Include="..\glb\glbinput.cpp" />
     <ClCompile Include="..\glb\math\glbbv.cpp" />
     <ClCompile Include="..\glb\math\glbmath.cpp" />
@@ -197,11 +196,8 @@
     <ClCompile Include="glb_normalmap.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\glb\comm.h" />
     <ClInclude Include="..\glb\glb.h" />
     <ClInclude Include="..\glb\glbapplication.h" />
-    <ClInclude Include="..\glb\glbcomm.h" />
-    <ClInclude Include="..\glb\glbeditorcomm.h" />
     <ClInclude Include="..\glb\glbinput.h" />
     <ClInclude Include="..\glb\math\glbbv.h" />
     <ClInclude Include="..\glb\math\glbmath.h" />

@@ -5,6 +5,9 @@
 // Brief: This is a uber shader, all the light calculation, texture mapping
 // and some sort of that will be implemented in this shader.
 //----------------------------------------------------
+
+#extension GL_NV_shadow_samplers_cube : enable
+
 // Input attributes
 in vec3 vs_Vertex;
 
@@ -40,27 +43,27 @@ out vec4 oColor;
 // Uniform
 #ifdef GLB_TEXCOORD_IN_VERTEX
 
-	#ifdef GLB_ENABLE_DIFFUSE_TEX
-	uniform sampler2D glb_DiffuseTex;
-	#endif
+#ifdef GLB_ENABLE_DIFFUSE_TEX
+uniform sampler2D glb_DiffuseTex;
+#endif
 
-	#ifdef GLB_ENABLE_ALPHA_TEX
-	uniform sampler2D glb_AlphaTex;
-	#endif
+#ifdef GLB_ENABLE_ALPHA_TEX
+uniform sampler2D glb_AlphaTex;
+#endif
 
-	#ifdef GLB_ENABLE_NORMAL_TEX
-	uniform sampler2D glb_NormalTex;
+#ifdef GLB_ENABLE_NORMAL_TEX
+uniform sampler2D glb_NormalTex;
 
-		#ifdef GLB_TANGENT_IN_VERTEX
-		#ifdef GLB_BINORMAL_IN_VERTEX
-			#define GLB_ENABLE_NORMAL_MAPPING
-		#endif
-		#endif
-	#endif
+#ifdef GLB_TANGENT_IN_VERTEX
+#ifdef GLB_BINORMAL_IN_VERTEX
+	#define GLB_ENABLE_NORMAL_MAPPING
+#endif
+#endif
+#endif
 
-	#ifdef GLB_ENABLE_REFLECT_TEX
-		uniform samplerCube glb_ReflectTex;
-	#endif
+#ifdef GLB_ENABLE_REFLECT_TEX
+uniform samplerCube glb_ReflectTex;
+#endif
 
 #endif
 
@@ -121,183 +124,92 @@ uniform vec3 glb_Material_Ambient;
 uniform vec3 glb_Material_Diffuse;
 uniform vec3 glb_Material_Specular;
 uniform float glb_Material_Pow;
+uniform vec3 glb_Material_Albedo;
+uniform float glb_Material_Roughness;
+uniform float glb_Material_Metallic;
 
-	#ifdef GLB_USE_PARALLEL_LIGHT
-	uniform vec3 glb_ParallelLight_Dir;
-	uniform vec3 glb_ParallelLight_Ambient;
-	uniform vec3 glb_ParallelLight_Diffuse;
-	uniform vec3 glb_ParallelLight_Specular;
+uniform vec3 glb_GlobalLight_Ambient;
 
-	vec3 calc_diffuse(vec3 light_vec, vec3 normal, vec3 diffuse_mat, vec3 light_color) {
-		float ratio = dot(light_vec, normal);
-		ratio = max(ratio, 0.0);
-		return light_color * diffuse_mat * ratio;
-	}
+#ifdef GLB_USE_PARALLEL_LIGHT
+uniform vec3 glb_ParallelLight_Dir;
+uniform vec3 glb_ParallelLight;
+#else
+	#error No light source specified
+#endif
 
-	vec3 calc_specular(vec3 light_vec, vec3 normal, vec3 view_vec, vec3 spec_mat, vec3 light_color, float pow_value) {
-		/*******************************************
-		* reflect(incident light vector, surface normal)
-		* incident_light_vec = -light_vec
-		********************************************/
-		vec3 ref_light_vec = reflect(-light_vec, normal);
-		float ratio = dot(ref_light_vec, view_vec);
-		ratio = max(ratio, 0.0);
-		ratio = pow(ratio, pow_value);
+const float PI = 3.1415927;
 
-		return light_color * spec_mat * ratio;
-	}
-	#else
-		#error No light source specified
-	#endif
+vec3 calc_frenel(vec3 n, vec3 v, vec3 F0) {
+    float ndotv = max(dot(n, v), 0.0);
+    return F0 + (vec3(1.0, 1.0, 1.0) - F0) * pow(1.0 - ndotv, 5.0);
+}
+
+float calc_NDF_GGX(vec3 n, vec3 h, float roughness) {
+    float a = roughness * roughness;
+    float a2 = a * a;
+    float ndoth = max(dot(n, h), 0.0);
+    float ndoth2 = ndoth * ndoth;
+    float t = ndoth2 * (a2 - 1.0) + 1.0;
+    float t2 = t * t;
+    return a2 / (PI * t2);
+}
+
+float calc_Geometry_GGX(float costheta, float roughness) {
+    float a = roughness;
+    float r = a + 1.0;
+    float r2 = r * r;
+    float k = r2 / 8.0;
+
+    float t = costheta * (1.0 - k) + k;
+
+    return costheta / t;
+}
+
+float calc_Geometry_Smith(vec3 n, vec3 v, vec3 l, float roughness) {
+    float ndotv = max(dot(n, v), 0.0);
+    float ndotl = max(dot(n, l), 0.0);
+    float ggx1 = calc_Geometry_GGX(ndotv, roughness);
+    float ggx2 = calc_Geometry_GGX(ndotl, roughness);
+    return ggx1 * ggx2;
+}
+
+vec3 calc_pbr_brdf(vec3 n, vec3 v, vec3 l, vec3 h, vec3 albedo, float roughness, float metalic) {
+    vec3 F0 = mix(vec3(0.04, 0.04, 0.04), albedo, metalic);
+    vec3 F = calc_frenel(h, v, F0);
+
+    vec3 T = vec3(1.0, 1.0, 1.0) - F;
+    vec3 kD = T * (1.0 - metalic);
+
+    float D = calc_NDF_GGX(n, h, roughness);
+
+    float G = calc_Geometry_Smith(n, v, l, roughness);
+
+    vec3 Diffuse = kD * albedo * vec3(1.0 / PI, 1.0 / PI, 1.0 / PI);
+    float t = 4.0 * max(dot(n, v), 0.0) * max(dot(n, l), 0.0) + 0.001;
+    vec3 Specular = D * F * G * vec3(1.0 / t, 1.0 / t, 1.0 / t);
+
+    float ndotl = max(dot(n, l), 0.0);
+    return (Diffuse + Specular);
+}
 
 #endif  // GLB_ENABLE_LIGHTING
 
-//-----------------------------------------------------------------------------------------------
-/*******************************************
-* Control how to combine all colors
-********************************************/
-#ifdef GLB_ENABLE_LIGHTING
-#ifndef GLB_COLOR_IN_VERTEX
-#ifndef GLB_TEXCOORD_IN_VERTEX
+vec3 calc_light() {
+	vec3 light = vec3(0.0, 0.0, 0.0);
 
-#define GLB_COMBINE_COLOR_SUPPORT
-vec3 combine_color(vec3 light, vec3 reflect_light, vec3 diffuse_color, vec3 vtx_color) {
+#ifdef GLB_ENABLE_LIGHTING
+	light = light + glb_GlobalLight_Ambient;
+#ifdef GLB_USE_PARALLEL_LIGHT
+	light = light + glb_ParallelLight;
+#endif
+#endif
+
 	return light;
 }
 
-#endif
-#endif
-#endif
+float calc_shadow() {
+	float shadow_factor = 1.0;
 
-#ifdef GLB_ENABLE_LIGHTING
-#ifdef GLB_TEXCOORD_IN_VERTEX
-#ifndef GLB_COLOR_IN_VERTEX
-#ifndef GLB_ENABLE_DIFFUSE_TEX
-
-#define GLB_COMBINE_COLOR_SUPPORT
-vec3 combine_color(vec3 light, vec3 reflect_light, vec3 diffuse_color, vec3 vtx_color) {
-	return light;
-}
-
-#endif
-#endif
-#endif
-#endif
-
-#ifdef GLB_ENABLE_LIGHTING
-#ifndef GLB_COLOR_IN_VERTEX
-#ifdef GLB_ENABLE_DIFFUSE_TEX
-#ifndef GLB_ENABLE_REFLECT_TEX
-
-#define GLB_COMBINE_COLOR_SUPPORT
-vec3 combine_color(vec3 light, vec3 reflect_light, vec3 diffuse_color, vec3 vtx_color) {
-	return light * diffuse_color;
-}
-
-#endif
-#endif
-#endif
-#endif
-
-#ifdef GLB_ENABLE_REFLECT_TEX
-#ifndef GLB_ENABLE_DIFFUSE_TEX
-#ifndef GLB_ENABLE_LIGHTING
-#endif
-#endif
-#endif
-
-#ifdef GLB_COLOR_IN_VERTEX
-#ifndef GLB_ENABLE_LIGHTING
-#ifndef GLB_TEXCOORD_IN_VERTEX
-
-#define GLB_COMBINE_COLOR_SUPPORT
-vec3 combine_color(vec3 light, vec3 reflect_light, vec3 diffuse_color, vec3 vtx_color) {
-	return vtx_color;
-}
-
-#endif
-#endif
-#endif
-
-#ifdef GLB_TEXCOORD_IN_VERTEX
-#ifdef GLB_ENABLE_DIFFUSE_TEX
-#ifndef GLB_ENABLE_LIGHTING
-#ifndef GLB_COLOR_IN_VERTEX
-#ifndef GLB_ENABLE_REFLECT_TEX
-
-#define GLB_COMBINE_COLOR_SUPPORT
-vec3 combine_color(vec3 light, vec3 reflect_light, vec3 diffuse_color, vec3 vtx_color) {
-	return diffuse_color;
-}
-
-#endif
-#endif
-#endif
-#endif
-#endif
-
-#ifndef GLB_ENABLE_LIGHTING
-#ifndef GLB_TEXCOORD_IN_VERTEX
-#ifndef GLB_COLOR_IN_VERTEX
-
-#define GLB_COMBINE_COLOR_SUPPORT
-vec3 combine_color(vec3 light, vec3 reflect_light, vec3 diffuse_color, vec3 vtx_color) {
-	return vec3(0.0, 0.0, 0.0);
-}
-
-#endif
-#endif
-#endif
-
-#ifdef GLB_TEXCOORD_IN_VERTEX
-#ifndef GLB_ENABLE_LIGHTING
-#ifndef GLB_COLOR_IN_VERTEX
-#ifndef GLB_ENABLE_DIFFUSE_TEX
-#ifndef GLB_ENABLE_REFLECT_TEX
-
-#define GLB_COMBINE_COLOR_SUPPORT
-vec3 combine_color(vec3 light, vec3 reflect_light, vec3 diffuse_color, vec3 vtx_color) {
-	return vec3(0.0, 0.0, 0.0);
-}
-
-#endif
-#endif
-#endif
-#endif
-#endif
-
-#ifdef GLB_TEXCOORD_IN_VERTEX
-#ifdef GLB_ENABLE_REFLECT_TEX
-#ifndef GLB_ENABLE_LIGHTING
-#ifndef GLB_ENABLE_DIFFUSE_TEX
-#ifndef GLB_COLOR_IN_VERTEX
-
-#define GLB_COMBINE_COLOR_SUPPORT
-vec3 combine_color(vec3 light, vec3 reflect_light, vec3 diffuse_color, vec3 vtx_color) {
-	return reflect_light;
-}
-
-#endif
-#endif
-#endif
-#endif
-#endif
-
-#ifndef GLB_COMBINE_COLOR_SUPPORT
-	#error No support color combine method
-#endif
-//-----------------------------------------------------------------------------------------------
-
-void main() {
-	oColor = vec4(0.0, 0.0, 0.0, 1.0);
-
-	vec3 diffuse_light = vec3(0.0, 0.0, 0.0);
-	vec3 specular_light = vec3(0.0, 0.0, 0.0);
-	vec3 ambient_light = vec3(0.0, 0.0, 0.0);
-	vec3 reflect_light = vec3(0.0, 0.0, 0.0);
-	vec3 emii_light = glb_Material_Emission;
-
-	float is_in_shadow = 0.0;
 #ifdef GLB_ENABLE_SHADOW
 	vec2 shadow_coord;
 	int index = calc_current_shadow_index(vs_Vertex, glb_EyePos, glb_LookAt, glb_ShadowSplit0, glb_ShadowSplit1, glb_ShadowSplit2);
@@ -329,18 +241,25 @@ void main() {
 		factor = texture2D(glb_ShadowTex3, light_space_pos.xy).z;
 	}
 	if (factor < light_space_pos.z) {
-		is_in_shadow = 1.0;
+		// In shadow
+		shadow_factor = 0.0;
 	}
 	if (light_space_pos.x < 0.0 || 
 		light_space_pos.x > 1.0 ||
 		light_space_pos.y < 0.0 ||
 		light_space_pos.y > 1.0) {
-		is_in_shadow = 0.0;
+		// Out of shadow
+		shadow_factor = 1.0;
 	}
 	shadow_coord = light_space_pos.xy;
 #endif
 
+	return shadow_factor;
+}
+
+vec3 calc_normal() {
 	vec3 normal = vec3(0.0, 0.0, 0.0);
+
 #ifdef GLB_NORMAL_IN_VERTEX
 	normal = normalize(vs_Normal);
 #endif
@@ -355,61 +274,76 @@ void main() {
 	normalize(normal);
 #endif
 
+	return normal;	
+}
+
+vec3 calc_view() {
+	vec3 view = vec3(0.0, 0.0, 0.0);
+
 #ifdef GLB_ENABLE_EYE_POS
-	vec3 view_vec = normalize(glb_EyePos - vs_Vertex);
+	view = normalize(glb_EyePos - vs_Vertex);
 #endif	
 
+	return view;
+}
+
+vec3 calc_light_dir() {
+	vec3 light_dir = vec3(0.0, 0.0, 0.0);
+#ifdef GLB_USE_PARALLEL_LIGHT
+	light_dir = -glb_ParallelLight_Dir;
+#endif
+	return light_dir;
+}
+
+vec3 calc_brdf(vec3 normal, vec3 view, vec3 light, vec3 half) {
+	vec3 brdf = vec3(1.0, 1.0, 1.0);
+
 #ifdef GLB_ENABLE_LIGHTING
-	if (is_in_shadow <= 0.0) {
-		#ifdef GLB_USE_PARALLEL_LIGHT
-			vec3 light_vec = -glb_ParallelLight_Dir;
-			ambient_light = glb_Material_Ambient * glb_ParallelLight_Ambient;
-			diffuse_light = calc_diffuse(light_vec, normal, glb_Material_Diffuse, glb_ParallelLight_Diffuse);
-			specular_light = calc_specular(light_vec, normal, view_vec, glb_Material_Specular, glb_ParallelLight_Specular, glb_Material_Pow);
-			emii_light = glb_Material_Emission;
-		#endif
-	} else {
-		ambient_light = glb_Material_Ambient * glb_ParallelLight_Ambient;
-		emii_light = glb_Material_Emission;
-	}
-#else
-	if (is_in_shadow >= 1.0) {
-		oColor.xyz = 0.5 * oColor.xyz;
-	}
+	vec3 albedo = glb_Material_Albedo;
+	float roughness = glb_Material_Roughness;
+	float metallic = glb_Material_Metallic;
+	brdf = calc_pbr_brdf(normal, view, light, half, albedo, roughness, metallic);
 #endif
 
-#ifdef GLB_ENABLE_AO
-	vec2 ao_coord = vec2(gl_FragCoord.x / glb_ScreenWidth, gl_FragCoord.y / glb_ScreenHeight);
-	ambient_light *= texture2D(glb_AOMap, ao_coord).rgb;
-#endif
+	return brdf;
+}
 
-	vec3 light = ambient_light + specular_light + diffuse_light;
+float calc_alpha() {
+	float alpha = 1.0;
 
-#ifdef GLB_ENABLE_REFLECT_TEX
-	vec3 refl = reflect(-view_vec, normal);
-	refl = normalize(refl);
-	refl.yz = -refl.yz;
-	reflect_light = textureCube(glb_ReflectTex, refl).xyz;
-#endif
-
-	vec3 brdf = vec3(0.0, 0.0, 0.0);
-	vec3 vtxc = vec3(0.0, 0.0, 0.0);
-#ifdef GLB_COLOR_IN_VERTEX
-	vtxc = vs_Color;
-#endif
-
-#ifdef GLB_TEXCOORD_IN_VERTEX
-	#ifdef GLB_ENABLE_DIFFUSE_TEX
-		brdf.xyz = texture2D(glb_DiffuseTex, vs_TexCoord).xyz;
-	#endif
-#endif
-
-	oColor.xyz = combine_color(light, reflect_light, brdf, vtxc);
-	oColor.xyz += emii_light;
-	
 #ifdef GLB_TEXCOORD_IN_VERTEX
 	#ifdef GLB_ENABLE_ALPHA_TEX
-		oColor.w = texture2D(glb_AlphaTex, vs_TexCoord).w;
+		alpha = texture2D(glb_AlphaTex, vs_TexCoord).w;
 	#endif
 #endif
+
+	return alpha;
+}
+
+void main() {
+	oColor = vec4(0.0, 0.0, 0.0, 0.0);
+
+	float shadow_factor = calc_shadow();
+	vec3 normal = calc_normal();
+	vec3 view = calc_view();
+	vec3 light = calc_light_dir();	
+	vec3 half = normalize(view + light);
+
+	vec3 light_color = calc_light();
+	vec3 brdf = calc_brdf(normal, view, light, half);
+	float ndotl = clamp(dot(normal, light), 0.0, 1.0);
+
+	// Lout = BRDF * Lin * cos(theta)
+	oColor.xyz = light_color * brdf * (ndotl * shadow_factor);
+
+	// TEST code
+#ifdef GLB_ENABLE_REFLECT_TEX
+    vec3 refl = reflect(-view, normal);
+    refl = normalize(refl);
+    refl.yz = -refl.yz;
+    oColor.xyz = textureCube(glb_ReflectTex, refl).xyz;
+#endif
+
+	float alpha = calc_alpha();
+	oColor.w = alpha;
 }

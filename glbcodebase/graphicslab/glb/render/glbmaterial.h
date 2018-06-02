@@ -42,7 +42,10 @@ class Material {
      math::Vector diffuse;
      math::Vector emission;
      math::Vector specular;
+     math::Vector albedo;
      float specular_pow;
+     float roughness;
+     float metallic;
      char mat_name[128];
 
      Material()
@@ -51,7 +54,10 @@ class Material {
      , diffuse(0.0f, 0.0f, 0.0f)
      , emission(0.0f, 0.0f, 0.0f)
      , specular(0.0f, 0.0f, 0.0f)
-     , specular_pow(0.0f) {
+     , specular_pow(0.0f)
+     , albedo(0.0f, 0.0f, 0.0f)
+     , roughness(0.0f)
+     , metallic(0.0) {
          memset(mat_name, 0, sizeof(mat_name));
          memcpy(mat_name, "default", sizeof("default"));
      }
@@ -62,7 +68,10 @@ class Material {
      , diffuse(0.0f, 0.0f, 0.0f)
      , emission(0.0f, 0.0f, 0.0f)
      , specular(0.0f, 0.0f, 0.0f)
-     , specular_pow(0.0f) {
+     , specular_pow(0.0f)
+     , albedo(0.0f, 0.0f, 0.0f)
+     , roughness(0.0f)
+     , metallic(0.0) {
          memset(mat_name, 0, sizeof(mat_name));
          memcpy(mat_name, name, strlen(name));
      }

@@ -15,6 +15,7 @@ namespace scene {
 
 enum {
     UNKNOWN_LIGHT = 0,
+    AMBIENT_LIGHT,
     PARALLEL_LIGHT,
     POINT_LIGHT,
 };
@@ -22,23 +23,15 @@ enum {
 class Light {
 public:
     Light(int32_t type)
-    : ambient(0.0f, 0.0f, 0.0f)
-    , diffuse(0.0f, 0.0f, 0.0f)
-    , specular(0.0f, 0.0f, 0.0f)
-    , pos(0.0f, 0.0f, 0.0f)
-    , dir(0.0f, 0.0f, 0.0f)
-    , pow(0.0f) {
+    : color(0.0f, 0.0f, 0.0f)
+    , dir(0.0f, 0.0f, 0.0f) {
         this->type = type;
     }
 
     Light()
-    :type(UNKNOWN_LIGHT)
-    , ambient(0.0f, 0.0f, 0.0f)
-    , diffuse(0.0f, 0.0f, 0.0f)
-    , specular(0.0f, 0.0f, 0.0f)
-    , pos(0.0f, 0.0f, 0.0f)
-    , dir(0.0f, 0.0f, 0.0f)
-    , pow(0.0f) {
+    : type(UNKNOWN_LIGHT)
+    , color(0.0f, 0.0f, 0.0f)
+    , dir(0.0f, 0.0f, 0.0f) {
     }
 
     virtual ~Light() {
@@ -46,12 +39,8 @@ public:
 
 public:
     int32_t         type;
-    math::Vector    ambient;
-    math::Vector    diffuse;
-    math::Vector    specular;
-    math::Vector    pos;
+    math::Vector    color;
     math::Vector    dir;
-    float           pow;
 };
 
 };  // namespace scene

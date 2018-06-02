@@ -49,12 +49,14 @@ enum {
     GLB_MATERIAL_SPECULAR,
     GLB_MATERIAL_EMISSION,
     GLB_MATERIAL_POW,
+    GLB_MATERIAL_ALBEDO,
+    GLB_MATERIAL_ROUGHNESS,
+    GLB_MATERIAL_METALLIC,
     GLB_EYEPOS,
     GLB_LOOKAT,
+    GLB_GLOBALLIGHT_AMBIENT,
     GLB_PARALLELLIGHT_DIR,
-    GLB_PARALLELLIGHT_AMBIENT,
-    GLB_PARALLELLIGHT_DIFFUSE,
-    GLB_PARALLELLIGHT_SPECULAR,
+    GLB_PARALLELLIGHT,
     GLB_HDR_AVERAGE_LUM,
     GLB_HDR_SCENE_TEX,
     GLB_LOG_LUM_TEX,
@@ -103,12 +105,14 @@ static const struct {
     {"glb_Material_Specular",               GLB_MATERIAL_SPECULAR,              0},
     {"glb_Material_Emission",               GLB_MATERIAL_EMISSION,              0},
     {"glb_Material_Pow",                    GLB_MATERIAL_POW,                   0},
+    {"glb_Material_Albedo",                 GLB_MATERIAL_ALBEDO   ,             0},
+    {"glb_Material_Roughness",              GLB_MATERIAL_ROUGHNESS,             0},
+    {"glb_Material_Metallic",               GLB_MATERIAL_METALLIC,              0},
     {"glb_EyePos",                          GLB_EYEPOS,                         1},
     {"glb_LookAt",                          GLB_LOOKAT,                         1},
+    {"glb_GlobalLight_Ambient",             GLB_GLOBALLIGHT_AMBIENT,            1},
     {"glb_ParallelLight_Dir",               GLB_PARALLELLIGHT_DIR,              1},
-    {"glb_ParallelLight_Ambient",           GLB_PARALLELLIGHT_AMBIENT,          1},
-    {"glb_ParallelLight_Diffuse",           GLB_PARALLELLIGHT_DIFFUSE,          1},
-    {"glb_ParallelLight_Specular",          GLB_PARALLELLIGHT_SPECULAR,         1},
+    {"glb_ParallelLight",                   GLB_PARALLELLIGHT,                  1},
     {"glb_AverageLum",                      GLB_HDR_AVERAGE_LUM,                1},
     {"glb_HDRSceneTex",                     GLB_HDR_SCENE_TEX,                  1},
     {"glb_LogLumTex",                       GLB_LOG_LUM_TEX,                    1},
@@ -203,12 +207,14 @@ Wrapper uniform_material_diffuse_picker(scene::Object*);          // Pick glb_Ma
 Wrapper uniform_material_specular_picker(scene::Object*);         // Pick glb_Material_Specular
 Wrapper uniform_material_emission_picker(scene::Object*);         // Pick glb_Material_Emission
 Wrapper uniform_material_pow_picker(scene::Object*);              // Pick glb_Material_Pow
+Wrapper uniform_material_albedo_picker(scene::Object*);           // Pick glb_Material_Albedo
+Wrapper uniform_material_roughness_picker(scene::Object*);        // Pick glb_Material_Roughness
+Wrapper uniform_material_metallic_picker(scene::Object*);         // Pick glb_Material_Metallic
 Wrapper uniform_eye_pos_picker(scene::Object*);                   // Pick glb_EyePos
 Wrapper uniform_look_at_picker(scene::Object*);                   // Pick glb_LookAt
+Wrapper uniform_global_light_ambient_picker(scene::Object*);      // Pick glb_GlobalLight_Ambient
 Wrapper uniform_parallel_light_dir_picker(scene::Object*);        // Pick glb_ParallelLight_Dir
-Wrapper uniform_parallel_light_ambient_picker(scene::Object*);    // Pick glb_ParallelLight_Ambient
-Wrapper uniform_parallel_light_diffuse_picker(scene::Object*);    // Pick glb_ParallelLight_Diffuse
-Wrapper uniform_parallel_light_specular_picker(scene::Object*);   // Pick glb_ParallelLight_Specular
+Wrapper uniform_parallel_light_picker(scene::Object*);            // Pick glb_ParallelLight
 Wrapper uniform_hdr_average_lum_picker(scene::Object*);           // Pick glb_AverageLum
 Wrapper uniform_hdr_scene_tex_picker(scene::Object*);             // Pick glb_HDRSceneTex
 Wrapper uniform_log_lum_tex_picker(scene::Object*);               // Pick glb_LogLumTex
@@ -255,12 +261,14 @@ static const struct {
     {uniform_material_specular_picker,          GLB_MATERIAL_SPECULAR},
     {uniform_material_emission_picker,          GLB_MATERIAL_EMISSION},
     {uniform_material_pow_picker,               GLB_MATERIAL_POW},
+    {uniform_material_albedo_picker,            GLB_MATERIAL_ALBEDO},
+    {uniform_material_roughness_picker,         GLB_MATERIAL_ROUGHNESS},
+    {uniform_material_metallic_picker,          GLB_MATERIAL_METALLIC},
     {uniform_eye_pos_picker,                    GLB_EYEPOS},
     {uniform_look_at_picker,                    GLB_LOOKAT},
+    {uniform_global_light_ambient_picker,       GLB_GLOBALLIGHT_AMBIENT},
     {uniform_parallel_light_dir_picker,         GLB_PARALLELLIGHT_DIR},
-    {uniform_parallel_light_ambient_picker,     GLB_PARALLELLIGHT_AMBIENT},
-    {uniform_parallel_light_diffuse_picker,     GLB_PARALLELLIGHT_DIFFUSE},
-    {uniform_parallel_light_specular_picker,    GLB_PARALLELLIGHT_SPECULAR},
+    {uniform_parallel_light_picker,             GLB_PARALLELLIGHT},
     {uniform_hdr_average_lum_picker,            GLB_HDR_AVERAGE_LUM},
     {uniform_hdr_scene_tex_picker,              GLB_HDR_SCENE_TEX},
     {uniform_log_lum_tex_picker,                GLB_LOG_LUM_TEX},

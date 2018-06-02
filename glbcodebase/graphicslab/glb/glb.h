@@ -25,9 +25,7 @@
 #error Must define one GLB_PLATFORM_XXX
 #endif
 
-#include "comm.h"
 #include "glbapplication.h"
-#include "glbeditorcomm.h"
 #include "glbinput.h"
 
 #include "math/glbmath.h"

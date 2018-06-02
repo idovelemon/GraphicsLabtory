@@ -74,10 +74,6 @@ public:
     static void SetHighLightBase(float base);
     static float GetHighLightBase();
 
-    // Env Map
-    static int32_t RequestBakeEnvMap(int32_t width, int32_t height, scene::Object* obj);
-    static void CancleBakeEnvMap(scene::Object* obj);
-
     // Debug draw
     static void AddLine(math::Vector start, math::Vector end, math::Vector color);
     static void AddBoundBox(math::AABB bv, math::Vector color);

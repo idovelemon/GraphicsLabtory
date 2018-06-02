@@ -27,7 +27,7 @@ const int32_t kObjFloatPerTexcoord = 2;
 const int32_t kObjFloatPerNormal = 3;
 const int32_t kObjFloatPerTangent = 3;
 const int32_t kObjFloatPerBinormal = 3;
-const int32_t kObjMaxPrefixLength = 8;
+const int32_t kObjMaxPrefixLength = 32;
 const int32_t kObjMaxLineLength = 256;
 
 //----------------------------------------------------------------------------------------
@@ -112,91 +112,92 @@ ObjModelFile::~ObjModelFile() {
 }
 
 int32_t ObjModelFile::ExtractModelData(
-        const char* model_file_name, 
-        ModelEffectParam& effect_param,
-        ModelMaterialParam& material_param,
-        float** vertex_buf,
-        float** texcoord_buf,
-        float** normal_buf,
-        float** tangent_buf,
-        float** binormal_buf
+        const char* modelFileName, 
+        ModelEffectParam& effectParam,
+        ModelMaterialParam& materialParam,
+        float** vertexBuf,
+        float** texcoordBuf,
+        float** normalBuf,
+        float** tangentBuf,
+        float** binormalBuf
         ) {
     int32_t result = 0;
 
-    if (model_file_name != NULL && vertex_buf != NULL) {
+    if (modelFileName != NULL && vertexBuf != NULL) {
         std::ifstream input;
-        input.open(model_file_name);
+        input.open(modelFileName);
 
         if (!input.fail()) {
-            std::vector<math::Vector> vertex_array;
-            std::vector<math::Vector> tex_array;
-            std::vector<math::Vector> normal_array;
-            std::vector<math::Vector> tangent_array;
-            std::vector<math::Vector> binormal_array;
-            std::vector<ObjFace> face_array;
+            std::vector<math::Vector> vertexArray;
+            std::vector<math::Vector> texArray;
+            std::vector<math::Vector> normalArray;
+            std::vector<math::Vector> tangentArray;
+            std::vector<math::Vector> binormalArray;
+            std::vector<ObjFace> faceArray;
 
             char prefix[kObjMaxPrefixLength];
             char buffer[kObjMaxLineLength];
 
-            material_param.boundbox_min.x = FLT_MAX;
-            material_param.boundbox_min.y = FLT_MAX;
-            material_param.boundbox_min.z = FLT_MAX;
-            material_param.boundbox_max.x = 0.0f;
-            material_param.boundbox_max.y = 0.0f;
-            material_param.boundbox_max.z = 0.0f;
+            materialParam.boundboxMin.x = FLT_MAX;
+            materialParam.boundboxMin.y = FLT_MAX;
+            materialParam.boundboxMin.z = FLT_MAX;
+            materialParam.boundboxMax.x = 0.0f;
+            materialParam.boundboxMax.y = 0.0f;
+            materialParam.boundboxMax.z = 0.0f;
 
             // Read the data from file
-            while (!input.eof()) {    
+            while (!input.eof()) {
                 input >> prefix;
 
                 if (!strcmp(prefix, "v")) {
                     // Vertex
                     math::Vector vertex;
                     input >> vertex.x >> vertex.y >> vertex.z;
-                    vertex_array.push_back(vertex);
+                    vertexArray.push_back(vertex);
 
-                    if (vertex.x < material_param.boundbox_min.x) {
-                        material_param.boundbox_min.x = vertex.x;
-                    } else if (vertex.x > material_param.boundbox_max.x) {
-                        material_param.boundbox_max.x = vertex.x;
+                    if (vertex.x < materialParam.boundboxMin.x) {
+                        materialParam.boundboxMin.x = vertex.x;
+                    } else if (vertex.x > materialParam.boundboxMax.x) {
+                        materialParam.boundboxMax.x = vertex.x;
                     }
 
-                    if (vertex.y < material_param.boundbox_min.y) {
-                        material_param.boundbox_min.y = vertex.y;
-                    } else if (vertex.y > material_param.boundbox_max.y) {
-                        material_param.boundbox_max.y = vertex.y;
+                    if (vertex.y < materialParam.boundboxMin.y) {
+                        materialParam.boundboxMin.y = vertex.y;
+                    } else if (vertex.y > materialParam.boundboxMax.y) {
+                        materialParam.boundboxMax.y = vertex.y;
                     }
 
-                    if (vertex.z < material_param.boundbox_min.z) {
-                        material_param.boundbox_min.z = vertex.z;
-                    } else if (vertex.z > material_param.boundbox_max.z) {
-                        material_param.boundbox_max.z = vertex.z;
+                    if (vertex.z < materialParam.boundboxMin.z) {
+                        materialParam.boundboxMin.z = vertex.z;
+                    } else if (vertex.z > materialParam.boundboxMax.z) {
+                        materialParam.boundboxMax.z = vertex.z;
                     }
                 } else if (!strcmp(prefix, "vt")) {
                     // Texture Coordinate
                     math::Vector texcoord;
-                    input >> texcoord.x >> texcoord.y >> texcoord.z;
-                    tex_array.push_back(texcoord);
+                    // input >> texcoord.x >> texcoord.y >> texcoord.z;
+                    input >> texcoord.x >> texcoord.y;  // .obj from blender do not have z value for texture coordinate
+                    texArray.push_back(texcoord);
 
-                    effect_param.has_texcoord = true;
+                    effectParam.hasTexcoord = true;
                 } else if (!strcmp(prefix, "vn")) {
                     // Normal
                     math::Vector normal;
                     input >> normal.x >> normal.y >> normal.z;
-                    normal_array.push_back(normal);
-                    effect_param.has_normal = true;
+                    normalArray.push_back(normal);
+                    effectParam.hasNormal = true;
                 } else if (!strcmp(prefix, "vtan")) {
                     // Tangent
                     math::Vector tanget;
                     input >> tanget.x >> tanget.y >> tanget.z;
-                    tangent_array.push_back(tanget);
-                    effect_param.has_tanget = true;
+                    tangentArray.push_back(tanget);
+                    effectParam.hasTanget = true;
                 } else if (!strcmp(prefix, "vbi")) {
                     // Binormal
                     math::Vector binormal;
                     input >> binormal.x >> binormal.y >> binormal.z;
-                    binormal_array.push_back(binormal);
-                    effect_param.has_binormal = true;
+                    binormalArray.push_back(binormal);
+                    effectParam.hasBinormal = true;
                 } else if (!strcmp(prefix, "f")) {
                     // Triangle
                     ObjFace face;
@@ -206,92 +207,125 @@ int32_t ObjModelFile::ExtractModelData(
                         ExtractFaceData(buffer, face.vertex_index[i], face.texcoord_index[i], face.normal_index[i], face.tangent_index[i], face.binormal_index[i]);
                     }
 
-                    face_array.push_back(face);
-                } else if (!strcmp(prefix, "td")) {
-                    // Diffuse texture
+                    faceArray.push_back(face);
+                } else if (!strcmp(prefix, "talbedo")) {
+                    // Albedo texture
                     input >> buffer;
-                    effect_param.has_diffuse_tex = true;
+                    effectParam.hasAlbedoTex = true;
 
                     int32_t len = strlen(buffer);
-                    memcpy(material_param.diffuse_tex_name, buffer, len);
-                    material_param.diffuse_tex_name[len] = '\0';
+                    memcpy(materialParam.albedoTexName, buffer, len);
+                    materialParam.albedoTexName[len] = '\0';
+                } else if (!strcmp(prefix, "troughness")) {
+                    // Roughness texture
+                    input >> buffer;
+                    effectParam.hasRoughnessTex = true;
+
+                    int32_t len = strlen(buffer);
+                    memcpy(materialParam.roughnessTexName, buffer, len);
+                    materialParam.roughnessTexName[len] = '\0';
+                } else if (!strcmp(prefix, "tmetallic")) {
+                    // Metallic texture
+                    input >> buffer;
+                    effectParam.hasMetallicTex = true;
+
+                    int32_t len = strlen(buffer);
+                    memcpy(materialParam.metallicTexName, buffer, len);
+                    materialParam.metallicTexName[len] = '\0';
                 } else if (!strcmp(prefix, "ta")) {
                     // Alpha texture
                     input >> buffer;
-                    effect_param.has_alpha_tex = true;
+                    effectParam.hasAlphaTex = true;
 
                     int32_t len = strlen(buffer);
-                    memcpy(material_param.alpha_tex_name, buffer, len);
-                    material_param.alpha_tex_name[len] = '\0';
+                    memcpy(materialParam.alphaTexName, buffer, len);
+                    materialParam.alphaTexName[len] = '\0';
                 } else if (!strcmp(prefix, "tn")) {
                     // Normal texture
                     input >> buffer;
-                    effect_param.has_normal_tex = true;
+                    effectParam.hasNormalTex = true;
 
                     int32_t len = strlen(buffer);
-                    memcpy(material_param.normal_tex_name, buffer, len);
-                    material_param.normal_tex_name[len] = '\0';
+                    memcpy(materialParam.normalTexName, buffer, len);
+                    materialParam.normalTexName[len] = '\0';
                 } else if (!strcmp(prefix, "al")) {
                     // Accept light
                     int32_t temp = 0;
                     input >> temp;
                     if (temp != 0) {
-                        effect_param.accept_light = true;
+                        effectParam.acceptLight = true;
                     } else {
-                        effect_param.accept_light = false;
+                        effectParam.acceptLight = false;
                     }
                 } else if (!strcmp(prefix, "as")) {
                     // Accept shadow
                     int32_t temp = 0;
                     input >> temp;
                     if (temp != 0) {
-                        effect_param.accept_shadow = true;
+                        effectParam.acceptShadow = true;
                     } else {
-                        effect_param.accept_shadow = false;
+                        effectParam.acceptShadow = false;
                     }
                 } else if (!strcmp(prefix, "ao")) {
                     // Use AO
                     int32_t temp = 0;
                     input >> temp;
                     if (temp != 0) {
-                        effect_param.use_ao = true;
+                        effectParam.useAO = true;
                     } else {
-                        effect_param.use_ao = false;
+                        effectParam.useAO = false;
                     }
                 } else if (!strcmp(prefix, "cs")) {
                     // Cast shadow
                     int32_t temp = 0;
                     input >> temp;
                     if (temp != 0) {
-                        effect_param.cast_shadow = true;
+                        effectParam.castShadow = true;
                     } else {
-                        effect_param.cast_shadow = false;
+                        effectParam.castShadow = false;
                     }
                 } else if (!strcmp(prefix, "ma")) {
                     // Material ambient
                     math::Vector ambient;
                     input >> ambient.x >> ambient.y >> ambient.z;
-                    material_param.ambient = ambient;
+                    materialParam.ambient = ambient;
                 } else if (!strcmp(prefix, "md")) {
                     // Material diffuse
                     math::Vector diffuse;
                     input >> diffuse.x >> diffuse.y >> diffuse.z;
-                    material_param.diffuse = diffuse;
+                    materialParam.diffuse = diffuse;
                 } else if (!strcmp(prefix, "ms")) {
                     // Material specular
                     math::Vector specular;
                     input >> specular.x >> specular.y >> specular.z;
-                    material_param.specular = specular;
+                    materialParam.specular = specular;
                 } else if (!strcmp(prefix, "me")) {
                     // Material emission
                     math::Vector emission;
                     input >> emission.x >> emission.y >> emission.z;
-                    material_param.emission = emission;
+                    materialParam.emission = emission;
                 } else if (!strcmp(prefix, "mp")) {
                     // Material pow
                     float pow = 0.0f;
                     input >> pow;
-                    material_param.pow = pow;
+                    materialParam.pow = pow;
+                } else if (!strcmp(prefix, "malbedo")) {
+                    // Material base color(or reflectance for metal)
+                    math::Vector albedo;
+                    input >> albedo.x;
+                    input >> albedo.y;
+                    input >> albedo.z;
+                    materialParam.albedo = albedo;
+                } else if (!strcmp(prefix, "mroughness")) {
+                    // Material roughness
+                    float roughness = 0.0f;
+                    input >> roughness;
+                    materialParam.roughness = roughness;
+                } else if (!strcmp(prefix, "mmetallic")) {
+                    // Material metallic
+                    float metallic = 0.0f;
+                    input >> metallic;
+                    materialParam.metallic = metallic;
                 } else {
                     input.getline(buffer, sizeof(buffer));
                     memset(buffer, 0, sizeof(buffer));
@@ -301,61 +335,61 @@ int32_t ObjModelFile::ExtractModelData(
             input.close();
 
             // Generate the buffer
-            int32_t triangle_num = face_array.size();
-            *vertex_buf = new float[kVertexPerTri * triangle_num * kObjFloatPerVertex];
+            int32_t triangle_num = faceArray.size();
+            *vertexBuf = new float[kVertexPerTri * triangle_num * kObjFloatPerVertex];
             for (int32_t i = 0; i < triangle_num; i++) {
                 for (int32_t j = 0; j < kVertexPerTri; j++) {
-                    (*vertex_buf)[i * kVertexPerTri * kObjFloatPerVertex + j * kObjFloatPerVertex + 0] = vertex_array[face_array[i].vertex_index[j] - 1].x;
-                    (*vertex_buf)[i * kVertexPerTri * kObjFloatPerVertex + j * kObjFloatPerVertex + 1] = vertex_array[face_array[i].vertex_index[j] - 1].y;
-                    (*vertex_buf)[i * kVertexPerTri * kObjFloatPerVertex + j * kObjFloatPerVertex + 2] = vertex_array[face_array[i].vertex_index[j] - 1].z;
+                    (*vertexBuf)[i * kVertexPerTri * kObjFloatPerVertex + j * kObjFloatPerVertex + 0] = vertexArray[faceArray[i].vertex_index[j] - 1].x;
+                    (*vertexBuf)[i * kVertexPerTri * kObjFloatPerVertex + j * kObjFloatPerVertex + 1] = vertexArray[faceArray[i].vertex_index[j] - 1].y;
+                    (*vertexBuf)[i * kVertexPerTri * kObjFloatPerVertex + j * kObjFloatPerVertex + 2] = vertexArray[faceArray[i].vertex_index[j] - 1].z;
                 }
             }
 
-            if (tex_array.size() > 0 && texcoord_buf != NULL) {
-                *texcoord_buf = new float[kVertexPerTri * triangle_num * kObjFloatPerTexcoord];
+            if (texArray.size() > 0 && texcoordBuf != NULL) {
+                *texcoordBuf = new float[kVertexPerTri * triangle_num * kObjFloatPerTexcoord];
                 for (int32_t i = 0; i < triangle_num; i++) {
                     for (int32_t j = 0; j < kVertexPerTri; j++) {
-                        (*texcoord_buf)[i * kVertexPerTri * kObjFloatPerTexcoord + j * kObjFloatPerTexcoord + 0] = tex_array[face_array[i].texcoord_index[j] - 1].x;
-                        (*texcoord_buf)[i * kVertexPerTri * kObjFloatPerTexcoord + j * kObjFloatPerTexcoord + 1] = tex_array[face_array[i].texcoord_index[j] - 1].y;
+                        (*texcoordBuf)[i * kVertexPerTri * kObjFloatPerTexcoord + j * kObjFloatPerTexcoord + 0] = texArray[faceArray[i].texcoord_index[j] - 1].x;
+                        (*texcoordBuf)[i * kVertexPerTri * kObjFloatPerTexcoord + j * kObjFloatPerTexcoord + 1] = texArray[faceArray[i].texcoord_index[j] - 1].y;
                     }
                 }
             }
 
-            if (normal_array.size() > 0 && normal_buf != NULL) {
-                *normal_buf = new float[kVertexPerTri * triangle_num * kObjFloatPerNormal];
+            if (normalArray.size() > 0 && normalBuf != NULL) {
+                *normalBuf = new float[kVertexPerTri * triangle_num * kObjFloatPerNormal];
                 for (int32_t i = 0; i < triangle_num; i++) {
                     for (int32_t j = 0; j < kVertexPerTri; j++) {
-                        (*normal_buf)[i * kVertexPerTri * kObjFloatPerNormal + j * kObjFloatPerNormal + 0] = normal_array[face_array[i].normal_index[j] - 1].x;
-                        (*normal_buf)[i * kVertexPerTri * kObjFloatPerNormal + j * kObjFloatPerNormal + 1] = normal_array[face_array[i].normal_index[j] - 1].y;
-                        (*normal_buf)[i * kVertexPerTri * kObjFloatPerNormal + j * kObjFloatPerNormal + 2] = normal_array[face_array[i].normal_index[j] - 1].z;
+                        (*normalBuf)[i * kVertexPerTri * kObjFloatPerNormal + j * kObjFloatPerNormal + 0] = normalArray[faceArray[i].normal_index[j] - 1].x;
+                        (*normalBuf)[i * kVertexPerTri * kObjFloatPerNormal + j * kObjFloatPerNormal + 1] = normalArray[faceArray[i].normal_index[j] - 1].y;
+                        (*normalBuf)[i * kVertexPerTri * kObjFloatPerNormal + j * kObjFloatPerNormal + 2] = normalArray[faceArray[i].normal_index[j] - 1].z;
                     }
                 }
             }
 
-            if (tangent_array.size() > 0 && tangent_buf != NULL) {
-                *tangent_buf = new float[kVertexPerTri * triangle_num * kObjFloatPerTangent];
+            if (tangentArray.size() > 0 && tangentBuf != NULL) {
+                *tangentBuf = new float[kVertexPerTri * triangle_num * kObjFloatPerTangent];
                 for (int32_t i = 0; i < triangle_num; i++) {
                     for (int32_t j = 0; j < kVertexPerTri; j++) {
-                        (*tangent_buf)[i * kVertexPerTri * kObjFloatPerTangent + j * kObjFloatPerTangent + 0] = tangent_array[face_array[i].tangent_index[j] - 1].x;
-                        (*tangent_buf)[i * kVertexPerTri * kObjFloatPerTangent + j * kObjFloatPerTangent + 1] = tangent_array[face_array[i].tangent_index[j] - 1].y;
-                        (*tangent_buf)[i * kVertexPerTri * kObjFloatPerTangent + j * kObjFloatPerTangent + 2] = tangent_array[face_array[i].tangent_index[j] - 1].z;
+                        (*tangentBuf)[i * kVertexPerTri * kObjFloatPerTangent + j * kObjFloatPerTangent + 0] = tangentArray[faceArray[i].tangent_index[j] - 1].x;
+                        (*tangentBuf)[i * kVertexPerTri * kObjFloatPerTangent + j * kObjFloatPerTangent + 1] = tangentArray[faceArray[i].tangent_index[j] - 1].y;
+                        (*tangentBuf)[i * kVertexPerTri * kObjFloatPerTangent + j * kObjFloatPerTangent + 2] = tangentArray[faceArray[i].tangent_index[j] - 1].z;
                     }
                 }
             }
 
-            if (binormal_array.size() > 0 && binormal_buf != NULL) {
-                *binormal_buf = new float[kVertexPerTri * triangle_num * kObjFloatPerBinormal];
+            if (binormalArray.size() > 0 && binormalBuf != NULL) {
+                *binormalBuf = new float[kVertexPerTri * triangle_num * kObjFloatPerBinormal];
                 for (int32_t i = 0; i < triangle_num; i++) {
                     for (int32_t j = 0; j < kVertexPerTri; j++) {
-                        (*binormal_buf)[i * kVertexPerTri * kObjFloatPerBinormal + j * kObjFloatPerBinormal + 0] = binormal_array[face_array[i].binormal_index[j] - 1].x;
-                        (*binormal_buf)[i * kVertexPerTri * kObjFloatPerBinormal + j * kObjFloatPerBinormal + 1] = binormal_array[face_array[i].binormal_index[j] - 1].y;
-                        (*binormal_buf)[i * kVertexPerTri * kObjFloatPerBinormal + j * kObjFloatPerBinormal + 2] = binormal_array[face_array[i].binormal_index[j] - 1].z;
+                        (*binormalBuf)[i * kVertexPerTri * kObjFloatPerBinormal + j * kObjFloatPerBinormal + 0] = binormalArray[faceArray[i].binormal_index[j] - 1].x;
+                        (*binormalBuf)[i * kVertexPerTri * kObjFloatPerBinormal + j * kObjFloatPerBinormal + 1] = binormalArray[faceArray[i].binormal_index[j] - 1].y;
+                        (*binormalBuf)[i * kVertexPerTri * kObjFloatPerBinormal + j * kObjFloatPerBinormal + 2] = binormalArray[faceArray[i].binormal_index[j] - 1].z;
                     }
                 }
             }
 
             // Save the number of triangles
-            result = face_array.size();
+            result = faceArray.size();
         } else {
             input.close();
             GLB_SAFE_ASSERT(false);

@@ -52,22 +52,6 @@ struct PerspectiveProj {
     math::Matrix m;
 };
 
-struct EnvBaker {
-    RenderTarget* target;
-    scene::Object* obj;
-    int32_t tex_id;
-    int32_t width;
-    int32_t height;
-
-    EnvBaker()
-    : target(NULL)
-    , obj(NULL)
-    , tex_id(-1)
-    , width(0)
-    , height(0) {
-    }
-};
-
 //-----------------------------------------------------------------------------------
 // CLASS DECLARATION
 //----------------------------------------------------------------------------------
@@ -170,9 +154,6 @@ public:
     void SetHighLightBase(float base);
     float GetHighLightBase();
 
-    int32_t RequestBakeEnvMap(int32_t width, int32_t height, scene::Object* obj);
-    void CancleBakeEnvMap(scene::Object* obj);
-
     void AddLine(math::Vector start, math::Vector end, math::Vector color);
     void AddBoundBox(math::AABB bv, math::Vector color);
 
@@ -180,7 +161,6 @@ protected:
     void PreDraw();
     void DrawShadowMap();
     void DrawAOMap();
-    void DrawEnvMap();
     void DrawLightLoop();
     void DrawDebug();
     void DrawHDR();
@@ -226,10 +206,6 @@ protected:
     void DrawAO();
     void BiBlurH();
     void BiBlurV();
-
-    // Env
-    void PreDrawEnvMap();
-    void DrawEnvMapCore();
 
     void SetUniform(int32_t location, uniform::Wrapper& wrapper);
     inline float ZValueFromCamera(scene::Object* obj);
@@ -288,9 +264,6 @@ private:
     int32_t                                 m_AOShader;
     int32_t                                 m_BiBlurHShader;
     int32_t                                 m_BiBlurVShader;
-
-    // Env Map
-    std::vector<EnvBaker>                   m_EnvBakers;
 
     mesh::DebugMesh*                        m_DebugMesh;
 };
@@ -446,7 +419,6 @@ RenderImp::RenderImp()
     memset(m_LightSpaceFrustum, 0, sizeof(m_LightSpaceFrustum));
     memset(m_ShadowMatrix, 0, sizeof(m_ShadowMatrix));
     memset(m_ShadowSplitValue, 0, sizeof(m_ShadowSplitValue));
-    m_EnvBakers.clear();
 }
 
 RenderImp::~RenderImp() {
@@ -530,7 +502,6 @@ void RenderImp::Draw() {
     DrawShadowMap();
     DrawDepthMap();
     DrawAOMap();
-    DrawEnvMap();
     DrawLightLoop();
     DrawDebug();
     DrawHDR();
@@ -708,53 +679,6 @@ float RenderImp::GetHighLightBase() {
     return m_HighLightBase;
 }
 
-int32_t RenderImp::RequestBakeEnvMap(int32_t width, int32_t height, scene::Object* obj) {
-    int32_t result = -1;
-
-    RenderTarget* rt = RenderTarget::Create(width, height);
-    texture::Texture* env_map = texture::Texture::CreateFloat32CubeTexture(width, height);
-    if (rt != NULL && env_map != NULL && obj != NULL) {
-        DrawColorBuffer attach_pos[6] = {
-            COLORBUF_COLOR_ATTACHMENT0,
-            COLORBUF_COLOR_ATTACHMENT1,
-            COLORBUF_COLOR_ATTACHMENT2,
-            COLORBUF_COLOR_ATTACHMENT3,
-            COLORBUF_COLOR_ATTACHMENT4,
-            COLORBUF_COLOR_ATTACHMENT5
-        };
-        rt->AttachCubeTexture(attach_pos, env_map);
-        result = texture::Mgr::AddTexture(env_map);
-        EnvBaker baker;
-        baker.target = rt;
-        baker.obj = obj;
-        baker.tex_id = result;
-        baker.width = width;
-        baker.height = height;
-        m_EnvBakers.push_back(baker);
-    } else {
-        GLB_SAFE_ASSERT(false);
-    }
-
-    return result;
-}
-
-void RenderImp::CancleBakeEnvMap(scene::Object* obj) {
-    if (obj != NULL) {
-        if (!m_EnvBakers.empty()) {
-            std::vector<EnvBaker>::iterator it = m_EnvBakers.begin();
-            for (; it != m_EnvBakers.end(); ++it) {
-                if (it->obj == obj) {
-                    GLB_SAFE_DELETE(it->target);
-                    it->tex_id = -1;
-                    it->obj = NULL;
-                    m_EnvBakers.erase(it);
-                    break;
-                }
-            }
-        }
-    }
-}
-
 void RenderImp::AddLine(math::Vector start, math::Vector end, math::Vector color) {
     if (m_DebugMesh != NULL) {
         m_DebugMesh->AddLine(start, end, color);
@@ -837,11 +761,6 @@ void RenderImp::DrawAOMap() {
     DrawAO();
     BiBlurH();
     BiBlurV();
-}
-
-void RenderImp::DrawEnvMap() {
-    PreDrawEnvMap();
-    DrawEnvMapCore();
 }
 
 void RenderImp::DrawLightLoop() {
@@ -1721,12 +1640,12 @@ void RenderImp::DrawLightLoopCore() {
         render::Device::SetShaderLayout(program->GetShaderLayout());
 
         // Common Texture
-        int32_t tex_unit = 0;
-        render::Device::SetTexture(render::TS_SHADOW0, texture::Mgr::GetTextureById(m_ShadowMap[0]), tex_unit++);
-        render::Device::SetTexture(render::TS_SHADOW1, texture::Mgr::GetTextureById(m_ShadowMap[1]), tex_unit++);
-        render::Device::SetTexture(render::TS_SHADOW2, texture::Mgr::GetTextureById(m_ShadowMap[2]), tex_unit++);
-        render::Device::SetTexture(render::TS_SHADOW3, texture::Mgr::GetTextureById(m_ShadowMap[3]), tex_unit++);
-        render::Device::SetTexture(render::TS_AO_MAP, texture::Mgr::GetTextureById(m_AOMap), tex_unit++);
+        int32_t texUnit = 0;
+        render::Device::SetTexture(render::TS_SHADOW0, texture::Mgr::GetTextureById(m_ShadowMap[0]), texUnit++);
+        render::Device::SetTexture(render::TS_SHADOW1, texture::Mgr::GetTextureById(m_ShadowMap[1]), texUnit++);
+        render::Device::SetTexture(render::TS_SHADOW2, texture::Mgr::GetTextureById(m_ShadowMap[2]), texUnit++);
+        render::Device::SetTexture(render::TS_SHADOW3, texture::Mgr::GetTextureById(m_ShadowMap[3]), texUnit++);
+        render::Device::SetTexture(render::TS_AO_MAP, texture::Mgr::GetTextureById(m_AOMap), texUnit++);
 
         // Scene uniforms
         for (int32_t j = 0; j < static_cast<int32_t>(uniforms.size()); j++) {
@@ -1748,17 +1667,23 @@ void RenderImp::DrawLightLoopCore() {
             }
 
             // Textures
-            if (obj->GetModel()->HasDiffuseTexture()) {
-                render::Device::SetTexture(render::TS_DIFFUSE, texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(scene::Model::MT_DIFFUSE)), tex_unit++);
+            if (obj->GetModel()->HasAlbedoTexture()) {
+                render::Device::SetTexture(render::TS_ALBEDO, texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(scene::Model::MT_ALBEDO)), texUnit++);
+            }
+            if (obj->GetModel()->HasRoughnessTexture()) {
+                render::Device::SetTexture(render::TS_ROUGHNESS, texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(scene::Model::MT_ROUGHNESS)), texUnit++);
+            }
+            if (obj->GetModel()->HasMettalicTexture()) {
+                render::Device::SetTexture(render::TS_METALLIC, texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(scene::Model::MT_METALLIC)), texUnit++);
             }
             if (obj->GetModel()->HasAlphaTexture()) {
-                render::Device::SetTexture(render::TS_ALPHA, texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(scene::Model::MT_ALPHA)), tex_unit++);
+                render::Device::SetTexture(render::TS_ALPHA, texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(scene::Model::MT_ALPHA)), texUnit++);
             }
             if (obj->GetModel()->HasNormalTexture()) {
-                render::Device::SetTexture(render::TS_NORMAL, texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(scene::Model::MT_NORMAL)), tex_unit++);
+                render::Device::SetTexture(render::TS_NORMAL, texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(scene::Model::MT_NORMAL)), texUnit++);
             }
             if (obj->GetModel()->HasReflectTexture()) {
-                render::Device::SetTexture(render::TS_REFLECT, texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(scene::Model::MT_REFLECT)), tex_unit++);
+                render::Device::SetTexture(render::TS_REFLECT, texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(scene::Model::MT_REFLECT)), texUnit++);
             }
 
             // Object Uniform
@@ -2362,254 +2287,6 @@ void RenderImp::BiBlurV() {
     render::Device::SetRenderTarget(0);
 }
 
-void RenderImp::PreDrawEnvMap() {
-    std::vector<scene::Object*> objs;
-    m_ShaderGroups.clear();
-
-    // Add sky object
-    scene::Object* obj = glb::scene::Scene::GetSkyObject();
-    if (obj != NULL) {
-        objs.push_back(obj);
-    }
-
-    // Add normal object
-    glb::scene::Scene::GetAllObjects(objs);
-
-    // Sort object by shader
-    std::map<std::string, ShaderGroup> opaque_group;
-    std::vector<scene::Object*> transparent_objs;
-    for (int32_t i = 0; i < static_cast<int32_t>(objs.size()); i++) {
-        shader::Descriptor desc = objs[i]->GetShaderDesc();
-        desc.SetFlag(shader::GLB_ENABLE_REFLECT_TEX, false);
-        bool is_transparent = desc.GetFlag(shader::GLB_ENABLE_ALPHA_TEX);
-        if (is_transparent) {
-            transparent_objs.push_back(objs[i]);
-        } else {
-            std::map<std::string, ShaderGroup>::iterator it = opaque_group.find(desc.GetString());
-            if (it != opaque_group.end()) {
-                it->second.AddObject(objs[i]);
-            } else {
-                shader::Program* program = shader::Mgr::GetShader(shader::Mgr::GetUberShaderID(desc));
-                ShaderGroup new_group(desc, program);
-                new_group.AddObject(objs[i]);
-                opaque_group.insert(std::pair<std::string, ShaderGroup>(new_group.GetShaderDesc().GetString(), new_group));
-            }
-        }
-    }
-
-    // Transparent objects
-    std::vector<ShaderGroup> transparent_group;
-    {
-        // Sort transparent group from far to near
-        std::vector<float> obj_zvalues;
-        for (int32_t i = 0; i < static_cast<int32_t>(transparent_objs.size()); i++) {
-            obj_zvalues.push_back(ZValueFromCamera(transparent_objs[i]));
-        }
-
-        for (int32_t i = static_cast<int32_t>(transparent_objs.size()); i >= 0 ; i--) {
-            for (int32_t j = 0; j < i - 1; j++) {
-                float obj1_zvalue = obj_zvalues[j];
-                float obj2_zvalue = obj_zvalues[j + 1];
-                if (obj1_zvalue < obj2_zvalue) {
-                    scene::Object* temp = transparent_objs[j];
-                    transparent_objs[j] = transparent_objs[j + 1];
-                    transparent_objs[j + 1] = temp;
-
-                    obj_zvalues[j] = obj2_zvalue;
-                    obj_zvalues[j + 1] = obj1_zvalue;
-                }
-            }
-        }
-
-        // Split into groups
-        for (int32_t i = 0; i < static_cast<int32_t>(transparent_objs.size()); i++) {
-            if (transparent_group.size() == 0) {
-                shader::Descriptor desc = transparent_objs[i]->GetShaderDesc();
-                desc.SetFlag(shader::GLB_ENABLE_REFLECT_TEX, false);
-                ShaderGroup new_group(desc, shader::Mgr::GetShader(shader::Mgr::GetUberShaderID(desc)));
-                new_group.AddObject(transparent_objs[i]);
-                transparent_group.push_back(new_group);
-            } else {
-                shader::Descriptor desc = transparent_objs[i]->GetShaderDesc();
-                desc.SetFlag(shader::GLB_ENABLE_REFLECT_TEX, false);
-                shader::Descriptor desc2 = transparent_group[transparent_group.size() - 1].GetShaderDesc();
-                desc2.SetFlag(shader::GLB_ENABLE_REFLECT_TEX, false);
-                if (desc2.Equal(desc)) {
-                    transparent_group[transparent_group.size() - 1].AddObject(transparent_objs[i]);
-                } else {
-                    ShaderGroup new_group(desc, shader::Mgr::GetShader(shader::Mgr::GetUberShaderID(desc)));
-                    new_group.AddObject(transparent_objs[i]);
-                    transparent_group.push_back(new_group);
-                }
-            }
-        }
-    }
-
-    // Merge two groups, make sure transparent group is after opaque group
-    for (std::map<std::string, ShaderGroup>::iterator it = opaque_group.begin(); it != opaque_group.end(); ++it) {
-        m_ShaderGroups.push_back(it->second);
-    }
-    for (int32_t i = 0; i < static_cast<int32_t>(transparent_group.size()); i++) {
-        m_ShaderGroups.push_back(transparent_group[i]);
-    }
-}
-
-void RenderImp::DrawEnvMapCore() {
-    // Save original proj-view matrix information
-    PerspectiveProj old_proj = m_Perspective[Render::PRIMARY_PERS];
-    scene::CameraBase* old_camera = NULL;
-    scene::Scene::GetCurCamera()->Clone(&old_camera);
-    scene::Object* sky_obj = scene::Scene::GetSkyObject();
-    math::Vector old_sky_object_pos(0.0f, 0.0f, 0.0f);
-    if (sky_obj) {
-        old_sky_object_pos = sky_obj->GetPos();
-    }
-
-    // New perspective matrix
-    m_Perspective[Render::PRIMARY_PERS].znear = 0.1f;
-    m_Perspective[Render::PRIMARY_PERS].zfar = 1000.0f;
-    m_Perspective[Render::PRIMARY_PERS].aspect = 1.0f;
-    m_Perspective[Render::PRIMARY_PERS].fov = 90.0f;
-    m_Perspective[Render::PRIMARY_PERS].m.MakeProjectionMatrix(1.0f, 90.0f, 0.1f, 1000.0f);
-
-    int32_t size = m_EnvBakers.size();
-    for (int32_t i = 0; i < size; i++) {
-        scene::Object* ref_obj = m_EnvBakers[i].obj;
-        math::Vector ref_pos = ref_obj->GetPos();
-
-        scene::Scene::GetSkyObject()->SetPos(ref_pos);
-        scene::Scene::GetSkyObject()->Update();
-
-        // 6 View matrix(+X,-X,+Y,-Y,+Z,-Z)
-        math::Matrix views[6];
-        views[0].MakeViewMatrix(ref_pos, ref_pos + math::Vector(1.0f, 0.0f, 0.0f));
-        views[1].MakeViewMatrix(ref_pos, ref_pos + math::Vector(-1.0f, 0.0f, 0.0f));
-        views[2].MakeViewMatrix(ref_pos, math::Vector(1.0f, 0.0f, 0.0f), math::Vector(0.0f, 0.0f, 1.0f), math::Vector(0.0f, -1.0f, 0.0f));
-        views[3].MakeViewMatrix(ref_pos, math::Vector(1.0f, 0.0f, 0.0f), math::Vector(0.0f, 0.0f, -1.0f), math::Vector(0.0f, 1.0f, 0.0f));
-        views[4].MakeViewMatrix(ref_pos, ref_pos + math::Vector(0.0f, 0.0f, 1.0f));
-        views[5].MakeViewMatrix(ref_pos, ref_pos + math::Vector(0.0f, 0.0f, -1.0f));
-
-        // Render Target
-        render::Device::SetRenderTarget(m_EnvBakers[i].target);
-
-        // View port
-        render::Device::SetViewport(0, 0, m_EnvBakers[i].width, m_EnvBakers[i].height);
-
-        for (int32_t j = 0; j < 6; j++) {
-            scene::Scene::GetCurCamera()->SetViewMatrix(views[j]);
-
-            // Draw Buffer
-            render::Device::SetDrawColorBuffer(static_cast<render::DrawColorBuffer>(render::COLORBUF_COLOR_ATTACHMENT0 + j));
-
-            // Clear
-            render::Device::SetClearColor(1.0f, 1.0f, 1.0f);
-            render::Device::SetClearDepth(1.0f);
-            render::Device::Clear(CLEAR_COLOR | CLEAR_DEPTH);
-
-            for (int32_t k = 0; k < static_cast<int32_t>(m_ShaderGroups.size()); k++) {
-                std::vector<scene::Object*> objs = m_ShaderGroups[k].GetObjects();
-                shader::Descriptor desc = m_ShaderGroups[k].GetShaderDesc();
-                shader::UberProgram* program = static_cast<shader::UberProgram*>(m_ShaderGroups[k].GetShaderProgram());
-                std::vector<uniform::UniformEntry>& uniforms = program->GetUniforms();
-
-                // Shader
-                render::Device::SetShader(program);
-                render::Device::SetShaderLayout(program->GetShaderLayout());
-
-                // Common Texture
-                int32_t tex_unit = 0;
-                render::Device::SetTexture(render::TS_SHADOW0, texture::Mgr::GetTextureById(m_ShadowMap[0]), tex_unit++);
-                render::Device::SetTexture(render::TS_SHADOW1, texture::Mgr::GetTextureById(m_ShadowMap[1]), tex_unit++);
-                render::Device::SetTexture(render::TS_SHADOW2, texture::Mgr::GetTextureById(m_ShadowMap[2]), tex_unit++);
-                render::Device::SetTexture(render::TS_SHADOW3, texture::Mgr::GetTextureById(m_ShadowMap[3]), tex_unit++);
-                render::Device::SetTexture(render::TS_AO_MAP, texture::Mgr::GetTextureById(m_AOMap), tex_unit++);
-
-                // Scene uniforms
-                for (int32_t l = 0; l < static_cast<int32_t>(uniforms.size()); l++) {
-                    uniform::UniformEntry entry = uniforms[l];
-                    if (entry.flag) {
-                        // TODO: for now, id is the index of the uniform picker table
-                        uniform::Wrapper uniform_wrapper = uniform::kUniformPickers[entry.id].picker(NULL);
-                        SetUniform(entry.location, uniform_wrapper);
-                    }
-                }
-
-                // Objects
-                for (int32_t l = 0; l < static_cast<int32_t>(objs.size()); l++) {
-                    scene::Object* obj = objs[l];
-                    if (obj == ref_obj || !obj->IsDrawEnable()) {
-                        continue;
-                    }
-
-                    // Textures
-                    if (obj->GetModel()->HasDiffuseTexture()) {
-                        render::Device::SetTexture(render::TS_DIFFUSE, texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(scene::Model::MT_DIFFUSE)), tex_unit++);
-                    }
-                    if (obj->GetModel()->HasAlphaTexture()) {
-                        render::Device::SetTexture(render::TS_ALPHA, texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(scene::Model::MT_ALPHA)), tex_unit++);
-                    }
-                    if (obj->GetModel()->HasNormalTexture()) {
-                        render::Device::SetTexture(render::TS_NORMAL, texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(scene::Model::MT_NORMAL)), tex_unit++);
-                    }
-
-                    // Object Uniform
-                    for (int32_t m = 0; m < static_cast<int32_t>(uniforms.size()); m++) {
-                        uniform::UniformEntry entry = uniforms[m];
-                        if (!entry.flag) {
-                            // TODO: for now, id is the index of the uniform picker table
-                            uniform::Wrapper uniform_wrapper = uniform::kUniformPickers[entry.id].picker(obj);
-                            SetUniform(entry.location, uniform_wrapper);
-                        }
-                    }
-
-                    // Vertex Buffer
-                    int32_t mesh_id = obj->GetModel()->GetMeshId();
-                    VertexLayout layout = mesh::Mgr::GetMeshById(mesh_id)->GetVertexLayout();
-                    int32_t num = mesh::Mgr::GetMeshById(mesh_id)->GetVertexNum();
-                    render::Device::SetVertexBuffer(mesh::Mgr::GetMeshById(mesh_id)->GetVertexBuffer());
-                    render::Device::SetVertexLayout(layout);
-
-                    if (obj->IsCullFaceEnable()) {
-                        render::Device::SetCullFaceEnable(true);
-                        render::Device::SetCullFaceMode(obj->GetCullFaceMode());
-                    } else {
-                        render::Device::SetCullFaceEnable(false);
-                    }
-
-                    if (obj->IsDepthTestEnable()) {
-                        render::Device::SetDepthTestEnable(true);
-                    } else {
-                        render::Device::SetDepthTestEnable(false);
-                    }
-
-                    if (obj->IsAlphaBlendEnable()) {
-                        render::Device::SetAlphaBlendEnable(true);
-                        render::Device::SetAlphaBlendFunc(render::FACTOR_SRC, obj->GetAlphaBlendFunc(render::FACTOR_SRC));
-                        render::Device::SetAlphaBlendFunc(render::FACTOR_DST, obj->GetAlphaBlendFunc(render::FACTOR_DST));
-                    } else {
-                        render::Device::SetAlphaBlendEnable(false);
-                    }
-
-                    // Draw
-                    render::Device::Draw(render::PT_TRIANGLES, 0, num);
-                }
-            }
-        }
-
-        // Reset render target
-        render::Device::SetRenderTarget(0);
-    }
-
-    // Restore original proj-view matrix information
-    m_Perspective[Render::PRIMARY_PERS] = old_proj;
-    scene::Scene::GetCurCamera()->Restore(&old_camera);
-    if (sky_obj) {
-        sky_obj->SetPos(old_sky_object_pos);
-        sky_obj->Update();
-    }
-    render::Device::SetViewport(0, 0, m_Width, m_Height);
-}
-
 void RenderImp::SetUniform(int32_t location, uniform::Wrapper& wrapper) {
     switch (wrapper.GetFormat()) {
     case uniform::Wrapper::FMT_INT:
@@ -2962,26 +2639,6 @@ float Render::GetHighLightBase() {
     }
 
     return result;
-}
-
-int32_t Render::RequestBakeEnvMap(int32_t width, int32_t height, scene::Object* obj) {
-    int32_t result = -1;
-
-    if (s_RenderImp != NULL) {
-        result = s_RenderImp->RequestBakeEnvMap(width, height, obj);
-    } else {
-        GLB_SAFE_ASSERT(false);
-    }
-
-    return result;
-}
-
-void Render::CancleBakeEnvMap(scene::Object* obj) {
-    if (s_RenderImp != NULL) {
-        s_RenderImp->CancleBakeEnvMap(obj);
-    } else {
-        GLB_SAFE_ASSERT(false);
-    }
 }
 
 void Render::AddLine(math::Vector start, math::Vector end, math::Vector color) {

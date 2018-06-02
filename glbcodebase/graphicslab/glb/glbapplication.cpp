@@ -6,8 +6,6 @@
 //-------------------------------------------------------------------
 #include "glbapplication.h"
 
-#include "glbeditorcomm.h"
-
 #include "glbinput.h"
 #include "render/glbmaterial.h"
 #include "render/glbmesh.h"

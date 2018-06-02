@@ -226,7 +226,7 @@ Wrapper uniform_diffuse_texslot_picker(scene::Object* obj) {
     wrapper.SetFormat(Wrapper::FMT_SAMPLER2D);
 
     if (obj != NULL) {
-        wrapper.SetSampler2D(render::TS_DIFFUSE);
+        wrapper.SetSampler2D(render::TS_ALBEDO);
     } else {
         GLB_SAFE_ASSERT(false);
         wrapper.SetSampler2D(0);
@@ -374,6 +374,51 @@ Wrapper uniform_material_pow_picker(scene::Object* obj) {
     return wrapper;
 }
 
+Wrapper uniform_material_albedo_picker(scene::Object* obj) {
+    Wrapper wrapper;
+    wrapper.SetFormat(Wrapper::FMT_FLOAT3);
+
+    if (obj != NULL) {
+        int32_t mat_id = obj->GetModel()->GetMaterial();
+        wrapper.SetVector(material::Mgr::GetMaterial(mat_id).albedo);
+    } else {
+        GLB_SAFE_ASSERT(false);
+        wrapper.SetVector(math::Vector(0.0f, 0.0f, 0.0f));
+    }
+
+    return wrapper;
+}
+
+Wrapper uniform_material_roughness_picker(scene::Object* obj) {
+    Wrapper wrapper;
+    wrapper.SetFormat(Wrapper::FMT_FLOAT);
+
+    if (obj != NULL) {
+        int32_t mat_id = obj->GetModel()->GetMaterial();
+        wrapper.SetFloat(material::Mgr::GetMaterial(mat_id).roughness);
+    } else {
+        GLB_SAFE_ASSERT(false);
+        wrapper.SetFloat(0.0f);
+    }
+
+    return wrapper;
+}
+
+Wrapper uniform_material_metallic_picker(scene::Object* obj) {
+    Wrapper wrapper;
+    wrapper.SetFormat(Wrapper::FMT_FLOAT);
+
+    if (obj != NULL) {
+        int32_t mat_id = obj->GetModel()->GetMaterial();
+        wrapper.SetFloat(material::Mgr::GetMaterial(mat_id).metallic);
+    } else {
+        GLB_SAFE_ASSERT(false);
+        wrapper.SetFloat(0.0f);
+    }
+
+    return wrapper;
+}
+
 Wrapper uniform_eye_pos_picker(scene::Object*) {
     Wrapper wrapper;
     wrapper.SetFormat(Wrapper::FMT_FLOAT3);
@@ -389,46 +434,71 @@ Wrapper uniform_eye_pos_picker(scene::Object*) {
     return wrapper;
 }
 
+Wrapper uniform_global_light_ambient_picker(scene::Object*) {
+    Wrapper wrapper;
+    wrapper.SetFormat(Wrapper::FMT_FLOAT3);
+
+    // Only support one global ambient light now
+    bool bFound = false;
+    for (int32_t i = 0; i < scene::kMaxLight; i++) {
+        scene::Light lit = scene::Scene::GetLight(i);
+        if (lit.type == scene::AMBIENT_LIGHT) {
+            wrapper.SetVector(lit.color);
+            bFound = true;
+            break;
+        }
+    }
+
+    if (!bFound) {
+        GLB_SAFE_ASSERT(false);
+        wrapper.SetVector(math::Vector(0.5f, 0.5f, 0.5f));
+    }
+
+    return wrapper;
+}
+
 Wrapper uniform_parallel_light_dir_picker(scene::Object*) {
     Wrapper wrapper;
     wrapper.SetFormat(Wrapper::FMT_FLOAT3);
 
     // Only support one parallel light now
-    scene::Light lit = scene::Scene::GetLight(0);
-    wrapper.SetVector(lit.dir);
+    bool bFound = false;
+    for (int32_t i = 0; i < scene::kMaxLight; i++) {
+        scene::Light lit = scene::Scene::GetLight(i);
+        if (lit.type == scene::PARALLEL_LIGHT) {
+            wrapper.SetVector(lit.dir);
+            bFound = true;
+            break;
+        }
+    }
+
+    if (!bFound) {
+        GLB_SAFE_ASSERT(false);
+        wrapper.SetVector(math::Vector(0.0f, 1.0f, 0.0f));
+    }
 
     return wrapper;
 }
 
-Wrapper uniform_parallel_light_ambient_picker(scene::Object*) {
+Wrapper uniform_parallel_light_picker(scene::Object*) {
     Wrapper wrapper;
     wrapper.SetFormat(Wrapper::FMT_FLOAT3);
 
     // Only support one parallel light now
-    scene::Light lit = scene::Scene::GetLight(0);
-    wrapper.SetVector(lit.ambient);
+    bool bFound = false;
+    for (int32_t i = 0; i < scene::kMaxLight; i++) {
+        scene::Light lit = scene::Scene::GetLight(i);
+        if (lit.type == scene::PARALLEL_LIGHT) {
+            wrapper.SetVector(lit.color);
+            bFound = true;
+            break;
+        }
+    }
 
-    return wrapper;
-}
-
-Wrapper uniform_parallel_light_diffuse_picker(scene::Object*) {
-    Wrapper wrapper;
-    wrapper.SetFormat(Wrapper::FMT_FLOAT3);
-
-    // Only support one parallel light now
-    scene::Light lit = scene::Scene::GetLight(0);
-    wrapper.SetVector(lit.diffuse);
-
-    return wrapper;
-}
-
-Wrapper uniform_parallel_light_specular_picker(scene::Object*) {
-    Wrapper wrapper;
-    wrapper.SetFormat(Wrapper::FMT_FLOAT3);
-
-    // Only support one parallel light now
-    scene::Light lit = scene::Scene::GetLight(0);
-    wrapper.SetVector(lit.specular);
+    if (!bFound) {
+        GLB_SAFE_ASSERT(false);
+        wrapper.SetVector(math::Vector(0.5f, 0.5f, 0.5f));
+    }
 
     return wrapper;
 }

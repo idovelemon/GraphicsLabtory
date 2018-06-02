@@ -24,34 +24,38 @@ namespace scene {
 class ModelEffectParam {
 public:
     ModelEffectParam()
-    : has_diffuse_tex(false)
-    , has_alpha_tex(false)
-    , has_normal_tex(false)
-    , has_texcoord(false)
-    , has_normal(false)
-    , has_tanget(false)
-    , has_binormal(false)
-    , accept_light(false)
-    , accept_shadow(false)
-    , cast_shadow(false)
-    , use_ao(false) {
+    : hasAlbedoTex(false)
+    , hasRoughnessTex(false)
+    , hasMetallicTex(false)
+    , hasAlphaTex(false)
+    , hasNormalTex(false)
+    , hasTexcoord(false)
+    , hasNormal(false)
+    , hasTanget(false)
+    , hasBinormal(false)
+    , acceptLight(false)
+    , acceptShadow(false)
+    , castShadow(false)
+    , useAO(false) {
     }
 
     virtual ~ModelEffectParam() {
     }
 
 public:
-    bool    has_diffuse_tex;
-    bool    has_alpha_tex;
-    bool    has_normal_tex;
-    bool    has_texcoord;
-    bool    has_normal;
-    bool    has_tanget;
-    bool    has_binormal;
-    bool    accept_light;
-    bool    accept_shadow;
-    bool    cast_shadow;
-    bool    use_ao;
+    bool    hasAlbedoTex;
+    bool    hasRoughnessTex;
+    bool    hasMetallicTex;
+    bool    hasAlphaTex;
+    bool    hasNormalTex;
+    bool    hasTexcoord;
+    bool    hasNormal;
+    bool    hasTanget;
+    bool    hasBinormal;
+    bool    acceptLight;
+    bool    acceptShadow;
+    bool    castShadow;
+    bool    useAO;
 };
 
 class ModelMaterialParam {
@@ -61,12 +65,17 @@ public:
     , diffuse(0.0f, 0.0f, 0.0f)
     , specular(0.0f, 0.0f, 0.0f)
     , emission(0.0f, 0.0f, 0.0f)
-    , pow(0.0)
-    , boundbox_min(0.0f, 0.0f, 0.0f)
-    , boundbox_max(0.0f, 0.0f, 0.0f) {
-        memset(diffuse_tex_name, 0, sizeof(diffuse_tex_name));
-        memset(alpha_tex_name, 0, sizeof(alpha_tex_name));
-        memset(normal_tex_name, 0, sizeof(normal_tex_name));
+    , pow(0.0f)
+    , albedo(0.0f, 0.0f, 0.0f)
+    , roughness(0.0f)
+    , metallic(0.0f)
+    , boundboxMin(0.0f, 0.0f, 0.0f)
+    , boundboxMax(0.0f, 0.0f, 0.0f) {
+        memset(albedoTexName, 0, sizeof(albedoTexName));
+        memset(roughnessTexName, 0, sizeof(roughnessTexName));
+        memset(metallicTexName, 0, sizeof(metallicTexName));
+        memset(alphaTexName, 0, sizeof(alphaTexName));
+        memset(normalTexName, 0, sizeof(normalTexName));
     }
 
     virtual ~ModelMaterialParam() {
@@ -77,12 +86,17 @@ public:
     math::Vector diffuse;
     math::Vector specular;
     math::Vector emission;
+    math::Vector albedo;
     float        pow;
-    char         diffuse_tex_name[render::texture::kMaxTexNameLen];
-    char         alpha_tex_name[render::texture::kMaxTexNameLen];
-    char         normal_tex_name[render::texture::kMaxTexNameLen];
-    math::Vector boundbox_min;
-    math::Vector boundbox_max;
+    float        roughness;
+    float        metallic;
+    char         albedoTexName[render::texture::kMaxTexNameLen];
+    char         roughnessTexName[render::texture::kMaxTexNameLen];
+    char         metallicTexName[render::texture::kMaxTexNameLen];
+    char         alphaTexName[render::texture::kMaxTexNameLen];
+    char         normalTexName[render::texture::kMaxTexNameLen];
+    math::Vector boundboxMin;
+    math::Vector boundboxMax;
 };
 
 class ModelFile {

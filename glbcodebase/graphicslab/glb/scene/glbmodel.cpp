@@ -64,83 +64,104 @@ Model::Model()
 Model::~Model() {
 }
 
-Model* Model::Create(const char* file_name) {
+Model* Model::Create(const char* fileName) {
     Model* model = NULL;
-    if (file_name != NULL) {
+    if (fileName != NULL) {
         render::mesh::TriangleMesh* mesh = NULL;
-        int32_t diffuse_tex = -1;
-        int32_t alpha_tex = -1;
-        int32_t normal_tex = -1;
+        int32_t albedoTex = -1;
+        int32_t roughnessTex = -1;
+        int32_t metallicTex = -1;
+        int32_t alphaTex = -1;
+        int32_t normalTex = -1;
         int32_t material = -1;
 
-        float* vertex_buf = NULL;
-        float* tex_buf = NULL;
-        float* normal_buf = NULL;
-        float* tangent_buf = NULL;
-        float* binormal_buf = NULL;
-        ModelEffectParam effect_param;
-        ModelMaterialParam material_param;
-        std::string dir = util::path_get_dir(file_name);
+        float* vertexBuf = NULL;
+        float* texBuf = NULL;
+        float* normalBuf = NULL;
+        float* tangentBuf = NULL;
+        float* binormalBuf = NULL;
+        ModelEffectParam effectParam;
+        ModelMaterialParam materialParam;
+        std::string dir = util::path_get_dir(fileName);
         int32_t num_triangles = ModelFile::ExtractModelData(
-            file_name,
-            effect_param,
-            material_param,
-            &vertex_buf,
-            &tex_buf,
-            &normal_buf,
-            &tangent_buf,
-            &binormal_buf
+            fileName,
+            effectParam,
+            materialParam,
+            &vertexBuf,
+            &texBuf,
+            &normalBuf,
+            &tangentBuf,
+            &binormalBuf
             );
         if (num_triangles > 0) {
-            mesh = render::mesh::TriangleMesh::Create(num_triangles, vertex_buf, tex_buf, normal_buf, tangent_buf, binormal_buf);
+            mesh = render::mesh::TriangleMesh::Create(num_triangles, vertexBuf, texBuf, normalBuf, tangentBuf, binormalBuf);
             render::mesh::Mgr::AddMesh(mesh);
 
-            if (effect_param.has_diffuse_tex) {
-                std::string diffuse_tex_path = dir + material_param.diffuse_tex_name;
-                diffuse_tex = render::texture::Mgr::LoadTexture(diffuse_tex_path.c_str());
+            if (effectParam.hasAlbedoTex) {
+                std::string albedoTexPath = dir + materialParam.albedoTexName;
+                albedoTex = render::texture::Mgr::LoadTexture(albedoTexPath.c_str());
             }
 
-            if (effect_param.has_alpha_tex) {
-                std::string alpha_tex_path = dir + material_param.alpha_tex_name;
-                alpha_tex = render::texture::Mgr::LoadTexture(alpha_tex_path.c_str());
+            if (effectParam.hasRoughnessTex) {
+                std::string roughnessTexPath = dir + materialParam.roughnessTexName;
+                roughnessTex = render::texture::Mgr::LoadTexture(roughnessTexPath.c_str());
             }
 
-            if (effect_param.has_normal_tex) {
-                std::string normal_tex_path = dir + material_param.normal_tex_name;
-                normal_tex = render::texture::Mgr::LoadTexture(normal_tex_path.c_str());
+            if (effectParam.hasMetallicTex) {
+                std::string metallicTexPath = dir + materialParam.metallicTexName;
+                metallicTex = render::texture::Mgr::LoadTexture(metallicTexPath.c_str());
             }
 
-            ModelFile::RelaseBuf(&vertex_buf, &tex_buf, &normal_buf, &tangent_buf, &binormal_buf);
+            if (effectParam.hasAlphaTex) {
+                std::string alphaTexPath = dir + materialParam.alphaTexName;
+                alphaTex = render::texture::Mgr::LoadTexture(alphaTexPath.c_str());
+            }
+
+            if (effectParam.hasNormalTex) {
+                std::string normalTexPath = dir + materialParam.normalTexName;
+                normalTex = render::texture::Mgr::LoadTexture(normalTexPath.c_str());
+            }
+
+            ModelFile::RelaseBuf(&vertexBuf, &texBuf, &normalBuf, &tangentBuf, &binormalBuf);
         } else {
             GLB_SAFE_ASSERT(false);
         }
 
         render::material::Material mat;
-        mat.ambient = material_param.ambient;
-        mat.diffuse = material_param.diffuse;
-        mat.specular = material_param.specular;
-        mat.emission = material_param.emission;
-        mat.specular_pow = material_param.pow;
-        memcpy(mat.mat_name, file_name, strlen(file_name));
-        mat.mat_name[strlen(file_name)] = '\0';
+        mat.ambient = materialParam.ambient;
+        mat.diffuse = materialParam.diffuse;
+        mat.specular = materialParam.specular;
+        mat.emission = materialParam.emission;
+        mat.specular_pow = materialParam.pow;
+        mat.albedo = materialParam.albedo;
+        mat.roughness = materialParam.roughness;
+        mat.metallic = materialParam.metallic;
+        memcpy(mat.mat_name, fileName, strlen(fileName));
+        mat.mat_name[strlen(fileName)] = '\0';
         material = render::material::Mgr::AddMaterial(mat);
 
         model = new Model;
-        model->m_Name = std::string(file_name);
+        model->m_Name = std::string(fileName);
         model->m_Mesh = mesh->GetId();
-        if (effect_param.has_diffuse_tex) {
-            model->m_Tex[MT_DIFFUSE] = diffuse_tex;
+        if (effectParam.hasAlbedoTex) {
+            model->m_Tex[MT_ALBEDO] = albedoTex;
         }
-        if (effect_param.has_alpha_tex) {
-            model->m_Tex[MT_ALPHA] = alpha_tex;
+        if (effectParam.hasRoughnessTex) {
+            model->m_Tex[MT_ROUGHNESS] = roughnessTex;
         }
-        if (effect_param.has_normal_tex) {
-            model->m_Tex[MT_NORMAL] = normal_tex;
+        if (effectParam.hasMetallicTex) {
+            model->m_Tex[MT_METALLIC] = metallicTex;
+        }
+        if (effectParam.hasAlphaTex) {
+            model->m_Tex[MT_ALPHA] = alphaTex;
+        }
+        if (effectParam.hasNormalTex) {
+            model->m_Tex[MT_NORMAL] = normalTex;
         }
         model->m_Material = material;
-        model->m_ModelEffectParam = effect_param;
-        model->m_BoundBoxMax = material_param.boundbox_max;
-        model->m_BoundBoxMin = material_param.boundbox_min;
+        model->m_ModelEffectParam = effectParam;
+        model->m_BoundBoxMax = materialParam.boundboxMax;
+        model->m_BoundBoxMin = materialParam.boundboxMin;
     } else {
         GLB_SAFE_ASSERT(false);
     }
@@ -148,15 +169,15 @@ Model* Model::Create(const char* file_name) {
     return model;
 }
 
-std::string Model::GetName() {
+std::string Model::GetName() const {
     return m_Name;
 }
 
-int32_t Model::GetMeshId() {
+int32_t Model::GetMeshId() const {
     return m_Mesh;
 }
 
-int32_t Model::GetTexId(int32_t slot) {
+int32_t Model::GetTexId(int32_t slot) const {
     int32_t result = -1;
     if (0 <= slot && slot < MT_MAX) {
         result = m_Tex[slot];
@@ -165,31 +186,39 @@ int32_t Model::GetTexId(int32_t slot) {
     return result;
 }
 
-int32_t Model::GetMaterial() {
+int32_t Model::GetMaterial() const {
     return m_Material;
 }
 
-math::Vector Model::GetBoundBoxMax() {
+math::Vector Model::GetBoundBoxMax() const {
     return m_BoundBoxMax;
 }
 
-math::Vector Model::GetBoundBoxMin() {
+math::Vector Model::GetBoundBoxMin() const {
     return m_BoundBoxMin;
 }
 
-bool Model::HasDiffuseTexture() {
-    return m_ModelEffectParam.has_diffuse_tex;
+bool Model::HasAlbedoTexture() const {
+    return m_ModelEffectParam.hasAlbedoTex;
 }
 
-bool Model::HasAlphaTexture() {
-    return m_ModelEffectParam.has_alpha_tex;
+bool Model::HasRoughnessTexture() const {
+    return m_ModelEffectParam.hasRoughnessTex;
 }
 
-bool Model::HasNormalTexture() {
-    return m_ModelEffectParam.has_normal_tex;
+bool Model::HasMettalicTexture() const {
+    return m_ModelEffectParam.hasMetallicTex;
 }
 
-bool Model::HasReflectTexture() {
+bool Model::HasAlphaTexture() const {
+    return m_ModelEffectParam.hasAlphaTex;
+}
+
+bool Model::HasNormalTexture() const {
+    return m_ModelEffectParam.hasNormalTex;
+}
+
+bool Model::HasReflectTexture() const {
     bool result = false;
 
     if (m_Tex[MT_REFLECT] != -1) {
@@ -199,48 +228,48 @@ bool Model::HasReflectTexture() {
     return result;
 }
 
-bool Model::HasTexCoord() {
-    return m_ModelEffectParam.has_texcoord;
+bool Model::HasTexCoord() const {
+    return m_ModelEffectParam.hasTexcoord;
 }
 
-bool Model::HasNormal() {
-    return m_ModelEffectParam.has_normal;
+bool Model::HasNormal() const {
+    return m_ModelEffectParam.hasNormal;
 }
 
-bool Model::HasTangent() {
-    return m_ModelEffectParam.has_tanget;
+bool Model::HasTangent() const {
+    return m_ModelEffectParam.hasTanget;
 }
 
-bool Model::HasBinormal() {
-    return m_ModelEffectParam.has_binormal;
+bool Model::HasBinormal() const {
+    return m_ModelEffectParam.hasBinormal;
 }
 
-bool Model::IsAcceptLight() {
-    return m_ModelEffectParam.accept_light;
+bool Model::IsAcceptLight() const {
+    return m_ModelEffectParam.acceptLight;
 }
 
 void Model::SetAcceptLight(bool accept) {
-    m_ModelEffectParam.accept_light = accept;
+    m_ModelEffectParam.acceptLight = accept;
 }
 
-bool Model::IsAcceptShadow() {
-    return m_ModelEffectParam.accept_shadow;
+bool Model::IsAcceptShadow() const {
+    return m_ModelEffectParam.acceptShadow;
 }
 
 void Model::SetAcceptShadow(bool accept) {
-    m_ModelEffectParam.accept_shadow = accept;
+    m_ModelEffectParam.acceptShadow = accept;
 }
 
-bool Model::IsCastShadow() {
-    return m_ModelEffectParam.cast_shadow;
+bool Model::IsCastShadow() const {
+    return m_ModelEffectParam.castShadow;
 }
 
 void Model::SetCastShadow(bool cast) {
-    m_ModelEffectParam.cast_shadow = cast;
+    m_ModelEffectParam.castShadow = cast;
 }
 
-bool Model::IsUseAO() {
-    return m_ModelEffectParam.use_ao;
+bool Model::IsUseAO() const {
+    return m_ModelEffectParam.useAO;
 }
 
 void Model::SetTexWithId(int32_t slot, int32_t tex_id) {

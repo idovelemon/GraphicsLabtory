@@ -45,6 +45,8 @@
         assert(result); \
     }while(false);
 
+// #define GLB_SAFE_ASSERT_D(_expression_) (_expression_)
+
 #define GLB_SAFE_ASSERT_R(_expression_) \
     do {\
         bool result = _expression_; \

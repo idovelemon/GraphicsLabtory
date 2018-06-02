@@ -33,12 +33,14 @@ glb_Material_Diffuse                                             vec3           
 glb_Material_Specular                                            vec3              镜面反射光材质
 glb_Material_Emission                                            vec3              发光材质
 glb_Material_Pow                                                 float             镜面反射光系数
+glb_Material_Albedo						 vec3	 	   基本颜色（非金属的基本颜色/金属的反射率）
+glb_Material_Roughness						 float	           粗糙度
+glb_Material_Metallic						 float		   金属度
 glb_EyePos                                                       vec3              视点位置
 glb_LookAt							 vec3              相机观察方向
+glb_GlobalLight_Ambient                                        vec3              全局环境光颜色
 glb_ParallelLight_Dir                                            vec3              平行光方向
-glb_ParallelLight_Ambient                                        vec3              平行光环境光颜色
-glb_ParallelLight_Diffuse                                        vec3              平行光漫反射颜色
-glb_ParallelLight_Specular                                       vec3              平行光镜面反射颜色
+glb_ParallelLight                                      vec3              平行光颜色
 glb_AverageLum							 float		   HDR场景的平均亮度
 glb_FarClip							 float		   远裁剪面
 glb_ScreenWidth							 float		   屏幕宽度
