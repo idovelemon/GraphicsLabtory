@@ -232,7 +232,7 @@ int32_t ObjModelFile::ExtractModelData(
                     int32_t len = strlen(buffer);
                     memcpy(materialParam.metallicTexName, buffer, len);
                     materialParam.metallicTexName[len] = '\0';
-                } else if (!strcmp(prefix, "ta")) {
+                } else if (!strcmp(prefix, "talpha")) {
                     // Alpha texture
                     input >> buffer;
                     effectParam.hasAlphaTex = true;
@@ -240,7 +240,7 @@ int32_t ObjModelFile::ExtractModelData(
                     int32_t len = strlen(buffer);
                     memcpy(materialParam.alphaTexName, buffer, len);
                     materialParam.alphaTexName[len] = '\0';
-                } else if (!strcmp(prefix, "tn")) {
+                } else if (!strcmp(prefix, "tnormal")) {
                     // Normal texture
                     input >> buffer;
                     effectParam.hasNormalTex = true;

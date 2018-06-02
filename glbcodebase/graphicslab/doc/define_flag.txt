@@ -8,7 +8,9 @@ GLB_ENABLE_LIGHTING                                            ¸ÃShaderÖ§³Ö¹âÕÕÔ
 GLB_ENABLE_SHADOW					       ¸ÃShaderÖ§³ÖÒõÓ°¼ÆËã
 GLB_ENABLE_AO						       ¸ÃShaderÖ§³ÖAO
 GLB_USE_PARALLEL_LIGHT                                         Ê¹ÓÃÆ½ÐÐ¹â½øÐÐ¹âÕÕ¼ÆËã
-GLB_ENABLE_DIFFUSE_TEX					       Ê¹ÓÃDiffuseÌùÍ¼±íÊö²ÄÖÊ
+GLB_ENABLE_ALBEDO_TEX					       Ê¹ÓÃAlbedoÌùÍ¼±íÊö²ÄÖÊ
+GLB_ENABLE_ROUGHNESS_TEX                       Ê¹ÓÃRoughnessÌùÍ¼±íÊö²ÄÖÊ
+GLB_ENABLE_METALLIC_TEX                        Ê¹ÓÃMetallicÌùÍ¼±íÊö²ÄÖÊ
 GLB_ENABLE_ALPHA_TEX					       Ê¹ÓÃAlphaÌùÍ¼½øÐÐalpha blend
 GLB_ENABLE_NORMAL_TEX					       Ê¹ÓÃNormalÌùÍ¼½øÐÐBump mapping
 GLB_ENABLE_REFLECT_TEX					       Ê¹ÓÃEnvironmentÌùÍ¼½øÐÐEnvironment Reflect

@@ -10617,4 +10617,8 @@ mp 128.0
 malbedo 1.0 1.0 1.0
 mroughness 0.0
 mmetallic 0.5
+talbedo bathroomtile_basecolor.dds
+troughness bathroomtile_roughness.dds
+tmetallic bathroomtile_metallic.dds
+tnormal bathroomtile_normal.dds
 # Material

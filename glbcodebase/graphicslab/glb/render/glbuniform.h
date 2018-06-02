@@ -36,7 +36,9 @@ enum {
     GLB_SHADOWSPLIT2,
     GLB_SHADOWMINDEX,
     GLB_TRANS_INV_WORLDM,
-    GLB_DIFFUSETEX,
+    GLB_ALBEDOTEX,
+    GLB_ROUGHNESSTEX,
+    GLB_METALLICTEX,
     GLB_ALPHATEX,
     GLB_NORMALTEX,
     GLB_REFLECT_TEX,
@@ -92,7 +94,9 @@ static const struct {
     {"glb_ShadowSplit2",                    GLB_SHADOWSPLIT2,                   1},
     {"glb_ShadowMIndex",                    GLB_SHADOWMINDEX,                   1},
     {"glb_Trans_Inv_WorldM",                GLB_TRANS_INV_WORLDM,               0},
-    {"glb_DiffuseTex",                      GLB_DIFFUSETEX,                     0},
+    {"glb_AlbedoTex",                       GLB_ALBEDOTEX,                      0},
+    {"glb_RoughnessTex",                    GLB_ROUGHNESSTEX,                   0},
+    {"glb_MetallicTex",                     GLB_METALLICTEX,                    0},
     {"glb_AlphaTex",                        GLB_ALPHATEX,                       0},
     {"glb_NormalTex",                       GLB_NORMALTEX,                      0},
     {"glb_ReflectTex",                      GLB_REFLECT_TEX,                    0},
@@ -194,7 +198,9 @@ Wrapper uniform_shadowsplit1_picker(scene::Object*);              // Pick glb_Sh
 Wrapper uniform_shadowsplit2_picker(scene::Object*);              // Pick glb_ShadowSplit2
 Wrapper uniform_shadowmindex_picker(scene::Object*);              // Pick glb_ShadowMIndex
 Wrapper uniform_trans_inv_worldm_picker(scene::Object*);          // Pick glb_Trans_Inv_WorldM
-Wrapper uniform_diffuse_texslot_picker(scene::Object*);           // Pick glb_DiffuseTex
+Wrapper uniform_albedo_texslot_picker(scene::Object*);            // Pick glb_AlbedoTex
+Wrapper uniform_roughness_texslot_picker(scene::Object*);         // Pick glb_RoughnessTex
+Wrapper uniform_metallic_texslot_picker(scene::Object*);          // Pick glb_MetallicTex
 Wrapper uniform_alpha_texslot_picker(scene::Object*);             // Pick glb_AlphaTex
 Wrapper uniform_normal_texslot_picker(scene::Object*);            // Pick glb_NormalTex
 Wrapper uniform_reflect_texslot_picker(scene::Object*);           // Pick glb_ReflectTex
@@ -248,7 +254,9 @@ static const struct {
     {uniform_shadowsplit2_picker,               GLB_SHADOWSPLIT2},
     {uniform_shadowmindex_picker,               GLB_SHADOWMINDEX},
     {uniform_trans_inv_worldm_picker,           GLB_TRANS_INV_WORLDM},
-    {uniform_diffuse_texslot_picker,            GLB_DIFFUSETEX},
+    {uniform_albedo_texslot_picker,             GLB_ALBEDOTEX},
+    {uniform_roughness_texslot_picker,          GLB_ROUGHNESSTEX},
+    {uniform_metallic_texslot_picker,           GLB_METALLICTEX},
     {uniform_alpha_texslot_picker,              GLB_ALPHATEX},
     {uniform_normal_texslot_picker,             GLB_NORMALTEX},
     {uniform_reflect_texslot_picker,            GLB_REFLECT_TEX},

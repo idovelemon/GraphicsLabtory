@@ -43,8 +43,16 @@ out vec4 oColor;
 // Uniform
 #ifdef GLB_TEXCOORD_IN_VERTEX
 
-#ifdef GLB_ENABLE_DIFFUSE_TEX
-uniform sampler2D glb_DiffuseTex;
+#ifdef GLB_ENABLE_ALBEDO_TEX
+uniform sampler2D glb_AlbedoTex;
+#endif
+
+#ifdef GLB_ENABLE_ROUGHNESS_TEX
+uniform sampler2D glb_RoughnessTex;
+#endif
+
+#ifdef GLB_ENABLE_METALLIC_TEX
+uniform sampler2D glb_MetallicTex;
 #endif
 
 #ifdef GLB_ENABLE_ALPHA_TEX
@@ -56,9 +64,12 @@ uniform sampler2D glb_NormalTex;
 
 #ifdef GLB_TANGENT_IN_VERTEX
 #ifdef GLB_BINORMAL_IN_VERTEX
+#ifdef GLB_ENABLE_NORMAL_TEX
 	#define GLB_ENABLE_NORMAL_MAPPING
 #endif
 #endif
+#endif
+
 #endif
 
 #ifdef GLB_ENABLE_REFLECT_TEX
@@ -199,9 +210,11 @@ vec3 calc_light() {
 
 #ifdef GLB_ENABLE_LIGHTING
 	light = light + glb_GlobalLight_Ambient;
+
 #ifdef GLB_USE_PARALLEL_LIGHT
 	light = light + glb_ParallelLight;
 #endif
+
 #endif
 
 	return light;
@@ -299,10 +312,27 @@ vec3 calc_brdf(vec3 normal, vec3 view, vec3 light, vec3 half) {
 	vec3 brdf = vec3(1.0, 1.0, 1.0);
 
 #ifdef GLB_ENABLE_LIGHTING
+
+#ifdef GLB_ENABLE_ALBEDO_TEX
+	vec3 albedo = texture(glb_AlbedoTex, vs_TexCoord).xyz;
+#else
 	vec3 albedo = glb_Material_Albedo;
+#endif
+
+#ifdef GLB_ENABLE_ROUGHNESS_TEX
+	float roughness = texture(glb_RoughnessTex, vs_TexCoord).x;
+#else
 	float roughness = glb_Material_Roughness;
+#endif
+
+#ifdef GLB_ENABLE_METALLIC_TEX
+	float metallic = texture(glb_MetallicTex, vs_TexCoord).x;
+#else
 	float metallic = glb_Material_Metallic;
+#endif
+	
 	brdf = calc_pbr_brdf(normal, view, light, half, albedo, roughness, metallic);
+
 #endif
 
 	return brdf;

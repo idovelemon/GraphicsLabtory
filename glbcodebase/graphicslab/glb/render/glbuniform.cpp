@@ -221,12 +221,40 @@ Wrapper uniform_trans_inv_worldm_picker(scene::Object* obj) {
     return wrapper;
 }
 
-Wrapper uniform_diffuse_texslot_picker(scene::Object* obj) {
+Wrapper uniform_albedo_texslot_picker(scene::Object* obj) {
     Wrapper wrapper;
     wrapper.SetFormat(Wrapper::FMT_SAMPLER2D);
 
     if (obj != NULL) {
         wrapper.SetSampler2D(render::TS_ALBEDO);
+    } else {
+        GLB_SAFE_ASSERT(false);
+        wrapper.SetSampler2D(0);
+    }
+
+    return wrapper;
+}
+
+Wrapper uniform_roughness_texslot_picker(scene::Object* obj) {
+    Wrapper wrapper;
+    wrapper.SetFormat(Wrapper::FMT_SAMPLER2D);
+
+    if (obj != NULL) {
+        wrapper.SetSampler2D(render::TS_ROUGHNESS);
+    } else {
+        GLB_SAFE_ASSERT(false);
+        wrapper.SetSampler2D(0);
+    }
+
+    return wrapper;
+}
+
+Wrapper uniform_metallic_texslot_picker(scene::Object* obj) {
+    Wrapper wrapper;
+    wrapper.SetFormat(Wrapper::FMT_SAMPLER2D);
+
+    if (obj != NULL) {
+        wrapper.SetSampler2D(render::TS_METALLIC);
     } else {
         GLB_SAFE_ASSERT(false);
         wrapper.SetSampler2D(0);

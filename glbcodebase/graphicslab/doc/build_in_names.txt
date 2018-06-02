@@ -17,7 +17,9 @@ glb_ShadowSplit1						 float		   分割z值1
 glb_ShadowSplit2						 float		   分割z值2
 glb_ShadowMIndex						 int		   当前绘制的阴影贴图下标
 glb_Trans_Inv_WorldM                                             mat4              世界变换矩阵的逆矩阵的转置矩阵
-glb_DiffuseTex                                                   sampler2D         漫反射贴图
+glb_AlbedoTex                                                   sampler2D         Albedo贴图
+glb_RoughnessTex                                                sampler2D         粗糙度贴图
+glb_MetallicTex                                                 sampler2D         金属度贴图
 glb_AlphaTex						         sampler2D	   Alpha混合贴图
 glb_NormalTex							 sampler2D         法线贴图
 glb_ShadowTex0						         sampler2D	   Shadow Map 0

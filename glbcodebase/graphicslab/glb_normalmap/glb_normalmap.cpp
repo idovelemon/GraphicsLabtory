@@ -63,12 +63,12 @@ public:
         math::Matrix rot;
         rot.MakeRotateYMatrix(rotY);
         lit.dir = rot * lit.dir;
-        glb::scene::Scene::SetLight(lit, 1);
+        //glb::scene::Scene::SetLight(lit, 1);
 
         // Randomly Rotate the sphere
         math::Vector rot_v = glb::scene::Scene::GetObjectById(m_Cube)->GetRotation();
-        rot_v += math::Vector(0.1f, 0.1f, 0.1f);
-        //glb::scene::Scene::GetObjectById(m_Cube)->SetRotation(rot_v);
+        rot_v += math::Vector(0.5f, 0.5f, 0.5f);
+        glb::scene::Scene::GetObjectById(m_Cube)->SetRotation(rot_v);
 
         glb::scene::Scene::Update();
 
