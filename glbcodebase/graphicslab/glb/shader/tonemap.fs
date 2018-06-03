@@ -15,13 +15,13 @@ uniform sampler2D glb_HDRSceneTex;
 uniform float glb_ExposureLevel;
 
 const float kGamma = 2.2;
-const float A = 0.15;
-const float B = 0.50;
+const float A = 0.22;
+const float B = 0.30;
 const float C = 0.10;
 const float D = 0.20;
-const float E = 0.02;
+const float E = 0.01;
 const float F = 0.30;
-const float W = 11.2;
+const float W = 1.5;
 
 vec3 Uncharted2Tonemap(vec3 x)
 {
@@ -29,19 +29,27 @@ vec3 Uncharted2Tonemap(vec3 x)
 }
 
 void main() {
-	vec4 hdr_color = texture2D(glb_HDRSceneTex, vs_texcoord);
-	vec4 bloom_color = texture2D(glb_LogLumTex, vs_texcoord);
-	hdr_color = hdr_color + bloom_color;
-	hdr_color *= glb_ExposureLevel;
+	vec3 hdr_color = texture2D(glb_HDRSceneTex, vs_texcoord).xyz;
+	//vec4 bloom_color = texture2D(glb_LogLumTex, vs_texcoord);
+	//hdr_color = hdr_color + bloom_color;
+	//hdr_color *= glb_ExposureLevel;
 
 	// Filmic Tone mapping
-	hdr_color.xyz = Uncharted2Tonemap(hdr_color.xyz);
-	vec3 whiteScale = vec3(1.0, 1.0, 1.0) / Uncharted2Tonemap(vec3(W, W, W));
-	color.xyz = whiteScale * hdr_color.xyz;
+	//hdr_color.xyz = Uncharted2Tonemap(hdr_color.xyz);
+	//vec3 whiteScale = vec3(1.0, 1.0, 1.0) / Uncharted2Tonemap(vec3(W, W, W));
+	//color.xyz = whiteScale * hdr_color.xyz;
 
 	// Gamma correction
-	color.x = pow(color.x, 1.0 / kGamma);
-	color.y = pow(color.y, 1.0 / kGamma);
-	color.z = pow(color.z, 1.0 / kGamma);
+	// color.x = pow(color.x, 1.0 / kGamma);
+	// color.y = pow(color.y, 1.0 / kGamma);
+	// color.z = pow(color.z, 1.0 / kGamma);
+
+    // base tone mapping
+    hdr_color = hdr_color / (hdr_color + vec3(1.0, 1.0, 1.0));
+
+    // gamma correction
+    hdr_color = pow(hdr_color, vec3(1.0 / 2.2, 1.0 / 2.2, 1.0 / 2.2));
+
+	color.xyz = hdr_color;
 	color.w = 1.0;
 }

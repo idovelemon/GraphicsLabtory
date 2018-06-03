@@ -140,11 +140,13 @@ void DeviceImp::Initialize() {
 }
 
 void DeviceImp::Destroy() {
-    wglMakeCurrent(m_WindowDC, NULL);
-    wglDeleteContext(m_OpenGLContext);
-    ReleaseDC(app::Application::GetWindowHandle(), m_WindowDC);
-    m_WindowDC = NULL;
-    m_OpenGLContext = NULL;
+    if (m_WindowDC && m_OpenGLContext) {
+        wglMakeCurrent(m_WindowDC, NULL);
+        wglDeleteContext(m_OpenGLContext);
+        ReleaseDC(app::Application::GetWindowHandle(), m_WindowDC);
+        m_WindowDC = NULL;
+        m_OpenGLContext = NULL;
+    }
 }
 
 // Vertex Buffer

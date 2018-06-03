@@ -248,6 +248,22 @@ int32_t ObjModelFile::ExtractModelData(
                     int32_t len = strlen(buffer);
                     memcpy(materialParam.normalTexName, buffer, len);
                     materialParam.normalTexName[len] = '\0';
+                } else if (!strcmp(prefix, "tdiffusepfc")) {
+                    // Diffuse Prefilter CubeMap texture
+                    input >> buffer;
+                    effectParam.hasDiffusePFCTex = true;
+
+                    int32_t len = strlen(buffer);
+                    memcpy(materialParam.diffusePFCTexName, buffer, len);
+                    materialParam.diffusePFCTexName[len] = '\0';
+                } else if (!strcmp(prefix, "tspecularpfc")) {
+                    // Specular Prefilter CubeMap texture
+                    input >> buffer;
+                    effectParam.hasSpecularPFCTex = true;
+
+                    int32_t len = strlen(buffer);
+                    memcpy(materialParam.specularPFCTexName, buffer, len);
+                    materialParam.specularPFCTexName[len] = '\0';
                 } else if (!strcmp(prefix, "al")) {
                     // Accept light
                     int32_t temp = 0;

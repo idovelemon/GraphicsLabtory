@@ -215,6 +215,9 @@ private:
     int32_t                                 m_Height;
     std::vector<ShaderGroup>                m_ShaderGroups;
 
+    // Image based Lighting
+    int32_t                                 m_BRDFPFTMap;
+
     // Perspective
     int32_t                                 m_PerspectiveType;
     PerspectiveProj                         m_Perspective[Render::MAX_PERS];
@@ -369,6 +372,9 @@ RenderImp::RenderImp()
 , m_Height(0)
 , m_PerspectiveType(Render::PRIMARY_PERS)
 
+// Image based Lighting
+, m_BRDFPFTMap(-1)
+
 // Shadow
 , m_ShadowShader(-1)
 , m_ShadowMapIndex(-1)
@@ -508,7 +514,7 @@ void RenderImp::Draw() {
     AfterDraw();
 
 #ifdef GLB_PLATFORM_OPENGL
-    //GLB_CHECK_GL_ERROR;
+    GLB_CHECK_GL_ERROR;
 #endif
 }
 
@@ -970,6 +976,7 @@ void RenderImp::PrepareHDR() {
 }
 
 void RenderImp::PrepareEnvMap() {
+    m_BRDFPFTMap = texture::Mgr::LoadPFTTexture("..\\glb\\resource\\texture\\dfg.pft");
 }
 
 void RenderImp::SplitFrustum() {
@@ -1646,6 +1653,7 @@ void RenderImp::DrawLightLoopCore() {
         render::Device::SetTexture(render::TS_SHADOW2, texture::Mgr::GetTextureById(m_ShadowMap[2]), texUnit++);
         render::Device::SetTexture(render::TS_SHADOW3, texture::Mgr::GetTextureById(m_ShadowMap[3]), texUnit++);
         render::Device::SetTexture(render::TS_AO_MAP, texture::Mgr::GetTextureById(m_AOMap), texUnit++);
+        render::Device::SetTexture(render::TS_BRDF_PFT, texture::Mgr::GetTextureById(m_BRDFPFTMap), texUnit++);
 
         // Scene uniforms
         for (int32_t j = 0; j < static_cast<int32_t>(uniforms.size()); j++) {
@@ -1684,6 +1692,12 @@ void RenderImp::DrawLightLoopCore() {
             }
             if (obj->GetModel()->HasReflectTexture()) {
                 render::Device::SetTexture(render::TS_REFLECT, texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(scene::Model::MT_REFLECT)), texUnit++);
+            }
+            if (obj->GetModel()->HasDiffusePFCTexture()) {
+                render::Device::SetTexture(render::TS_DIFFUSE_PFC, texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(scene::Model::MT_DIFFUSE_PFC)), texUnit++);
+            }
+            if (obj->GetModel()->HasSpecularPFCTexture()) {
+                render::Device::SetTexture(render::TS_SPECULAR_PFC, texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(scene::Model::MT_SPECULAR_PFC)), texUnit++);
             }
 
             // Object Uniform

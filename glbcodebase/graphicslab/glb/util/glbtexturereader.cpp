@@ -558,9 +558,9 @@ int32_t TextureReader::ReadTexture(const char* fileName, int8_t** data, int32_t&
 
     if (fileName != NULL) {
         // Get the postfix
-        int32_t index = 0;
         int32_t file_name_len = strlen(fileName);
-        for (index = 0; index < file_name_len; index++) {
+        int32_t index = file_name_len - 1;
+        for (index = file_name_len - 1; index >= 0; index--) {
             if (fileName[index] == '.') {
                 break;
             }

@@ -102,6 +102,8 @@ public:
     // @return: If failed, return -1. Otherwise, return the ID of the texture
     //------------------------------------------------------------------------
     static int32_t LoadTexture(const char* texture_name);
+    static int32_t LoadPFCTexture(const char* textureName);
+    static int32_t LoadPFTTexture(const char* textureName);
 
     //------------------------------------------------------------------------
     // @return: If failed, return -1. Otherwise, return the ID of the texture

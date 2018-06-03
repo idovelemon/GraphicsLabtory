@@ -8,6 +8,9 @@
 
 #extension GL_NV_shadow_samplers_cube : enable
 
+// Constant
+const float PI = 3.1415927;
+
 // Input attributes
 in vec3 vs_Vertex;
 
@@ -25,12 +28,6 @@ in vec3 vs_Tangent;
 
 #ifdef GLB_BINORMAL_IN_VERTEX
 in vec3 vs_Binormal;
-#endif
-
-#ifdef GLB_TANGENT_IN_VERTEX
-#ifdef GLB_BINORMAL_IN_VERTEX
-in vec3 vs_NT;
-#endif
 #endif
 
 #ifdef GLB_TEXCOORD_IN_VERTEX
@@ -148,9 +145,11 @@ uniform vec3 glb_ParallelLight;
 	#error No light source specified
 #endif
 
-const float PI = 3.1415927;
+uniform samplerCube glb_DiffusePFCTex;
+uniform samplerCube glb_SpecularPFCTex;
+uniform sampler2D glb_BRDFPFTTex;
 
-vec3 calc_frenel(vec3 n, vec3 v, vec3 F0) {
+vec3 calc_fresnel(vec3 n, vec3 v, vec3 F0) {
     float ndotv = max(dot(n, v), 0.0);
     return F0 + (vec3(1.0, 1.0, 1.0) - F0) * pow(1.0 - ndotv, 5.0);
 }
@@ -184,41 +183,22 @@ float calc_Geometry_Smith(vec3 n, vec3 v, vec3 l, float roughness) {
     return ggx1 * ggx2;
 }
 
-vec3 calc_pbr_brdf(vec3 n, vec3 v, vec3 l, vec3 h, vec3 albedo, float roughness, float metalic) {
-    vec3 F0 = mix(vec3(0.04, 0.04, 0.04), albedo, metalic);
-    vec3 F = calc_frenel(h, v, F0);
+vec3 calc_fresnel_roughness(vec3 n, vec3 v, vec3 F0, float roughness) {
+    float ndotv = max(dot(n, v), 0.0);
+    return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(1.0 - ndotv, 5.0);
+}
 
-    vec3 T = vec3(1.0, 1.0, 1.0) - F;
-    vec3 kD = T * (1.0 - metalic);
+vec3 filtering_cube_map(samplerCube cube, vec3 n) {
+    n.yz = -n.yz;
+    return texture(cube, n).xyz;
+}
 
-    float D = calc_NDF_GGX(n, h, roughness);
-
-    float G = calc_Geometry_Smith(n, v, l, roughness);
-
-    vec3 Diffuse = kD * albedo * vec3(1.0 / PI, 1.0 / PI, 1.0 / PI);
-    float t = 4.0 * max(dot(n, v), 0.0) * max(dot(n, l), 0.0) + 0.001;
-    vec3 Specular = D * F * G * vec3(1.0 / t, 1.0 / t, 1.0 / t);
-
-    float ndotl = max(dot(n, l), 0.0);
-    return (Diffuse + Specular);
+vec3 filtering_cube_map_lod(samplerCube cube, vec3 n, float lod) {
+    n.yz = -n.yz;
+    return textureLod(cube, n, lod).xyz;
 }
 
 #endif  // GLB_ENABLE_LIGHTING
-
-vec3 calc_light() {
-	vec3 light = vec3(0.0, 0.0, 0.0);
-
-#ifdef GLB_ENABLE_LIGHTING
-	light = light + glb_GlobalLight_Ambient;
-
-#ifdef GLB_USE_PARALLEL_LIGHT
-	light = light + glb_ParallelLight;
-#endif
-
-#endif
-
-	return light;
-}
 
 float calc_shadow() {
 	float shadow_factor = 1.0;
@@ -281,8 +261,9 @@ vec3 calc_normal() {
 	normal = texture2D(glb_NormalTex, vs_TexCoord).xyz;
 	normal -= vec3(0.5, 0.5, 0.5);
 	normal *= 2.0;
+	normal = normalize(normal);
 
-	mat3 tbn = mat3(vs_Tangent, vs_Binormal, vs_NT);
+	mat3 tbn = mat3(normalize(vs_Tangent), normalize(vs_Binormal), vs_Normal);
 	normal = tbn * normal;
 	normalize(normal);
 #endif
@@ -308,34 +289,94 @@ vec3 calc_light_dir() {
 	return light_dir;
 }
 
-vec3 calc_brdf(vec3 normal, vec3 view, vec3 light, vec3 half) {
-	vec3 brdf = vec3(1.0, 1.0, 1.0);
-
+void calc_material(out vec3 albedo, out float roughness, out float metallic) {
 #ifdef GLB_ENABLE_LIGHTING
 
 #ifdef GLB_ENABLE_ALBEDO_TEX
-	vec3 albedo = texture(glb_AlbedoTex, vs_TexCoord).xyz;
+	albedo = texture(glb_AlbedoTex, vs_TexCoord).xyz;
 #else
-	vec3 albedo = glb_Material_Albedo;
+	albedo = glb_Material_Albedo;
 #endif
 
 #ifdef GLB_ENABLE_ROUGHNESS_TEX
-	float roughness = texture(glb_RoughnessTex, vs_TexCoord).x;
+	roughness = texture(glb_RoughnessTex, vs_TexCoord).x;
 #else
-	float roughness = glb_Material_Roughness;
+	roughness = glb_Material_Roughness;
 #endif
 
 #ifdef GLB_ENABLE_METALLIC_TEX
-	float metallic = texture(glb_MetallicTex, vs_TexCoord).x;
+	metallic = texture(glb_MetallicTex, vs_TexCoord).x;
 #else
-	float metallic = glb_Material_Metallic;
+	metallic = glb_Material_Metallic;
 #endif
-	
-	brdf = calc_pbr_brdf(normal, view, light, half, albedo, roughness, metallic);
+
+#endif
+}
+
+vec3 calc_direct_light_color() {
+	vec3 light = vec3(0.0, 0.0, 0.0);
+
+#ifdef GLB_ENABLE_LIGHTING
+	light = light + glb_GlobalLight_Ambient;
+
+#ifdef GLB_USE_PARALLEL_LIGHT
+	light = light + glb_ParallelLight;
+#endif
 
 #endif
 
-	return brdf;
+	return light;
+}
+
+vec3 calc_direct_lighting(vec3 n, vec3 v, vec3 l, vec3 h, vec3 albedo, float roughness, float metalic, vec3 light) {
+	vec3 result = vec3(0.0, 0.0, 0.0);
+
+#ifdef GLB_ENABLE_LIGHTING
+    vec3 F0 = mix(vec3(0.04, 0.04, 0.04), albedo, metalic);
+    vec3 F = calc_fresnel(h, v, F0);
+
+    vec3 T = vec3(1.0, 1.0, 1.0) - F;
+    vec3 kD = T * (1.0 - metalic);
+
+    float D = calc_NDF_GGX(n, h, roughness);
+
+    float G = calc_Geometry_Smith(n, v, l, roughness);
+
+    vec3 Diffuse = kD * albedo * vec3(1.0 / PI, 1.0 / PI, 1.0 / PI);
+    float t = 4.0 * max(dot(n, v), 0.0) * max(dot(n, l), 0.0) + 0.001;
+    vec3 Specular = D * F * G * vec3(1.0 / t, 1.0 / t, 1.0 / t);
+
+    float ndotl = max(dot(n, l), 0.0);
+	result = (Diffuse + Specular) * light * (ndotl);
+#endif
+return result;
+}
+
+vec3 calc_ibl_lighting(vec3 n, vec3 v, vec3 albedo, float roughness, float metalic) {
+	vec3 result = vec3(0.0, 0.0, 0.0);	
+
+#ifdef GLB_ENABLE_LIGHTING
+    vec3 F0 = mix(vec3(0.04, 0.04, 0.04), albedo, metalic);
+    vec3 F = calc_fresnel_roughness(n, v, F0, roughness);
+
+    // Diffuse part
+    vec3 T = vec3(1.0, 1.0, 1.0) - F;
+    vec3 kD = T * (1.0 - metalic);
+
+    vec3 irradiance = filtering_cube_map(glb_DiffusePFCTex, n);
+    vec3 diffuse = kD * albedo * irradiance;
+
+    // Specular part
+    float ndotv = max(0.0, dot(n, v));
+    vec3 r = 2.0 * ndotv * n - v;
+    vec3 ld = filtering_cube_map_lod(glb_SpecularPFCTex, r, roughness);
+    vec2 dfg = textureLod(glb_BRDFPFTTex, vec2(ndotv, roughness), 0.0).xy;
+    vec3 specular = ld * (F0 * dfg.x + dfg.y);
+
+    return diffuse + specular;
+#endif
+
+	return result;
 }
 
 float calc_alpha() {
@@ -359,12 +400,20 @@ void main() {
 	vec3 light = calc_light_dir();	
 	vec3 half = normalize(view + light);
 
-	vec3 light_color = calc_light();
-	vec3 brdf = calc_brdf(normal, view, light, half);
-	float ndotl = clamp(dot(normal, light), 0.0, 1.0);
+	vec3 albedo = vec3(0.0, 0.0, 0.0);
+	float roughness = 0.0;
+	float metallic = 0.0;
+	calc_material(albedo, roughness, metallic);
 
-	// Lout = BRDF * Lin * cos(theta)
-	oColor.xyz = light_color * brdf * (ndotl * shadow_factor);
+	vec3 direct_light_color = calc_direct_light_color();
+
+	// vec3 n, vec3 v, vec3 l, vec3 h, vec3 albedo, float roughness, float metalic, vec3 light
+	vec3 direct_color = calc_direct_lighting(normal, view, light, half, albedo, roughness, metallic, direct_light_color);
+
+	// vec3 n, vec3 v, vec3 albedo, float roughness, float metalic
+	vec3 ibl_color = calc_ibl_lighting(normal, view, albedo, roughness, metallic);
+
+	oColor.xyz = (direct_color + ibl_color) * shadow_factor;
 
 	// TEST code
 #ifdef GLB_ENABLE_REFLECT_TEX

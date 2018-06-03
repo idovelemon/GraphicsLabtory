@@ -29,6 +29,8 @@ public:
     , hasMetallicTex(false)
     , hasAlphaTex(false)
     , hasNormalTex(false)
+    , hasDiffusePFCTex(false)
+    , hasSpecularPFCTex(false)
     , hasTexcoord(false)
     , hasNormal(false)
     , hasTanget(false)
@@ -48,6 +50,8 @@ public:
     bool    hasMetallicTex;
     bool    hasAlphaTex;
     bool    hasNormalTex;
+    bool    hasDiffusePFCTex;
+    bool    hasSpecularPFCTex;
     bool    hasTexcoord;
     bool    hasNormal;
     bool    hasTanget;
@@ -76,6 +80,8 @@ public:
         memset(metallicTexName, 0, sizeof(metallicTexName));
         memset(alphaTexName, 0, sizeof(alphaTexName));
         memset(normalTexName, 0, sizeof(normalTexName));
+        memset(diffusePFCTexName, 0, sizeof(diffusePFCTexName));
+        memset(specularPFCTexName, 0, sizeof(specularPFCTexName));
     }
 
     virtual ~ModelMaterialParam() {
@@ -95,6 +101,8 @@ public:
     char         metallicTexName[render::texture::kMaxTexNameLen];
     char         alphaTexName[render::texture::kMaxTexNameLen];
     char         normalTexName[render::texture::kMaxTexNameLen];
+    char         diffusePFCTexName[render::texture::kMaxTexNameLen];
+    char         specularPFCTexName[render::texture::kMaxTexNameLen];
     math::Vector boundboxMin;
     math::Vector boundboxMax;
 };

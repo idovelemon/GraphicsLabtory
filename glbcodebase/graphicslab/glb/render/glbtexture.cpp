@@ -49,6 +49,8 @@ class MgrImp {
      void Destroy();
 
      int32_t LoadTexture(const char* texture_name);
+     int32_t LoadPFCTexture(const char* textureName);
+     int32_t LoadPFTTexture(const char* textureName);
      int32_t AddTexture(Texture* tex);
      Texture* GetTextureById(int32_t id);
 
@@ -431,6 +433,54 @@ int32_t MgrImp::LoadTexture(const char* texture_name) {
     return result;
 }
 
+int32_t MgrImp::LoadPFCTexture(const char* textureName) {
+    int32_t result = -1;
+
+    if (textureName) {
+        // Check if already loaded
+        bool is_loaded = false;
+        for (size_t i = 0; i < m_TexDataBase.size(); i++) {
+            if (!strcmp(textureName, m_TexDataBase[i]->GetName())) {
+                is_loaded = true;
+                result = i;
+                break;
+            }
+        }
+
+        // Load the texture
+        if (is_loaded == false) {
+            Texture* new_tex = Texture::CreatePrefilterCubeMap(textureName);
+            if (new_tex) {
+                result = m_TexDataBase.size();
+                m_TexDataBase.push_back(new_tex);
+                new_tex->SetID(result);
+            } else {
+                GLB_SAFE_ASSERT(false);
+            }
+        }
+    }
+
+    return result;
+}
+
+int32_t MgrImp::LoadPFTTexture(const char* textureName) {
+    int32_t result = -1;
+
+    if (textureName) {
+        // Load the texture, only one PFT
+        Texture* new_tex = Texture::CreatePrefilterTableMap(textureName);
+        if (new_tex) {
+            result = m_TexDataBase.size();
+            m_TexDataBase.push_back(new_tex);
+            new_tex->SetID(result);
+        } else {
+            GLB_SAFE_ASSERT(false);
+        }
+    }
+
+    return result;
+}
+
 int32_t MgrImp::AddTexture(Texture* tex) {
     int32_t result = -1;
 
@@ -484,6 +534,30 @@ int32_t Mgr::LoadTexture(const char* texture_name) {
     
     if (s_MgrImp != NULL) {
         result = s_MgrImp->LoadTexture(texture_name);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return result;
+}
+
+int32_t Mgr::LoadPFCTexture(const char* textureName) {
+    int32_t result = -1;
+    
+    if (s_MgrImp != NULL) {
+        result = s_MgrImp->LoadPFCTexture(textureName);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return result;
+}
+
+int32_t Mgr::LoadPFTTexture(const char* textureName) {
+    int32_t result = -1;
+    
+    if (s_MgrImp != NULL) {
+        result = s_MgrImp->LoadPFTTexture(textureName);
     } else {
         GLB_SAFE_ASSERT(false);
     }

@@ -326,6 +326,27 @@ Wrapper uniform_shadow3_texslot_picker(scene::Object* obj) {
     return wrapper;
 }
 
+Wrapper uniform_diffuse_pfc_texslot_picker(scene::Object* obj) {
+    Wrapper wrapper;
+    wrapper.SetFormat(Wrapper::FMT_SAMPLERCUBE);
+    wrapper.SetSamplerCube(render::TS_DIFFUSE_PFC);
+    return wrapper;
+}
+
+Wrapper uniform_specular_pfc_texslot_picker(scene::Object* obj) {
+    Wrapper wrapper;
+    wrapper.SetFormat(Wrapper::FMT_SAMPLERCUBE);
+    wrapper.SetSamplerCube(render::TS_SPECULAR_PFC);
+    return wrapper;
+}
+
+Wrapper uniform_brdf_pft_texslot_picker(scene::Object* obj) {
+    Wrapper wrapper;
+    wrapper.SetFormat(Wrapper::FMT_SAMPLER2D);
+    wrapper.SetSampler2D(render::TS_BRDF_PFT);
+    return wrapper;
+}
+
 Wrapper uniform_material_ambient_picker(scene::Object* obj) {
     Wrapper wrapper;
     wrapper.SetFormat(Wrapper::FMT_FLOAT3);

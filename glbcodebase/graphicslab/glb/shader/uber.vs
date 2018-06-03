@@ -51,12 +51,6 @@ out vec3 vs_Binormal;
 out vec2 vs_TexCoord;
 #endif
 
-#ifdef GLB_TANGENT_IN_VERTEX
-#ifdef GLB_BINORMAL_IN_VERTEX
-out vec3 vs_NT;
-#endif
-#endif
-
 uniform mat4 glb_ProjM;
 uniform mat4 glb_ViewM;
 uniform mat4 glb_WorldM;
@@ -72,13 +66,6 @@ void main() {
 
 #ifdef GLB_NORMAL_IN_VERTEX
 	vs_Normal = (glb_Trans_Inv_WorldM * vec4(glb_Normal, 0.0)).xyz;
-#endif
-
-#ifdef GLB_TANGENT_IN_VERTEX
-#ifdef GLB_BINORMAL_IN_VERTEX
-	vs_NT = cross(glb_Tangent, glb_Binormal);
-	vs_NT = (glb_Trans_Inv_WorldM * vec4(vs_NT, 0.0)).xyz;
-#endif
 #endif
 
 #ifdef GLB_TANGENT_IN_VERTEX

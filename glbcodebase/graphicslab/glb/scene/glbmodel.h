@@ -22,6 +22,8 @@ public:
         MT_METALLIC,
         MT_ALPHA,
         MT_NORMAL,
+        MT_DIFFUSE_PFC,
+        MT_SPECULAR_PFC,
         MT_REFLECT,
         MT_MAX,
     };
@@ -46,6 +48,8 @@ public:
     bool HasAlphaTexture() const;
     bool HasNormalTexture() const;
     bool HasReflectTexture() const;
+    bool HasDiffusePFCTexture() const;
+    bool HasSpecularPFCTexture() const;
     bool HasTexCoord() const;
     bool HasNormal() const;
     bool HasTangent() const;

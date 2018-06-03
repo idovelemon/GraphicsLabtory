@@ -73,6 +73,8 @@ Model* Model::Create(const char* fileName) {
         int32_t metallicTex = -1;
         int32_t alphaTex = -1;
         int32_t normalTex = -1;
+        int32_t diffusePFCTex = -1;
+        int32_t specularPFCTex = -1;
         int32_t material = -1;
 
         float* vertexBuf = NULL;
@@ -122,6 +124,16 @@ Model* Model::Create(const char* fileName) {
                 normalTex = render::texture::Mgr::LoadTexture(normalTexPath.c_str());
             }
 
+            if (effectParam.hasDiffusePFCTex) {
+                std::string diffusePFCTexPath = dir + materialParam.diffusePFCTexName;
+                diffusePFCTex = render::texture::Mgr::LoadPFCTexture(diffusePFCTexPath.c_str());
+            }
+
+            if (effectParam.hasSpecularPFCTex) {
+                std::string specularPFCTexPath = dir + materialParam.specularPFCTexName;
+                specularPFCTex = render::texture::Mgr::LoadPFCTexture(specularPFCTexPath.c_str());
+            }
+
             ModelFile::RelaseBuf(&vertexBuf, &texBuf, &normalBuf, &tangentBuf, &binormalBuf);
         } else {
             GLB_SAFE_ASSERT(false);
@@ -157,6 +169,12 @@ Model* Model::Create(const char* fileName) {
         }
         if (effectParam.hasNormalTex) {
             model->m_Tex[MT_NORMAL] = normalTex;
+        }
+        if (effectParam.hasDiffusePFCTex) {
+            model->m_Tex[MT_DIFFUSE_PFC] = diffusePFCTex;
+        }
+        if (effectParam.hasSpecularPFCTex) {
+            model->m_Tex[MT_SPECULAR_PFC] = specularPFCTex;
         }
         model->m_Material = material;
         model->m_ModelEffectParam = effectParam;
@@ -226,6 +244,14 @@ bool Model::HasReflectTexture() const {
     }
 
     return result;
+}
+
+bool Model::HasDiffusePFCTexture() const {
+    return m_ModelEffectParam.hasDiffusePFCTex;
+}
+
+bool Model::HasSpecularPFCTexture() const {
+    return m_ModelEffectParam.hasSpecularPFCTex;
 }
 
 bool Model::HasTexCoord() const {

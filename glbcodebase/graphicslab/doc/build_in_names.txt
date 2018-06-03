@@ -1,54 +1,54 @@
-Ãû³Æ				                                               ÀàĞÍ		        º¬Òå	
-glb_Pos			                                                 vec3	           ¶¥µãµÄPositionÊôĞÔ
-glb_Color								 vec3	           ¶¥µãµÄColorÊôĞÔ
-glb_Normal		                                                 vec3	           ¶¥µãµÄNormalÊôĞÔ
-glb_Tangent								 vec3	           ¶¥µãµÄTangentÊôĞÔ
-glb_Binormal								 vec3              ¶¥µãµÄBinormalÊôĞÔ
-glb_TexCoord	                                                 vec2	           ¶¥µã¶ÔÓ¦µÄÎÆÀí×ø±ê
-glb_ProjM                                                        mat4              Í¶Ó°±ä»»¾ØÕó
-glb_ViewM                                                        mat4              Ïà»ú±ä»»¾ØÕó
-glb_WorldM                                                       mat4              ÊÀ½ç±ä»»¾ØÕó
-glb_ShadowM0							 mat4              ÒõÓ°±ä»»¾ØÕó0
-glb_ShadowM1							 mat4              ÒõÓ°±ä»»¾ØÕó1
-glb_ShadowM2							 mat4              ÒõÓ°±ä»»¾ØÕó2
-glb_ShadowM3							 mat4              ÒõÓ°±ä»»¾ØÕó3
-glb_ShadowSplit0						 float		   ·Ö¸îzÖµ0
-glb_ShadowSplit1						 float		   ·Ö¸îzÖµ1
-glb_ShadowSplit2						 float		   ·Ö¸îzÖµ2
-glb_ShadowMIndex						 int		   µ±Ç°»æÖÆµÄÒõÓ°ÌùÍ¼ÏÂ±ê
-glb_Trans_Inv_WorldM                                             mat4              ÊÀ½ç±ä»»¾ØÕóµÄÄæ¾ØÕóµÄ×ªÖÃ¾ØÕó
-glb_AlbedoTex                                                   sampler2D         AlbedoÌùÍ¼
-glb_RoughnessTex                                                sampler2D         ´Ö²Ú¶ÈÌùÍ¼
-glb_MetallicTex                                                 sampler2D         ½ğÊô¶ÈÌùÍ¼
-glb_AlphaTex						         sampler2D	   Alpha»ìºÏÌùÍ¼
-glb_NormalTex							 sampler2D         ·¨ÏßÌùÍ¼
+ï¿½ï¿½ï¿½ï¿½				                                               ï¿½ï¿½ï¿½ï¿½		        ï¿½ï¿½ï¿½ï¿½	
+glb_Pos			                                                 vec3	           ï¿½ï¿½ï¿½ï¿½ï¿½Positionï¿½ï¿½ï¿½ï¿½
+glb_Color								 vec3	           ï¿½ï¿½ï¿½ï¿½ï¿½Colorï¿½ï¿½ï¿½ï¿½
+glb_Normal		                                                 vec3	           ï¿½ï¿½ï¿½ï¿½ï¿½Normalï¿½ï¿½ï¿½ï¿½
+glb_Tangent								 vec3	           ï¿½ï¿½ï¿½ï¿½ï¿½Tangentï¿½ï¿½ï¿½ï¿½
+glb_Binormal								 vec3              ï¿½ï¿½ï¿½ï¿½ï¿½Binormalï¿½ï¿½ï¿½ï¿½
+glb_TexCoord	                                                 vec2	           ï¿½ï¿½ï¿½ï¿½ï¿½Ó¦ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+glb_ProjM                                                        mat4              æŠ•å½±å˜æ¢çŸ©é˜µ
+glb_ViewM                                                        mat4              ç›¸æœºå˜æ¢çŸ©é˜µ
+glb_WorldM                                                       mat4              ä¸–ç•Œå˜æ¢çŸ©é˜µ
+glb_ShadowM0							 mat4              é˜´å½±å˜æ¢çŸ©é˜µ0
+glb_ShadowM1							 mat4              é˜´å½±å˜æ¢çŸ©é˜µ1
+glb_ShadowM2							 mat4              é˜´å½±å˜æ¢çŸ©é˜µ2
+glb_ShadowM3							 mat4              é˜´å½±å˜æ¢çŸ©é˜µ3
+glb_ShadowSplit0						 float		   åˆ†å‰²zå€¼0
+glb_ShadowSplit1						 float		   åˆ†å‰²zå€¼1
+glb_ShadowSplit2						 float		   åˆ†å‰²zå€¼2
+glb_ShadowMIndex						 int		   å½“å‰ç»˜åˆ¶çš„é˜´å½±è´´å›¾ä¸‹æ ‡
+glb_Trans_Inv_WorldM                                             mat4              ä¸–ç•Œå˜æ¢çŸ©é˜µçš„é€†çŸ©é˜µçš„è½¬ç½®çŸ©é˜µ
+glb_AlbedoTex                                                   sampler2D         Albedoè´´å›¾
+glb_RoughnessTex                                                sampler2D         ç²—ç³™åº¦è´´å›¾
+glb_MetallicTex                                                 sampler2D         é‡‘å±åº¦è´´å›¾
+glb_AlphaTex						         sampler2D	   Alphaæ··åˆè´´å›¾
+glb_NormalTex							 sampler2D         æ³•çº¿è´´å›¾
 glb_ShadowTex0						         sampler2D	   Shadow Map 0
 glb_ShadowTex1							 sampler2D         Shadow Map 1
 glb_ShadowTex2							 sampler2D         Shadow Map 2
 glb_ShadowTex3							 sampler2D         Shadow Map 3
-glb_HDRSceneTex							 sampler2D         HDRÌùÍ¼
+glb_HDRSceneTex							 sampler2D         HDRè´´å›¾
 glb_HighLightTex						 sampler2D	   HDR high light texture
 glb_Bloom0							 sampler2D	   Bloom texture after h-blur
 glb_Bloom1							 sampler2D	   Bloom texture after h-blur and v-blur
-glb_Material_Ambient                                             vec3              »·¾³¹â²ÄÖÊ
-glb_Material_Diffuse                                             vec3              Âş·´Éä¹â²ÄÖÊ
-glb_Material_Specular                                            vec3              ¾µÃæ·´Éä¹â²ÄÖÊ
-glb_Material_Emission                                            vec3              ·¢¹â²ÄÖÊ
-glb_Material_Pow                                                 float             ¾µÃæ·´Éä¹âÏµÊı
-glb_Material_Albedo						 vec3	 	   »ù±¾ÑÕÉ«£¨·Ç½ğÊôµÄ»ù±¾ÑÕÉ«/½ğÊôµÄ·´ÉäÂÊ£©
-glb_Material_Roughness						 float	           ´Ö²Ú¶È
-glb_Material_Metallic						 float		   ½ğÊô¶È
-glb_EyePos                                                       vec3              ÊÓµãÎ»ÖÃ
-glb_LookAt							 vec3              Ïà»ú¹Û²ì·½Ïò
-glb_GlobalLight_Ambient                                        vec3              È«¾Ö»·¾³¹âÑÕÉ«
-glb_ParallelLight_Dir                                            vec3              Æ½ĞĞ¹â·½Ïò
-glb_ParallelLight                                      vec3              Æ½ĞĞ¹âÑÕÉ«
-glb_AverageLum							 float		   HDR³¡¾°µÄÆ½¾ùÁÁ¶È
-glb_FarClip							 float		   Ô¶²Ã¼ôÃæ
-glb_ScreenWidth							 float		   ÆÁÄ»¿í¶È
-glb_ScreenHeight					         float		   ÆÁÄ»¸ß¶È
-glb_DepthMap							 sampler2D         ³¡¾°µÄÉî¶ÈÌùÍ¼
-glb_RandomRotateMap					         sampler2D	   Ëæ»úĞı×ªÏòÁ¿ÌùÍ¼£¨AOÊ¹ÓÃ£©
+glb_Material_Ambient                                             vec3              ç¯å¢ƒå…‰æè´¨
+glb_Material_Diffuse                                             vec3              æ¼«åå°„å…‰æè´¨
+glb_Material_Specular                                            vec3              é•œé¢åå°„å…‰æè´¨
+glb_Material_Emission                                            vec3              å‘å…‰æè´¨
+glb_Material_Pow                                                 float             é•œé¢åå°„å…‰ç³»æ•°
+glb_Material_Albedo						 vec3	 	   åŸºæœ¬é¢œè‰²ï¼ˆéé‡‘å±çš„åŸºæœ¬é¢œè‰²/é‡‘å±çš„åå°„ç‡ï¼‰
+glb_Material_Roughness						 float	           ç²—ç³™åº¦
+glb_Material_Metallic						 float		   é‡‘å±åº¦
+glb_EyePos                                                       vec3              è§†ç‚¹ä½ç½®
+glb_LookAt							 vec3              ç›¸æœºè§‚å¯Ÿæ–¹å‘
+glb_GlobalLight_Ambient                                        vec3              å…¨å±€ç¯å¢ƒå…‰é¢œè‰²
+glb_ParallelLight_Dir                                            vec3              å¹³è¡Œå…‰æ–¹å‘
+glb_ParallelLight                                      vec3              å¹³è¡Œå…‰é¢œè‰²
+glb_AverageLum							 float		   HDRåœºæ™¯çš„å¹³å‡äº®åº¦
+glb_FarClip							 float		   è¿œè£å‰ªé¢
+glb_ScreenWidth							 float		   å±å¹•å®½åº¦
+glb_ScreenHeight					         float		   å±å¹•é«˜åº¦
+glb_DepthMap							 sampler2D         åœºæ™¯çš„æ·±åº¦è´´å›¾
+glb_RandomRotateMap					         sampler2D	   éšæœºæ—‹è½¬å‘é‡è´´å›¾ï¼ˆAOä½¿ç”¨ï¼‰
 glb_AOMap							 sampler2D         Ambient Occlusion Map
-glb_BiBlurMap							 sampler2D         Blur map(AOÊ¹ÓÃ)
-glb_HighLightBase						 float	     	   ¸ß¹â¹ıÂËµÄ»ùµ×¸ß¹â
+glb_BiBlurMap							 sampler2D         Blur map(AOä½¿ç”¨)
+glb_HighLightBase						 float	     	   é«˜å…‰è¿‡æ»¤çš„åŸºåº•é«˜å…‰
