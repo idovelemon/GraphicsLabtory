@@ -89,6 +89,42 @@ Texture* Texture::Create(const char* texture_name) {
     return tex;
 }
 
+Texture* Texture::CreatePrefilterCubeMap(const char* texture_name) {
+    Texture* tex = NULL;
+    Texture::Imp* imp = Texture::Imp::CreatePrefilterCubeMap(texture_name);
+
+    if (imp != NULL) {
+        tex = new Texture;
+        if (tex != NULL) {
+            tex->m_Imp = imp;
+        } else {
+            GLB_SAFE_ASSERT(false);
+        }
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return tex;
+}
+
+Texture* Texture::CreatePrefilterTableMap(const char* textureName) {
+    Texture* tex = NULL;
+    Texture::Imp* imp = Texture::Imp::CreatePrefilterTableMap(textureName);
+
+    if (imp != NULL) {
+        tex = new Texture;
+        if (tex != NULL) {
+            tex->m_Imp = imp;
+        } else {
+            GLB_SAFE_ASSERT(false);
+        }
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return tex;
+}
+
 Texture* Texture::Create(int32_t width, int32_t height) {
     Texture* tex = NULL;
     Texture::Imp* imp = Texture::Imp::Create(width, height);
@@ -231,6 +267,22 @@ void Texture::GenerateMipmap() {
 void Texture::Save(const char* file_name, util::TEXTURE_FILE_TYPE file_type) {
     if (m_Imp != NULL) {
         m_Imp->Save(file_name, file_type);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+}
+
+void Texture::SavePrefilterCubeMap(const char* file_name) {
+    if (m_Imp != NULL) {
+        m_Imp->SavePrefilterCubeMap(file_name);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+}
+
+void Texture::SavePrefilterTableMap(const char* file_name) {
+    if (m_Imp != NULL) {
+        m_Imp->SavePrefilterTableMap(file_name);
     } else {
         GLB_SAFE_ASSERT(false);
     }

@@ -51,7 +51,7 @@ public:
     }
 
 public:
-    virtual int32_t ReadTexture(const char* file_name, int8_t** texture_data, int32_t& tex_width, int32_t& tex_height, int32_t& texture_type, int32_t& pixel_format) = 0;
+    virtual int32_t ReadTexture(const char* fileName, int8_t** textureData, int32_t& texWidth, int32_t& texHeight, int32_t& textureType, int32_t& pixelFormat) = 0;
 };
 
 //--------------------------------------------------------------------------
@@ -62,7 +62,7 @@ public:
     virtual ~BmpTextureReader();
 
 public:
-    virtual int32_t ReadTexture(const char* file_name, int8_t** texture_data, int32_t& tex_width, int32_t& tex_height, int32_t& texture_type, int32_t& pixel_format);
+    virtual int32_t ReadTexture(const char* fileName, int8_t** textureData, int32_t& texWidth, int32_t& texHeight, int32_t& textureType, int32_t& pixelFormat);
 };
 
 //--------------------------------------------------------------------------
@@ -73,7 +73,7 @@ public:
     virtual ~DDSTextureReader();
 
 public:
-    virtual int32_t ReadTexture(const char* file_name, int8_t** texture_data, int32_t& tex_width, int32_t& tex_height, int32_t& texture_type, int32_t& pixel_format);
+    virtual int32_t ReadTexture(const char* fileName, int8_t** textureData, int32_t& texWidth, int32_t& texHeight, int32_t& textureType, int32_t& pixelFormat);
 
 protected:
     TEXTURE_PIXEL_FORMAT_TYPE GetPixelType(DDSSurfaceDesc desc);
@@ -95,7 +95,29 @@ public:
     virtual~HDRTextureReader();
 
 public:
-    virtual int32_t ReadTexture(const char* file_name, int8_t** texture_data, int32_t& tex_width, int32_t& tex_height, int32_t& texture_type, int32_t& pixel_format);
+    virtual int32_t ReadTexture(const char* fileName, int8_t** textureData, int32_t& texWidth, int32_t& texHeight, int32_t& textureType, int32_t& pixelFormat);
+};
+
+//--------------------------------------------------------------------------
+
+class PFCTextureReader : public TextureReaderBase {
+public:
+    PFCTextureReader();
+    virtual~ PFCTextureReader();
+
+public:
+    virtual int32_t ReadTexture(const char* fileName, int8_t** textureData, int32_t& texWidth, int32_t& texHeight, int32_t& textureType, int32_t& pixelFormat);
+};
+
+//--------------------------------------------------------------------------
+
+class PFTTextureReader : public TextureReaderBase {
+public:
+    PFTTextureReader();
+    virtual~ PFTTextureReader();
+
+public:
+    virtual int32_t ReadTexture(const char* fileName, int8_t** textureData, int32_t& texWidth, int32_t& texHeight, int32_t& textureType, int32_t& pixelFormat);
 };
 
 //--------------------------------------------------------------------------------
@@ -250,6 +272,8 @@ TEXTURE_PIXEL_FORMAT_TYPE DDSTextureReader::GetPixelType(DDSSurfaceDesc desc) {
             {TPFT_R16G16, 32, 0xffff0000, 0x0000ffff, 0x0, 0x0},
             {TPFT_G16R16, 32, 0x0000ffff, 0xffff0000, 0x0, 0x0},
             {TPFT_R16G16B16F, 32, 0x0000ffff, 0xffff0000, 0x0, 0x0},  // not use
+            {TPFT_R16G16B16A16F, 32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000},  // not use
+            {TPFT_R32G32B32A32F, 32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000},  // not use
         };
         static_assert(GLB_ARRAY_SIZE(pixel_format_tbl) == util::TPFT_UNKOWN, "");
 
@@ -416,6 +440,8 @@ TEXTURE_PIXEL_FORMAT_TYPE DDSTextureReader::ReorganizeRGBAFormat(TEXTURE_PIXEL_F
         {TPFT_R16G16, TPFT_R16G16},
         {TPFT_G16R16, TPFT_R16G16},
         {TPFT_R16G16B16F, TPFT_R16G16B16F},  // not use
+        {TPFT_R16G16B16A16F, TPFT_R16G16B16A16F},  // not use
+        {TPFT_R32G32B32A32F, TPFT_R32G32B32A32F},  // not use
     };
     static_assert(GLB_ARRAY_SIZE(reformat_pixel_tbl) == util::TPFT_UNKOWN, "");
 
@@ -455,35 +481,111 @@ int32_t HDRTextureReader::ReadTexture(const char* file_name, int8_t** texture_da
 
     return result;
 }
+
 //--------------------------------------------------------------------------------
 
-int32_t TextureReader::ReadTexture(const char* file_name, int8_t** data, int32_t& tex_width, int32_t& tex_height, int32_t& texture_type, int32_t& pixel_format) {
+PFCTextureReader::PFCTextureReader() {
+}
+
+PFCTextureReader::~PFCTextureReader() {
+}
+
+int32_t PFCTextureReader::ReadTexture(const char* fileName, int8_t** textureData, int32_t& texWidth, int32_t& texHeight, int32_t& textureType, int32_t& pixelFormat) {
+    TEXTURE_PIXEL_FORMAT_TYPE result = TPFT_UNKOWN;
+
+    if (fileName == NULL || textureData == NULL) return result;
+
+    FILE* file = fopen(fileName, "rb");
+    if (file == NULL) return result;
+
+    fread(&texWidth, sizeof(int32_t), 1, file);
+    fread(&texHeight, sizeof(int32_t), 1, file);
+
+    int32_t miplevels = log(max(texWidth, texHeight)) / log(2) + 1;
+    int32_t sizeBytes = 0;
+    for (int32_t i = 0; i < miplevels; i++) {
+        sizeBytes = sizeBytes + sizeof(int16_t) * 4 * (texWidth * pow(2, -i)) * (texHeight * pow(2, -i)) * 6;
+    }
+
+    *textureData = new int8_t[sizeBytes];
+
+    fread(*textureData, sizeBytes, 1, file);
+
+    fclose(file);
+    file = NULL;
+
+    pixelFormat = result = TPFT_R16G16B16A16F;
+
+    return result;
+}
+
+//--------------------------------------------------------------------------------
+
+PFTTextureReader::PFTTextureReader() {
+}
+
+PFTTextureReader::~PFTTextureReader() {
+}
+
+int32_t PFTTextureReader::ReadTexture(const char* fileName, int8_t** textureData, int32_t& texWidth, int32_t& texHeight, int32_t& textureType, int32_t& pixelFormat) {
+    TEXTURE_PIXEL_FORMAT_TYPE result = TPFT_UNKOWN;
+
+    if (fileName == NULL || textureData == NULL) return result;
+
+    FILE* file = fopen(fileName, "rb");
+    if (file == NULL) return result;
+
+    fread(&texWidth, sizeof(int32_t), 1, file);
+    fread(&texHeight, sizeof(int32_t), 1, file);
+
+    int32_t sizeBytes = sizeof(int32_t) * 4 * texWidth * texHeight;
+    *textureData = new int8_t[sizeBytes];
+
+    fread(*textureData, sizeBytes, 1, file);
+
+    fclose(file);
+    file = NULL;
+
+    pixelFormat = result = TPFT_R32G32B32A32F;
+
+    return result;
+}
+
+//--------------------------------------------------------------------------
+
+int32_t TextureReader::ReadTexture(const char* fileName, int8_t** data, int32_t& texWidth, int32_t& texHeight, int32_t& textureType, int32_t& pixelFormat) {
     int32_t result = 0;
 
-    if (file_name != NULL) {
+    if (fileName != NULL) {
         // Get the postfix
         int32_t index = 0;
-        int32_t file_name_len = strlen(file_name);
+        int32_t file_name_len = strlen(fileName);
         for (index = 0; index < file_name_len; index++) {
-            if (file_name[index] == '.') {
+            if (fileName[index] == '.') {
                 break;
             }
         }
 
         char postfix[kMaxPostfixLen];
-        memcpy(postfix, file_name + index, file_name_len - index);
+        memcpy(postfix, fileName + index, file_name_len - index);
         postfix[file_name_len - index] = 0;
 
         // Check format
         if (!strcmp(postfix, ".bmp")) {
             BmpTextureReader bmp_reader;
-            result = bmp_reader.ReadTexture(file_name, data, tex_width, tex_height, texture_type, pixel_format);
+            result = bmp_reader.ReadTexture(fileName, data, texWidth, texHeight, textureType, pixelFormat);
         } else if (!strcmp(postfix, ".dds")) {
             DDSTextureReader dds_reader;
-            result = dds_reader.ReadTexture(file_name, data, tex_width, tex_height, texture_type, pixel_format);
+            result = dds_reader.ReadTexture(fileName, data, texWidth, texHeight, textureType, pixelFormat);
         } else if (!strcmp(postfix, ".hdr")) {
             HDRTextureReader hdr_reader;
-            result = hdr_reader.ReadTexture(file_name, data, tex_width, tex_height, texture_type, pixel_format);
+            result = hdr_reader.ReadTexture(fileName, data, texWidth, texHeight, textureType, pixelFormat);
+        } else if (!strcmp(postfix, ".pfc")) {
+            PFCTextureReader pfcReader;
+            result = pfcReader.ReadTexture(fileName, data, texWidth, texHeight, textureType, pixelFormat);
+        } else if (!strcmp(postfix, ".pft")) {
+            PFTTextureReader pftReader;
+            result = pftReader.ReadTexture(fileName, data, texWidth, texHeight, textureType, pixelFormat);
         } else {
             GLB_SAFE_ASSERT(false);
         }

@@ -3,9 +3,12 @@
 // Author: i_dovelemon[1322600812@qq.com]
 // Date: 2018 / 03 / 14
 // Brief: Demostrate how to use PBR Texture
+// Update: 2018 / 06 / 03 -- Add support for saving .pfc and .pft file for image based lighting
 //----------------------------------------------------------------------
 #include "glb_pbs_texture.h"
 #include "resource.h"
+
+#define GLB_USE_PRELOAD_MAP (TRUE)  // Config to use offline precompute prefilter cubemap
 
 class ApplicationIBLSpecular : public glb::app::ApplicationBase {
 public:
@@ -46,7 +49,13 @@ public:
     , m_PBSProgram_PrefilterEnvMapLoc(-1)
     , m_PBSProgram_IntegrateBRDFMapLoc(-1)
     , m_TestCubeMap_WVPLoc(-1)
-    , m_TestProgram_CubeMapLoc(-1) {
+    , m_TestProgram_CubeMapLoc(-1)
+#if GLB_USE_PRELOAD_MAP
+    , m_PreLoadDiffseCubeMap(NULL)
+    , m_PreLoadSpecularCubeMap(NULL)
+    , m_PreLoadDFGMap(NULL)
+#endif
+    {
     }
     virtual~ApplicationIBLSpecular() {}
 
@@ -74,6 +83,10 @@ public:
         m_DiffuseCubeMap = render::texture::Texture::CreateFloat16CubeTexture(32, 32);
         m_DiffuseCubeMapRT->AttachCubeTexture(drawBuffer, m_DiffuseCubeMap);
 
+#if GLB_USE_PRELOAD_MAP
+        m_PreLoadDiffseCubeMap = render::texture::Texture::CreatePrefilterCubeMap("diffuse.pfc");
+#endif
+
         m_SpecularLDCubeMap = render::texture::Texture::CreateFloat16CubeTexture(128, 128);
         int32_t width = 128, height = 128;
         for (int32_t i = 0; i < 8; i++) {
@@ -83,9 +96,17 @@ public:
             height /= 2;
         }
 
+#if GLB_USE_PRELOAD_MAP
+        m_PreLoadSpecularCubeMap = render::texture::Texture::CreatePrefilterCubeMap("specular.pfc");
+#endif
+
         m_SpecularDFGCubeMap = render::texture::Texture::CreateFloat32Texture(128, 128);
         m_SpecularDFGCubeMapRT = render::RenderTarget::Create(128, 128);
         m_SpecularDFGCubeMapRT->AttachColorTexture(render::COLORBUF_COLOR_ATTACHMENT0, m_SpecularDFGCubeMap);
+
+#if GLB_USE_PRELOAD_MAP
+        m_PreLoadDFGMap = render::texture::Texture::CreatePrefilterTableMap("dfg.pft");
+#endif
 
         // Create Shader
         m_ConvertERMapToCubeMapProgram = render::shader::UserProgram::Create("res/filtering_ermap.vs", "res/filtering_ermap.fs");
@@ -163,9 +184,15 @@ public:
 
             DrawConvolutionCubeMapDiffuse();
             m_DiffuseCubeMap->GenerateMipmap();
+            render::Device::SetRenderTarget(render::RenderTarget::DefaultRenderTarget());
+
+            //m_DiffuseCubeMap->SavePrefilterCubeMap("diffuse.pfc");
 
             DrawConvolutionCubeMapSpecularLD();
             DrawConvolutionCubeMapSpecularDFG();
+
+            //m_SpecularDFGCubeMap->SavePrefilterTableMap("dfg.pft");
+            //m_SpecularLDCubeMap->SavePrefilterCubeMap("specular.pfc");
 
             isIrradianceMapGenerated = true;
         }
@@ -215,6 +242,11 @@ public:
         GLB_SAFE_DELETE(m_Sphere);
         GLB_SAFE_DELETE(m_ScreenMesh);
         GLB_SAFE_DELETE(m_Camera);
+
+#if GLB_USE_PRELOAD_MAP
+        GLB_SAFE_DELETE(m_PreLoadDiffseCubeMap);
+        GLB_SAFE_DELETE(m_PreLoadSpecularCubeMap);
+#endif
     }
 
     void DrawCubeMap() {
@@ -549,9 +581,16 @@ public:
 
         // Setup texture
         render::Device::ClearTexture();
+
+#if GLB_USE_PRELOAD_MAP
+        render::Device::SetTexture(0, m_PreLoadDiffseCubeMap, 0);
+        render::Device::SetTexture(1, m_PreLoadSpecularCubeMap, 1);
+        render::Device::SetTexture(2, m_PreLoadDFGMap, 2);
+#else
         render::Device::SetTexture(0, m_DiffuseCubeMap, 0);
         render::Device::SetTexture(1, m_SpecularLDCubeMap, 1);
         render::Device::SetTexture(2, m_SpecularDFGCubeMap, 2);
+#endif
 
         for (int32_t i = 0; i < 3; i++) {
             render::Device::SetTexture(3, m_AlbedoMap[i], 3);
@@ -638,6 +677,12 @@ protected:
 
     int32_t                         m_TestCubeMap_WVPLoc;
     int32_t                         m_TestProgram_CubeMapLoc;
+
+#if GLB_USE_PRELOAD_MAP
+    render::texture::Texture*       m_PreLoadDiffseCubeMap;
+    render::texture::Texture*       m_PreLoadSpecularCubeMap;
+    render::texture::Texture*       m_PreLoadDFGMap;
+#endif
 };
 
 int _stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPreInstance, LPSTR cmdLine, int nShowCmd) {

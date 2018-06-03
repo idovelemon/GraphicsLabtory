@@ -42,6 +42,8 @@ struct {
     {util::TPFT_R16G16, GL_RG16, GL_RG, GL_UNSIGNED_SHORT, 4},
     {util::TPFT_G16R16, GL_RG16, GL_RG, GL_UNSIGNED_SHORT, 4},
     {util::TPFT_R16G16B16F, GL_RGB16F, GL_RGB, GL_FLOAT, 3},
+    {util::TPFT_R16G16B16A16F, GL_RGBA16, GL_RGBA, GL_UNSIGNED_SHORT, 8},
+    {util::TPFT_R32G32B32A32F, GL_RGBA32F, GL_RGBA, GL_FLOAT, 16},
 };
 static_assert(GLB_ARRAY_SIZE(kGLPixelFormatTbl) == util::TPFT_UNKOWN, "");
 
@@ -132,6 +134,108 @@ Texture::Imp* Texture::Imp::Create(const char* texture_name) {
             } else {
                 GLB_SAFE_ASSERT(false);
             }
+        } else {
+            GLB_SAFE_ASSERT(false);
+        }
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return tex;
+}
+
+Texture::Imp* Texture::Imp::CreatePrefilterCubeMap(const char* fileName) {
+    Texture::Imp* tex = NULL;
+
+    if (fileName != NULL) {
+        int8_t* texture_data = NULL;
+        int32_t texture_width = 0;
+        int32_t texture_height = 0;
+        int32_t texture_type = util::TT_UNKOWN;
+        int32_t texture_pixel_format = util::TPFT_UNKOWN;
+        if (util::TextureReader::ReadTexture(fileName, &texture_data, texture_width, texture_height, texture_type, texture_pixel_format)) {
+            GLuint tex_obj = 0;
+            glGenTextures(1, &tex_obj);
+            glBindTexture(GL_TEXTURE_CUBE_MAP, tex_obj);
+            glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+            glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP);
+            glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP);
+            glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP);
+
+            int32_t miplevels = log(max(texture_width, texture_height)) / log(2) + 1;
+            int32_t glFaces[] = {
+                GL_TEXTURE_CUBE_MAP_POSITIVE_X,
+                GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
+                GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
+                GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,
+                GL_TEXTURE_CUBE_MAP_POSITIVE_Z,
+                GL_TEXTURE_CUBE_MAP_NEGATIVE_Z,
+            };
+
+            int32_t index = 0;
+            for (int32_t i = 0; i < miplevels; i++) {
+                for(int32_t j = 0; j < 6; j++) {
+                    int32_t width = texture_width * pow(2, -i);
+                    int32_t height = texture_height * pow(2, -i);
+                    glTexImage2D(glFaces[j], i, GL_RGBA16, width, height, 0, GL_RGBA, GL_UNSIGNED_SHORT, texture_data + index);
+
+                    int32_t sizeBytes = sizeof(int16_t) * 4 * width * height;
+                    index = index + sizeBytes;
+                }
+            }
+
+            util::TextureReader::ReleaseData(&texture_data);
+
+            tex = new Texture::Imp();
+            tex->m_TexObj = tex_obj;
+            memcpy(tex->m_TexName, fileName, strlen(fileName));
+            tex->m_TexName[strlen(fileName)] = 0;
+            tex->m_Type = TEX_CUBE;
+            tex->m_Width = texture_width;
+            tex->m_Height = texture_height;
+            tex->m_Depth = 0;
+            SetTexturePixelFormat(tex, texture_pixel_format);
+        } else {
+            GLB_SAFE_ASSERT(false);
+        }
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return tex;
+}
+
+Texture::Imp* Texture::Imp::CreatePrefilterTableMap(const char* fileName) {
+    Texture::Imp* tex = NULL;
+
+    if (fileName != NULL) {
+        int8_t* texture_data = NULL;
+        int32_t texture_width = 0;
+        int32_t texture_height = 0;
+        int32_t texture_type = util::TT_UNKOWN;
+        int32_t texture_pixel_format = util::TPFT_UNKOWN;
+        if (util::TextureReader::ReadTexture(fileName, &texture_data, texture_width, texture_height, texture_type, texture_pixel_format)) {
+            GLuint tex_obj = 0;
+            glGenTextures(1, &tex_obj);
+            glBindTexture(GL_TEXTURE_2D, tex_obj);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, texture_width, texture_height, 0, GL_RGBA, GL_FLOAT, texture_data);
+
+            util::TextureReader::ReleaseData(&texture_data);
+
+            tex = new Texture::Imp();
+            tex->m_TexObj = tex_obj;
+            memcpy(tex->m_TexName, fileName, strlen(fileName));
+            tex->m_TexName[strlen(fileName)] = 0;
+            tex->m_Type = TEX_2D;
+            tex->m_Width = texture_width;
+            tex->m_Height = texture_height;
+            tex->m_Depth = 0;
+            SetTexturePixelFormat(tex, texture_pixel_format);
         } else {
             GLB_SAFE_ASSERT(false);
         }
@@ -289,7 +393,7 @@ Texture::Imp* Texture::Imp::CreateFloat16CubeTexture(int32_t width, int32_t heig
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
 
         for(int32_t i = 0; i < 6; i++) {
-            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_UNSIGNED_SHORT, NULL);
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA16, width, height, 0, GL_RGBA, GL_UNSIGNED_SHORT, NULL);
         }
         glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 
@@ -418,6 +522,8 @@ void Texture::Imp::SetTexturePixelFormat(Texture::Imp* texture, int32_t texture_
             {util::TPFT_R16G16, FMT_R16G16, 4},
             {util::TPFT_G16R16, FMT_R16G16, 4},
             {util::TPFT_R16G16B16F, FMT_R16G16B16F, 3},
+            {util::TPFT_R16G16B16A16F, FMT_R16G16B16A16F, 8},
+            {util::TPFT_R32G32B32A32F, FMT_R32G32B32A32F, 16},
         };
         static_assert(GLB_ARRAY_SIZE(pixel_format) == util::TPFT_UNKOWN, "");
 
@@ -519,7 +625,7 @@ void Texture::Imp::GenerateMipmap() {
     }
 }
 
-void Texture::Imp::Save(const char* file_name, util::TEXTURE_FILE_TYPE file_type) {
+void Texture::Imp::Save(const char* fileName, util::TEXTURE_FILE_TYPE fileType) {
     if (m_Type == TEX_2D) {
         int8_t* pixel = new int8_t[m_Width * m_Height * m_BPP];
 
@@ -538,6 +644,84 @@ void Texture::Imp::Save(const char* file_name, util::TEXTURE_FILE_TYPE file_type
 
     } else {
         // TODO: Only save 2D texture now
+        GLB_SAFE_ASSERT(false);
+    }
+}
+
+void Texture::Imp::SavePrefilterCubeMap(const char* fileName) {
+    if (m_Type == TEX_CUBE && m_BPP == 8 && m_Format == FMT_R16G16B16A16F) {
+        // Calculate mipmap level
+        int32_t miplevels = log(max(m_Width, m_Height)) / log(2) + 1;
+        int32_t sizeBytes = 0;
+        for (int32_t i = 0; i < miplevels; i++) {
+            sizeBytes = sizeBytes + sizeof(int16_t) * 4 * (m_Width * pow(2, -i)) * (m_Height * pow(2, -i)) * 6;
+        }
+
+        int8_t* pixel = new int8_t[sizeBytes];
+
+        glEnable(GL_TEXTURE_CUBE_MAP);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, m_TexObj);
+
+        int32_t index = 0;
+        for (int32_t i = 0; i < miplevels; i++) {
+            sizeBytes = sizeof(int16_t) * 4 * (m_Width * pow(2, -i)) * (m_Height * pow(2, -i));
+            int8_t* data = new int8_t[sizeBytes];
+
+            // +X
+            glGetTexImage(GL_TEXTURE_CUBE_MAP_POSITIVE_X, i, GL_RGBA, GL_UNSIGNED_SHORT, data);
+            memcpy(pixel + index, data, sizeBytes);
+            index = index + sizeBytes;
+
+            // -X
+            glGetTexImage(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, i, GL_RGBA, GL_UNSIGNED_SHORT, data);
+            memcpy(pixel + index, data, sizeBytes);
+            index = index + sizeBytes;
+
+            // +Y
+            glGetTexImage(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, i, GL_RGBA, GL_UNSIGNED_SHORT, data);
+            memcpy(pixel + index, data, sizeBytes);
+            index = index + sizeBytes;
+
+            // -Y
+            glGetTexImage(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, i, GL_RGBA, GL_UNSIGNED_SHORT, data);
+            memcpy(pixel + index, data, sizeBytes);
+            index = index + sizeBytes;
+
+            // +Z
+            glGetTexImage(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, i, GL_RGBA, GL_UNSIGNED_SHORT, data);
+            memcpy(pixel + index, data, sizeBytes);
+            index = index + sizeBytes;
+
+            // -Z
+            glGetTexImage(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, i, GL_RGBA, GL_UNSIGNED_SHORT, data);
+            memcpy(pixel + index, data, sizeBytes);
+            index = index + sizeBytes;
+
+            delete[] data;
+            data = NULL;
+        }
+
+        util::TextureWriter::Write(fileName, pixel, m_Width, m_Height, -1, -1, util::TFT_PFC);
+
+        delete[] pixel;
+        pixel = NULL;
+
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+}
+
+void Texture::Imp::SavePrefilterTableMap(const char* fileName) {
+    if (m_Type == TEX_2D && m_BPP == 16 && m_Format == FMT_R32G32B32A32F) {
+        int8_t* pixel = new int8_t[sizeof(int32_t) * 4 * m_Width * m_Height];
+        GetTextureData(pixel, 0);
+
+        util::TextureWriter::Write(fileName, pixel, m_Width, m_Height, -1, -1, util::TFT_PFT);
+
+        delete[] pixel;
+        pixel = NULL;
+
+    } else {
         GLB_SAFE_ASSERT(false);
     }
 }

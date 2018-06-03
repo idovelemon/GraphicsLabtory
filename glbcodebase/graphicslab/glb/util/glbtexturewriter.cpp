@@ -8,6 +8,7 @@
 #include "glbtexturewriter.h"
 
 #include <stdio.h>
+#include <xtgmath.h>
 #include <memory.h>
 
 #include "glbddsformat.h"
@@ -49,6 +50,28 @@ public:
 protected:
     void SetRGBAMask(DDSPixelFormat& pf, int32_t pixel_format);
     void ReorganizeRGBData(int8_t* data, TEXTURE_PIXEL_FORMAT_TYPE type);
+};
+
+//--------------------------------------------------------------------------------
+
+class PFCWriter : public TextureWriterBase {
+public:
+    PFCWriter();
+    virtual ~PFCWriter();
+
+public:
+    virtual bool Write(const char* file_name, int8_t* data, int32_t width, int32_t height, int32_t pixel_format, int32_t bit_count);
+};
+
+//--------------------------------------------------------------------------------
+
+class PFTWriter : public TextureWriterBase {
+public:
+    PFTWriter();
+    virtual ~PFTWriter();
+
+public:
+    virtual bool Write(const char* file_name, int8_t* data, int32_t width, int32_t height, int32_t pixel_format, int32_t bit_count);
 };
 
 //--------------------------------------------------------------------------------
@@ -155,11 +178,75 @@ void DDSWriter::ReorganizeRGBData(int8_t* data, TEXTURE_PIXEL_FORMAT_TYPE type) 
 
 //--------------------------------------------------------------------------------
 
+PFCWriter::PFCWriter() {
+}
+
+PFCWriter::~PFCWriter() {
+}
+
+bool PFCWriter::Write(const char* file_name, int8_t* data, int32_t width, int32_t height, int32_t pixel_format, int32_t bit_count) {
+    bool result = false;
+
+    FILE* file = fopen(file_name, "wb");
+
+    if (file) {
+        int32_t miplevels = log(max(width, height)) / log(2) + 1;
+        int32_t sizeBytes = 0;
+        for (int32_t i = 0; i < miplevels; i++) {
+            sizeBytes = sizeBytes + sizeof(int16_t) * 4 * (width * pow(2, -i)) * (height * pow(2, -i)) * 6;
+        }
+
+        fwrite(&width, sizeof(width), 1, file);
+        fwrite(&height, sizeof(height), 1, file);
+        fwrite(data, sizeBytes, 1, file);
+
+        result = true;
+    }
+
+    fclose(file);
+
+    return result;
+}
+
+//--------------------------------------------------------------------------------
+
+PFTWriter::PFTWriter() {
+}
+
+PFTWriter::~PFTWriter() {
+}
+
+bool PFTWriter::Write(const char* file_name, int8_t* data, int32_t width, int32_t height, int32_t pixel_format, int32_t bit_count) {
+    bool result = false;
+
+    FILE* file = fopen(file_name, "wb");
+
+    if (file) {
+        fwrite(&width, sizeof(width), 1, file);
+        fwrite(&height, sizeof(height), 1, file);
+        fwrite(data, sizeof(int32_t) * 4 * width * height, 1, file);
+
+        result = true;
+    }
+
+    fclose(file);
+
+    return result;
+}
+
+//--------------------------------------------------------------------------------
+
 bool TextureWriter::Write(const char* file_name, int8_t* data, int32_t width, int32_t height, int32_t pixel_format, int32_t bit_count, int32_t format) {
     bool result = false;
 
     if (format == TFT_DDS) {
         DDSWriter writer;
+        result = writer.Write(file_name, data, width, height, pixel_format, bit_count);
+    } else if (format == TFT_PFC) {
+        PFCWriter writer;
+        result = writer.Write(file_name, data, width, height, pixel_format, bit_count);
+    } else if (format == TFT_PFT) {
+        PFTWriter writer;
         result = writer.Write(file_name, data, width, height, pixel_format, bit_count);
     } else {
         // TODO: Only support dds file now

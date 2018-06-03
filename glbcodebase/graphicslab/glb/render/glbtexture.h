@@ -57,6 +57,8 @@ public:
     virtual ~Texture();
 
     static Texture* Create(const char* texture_name);
+    static Texture* CreatePrefilterCubeMap(const char* textureName);
+    static Texture* CreatePrefilterTableMap(const char* textureName);
     static Texture* Create(int32_t width, int32_t height);
     static Texture* CreateFloat32Texture(int32_t width, int32_t height);
     static Texture* CreateFloat32DepthTexture(int32_t width, int32_t height);
@@ -80,6 +82,8 @@ public:
     void GenerateMipmap();
 
     void Save(const char* file_name, util::TEXTURE_FILE_TYPE file_type);
+    void SavePrefilterCubeMap(const char* file_name);
+    void SavePrefilterTableMap(const char* file_name);
 
 private:
     class Imp;
