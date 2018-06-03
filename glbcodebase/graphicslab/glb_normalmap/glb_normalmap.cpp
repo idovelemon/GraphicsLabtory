@@ -20,22 +20,22 @@ public:
 public:
     bool Initialize() {
         // Camera
-        scene::FreeCamera* cam = scene::FreeCamera::Create(math::Vector(0.0f, 0.0f, 160.0f), math::Vector(0.0f, 0.0f, 0.0f));
+        scene::FreeCamera* cam = scene::FreeCamera::Create(math::Vector(0.0f, 0.0f, 200.0f), math::Vector(0.0f, 0.0f, 0.0f));
         scene::Scene::SetCamera(glb::scene::PRIMIAY_CAM, cam);
 
         // Light
         scene::Light ambientLight(scene::AMBIENT_LIGHT);
-        ambientLight.color = math::Vector(0.5f, 0.5f, 0.5f);
+        ambientLight.color = math::Vector(0.1f, 0.1f, 0.1f);
         scene::Scene::SetLight(ambientLight, 0);
 
         scene::Light paralleLight(scene::PARALLEL_LIGHT);
-        paralleLight.color = math::Vector(2.5f, 2.5f, 2.5f);
+        paralleLight.color = math::Vector(1.5f, 1.5f, 0.75f);
         paralleLight.dir = math::Vector(-1.0f, -1.0f, -1.0f);
         paralleLight.dir.Normalize();
         scene::Scene::SetLight(paralleLight, 1);
 
         // Perspective
-        render::Render::SetPerspective(glb::render::Render::PRIMARY_PERS, 69.0f, 800 * 1.0f / 600, 0.1f, 500.0f);
+        render::Render::SetPerspective(glb::render::Render::PRIMARY_PERS, 60.0f, 800 * 1.0f / 600, 0.01f, 10000.0f);
 
         // HDR
         render::Render::SetExposureLevel(0.7f);
@@ -43,7 +43,7 @@ public:
         render::Render::SetHighLightBase(0.9f);
 
         // Objects
-        int32_t cube = scene::Scene::AddObject("res/sphere.obj");
+        int32_t cube = scene::Scene::AddObject("res/cube.obj");
         scene::Scene::GetObjectById(cube)->SetCullFaceEnable(true);
         scene::Scene::GetObjectById(cube)->SetCullFaceMode(glb::render::CULL_BACK);
         scene::Scene::GetObjectById(cube)->SetDepthTestEnable(true);
@@ -57,13 +57,15 @@ public:
         util::ProfileTime time;
         time.BeginProfile();
 
+        glb::Input::Update();
+
         // Update scene
         scene::Light lit = glb::scene::Scene::GetLight(1);
         float rotY = 1.0f;
-        math::Matrix rot;
-        rot.MakeRotateYMatrix(rotY);
-        lit.dir = rot * lit.dir;
-        //glb::scene::Scene::SetLight(lit, 1);
+        math::Matrix rotLight;
+        rotLight.MakeRotateYMatrix(rotY);
+        lit.dir = rotLight * lit.dir;
+        glb::scene::Scene::SetLight(lit, 1);
 
         // Randomly Rotate the sphere
         math::Vector rot_v = glb::scene::Scene::GetObjectById(m_Cube)->GetRotation();
@@ -71,6 +73,16 @@ public:
         glb::scene::Scene::GetObjectById(m_Cube)->SetRotation(rot_v);
 
         glb::scene::Scene::Update();
+
+        math::Vector pos = glb::scene::Scene::GetCurCamera()->GetPos();
+        math::Vector target = glb::scene::Scene::GetCurCamera()->GetTarget();
+        math::Vector look = pos - target;
+        math::Matrix rotCamera;
+        rotCamera.MakeRotateYMatrix(Input::GetMouseMoveX() * 0.1f);
+        look = rotCamera * look;
+        pos = target + look;
+        glb::scene::Scene::GetCurCamera()->SetPos(pos);
+        glb::scene::Scene::GetCurCamera()->Update(1.0f);
 
         // Draw scene
         glb::render::Render::Draw();

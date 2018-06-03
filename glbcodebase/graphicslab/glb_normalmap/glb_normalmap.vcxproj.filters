@@ -135,6 +135,9 @@
     <ClCompile Include="..\glb\util\glbutil.cpp">
       <Filter>源文件\glb\util</Filter>
     </ClCompile>
+    <ClCompile Include="..\glb\util\glbtexturewriter.cpp">
+      <Filter>源文件\glb\util</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="glb_normalmap.h">
@@ -256,6 +259,15 @@
     </ClInclude>
     <ClInclude Include="resource.h">
       <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\util\glbddsformat.h">
+      <Filter>源文件\glb\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\util\glbtextureinfo.h">
+      <Filter>源文件\glb\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\util\glbtexturewriter.h">
+      <Filter>源文件\glb\util</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

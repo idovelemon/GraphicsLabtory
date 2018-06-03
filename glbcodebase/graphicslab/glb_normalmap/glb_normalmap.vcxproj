@@ -192,6 +192,7 @@
     <ClCompile Include="..\glb\util\glblog.cpp" />
     <ClCompile Include="..\glb\util\glbprofile.cpp" />
     <ClCompile Include="..\glb\util\glbtexturereader.cpp" />
+    <ClCompile Include="..\glb\util\glbtexturewriter.cpp" />
     <ClCompile Include="..\glb\util\glbutil.cpp" />
     <ClCompile Include="glb_normalmap.cpp" />
   </ItemGroup>
@@ -229,10 +230,13 @@
     <ClInclude Include="..\glb\scene\glbmodelfile.h" />
     <ClInclude Include="..\glb\scene\glbobject.h" />
     <ClInclude Include="..\glb\scene\glbscene.h" />
+    <ClInclude Include="..\glb\util\glbddsformat.h" />
     <ClInclude Include="..\glb\util\glblog.h" />
     <ClInclude Include="..\glb\util\glbmacro.h" />
     <ClInclude Include="..\glb\util\glbprofile.h" />
+    <ClInclude Include="..\glb\util\glbtextureinfo.h" />
     <ClInclude Include="..\glb\util\glbtexturereader.h" />
+    <ClInclude Include="..\glb\util\glbtexturewriter.h" />
     <ClInclude Include="..\glb\util\glbutil.h" />
     <ClInclude Include="glb_normalmap.h" />
     <ClInclude Include="resource.h" />
