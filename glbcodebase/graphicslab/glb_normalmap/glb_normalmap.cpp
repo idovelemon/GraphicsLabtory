@@ -38,8 +38,6 @@ public:
         render::Render::SetPerspective(glb::render::Render::PRIMARY_PERS, 60.0f, 800 * 1.0f / 600, 0.01f, 10000.0f);
 
         // HDR
-        render::Render::SetExposureLevel(0.7f);
-        render::Render::SetLightAdaption(0.04f);
         render::Render::SetHighLightBase(0.9f);
 
         // Objects
