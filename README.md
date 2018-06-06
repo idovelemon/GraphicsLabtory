@@ -1,5 +1,5 @@
 # GraphicsLabtory
-This project is for computer graphics learning
+This project is for computer graphics learning.More information in my dev blog [here](https://blog.csdn.net/i_dovelemon/article/details/51541092v).
 
 ## Feature
 - .obj model file analysis
