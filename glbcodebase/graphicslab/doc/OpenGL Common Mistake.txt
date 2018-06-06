@@ -13,3 +13,5 @@ int32_t max_level = log(max(width,height)) / log(2);
 (5)glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);用于开启贴图的Mipmap功能
 
 (6)开启了mipmap功能的贴图，当作为render target的时候，绘制完毕，另外的mipmap level 需要调用glGenerateMipmap来生成
+
+(7)关于是否开启mipmap的功能，现在库默认时开启的。不过如果你处理向后处理这样的工作时，不要开启mipmapping，否则经常会出现访问带有mipmap的贴图，导致全黑的问题，原因见（6）
