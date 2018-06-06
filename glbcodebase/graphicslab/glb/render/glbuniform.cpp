@@ -587,33 +587,6 @@ Wrapper uniform_screen_height_picker(scene::Object*) {
     return wrapper;
 }
 
-Wrapper uniform_depth_tex_picker(scene::Object*) {
-    Wrapper wrapper;
-    wrapper.SetFormat(Wrapper::FMT_SAMPLER2D);
-    wrapper.SetSampler2D(render::TS_DEPTH);
-    return wrapper;
-}
-
-Wrapper uniform_random_rotate_tex_picker(scene::Object*) {
-    Wrapper wrapper;
-    wrapper.SetFormat(Wrapper::FMT_SAMPLER2D);
-    wrapper.SetSampler2D(render::TS_RANDOM_ROTATE);
-    return wrapper;
-}
-
-Wrapper uniform_ao_tex_picker(scene::Object*) {
-    Wrapper wrapper;
-    wrapper.SetFormat(Wrapper::FMT_SAMPLER2D);
-    wrapper.SetSampler2D(render::TS_AO_MAP);
-    return wrapper;
-}
-
-Wrapper uniform_biblur_tex_picker(scene::Object*) {
-    Wrapper wrapper;
-    wrapper.SetFormat(Wrapper::FMT_SAMPLER2D);
-    wrapper.SetSampler2D(render::TS_BI_BLUR_MAP);
-    return wrapper;
-}
 };  // namespace uniform
 
 }; // namespace render

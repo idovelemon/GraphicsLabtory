@@ -59,9 +59,6 @@ public:
     static int GetCurShadowMapIndex();
     static float GetShadowSplitValue(int32_t index);
 
-    // AO
-    static int32_t GetRandomRotateTex();
-
     // HDR
     static void SetHighLightBase(float base);
     static float GetHighLightBase();

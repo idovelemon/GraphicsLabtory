@@ -69,13 +69,6 @@ enum TextureSlot {
     TS_DIFFUSE_PFC,
     TS_SPECULAR_PFC,
     TS_BRDF_PFT,
-    TS_HDRSCENE,
-    TS_LOG_LUM,
-    TS_HDR_BLOOM,
-    TS_DEPTH,
-    TS_RANDOM_ROTATE,
-    TS_AO_MAP,
-    TS_BI_BLUR_MAP,
     TS_MAX,
 };
 

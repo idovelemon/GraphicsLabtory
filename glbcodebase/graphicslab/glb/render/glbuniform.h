@@ -66,10 +66,6 @@ enum {
     GLB_FAR_CLIP,
     GLB_SCREEN_WIDTH,
     GLB_SCREEN_HEIGHT,
-    GLB_DEPTH_TEX,
-    GLB_RANDOM_ROTATE_TEX,
-    GLB_AO_TEX,
-    GLB_BIBLUR_TEX,
 };
 
 // Uniform table
@@ -120,10 +116,6 @@ static const struct {
     {"glb_FarClip",                         GLB_FAR_CLIP,                       1},
     {"glb_ScreenWidth",                     GLB_SCREEN_WIDTH,                   1},
     {"glb_ScreenHeight",                    GLB_SCREEN_HEIGHT,                  1},
-    {"glb_DepthMap",                        GLB_DEPTH_TEX,                      1},
-    {"glb_RandRotateMap",                   GLB_RANDOM_ROTATE_TEX,              1},
-    {"glb_AOMap",                           GLB_AO_TEX,                         1},
-    {"glb_BiBlurMap",                       GLB_BIBLUR_TEX,                     1},
 };
 
 // Uniform wrapper
@@ -220,10 +212,6 @@ Wrapper uniform_parallel_light_picker(scene::Object*);            // Pick glb_Pa
 Wrapper uniform_far_clip_picker(scene::Object*);                  // Pick glb_FarClip
 Wrapper uniform_screen_width_picker(scene::Object*);              // Pick glb_ScreenWidth
 Wrapper uniform_screen_height_picker(scene::Object*);             // Pick glb_ScreenHeight
-Wrapper uniform_depth_tex_picker(scene::Object*);                 // Pick glb_DepthMap
-Wrapper uniform_random_rotate_tex_picker(scene::Object*);         // Pick glb_RandRotateMap
-Wrapper uniform_ao_tex_picker(scene::Object*);                    // Pick glb_AOMap
-Wrapper uniform_biblur_tex_picker(scene::Object*);                // Pick glb_BiBlurMap
 
 // Uniform picker table
 static const struct {
@@ -272,10 +260,6 @@ static const struct {
     {uniform_far_clip_picker,                   GLB_FAR_CLIP},
     {uniform_screen_width_picker,               GLB_SCREEN_WIDTH},
     {uniform_screen_height_picker,              GLB_SCREEN_HEIGHT},
-    {uniform_depth_tex_picker,                  GLB_DEPTH_TEX},
-    {uniform_random_rotate_tex_picker,          GLB_RANDOM_ROTATE_TEX},
-    {uniform_ao_tex_picker,                     GLB_AO_TEX},
-    {uniform_biblur_tex_picker,                 GLB_BIBLUR_TEX},
 };
 
 // Uniform entry
