@@ -63,14 +63,6 @@ public:
     static int32_t GetRandomRotateTex();
 
     // HDR
-    static float GetHDRAverageLum();
-    static int32_t GetHDRSceneTex();
-    static float GetBloomWidth();
-    static float GetBloomHeight();
-    static void SetExposureLevel(float level);
-    static float GetExposureLevel();
-    static void SetLightAdaption(float adaption);
-    static float GetLightAdaption();
     static void SetHighLightBase(float base);
     static float GetHighLightBase();
 

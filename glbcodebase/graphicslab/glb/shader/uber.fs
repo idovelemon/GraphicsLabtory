@@ -69,6 +69,10 @@ uniform sampler2D glb_NormalTex;
 
 #endif
 
+#ifdef GLB_ENABLE_EMISSION_TEX
+uniform sampler2D glb_EmissionTex;
+#endif
+
 #ifdef GLB_ENABLE_REFLECT_TEX
 uniform samplerCube glb_ReflectTex;
 #endif
@@ -289,7 +293,7 @@ vec3 calc_light_dir() {
 	return light_dir;
 }
 
-void calc_material(out vec3 albedo, out float roughness, out float metallic) {
+void calc_material(out vec3 albedo, out float roughness, out float metallic, out vec3 emission) {
 #ifdef GLB_ENABLE_LIGHTING
 
 #ifdef GLB_ENABLE_ALBEDO_TEX
@@ -308,6 +312,12 @@ void calc_material(out vec3 albedo, out float roughness, out float metallic) {
 	metallic = texture(glb_MetallicTex, vs_TexCoord).x;
 #else
 	metallic = glb_Material_Metallic;
+#endif
+
+#ifdef GLB_ENABLE_EMISSION_TEX
+	emission = texture(glb_EmissionTex, vs_TexCoord).xyz * glb_Material_Emission;
+#else
+	emission = glb_Material_Emission;
 #endif
 
 #endif
@@ -403,7 +413,8 @@ void main() {
 	vec3 albedo = vec3(0.0, 0.0, 0.0);
 	float roughness = 0.0;
 	float metallic = 0.0;
-	calc_material(albedo, roughness, metallic);
+	vec3 emission = vec3(0.0, 0.0, 0.0);
+	calc_material(albedo, roughness, metallic, emission);
 
 	vec3 direct_light_color = calc_direct_light_color();
 
@@ -413,7 +424,7 @@ void main() {
 	// vec3 n, vec3 v, vec3 albedo, float roughness, float metalic
 	vec3 ibl_color = calc_ibl_lighting(normal, view, albedo, roughness, metallic);
 
-	oColor.xyz = (direct_color + ibl_color) * shadow_factor;
+	oColor.xyz = (direct_color + ibl_color) * shadow_factor + emission;
 
 	// TEST code
 #ifdef GLB_ENABLE_REFLECT_TEX

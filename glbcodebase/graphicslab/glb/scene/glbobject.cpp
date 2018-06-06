@@ -252,6 +252,10 @@ render::shader::Descriptor Object::CalculateShaderDesc() {
         desc.SetFlag(render::shader::GLB_ENABLE_NORMAL_TEX, true);
     }
 
+    if (m_Model->HasEmissionTexture()) {
+        desc.SetFlag(render::shader::GLB_ENABLE_EMISSION_TEX, true);
+    }
+
     if (m_Model->HasNormal()) {
         desc.SetFlag(render::shader::GLB_NORMAL_IN_VERTEX, true);
     }

@@ -22,6 +22,7 @@ public:
         MT_METALLIC,
         MT_ALPHA,
         MT_NORMAL,
+        MT_EMISSION,
         MT_DIFFUSE_PFC,
         MT_SPECULAR_PFC,
         MT_REFLECT,
@@ -47,6 +48,7 @@ public:
     bool HasMettalicTexture() const;
     bool HasAlphaTexture() const;
     bool HasNormalTexture() const;
+    bool HasEmissionTexture() const;
     bool HasReflectTexture() const;
     bool HasDiffusePFCTexture() const;
     bool HasSpecularPFCTexture() const;

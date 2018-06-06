@@ -43,6 +43,9 @@ public:
 
     void* GetNativeRenderTarget();
 
+    int32_t GetWidth() const;
+    int32_t GetHeight() const;
+
 private:
     class Imp;
     Imp*    m_Imp;

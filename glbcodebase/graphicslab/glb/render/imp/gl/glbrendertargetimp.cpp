@@ -37,7 +37,9 @@ namespace render {
 //--------------------------------------------------------------------------------------
 RenderTarget::Imp::Imp()
 : m_FBO(0)
-, m_DepthRBO(0) {
+, m_DepthRBO(0)
+, m_Width(0)
+, m_Height(0) {
     memset(m_bDrawColorBuffers, 0, sizeof(m_bDrawColorBuffers));
 }
 
@@ -84,6 +86,8 @@ RenderTarget::Imp* RenderTarget::Imp::Create(int32_t width, int32_t height) {
     if (target != NULL) {
         target->m_FBO = fbo;
         target->m_DepthRBO = depth_rbo;
+        target->m_Width = width;
+        target->m_Height = height;
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     } else {
         GLB_SAFE_ASSERT(false);
@@ -185,6 +189,14 @@ void RenderTarget::Imp::DisableAllDrawColorBuffers() {
 
 void* RenderTarget::Imp::GetNativeRenderTarget() {
     return reinterpret_cast<void*>(m_FBO);
+}
+
+int32_t RenderTarget::Imp::GetWidth() const {
+    return m_Width;
+}
+
+int32_t RenderTarget::Imp::GetHeight() const {
+    return m_Height;
 }
 
 };  // namespace render

@@ -48,9 +48,14 @@ public:
 
     void* GetNativeRenderTarget();
 
+    int32_t GetWidth() const;
+    int32_t GetHeight() const;
+
 private:
     int32_t m_FBO;
     int32_t m_DepthRBO;
+    int32_t m_Width;
+    int32_t m_Height;
     bool m_bDrawColorBuffers[kMaxDrawColorBuffers];
 };
 

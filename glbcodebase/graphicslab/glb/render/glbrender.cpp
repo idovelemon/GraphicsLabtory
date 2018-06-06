@@ -143,14 +143,6 @@ public:
 
     int32_t GetRandomRotateTex();
 
-    float GetHDRAverageLum();
-    int32_t GetHDRSceneTex();
-    float GetBloomWidth();
-    float GetBloomHeight();
-    void SetExposureLevel(float level);
-    float GetExposureLevel();
-    void SetLightAdaption(float adaption);
-    float GetLightAdaption();
     void SetHighLightBase(float base);
     float GetHighLightBase();
 
@@ -191,14 +183,12 @@ protected:
     void DrawLightLoopCore();
 
     // HDR
-    void DownsamplerHDRScene();
-    void CalcLogLum();
-    void CalcAverageLum();
+    void DownsampleTex();
     void FilterBrightness();
-    void DownsamplerBrightness();
-    void BloomH();
-    void BloomV();
-    void BlendHDRScene();
+    void BloomTex();
+    void BloomHTex();
+    void BloomVTex();
+    void Tonemapping();
 
     // SSAO
     void DrawDepthMap();
@@ -238,26 +228,34 @@ private:
     int32_t                                 m_DepthMap;
 
     // HDR
+    float                                   m_HightLightBase;
     RenderTarget*                           m_HDRRenderTarget;
-    RenderTarget*                           m_BloomRenderTarget;
-    int32_t                                 m_HDRSceneTex;
-    int32_t                                 m_HighLightSceneTex;
-    int32_t                                 m_LogLumTex;
-    int32_t                                 m_BloomTex;
-    float                                   m_AverageLum;
-    int32_t                                 m_LogLumShader;
-    int32_t                                 m_FilterBrightnessShader;
-    int32_t                                 m_BloomHShader;
-    int32_t                                 m_BloomVShader;
-    int32_t                                 m_TonemapShader;
-    int32_t                                 m_MaxMipmapLevel;
+    int32_t                                 m_HDRTex;
+    RenderTarget*                           m_FilterBrightnessRT;
+    int32_t                                 m_FilterBrightnessTex;
+    RenderTarget*                           m_DownsamplerRenderTarget[4];
+    int32_t                                 m_DownsamplerTex[4];
+    shader::UserProgram*                    m_FilterBrightnessShader;
+    int32_t                                 m_FBTexLoc;
+    int32_t                                 m_FBHighBaseLoc;
+    shader::UserProgram*                    m_DownsamplerShader;
+    int32_t                                 m_DSTexLoc;
+    RenderTarget*                           m_BlurRenderTarget[4];
+    int32_t                                 m_BlurTex[4];
+    shader::UserProgram*                    m_BlurHShader;
+    shader::UserProgram*                    m_BlurVShader;
+    int32_t                                 m_BlurHTexLoc;
+    int32_t                                 m_BlurVTexLoc;
+    int32_t                                 m_BlurWidthLoc;
+    int32_t                                 m_BlurHeightLoc;
+    shader::UserProgram*                    m_TonemapShader;
+    int32_t                                 m_TonemapTexLoc;
+    int32_t                                 m_Bloom0TexLoc;
+    int32_t                                 m_Bloom1TexLoc;
+    int32_t                                 m_Bloom2TexLoc;
+    int32_t                                 m_Bloom3TexLoc;
+
     mesh::ScreenMesh*                       m_ScreenMesh;
-    float                                   m_BloomWidth;
-    float                                   m_BloomHeight;
-    float                                   m_ExposureLevel;
-    float                                   m_LightAdaption;
-    float                                   m_PreAverageLum;
-    float                                   m_HighLightBase;
 
     // SSAO
     RenderTarget*                           m_AORenderTarget;
@@ -385,25 +383,27 @@ RenderImp::RenderImp()
 , m_DepthShader(-1)
 
 // HDR
+, m_HightLightBase(1.0f)
 , m_HDRRenderTarget(NULL)
-, m_BloomRenderTarget(NULL)
-, m_HDRSceneTex(-1)
-, m_HighLightSceneTex(-1)
-, m_LogLumTex(-1)
-, m_BloomTex(-1)
-, m_AverageLum(0.0f)
-, m_LogLumShader(-1)
-, m_FilterBrightnessShader(-1)
-, m_BloomHShader(-1)
-, m_BloomVShader(-1)
-, m_TonemapShader(-1)
-, m_MaxMipmapLevel(0)
-, m_BloomWidth(0.0f)
-, m_BloomHeight(0.0f)
-, m_ExposureLevel(0.0f)
-, m_LightAdaption(0.0f)
-, m_PreAverageLum(0.0f)
-, m_HighLightBase(0.0f)
+, m_HDRTex(-1)
+, m_FilterBrightnessRT(NULL)
+, m_FilterBrightnessTex(-1)
+, m_FilterBrightnessShader(NULL)
+, m_FBTexLoc(-1)
+, m_FBHighBaseLoc(-1)
+, m_DownsamplerShader(NULL)
+, m_DSTexLoc(-1)
+, m_BlurHShader(NULL)
+, m_BlurVShader(NULL)
+, m_BlurHTexLoc(-1)
+, m_BlurWidthLoc(-1)
+, m_BlurHeightLoc(-1)
+, m_TonemapShader(NULL)
+, m_TonemapTexLoc(-1)
+, m_Bloom0TexLoc(-1)
+, m_Bloom1TexLoc(-1)
+, m_Bloom2TexLoc(-1)
+, m_Bloom3TexLoc(-1)
 
 // SSAO
 , m_AORenderTarget(NULL)
@@ -425,6 +425,10 @@ RenderImp::RenderImp()
     memset(m_LightSpaceFrustum, 0, sizeof(m_LightSpaceFrustum));
     memset(m_ShadowMatrix, 0, sizeof(m_ShadowMatrix));
     memset(m_ShadowSplitValue, 0, sizeof(m_ShadowSplitValue));
+    memset(m_DownsamplerRenderTarget, 0, sizeof(m_DownsamplerRenderTarget));
+    memset(m_DownsamplerTex, 0, sizeof(m_DownsamplerTex));
+    memset(m_BlurRenderTarget, 0, sizeof(m_BlurRenderTarget));
+    memset(m_BlurTex, 0, sizeof(m_BlurTex));
 }
 
 RenderImp::~RenderImp() {
@@ -471,24 +475,20 @@ void RenderImp::Destroy() {
     m_DepthShader = -1;
 
     // HDR
-    GLB_SAFE_DELETE(m_HDRRenderTarget);
-    GLB_SAFE_DELETE(m_BloomRenderTarget);
-    m_HDRSceneTex = -1;
-    m_HighLightSceneTex = -1;
-    m_LogLumTex = -1;
-    m_BloomTex = -1;
-    m_AverageLum = 0.0f;
-    m_LogLumShader = -1;
-    m_FilterBrightnessShader = -1;
-    m_BloomHShader = -1;
-    m_BloomVShader = -1;
-    m_TonemapShader = -1;
-    m_MaxMipmapLevel = 0;
-    m_BloomWidth = 0.0f;
-    m_BloomHeight = 0.0f;
-    m_ExposureLevel = 0.0f;
-    m_LightAdaption = 0.0f;
-    m_PreAverageLum = 0.0f;
+    GLB_SAFE_DELETE(m_FilterBrightnessRT);
+    GLB_SAFE_DELETE(m_FilterBrightnessShader);
+    m_FilterBrightnessTex = -1;
+    for (int32_t i = 0; i < 4; i++) {
+        GLB_SAFE_DELETE(m_DownsamplerRenderTarget[i]);
+        m_DownsamplerTex[i] = -1;
+    }
+    GLB_SAFE_DELETE(m_DownsamplerShader);
+    for (int32_t i = 0; i < 4; i++) {
+        GLB_SAFE_DELETE(m_BlurRenderTarget[i]);
+        m_BlurTex[i] = -1;
+    }
+    GLB_SAFE_DELETE(m_BlurHShader);
+    GLB_SAFE_DELETE(m_BlurVShader);
 
     // SSAO
     GLB_SAFE_DELETE(m_AORenderTarget);
@@ -505,11 +505,11 @@ void RenderImp::Destroy() {
 
 void RenderImp::Draw() {
     PreDraw();
-    DrawShadowMap();
-    DrawDepthMap();
-    DrawAOMap();
+    //DrawShadowMap();
+    //DrawDepthMap();
+    //DrawAOMap();
     DrawLightLoop();
-    DrawDebug();
+    //DrawDebug();
     DrawHDR();
     AfterDraw();
 
@@ -645,44 +645,12 @@ int32_t RenderImp::GetRandomRotateTex() {
     return m_RandRotateMap;
 }
 
-float RenderImp::GetHDRAverageLum() {
-    return m_AverageLum;
-}
-
-int32_t RenderImp::GetHDRSceneTex() {
-    return m_HDRSceneTex;
-}
-
-float RenderImp::GetBloomWidth() {
-    return m_BloomWidth;
-}
-
-float RenderImp::GetBloomHeight() {
-    return m_BloomHeight;
-}
-
-void RenderImp::SetExposureLevel(float level) {
-    m_ExposureLevel = level;
-}
-
-float RenderImp::GetExposureLevel() {
-    return m_ExposureLevel;
-}
-
-void RenderImp::SetLightAdaption(float adaption) {
-    m_LightAdaption = adaption;
-}
-
-float RenderImp::GetLightAdaption() {
-    return m_LightAdaption;
-}
-
 void RenderImp::SetHighLightBase(float base) {
-    m_HighLightBase = base;
+    m_HightLightBase = base;
 }
 
 float RenderImp::GetHighLightBase() {
-    return m_HighLightBase;
+    return m_HightLightBase;
 }
 
 void RenderImp::AddLine(math::Vector start, math::Vector end, math::Vector color) {
@@ -829,14 +797,11 @@ void RenderImp::DrawDebug() {
 }
 
 void RenderImp::DrawHDR() {
-    DownsamplerHDRScene();
-    CalcLogLum();
-    CalcAverageLum();
     FilterBrightness();
-    BloomH();
-    BloomV();
-    BlendHDRScene();
-} 
+    DownsampleTex();
+    BloomTex();
+    Tonemapping();
+}
 
 void RenderImp::AfterDraw() {
     render::Device::SwapBuffer();
@@ -930,49 +895,51 @@ void RenderImp::PrepareAOMap() {
 }
 
 void RenderImp::PrepareHDR() {
-    // Create hdr render target
-    m_HDRRenderTarget = RenderTarget::Create(static_cast<int32_t>(m_Width), static_cast<int32_t>(m_Height));
-    m_BloomRenderTarget = RenderTarget::Create(static_cast<int32_t>(m_Width / 4.0f), static_cast<int32_t>(m_Height / 4.0f));
-    GLB_SAFE_ASSERT(m_HDRRenderTarget != NULL);
-    GLB_SAFE_ASSERT(m_BloomRenderTarget != NULL);
+    // Create Render Target
+    m_HDRRenderTarget = RenderTarget::Create(m_Width, m_Height);
+    m_HDRTex = texture::Mgr::AddTexture(texture::Texture::CreateFloat32Texture(m_Width, m_Height, false));
+    m_HDRRenderTarget->AttachColorTexture(render::COLORBUF_COLOR_ATTACHMENT0, texture::Mgr::GetTextureById(m_HDRTex));
 
-    // Create hdr texture
-    texture::Texture* hdr_tex = texture::Texture::CreateFloat32Texture(static_cast<int32_t>(m_Width), static_cast<int32_t>(m_Height));
-    texture::Texture* log_lum_tex = texture::Texture::CreateFloat32Texture(static_cast<int32_t>(m_Width / 4.0f), static_cast<int32_t>(m_Height / 4.0f));
-    texture::Texture* bloom_tex = texture::Texture::CreateFloat32Texture(static_cast<int32_t>(m_Width / 4.0f), static_cast<int32_t>(m_Height / 4.0f));
-    if (hdr_tex != NULL && bloom_tex != NULL && log_lum_tex != NULL) {
-        m_HDRSceneTex = texture::Mgr::AddTexture(hdr_tex);
-        m_LogLumTex = texture::Mgr::AddTexture(log_lum_tex);
-        m_BloomTex = texture::Mgr::AddTexture(bloom_tex);
-    } else {
-        GLB_SAFE_ASSERT(false);
+    m_FilterBrightnessRT = RenderTarget::Create(m_Width, m_Height);
+    m_FilterBrightnessTex = texture::Mgr::AddTexture(texture::Texture::CreateFloat32Texture(m_Width, m_Height, false));
+    m_FilterBrightnessRT->AttachColorTexture(render::COLORBUF_COLOR_ATTACHMENT0, texture::Mgr::GetTextureById(m_FilterBrightnessTex));
+
+    for (int32_t i = 0; i < 4; i++) {
+        m_DownsamplerRenderTarget[i] = RenderTarget::Create(static_cast<int32_t>(m_Width / pow(2, i + 1)), static_cast<int32_t>(m_Height / pow(2, i + 1)));
+        m_DownsamplerTex[i] = texture::Mgr::AddTexture(texture::Texture::CreateFloat32Texture(static_cast<int32_t>(m_Width / pow(2, i + 1)), static_cast<int32_t>(m_Height / pow(2, i + 1)), false));
+        m_DownsamplerRenderTarget[i]->AttachColorTexture(render::COLORBUF_COLOR_ATTACHMENT0, texture::Mgr::GetTextureById(m_DownsamplerTex[i]));
     }
 
-    // Setup render target
-    if (m_HDRRenderTarget != NULL && m_BloomRenderTarget != NULL) {
-        m_HDRRenderTarget->AttachColorTexture(COLORBUF_COLOR_ATTACHMENT0, hdr_tex);
-        m_BloomRenderTarget->AttachColorTexture(COLORBUF_COLOR_ATTACHMENT0, log_lum_tex);
-        m_BloomRenderTarget->AttachColorTexture(COLORBUF_COLOR_ATTACHMENT1, bloom_tex);
-    } else {
-        GLB_SAFE_ASSERT(false);
+    for (int32_t i = 0; i < 4; i++) {
+        m_BlurRenderTarget[i] = RenderTarget::Create(static_cast<int32_t>(m_Width / pow(2, i + 1)), static_cast<int32_t>(m_Height / pow(2, i + 1)));
+        m_BlurTex[i] = texture::Mgr::AddTexture(texture::Texture::CreateFloat32Texture(static_cast<int32_t>(m_Width / pow(2, i + 1)), static_cast<int32_t>(m_Height / pow(2, i + 1)), false));
+        m_BlurRenderTarget[i]->AttachColorTexture(render::COLORBUF_COLOR_ATTACHMENT0, texture::Mgr::GetTextureById(m_BlurTex[i]));
     }
 
-    // Max mipmap level
-    m_MaxMipmapLevel = static_cast<int32_t>(floor(log(max(m_Width / 4.0 * 1.0f, m_Height / 4.0 * 1.0f)) / log(2.0f)));
+    // Create Shader
+    m_FilterBrightnessShader = shader::UserProgram::Create("..\\glb\\shader\\brightfilter.vs", "..\\glb\\shader\\brightfilter.fs");
+    m_FBTexLoc = m_FilterBrightnessShader->GetUniformLocation("glb_HDRSceneTex");
+    m_FBHighBaseLoc = m_FilterBrightnessShader->GetUniformLocation("glb_HighLightBase");
 
-    // Bloom size
-    m_BloomWidth = m_Width / 4.0f;
-    m_BloomHeight = m_Height / 4.0f;
+    m_DownsamplerShader = shader::UserProgram::Create("..\\glb\\shader\\downsample.vs", "..\\glb\\shader\\downsample.fs");
+    m_DSTexLoc = m_DownsamplerShader->GetUniformLocation("glb_Tex");
 
-    // Create hdr shader TODO: Use UserShader
-    m_LogLumShader = shader::Mgr::AddUberShader("..\\glb\\shader\\loglum.vs", "..\\glb\\shader\\loglum.fs");
-    m_FilterBrightnessShader = shader::Mgr::AddUberShader("..\\glb\\shader\\brightfilter.vs", "..\\glb\\shader\\brightfilter.fs");
-    m_BloomHShader = shader::Mgr::AddUberShader("..\\glb\\shader\\bloom.vs", "..\\glb\\shader\\bloomh.fs");
-    m_BloomVShader = shader::Mgr::AddUberShader("..\\glb\\shader\\bloom.vs", "..\\glb\\shader\\bloomv.fs");
-    m_TonemapShader = shader::Mgr::AddUberShader("..\\glb\\shader\\tonemap.vs", "..\\glb\\shader\\tonemap.fs");
+    m_BlurHShader = shader::UserProgram::Create("..\\glb\\shader\\bloom.vs", "..\\glb\\shader\\bloomh.fs");
+    m_BlurVShader = shader::UserProgram::Create("..\\glb\\shader\\bloom.vs", "..\\glb\\shader\\bloomv.fs");
+    m_BlurHTexLoc = m_BlurHShader->GetUniformLocation("glb_BloomTex");
+    m_BlurVTexLoc = m_BlurVShader->GetUniformLocation("glb_BloomTex");
+    m_BlurWidthLoc = m_BlurHShader->GetUniformLocation("glb_BloomTexWidth");
+    m_BlurHeightLoc = m_BlurVShader->GetUniformLocation("glb_BloomTexHeight");
+
+    m_TonemapShader = shader::UserProgram::Create("..\\glb\\shader\\tonemap.vs", "..\\glb\\shader\\tonemap.fs");
+    m_TonemapTexLoc = m_TonemapShader->GetUniformLocation("glb_Tex");
+    m_Bloom0TexLoc = m_TonemapShader->GetUniformLocation("glb_BloomTex[0]");
+    m_Bloom1TexLoc = m_TonemapShader->GetUniformLocation("glb_BloomTex[1]");
+    m_Bloom2TexLoc = m_TonemapShader->GetUniformLocation("glb_BloomTex[2]");
+    m_Bloom3TexLoc = m_TonemapShader->GetUniformLocation("glb_BloomTex[3]");
 
     // Create screen mesh
-    m_ScreenMesh = mesh::ScreenMesh::Create(static_cast<int32_t>(m_Width), static_cast<int32_t>(m_Height));
+    m_ScreenMesh = mesh::ScreenMesh::Create();
 }
 
 void RenderImp::PrepareEnvMap() {
@@ -1632,7 +1599,7 @@ void RenderImp::DrawLightLoopCore() {
     render::Device::SetDrawColorBuffer(render::COLORBUF_COLOR_ATTACHMENT0);
 
     // Clear
-    render::Device::SetClearColor(1.0f, 1.0f, 1.0f);
+    render::Device::SetClearColor(0.0f, 0.0f, 0.0f);
     render::Device::SetClearDepth(1.0f);
     render::Device::Clear(CLEAR_COLOR | CLEAR_DEPTH);
 
@@ -1689,6 +1656,9 @@ void RenderImp::DrawLightLoopCore() {
             }
             if (obj->GetModel()->HasNormalTexture()) {
                 render::Device::SetTexture(render::TS_NORMAL, texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(scene::Model::MT_NORMAL)), texUnit++);
+            }
+            if (obj->GetModel()->HasEmissionTexture()) {
+                render::Device::SetTexture(render::TS_EMISSION, texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(scene::Model::MT_EMISSION)), texUnit++);
             }
             if (obj->GetModel()->HasReflectTexture()) {
                 render::Device::SetTexture(render::TS_REFLECT, texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(scene::Model::MT_REFLECT)), texUnit++);
@@ -1747,304 +1717,209 @@ void RenderImp::DrawLightLoopCore() {
     render::Device::SetRenderTarget(0);
 }
 
-void RenderImp::DownsamplerHDRScene() {
-    texture::Mgr::GetTextureById(m_HDRSceneTex)->GenerateMipmap();
-}
-
-void RenderImp::CalcLogLum() {
-    // Change viewport to match render target
-    render::Device::SetViewport(0, 0, m_Width / 4, m_Height / 4);
-
-    // Render Target
-    render::Device::SetRenderTarget(m_BloomRenderTarget);
-
-    // Draw Buffer
-    render::Device::SetDrawColorBuffer(render::COLORBUF_COLOR_ATTACHMENT0);
-
-    // Clear
-    render::Device::SetClearColor(0.0f, 0.0f, 0.0f);
-    render::Device::SetClearDepth(1.0f);
-    render::Device::Clear(CLEAR_COLOR | CLEAR_DEPTH);
-
-    // Shader
-    shader::UberProgram* program = static_cast<shader::UberProgram*>(shader::Mgr::GetShader(m_LogLumShader));
-    render::Device::SetShader(program);
-    render::Device::SetShaderLayout(program->GetShaderLayout());
-
-    // Set texture
-    render::Device::ClearTexture();
-    render::Device::SetTexture(render::TS_HDRSCENE, texture::Mgr::GetTextureById(m_HDRSceneTex), 0);
-
-    // Scene uniforms
-    std::vector<uniform::UniformEntry> uniforms = program->GetUniforms();
-    for (int32_t j = 0; j < static_cast<int32_t>(uniforms.size()); j++) {
-        uniform::UniformEntry entry = uniforms[j];
-        if (entry.flag) {
-            // TODO: for now, id is the index of the uniform picker table
-            uniform::Wrapper uniform_wrapper = uniform::kUniformPickers[entry.id].picker(NULL);
-            SetUniform(entry.location, uniform_wrapper);
-        }
-    }
-
-    // Vertex Buffer
-    VertexLayout layout = m_ScreenMesh->GetVertexLayout();
-    int32_t num = m_ScreenMesh->GetVertexNum();
-    render::Device::SetVertexBuffer(m_ScreenMesh->GetVertexBuffer());
-    render::Device::SetVertexLayout(layout);
-
-    // Render State
-    render::Device::SetDepthTestEnable(false);
-    render::Device::SetCullFaceEnable(true);
-    render::Device::SetCullFaceMode(render::CULL_BACK);
-
-    // Draw
-    render::Device::Draw(render::PT_TRIANGLES, 0, num);
-
-    // Reset render target
-    render::Device::SetRenderTarget(0);
-
-    // Reset viewport
-    render::Device::SetViewport(0, 0, m_Width, m_Height);
-}
-
-void RenderImp::CalcAverageLum() {
-    texture::Texture* tex = texture::Mgr::GetTextureById(m_LogLumTex);
-    tex->GenerateMipmap();
-
-    float pixel[4];
-    memset(pixel, 0, sizeof(pixel));
-    tex->GetTextureData(pixel, m_MaxMipmapLevel);
-
-    float cur_scene_average_lum = exp(pixel[0]) - 0.0001f;
-    if (m_LightAdaption > 0.0f) {
-        m_AverageLum = m_PreAverageLum + m_LightAdaption;
-        if (m_AverageLum >= cur_scene_average_lum) {
-            m_AverageLum = cur_scene_average_lum;
-        }
-        m_PreAverageLum = m_AverageLum;
-    } else {
-        m_AverageLum = cur_scene_average_lum;
-    }
-}
-
 void RenderImp::FilterBrightness() {
-    // Change viewport to match render target
-    render::Device::SetViewport(0, 0, m_Width / 4, m_Height / 4);
-
     // Render Target
-    render::Device::SetRenderTarget(m_BloomRenderTarget);
+    render::Device::SetRenderTarget(m_FilterBrightnessRT);
+
+    // Viewport
+    render::Device::SetViewport(0, 0, m_FilterBrightnessRT->GetWidth(), m_FilterBrightnessRT->GetHeight());
 
     // Draw Buffer
     render::Device::SetDrawColorBuffer(render::COLORBUF_COLOR_ATTACHMENT0);
 
     // Clear
-    render::Device::SetClearColor(0.0f, 0.0f, 0.0f);
     render::Device::SetClearDepth(1.0f);
+    render::Device::SetClearColor(0.0f, 0.0f, 0.0f);
     render::Device::Clear(CLEAR_COLOR | CLEAR_DEPTH);
 
     // Shader
-    shader::UberProgram* program = static_cast<shader::UberProgram*>(shader::Mgr::GetShader(m_FilterBrightnessShader));
-    render::Device::SetShader(program);
-    render::Device::SetShaderLayout(program->GetShaderLayout());
+    render::Device::SetShader(m_FilterBrightnessShader);
+    render::Device::SetShaderLayout(m_FilterBrightnessShader->GetShaderLayout());
 
-    // Set texture
-    render::Device::ClearTexture();
-    render::Device::SetTexture(render::TS_HDRSCENE, texture::Mgr::GetTextureById(m_HDRSceneTex), 0);
-
-    // Scene uniforms
-    std::vector<uniform::UniformEntry> uniforms = program->GetUniforms();
-    for (int32_t j = 0; j < static_cast<int32_t>(uniforms.size()); j++) {
-        uniform::UniformEntry entry = uniforms[j];
-        if (entry.flag) {
-            // TODO: for now, id is the index of the uniform picker table
-            uniform::Wrapper uniform_wrapper = uniform::kUniformPickers[entry.id].picker(NULL);
-            SetUniform(entry.location, uniform_wrapper);
-        }
-    }
-
-    // Vertex Buffer
-    VertexLayout layout = m_ScreenMesh->GetVertexLayout();
-    int32_t num = m_ScreenMesh->GetVertexNum();
+    // Vertex
     render::Device::SetVertexBuffer(m_ScreenMesh->GetVertexBuffer());
-    render::Device::SetVertexLayout(layout);
+    render::Device::SetVertexLayout(m_ScreenMesh->GetVertexLayout());
 
-    // Render State
-    render::Device::SetDepthTestEnable(false);
-    render::Device::SetCullFaceEnable(true);
-    render::Device::SetCullFaceMode(render::CULL_BACK);
+    // Texture
+    render::Device::ClearTexture();
+    render::Device::SetTexture(0, texture::Mgr::GetTextureById(m_HDRTex), 0);
+
+    // Uniform
+    render::Device::SetUniformSampler2D(m_FBTexLoc, 0);
+    render::Device::SetUniform1f(m_FBHighBaseLoc, m_HightLightBase);
 
     // Draw
-    render::Device::Draw(render::PT_TRIANGLES, 0, num);
+    render::Device::Draw(render::PT_TRIANGLES, 0, m_ScreenMesh->GetVertexNum());
 
-    // Reset render target
-    render::Device::SetRenderTarget(0);
-
-    // Reset viewport
+    render::Device::SetRenderTarget(render::RenderTarget::DefaultRenderTarget());
     render::Device::SetViewport(0, 0, m_Width, m_Height);
 }
 
-void RenderImp::DownsamplerBrightness() {
-    texture::Mgr::GetTextureById(m_HighLightSceneTex)->GenerateMipmap();
-}
+void RenderImp::DownsampleTex() {
+    for (int32_t i = 0; i < 4; i++) {
+        // Render Target
+        render::Device::SetRenderTarget(m_DownsamplerRenderTarget[i]);
 
-void RenderImp::BloomH() {
-    // Change viewport to match render target
-    render::Device::SetViewport(0, 0, m_Width / 4, m_Height / 4);
+        // Viewport
+        render::Device::SetViewport(0, 0, m_DownsamplerRenderTarget[i]->GetWidth(), m_DownsamplerRenderTarget[i]->GetHeight());
 
-    // Render Target
-    render::Device::SetRenderTarget(m_BloomRenderTarget);
+        // Draw Buffer
+        render::Device::SetDrawColorBuffer(render::COLORBUF_COLOR_ATTACHMENT0);
 
-    // Draw Buffer
-    render::Device::SetDrawColorBuffer(render::COLORBUF_COLOR_ATTACHMENT1);
+        // Clear
+        render::Device::SetClearDepth(1.0f);
+        render::Device::SetClearColor(0.0f, 0.0f, 0.0f);
+        render::Device::Clear(CLEAR_COLOR | CLEAR_DEPTH);
 
-    // Clear
-    render::Device::SetClearColor(0.0f, 0.0f, 0.0f);
-    render::Device::SetClearDepth(1.0f);
-    render::Device::Clear(CLEAR_COLOR | CLEAR_DEPTH);
+        // Shader
+        render::Device::SetShader(m_DownsamplerShader);
+        render::Device::SetShaderLayout(m_DownsamplerShader->GetShaderLayout());
 
-    // Shader
-    shader::UberProgram* program = static_cast<shader::UberProgram*>(shader::Mgr::GetShader(m_BloomHShader));
-    render::Device::SetShader(program);
-    render::Device::SetShaderLayout(program->GetShaderLayout());
+        // Vertex
+        render::Device::SetVertexBuffer(m_ScreenMesh->GetVertexBuffer());
+        render::Device::SetVertexLayout(m_ScreenMesh->GetVertexLayout());
 
-    // Set texture
-    render::Device::ClearTexture();
-    render::Device::SetTexture(render::TS_LOG_LUM, texture::Mgr::GetTextureById(m_LogLumTex), 0);
-
-    // Scene uniforms
-    std::vector<uniform::UniformEntry> uniforms = program->GetUniforms();
-    for (int32_t j = 0; j < static_cast<int32_t>(uniforms.size()); j++) {
-        uniform::UniformEntry entry = uniforms[j];
-        if (entry.flag) {
-            // TODO: for now, id is the index of the uniform picker table
-            uniform::Wrapper uniform_wrapper = uniform::kUniformPickers[entry.id].picker(NULL);
-            SetUniform(entry.location, uniform_wrapper);
+        // Texture
+        render::Device::ClearTexture();
+        if (i == 0) {
+            render::Device::SetTexture(0, texture::Mgr::GetTextureById(m_FilterBrightnessTex), 0);
+        } else {
+            render::Device::SetTexture(0, texture::Mgr::GetTextureById(m_DownsamplerTex[i - 1]), 0);
         }
+
+        // Uniform
+        render::Device::SetUniformSampler2D(m_DSTexLoc, 0);
+
+        // Draw
+        render::Device::Draw(render::PT_TRIANGLES, 0, m_ScreenMesh->GetVertexNum());
     }
 
-    // Vertex Buffer
-    VertexLayout layout = m_ScreenMesh->GetVertexLayout();
-    int32_t num = m_ScreenMesh->GetVertexNum();
-    render::Device::SetVertexBuffer(m_ScreenMesh->GetVertexBuffer());
-    render::Device::SetVertexLayout(layout);
-
-    // Render State
-    render::Device::SetDepthTestEnable(false);
-    render::Device::SetCullFaceEnable(true);
-    render::Device::SetCullFaceMode(render::CULL_BACK);
-
-    // Draw
-    render::Device::Draw(render::PT_TRIANGLES, 0, num);
-
-    // Reset render target
-    render::Device::SetRenderTarget(0);
-
-    // Reset viewport
+    render::Device::SetRenderTarget(render::RenderTarget::DefaultRenderTarget());
     render::Device::SetViewport(0, 0, m_Width, m_Height);
 }
 
-void RenderImp::BloomV() {
-    // Change viewport to match render target
-    render::Device::SetViewport(0, 0, m_Width / 4, m_Height / 4);
+void RenderImp::BloomTex() {
+    BloomVTex();
+    BloomHTex();
+}
 
-    // Render Target
-    render::Device::SetRenderTarget(m_BloomRenderTarget);
+void RenderImp::BloomVTex() {
+    for (int32_t i = 0; i < 4; i++) {
+        // Render Target
+        render::Device::SetRenderTarget(m_BlurRenderTarget[i]);
 
-    // Draw Buffer
-    render::Device::SetDrawColorBuffer(render::COLORBUF_COLOR_ATTACHMENT0);
+        // Viewport
+        render::Device::SetViewport(0, 0, m_BlurRenderTarget[i]->GetWidth(), m_BlurRenderTarget[i]->GetHeight());
 
-    // Clear
-    render::Device::SetClearColor(0.0f, 0.0f, 0.0f);
-    render::Device::SetClearDepth(1.0f);
-    render::Device::Clear(CLEAR_COLOR | CLEAR_DEPTH);
+        // Draw Buffer
+        render::Device::SetDrawColorBuffer(render::COLORBUF_COLOR_ATTACHMENT0);
 
-    // Shader
-    shader::UberProgram* program = static_cast<shader::UberProgram*>(shader::Mgr::GetShader(m_BloomVShader));
-    render::Device::SetShader(program);
-    render::Device::SetShaderLayout(program->GetShaderLayout());
+        // Clear
+        render::Device::SetClearDepth(1.0f);
+        render::Device::SetClearColor(0.0f, 0.0f, 0.0f);
+        render::Device::Clear(CLEAR_COLOR | CLEAR_DEPTH);
 
-    // Set texture
-    render::Device::ClearTexture();
-    render::Device::SetTexture(render::TS_HDR_BLOOM, texture::Mgr::GetTextureById(m_BloomTex), 0);
+        // Shader
+        render::Device::SetShader(m_BlurVShader);
+        render::Device::SetShaderLayout(m_BlurVShader->GetShaderLayout());
 
-    // Scene uniforms
-    std::vector<uniform::UniformEntry> uniforms = program->GetUniforms();
-    for (int32_t j = 0; j < static_cast<int32_t>(uniforms.size()); j++) {
-        uniform::UniformEntry entry = uniforms[j];
-        if (entry.flag) {
-            // TODO: for now, id is the index of the uniform picker table
-            uniform::Wrapper uniform_wrapper = uniform::kUniformPickers[entry.id].picker(NULL);
-            SetUniform(entry.location, uniform_wrapper);
-        }
+        // Vertex
+        render::Device::SetVertexBuffer(m_ScreenMesh->GetVertexBuffer());
+        render::Device::SetVertexLayout(m_ScreenMesh->GetVertexLayout());
+
+        // Texture
+        render::Device::ClearTexture();
+        render::Device::SetTexture(0, texture::Mgr::GetTextureById(m_DownsamplerTex[i]), 0);
+
+        // Uniform
+        render::Device::SetUniformSampler2D(m_BlurVTexLoc, 0);
+        render::Device::SetUniform1f(m_BlurHeightLoc, m_BlurRenderTarget[i]->GetHeight());
+
+        // Draw
+        render::Device::Draw(render::PT_TRIANGLES, 0, m_ScreenMesh->GetVertexNum());
     }
 
-    // Vertex Buffer
-    VertexLayout layout = m_ScreenMesh->GetVertexLayout();
-    int32_t num = m_ScreenMesh->GetVertexNum();
-    render::Device::SetVertexBuffer(m_ScreenMesh->GetVertexBuffer());
-    render::Device::SetVertexLayout(layout);
-
-    // Render State
-    render::Device::SetDepthTestEnable(false);
-    render::Device::SetCullFaceEnable(true);
-    render::Device::SetCullFaceMode(render::CULL_BACK);
-
-    // Draw
-    render::Device::Draw(render::PT_TRIANGLES, 0, num);
-
-    // Reset render target
-    render::Device::SetRenderTarget(0);
-
-    // Reset viewport
+    render::Device::SetRenderTarget(render::RenderTarget::DefaultRenderTarget());
     render::Device::SetViewport(0, 0, m_Width, m_Height);
 }
 
-void RenderImp::BlendHDRScene() {
+void RenderImp::BloomHTex() {
+    for (int32_t i = 0; i < 4; i++) {
+        // Render Target
+        render::Device::SetRenderTarget(m_DownsamplerRenderTarget[i]);
+
+        // Viewport
+        render::Device::SetViewport(0, 0, m_DownsamplerRenderTarget[i]->GetWidth(), m_DownsamplerRenderTarget[i]->GetHeight());
+
+        // Draw Buffer
+        render::Device::SetDrawColorBuffer(render::COLORBUF_COLOR_ATTACHMENT0);
+
+        // Clear
+        render::Device::SetClearDepth(1.0f);
+        render::Device::SetClearColor(0.0f, 0.0f, 0.0f);
+        render::Device::Clear(CLEAR_COLOR | CLEAR_DEPTH);
+
+        // Shader
+        render::Device::SetShader(m_BlurHShader);
+        render::Device::SetShaderLayout(m_BlurHShader->GetShaderLayout());
+
+        // Vertex
+        render::Device::SetVertexBuffer(m_ScreenMesh->GetVertexBuffer());
+        render::Device::SetVertexLayout(m_ScreenMesh->GetVertexLayout());
+
+        // Texture
+        render::Device::ClearTexture();
+        render::Device::SetTexture(0, texture::Mgr::GetTextureById(m_BlurTex[i]), 0);
+
+        // Uniform
+        render::Device::SetUniformSampler2D(m_BlurHTexLoc, 0);
+        render::Device::SetUniform1f(m_BlurWidthLoc, m_DownsamplerRenderTarget[i]->GetWidth());
+
+        // Draw
+        render::Device::Draw(render::PT_TRIANGLES, 0, m_ScreenMesh->GetVertexNum());
+    }
+
+    render::Device::SetRenderTarget(render::RenderTarget::DefaultRenderTarget());
+    render::Device::SetViewport(0, 0, m_Width, m_Height);
+}
+
+void RenderImp::Tonemapping() {
     // Render Target
-    render::Device::SetRenderTarget(0);
+    render::Device::SetRenderTarget(render::RenderTarget::DefaultRenderTarget());
 
     // Clear
-    render::Device::SetClearColor(0.0f, 0.0f, 0.0f);
     render::Device::SetClearDepth(1.0f);
+    render::Device::SetClearColor(0.0f, 0.0f, 0.0f);
     render::Device::Clear(CLEAR_COLOR | CLEAR_DEPTH);
 
     // Shader
-    shader::UberProgram* program = static_cast<shader::UberProgram*>(shader::Mgr::GetShader(m_TonemapShader));
-    render::Device::SetShader(program);
-    render::Device::SetShaderLayout(program->GetShaderLayout());
+    render::Device::SetShader(m_TonemapShader);
+    render::Device::SetShaderLayout(m_TonemapShader->GetShaderLayout());
 
-    // Set texture
-    render::Device::ClearTexture();
-    render::Device::SetTexture(render::TS_LOG_LUM, texture::Mgr::GetTextureById(m_LogLumTex), 0);
-    render::Device::SetTexture(render::TS_HDRSCENE, texture::Mgr::GetTextureById(m_HDRSceneTex), 1);
-
-    // Scene uniforms
-    std::vector<uniform::UniformEntry> uniforms = program->GetUniforms();
-    for (int32_t j = 0; j < static_cast<int32_t>(uniforms.size()); j++) {
-        uniform::UniformEntry entry = uniforms[j];
-        if (entry.flag) {
-            // TODO: for now, id is the index of the uniform picker table
-            uniform::Wrapper uniform_wrapper = uniform::kUniformPickers[entry.id].picker(NULL);
-            SetUniform(entry.location, uniform_wrapper);
-        }
-    }
-
-    // Vertex Buffer
-    VertexLayout layout = m_ScreenMesh->GetVertexLayout();
-    int32_t num = m_ScreenMesh->GetVertexNum();
+    // Vertex
     render::Device::SetVertexBuffer(m_ScreenMesh->GetVertexBuffer());
-    render::Device::SetVertexLayout(layout);
+    render::Device::SetVertexLayout(m_ScreenMesh->GetVertexLayout());
 
-    // Render State
-    render::Device::SetDepthTestEnable(false);
-    render::Device::SetCullFaceEnable(true);
-    render::Device::SetCullFaceMode(render::CULL_BACK);
+    // Texture
+    render::Device::ClearTexture();
+    render::Device::SetTexture(0, texture::Mgr::GetTextureById(m_HDRTex), 0);
+    render::Device::SetTexture(1, texture::Mgr::GetTextureById(m_DownsamplerTex[0]), 1);
+    render::Device::SetTexture(2, texture::Mgr::GetTextureById(m_DownsamplerTex[1]), 2);
+    render::Device::SetTexture(3, texture::Mgr::GetTextureById(m_DownsamplerTex[2]), 3);
+    render::Device::SetTexture(4, texture::Mgr::GetTextureById(m_DownsamplerTex[3]), 4);
+
+    // Uniform
+    render::Device::SetUniformSampler2D(m_TonemapTexLoc, 0);
+    render::Device::SetUniformSampler2D(m_Bloom0TexLoc, 1);
+    render::Device::SetUniformSampler2D(m_Bloom1TexLoc, 2);
+    render::Device::SetUniformSampler2D(m_Bloom2TexLoc, 3);
+    render::Device::SetUniformSampler2D(m_Bloom3TexLoc, 4);
 
     // Draw
-    render::Device::Draw(render::PT_TRIANGLES, 0, num);
+    render::Device::Draw(render::PT_TRIANGLES, 0, m_ScreenMesh->GetVertexNum());
 
-    // Reset render target
-    render::Device::SetRenderTarget(0);
+    render::Device::SetRenderTarget(render::RenderTarget::DefaultRenderTarget());
+    render::Device::SetViewport(0, 0, m_Width, m_Height);
 }
 
 void RenderImp::DrawDepthMap() {
@@ -2540,94 +2415,6 @@ int32_t Render::GetRandomRotateTex() {
 
     if (s_RenderImp != NULL) {
         result = s_RenderImp->GetRandomRotateTex();
-    } else {
-        GLB_SAFE_ASSERT(false);
-    }
-
-    return result;
-}
-
-float Render::GetHDRAverageLum() {
-    float result = 0.0f;
-
-    if (s_RenderImp != NULL) {
-        result = s_RenderImp->GetHDRAverageLum();
-    } else {
-        GLB_SAFE_ASSERT(false);
-    }
-
-    return result;
-}
-
-int32_t Render::GetHDRSceneTex() {
-    int32_t result = -1;
-
-    if (s_RenderImp != NULL) {
-        result = s_RenderImp->GetHDRSceneTex();
-    } else {
-        GLB_SAFE_ASSERT(false);
-    }
-
-    return result;
-}
-
-float Render::GetBloomWidth() {
-    float result = 0.0f;
-
-    if (s_RenderImp != NULL) {
-        result = s_RenderImp->GetBloomWidth();
-    } else {
-        GLB_SAFE_ASSERT(false);
-    }
-
-    return result;
-}
-
-float Render::GetBloomHeight() {
-    float result = 0.0f;
-
-    if (s_RenderImp != NULL) {
-        result = s_RenderImp->GetBloomHeight();
-    } else {
-        GLB_SAFE_ASSERT(false);
-    }
-
-    return result;
-}
-
-void Render::SetExposureLevel(float level) {
-    if (s_RenderImp != NULL) {
-        s_RenderImp->SetExposureLevel(level);
-    } else {
-        GLB_SAFE_ASSERT(false);
-    }
-}
-
-float Render::GetExposureLevel() {
-    float result = 0.0f;
-
-    if (s_RenderImp != NULL) {
-        result = s_RenderImp->GetExposureLevel();
-    } else {
-        GLB_SAFE_ASSERT(false);
-    }
-
-    return result;
-}
-
-void Render::SetLightAdaption(float adaption) {
-    if (s_RenderImp != NULL) {
-        s_RenderImp->SetLightAdaption(adaption);
-    } else {
-        GLB_SAFE_ASSERT(false);
-    }
-}
-
-float Render::GetLightAdaption() {
-    float result = 0.0f;
-
-    if (s_RenderImp != NULL) {
-        result = s_RenderImp->GetLightAdaption();
     } else {
         GLB_SAFE_ASSERT(false);
     }

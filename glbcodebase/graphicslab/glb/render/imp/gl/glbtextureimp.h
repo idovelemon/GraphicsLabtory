@@ -39,19 +39,19 @@ public:
     Imp();
     virtual ~Imp();
 
-    static Imp* Create(const char* texture_name);
-    static Imp* CreatePrefilterCubeMap(const char* texture_name);
+    static Imp* Create(const char* texture_name, bool enableMipmapping = true);
+    static Imp* CreatePrefilterCubeMap(const char* textureName);
     static Imp* CreatePrefilterTableMap(const char* textureName);
-    static Imp* Create(int32_t width, int32_t height);
-    static Imp* CreateFloat32Texture(int32_t width, int32_t height);
-    static Imp* CreateFloat32DepthTexture(int32_t width, int32_t height);
-    static Imp* CreateFloat32CubeTexture(int32_t width, int32_t height);
-    static Imp* CreateFloat16CubeTexture(int32_t width, int32_t height);
-    static Imp* CreateFloat323DTexture(int32_t width, int32_t height, int32_t depth);
+    static Imp* Create(int32_t width, int32_t height, bool enableMipmapping = true);
+    static Imp* CreateFloat32Texture(int32_t width, int32_t height, bool enableMipmapping = true);
+    static Imp* CreateFloat32DepthTexture(int32_t width, int32_t height, bool enableMipmapping = true);
+    static Imp* CreateFloat32CubeTexture(int32_t width, int32_t height, bool enableMipmapping = true);
+    static Imp* CreateFloat16CubeTexture(int32_t width, int32_t height, bool enableMipmapping = true);
+    static Imp* CreateFloat323DTexture(int32_t width, int32_t height, int32_t depth, bool enableMipmapping = true);
 
 protected:
-    static void CreateGLTexture2D(int32_t tex_obj, int32_t width, int32_t height, int8_t* texture_data, int32_t texture_pixel_format);
-    static void CreateGLTextureCube(int32_t tex_obj, int32_t width, int32_t height, int8_t* texture_data, int32_t texture_pixel_format);
+    static void CreateGLTexture2D(int32_t tex_obj, int32_t width, int32_t height, int8_t* texture_data, int32_t texture_pixel_format, bool enableMipmapping);
+    static void CreateGLTextureCube(int32_t tex_obj, int32_t width, int32_t height, int8_t* texture_data, int32_t texture_pixel_format, bool enableMipmapping);
     static void SetTexturePixelFormat(Texture::Imp* texture, int32_t texture_pixel_format);
 
 public:

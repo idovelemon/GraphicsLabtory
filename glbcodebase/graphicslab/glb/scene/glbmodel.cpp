@@ -73,6 +73,7 @@ Model* Model::Create(const char* fileName) {
         int32_t metallicTex = -1;
         int32_t alphaTex = -1;
         int32_t normalTex = -1;
+        int32_t emissionTex = -1;
         int32_t diffusePFCTex = -1;
         int32_t specularPFCTex = -1;
         int32_t material = -1;
@@ -124,6 +125,11 @@ Model* Model::Create(const char* fileName) {
                 normalTex = render::texture::Mgr::LoadTexture(normalTexPath.c_str());
             }
 
+            if (effectParam.hasEmissionTex) {
+                std::string emissionTexPath = dir + materialParam.emissionTexName;
+                emissionTex = render::texture::Mgr::LoadTexture(emissionTexPath.c_str());
+            }
+
             if (effectParam.hasDiffusePFCTex) {
                 std::string diffusePFCTexPath = dir + materialParam.diffusePFCTexName;
                 diffusePFCTex = render::texture::Mgr::LoadPFCTexture(diffusePFCTexPath.c_str());
@@ -169,6 +175,9 @@ Model* Model::Create(const char* fileName) {
         }
         if (effectParam.hasNormalTex) {
             model->m_Tex[MT_NORMAL] = normalTex;
+        }
+        if (effectParam.hasEmissionTex) {
+            model->m_Tex[MT_EMISSION] = emissionTex;
         }
         if (effectParam.hasDiffusePFCTex) {
             model->m_Tex[MT_DIFFUSE_PFC] = diffusePFCTex;
@@ -234,6 +243,10 @@ bool Model::HasAlphaTexture() const {
 
 bool Model::HasNormalTexture() const {
     return m_ModelEffectParam.hasNormalTex;
+}
+
+bool Model::HasEmissionTexture() const {
+    return m_ModelEffectParam.hasEmissionTex;
 }
 
 bool Model::HasReflectTexture() const {

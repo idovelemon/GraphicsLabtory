@@ -248,6 +248,14 @@ int32_t ObjModelFile::ExtractModelData(
                     int32_t len = strlen(buffer);
                     memcpy(materialParam.normalTexName, buffer, len);
                     materialParam.normalTexName[len] = '\0';
+                } else if (!strcmp(prefix, "temission")) {
+                    // Emission texture
+                    input >> buffer;
+                    effectParam.hasEmissionTex = true;
+
+                    int32_t len = strlen(buffer);
+                    memcpy(materialParam.emissionTexName, buffer, len);
+                    materialParam.emissionTexName[len] = '\0';
                 } else if (!strcmp(prefix, "tdiffusepfc")) {
                     // Diffuse Prefilter CubeMap texture
                     input >> buffer;

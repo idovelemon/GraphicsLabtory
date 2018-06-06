@@ -56,15 +56,15 @@ public:
     Texture();
     virtual ~Texture();
 
-    static Texture* Create(const char* texture_name);
+    static Texture* Create(const char* texture_name, bool enableMipmapping = true);
     static Texture* CreatePrefilterCubeMap(const char* textureName);
     static Texture* CreatePrefilterTableMap(const char* textureName);
-    static Texture* Create(int32_t width, int32_t height);
-    static Texture* CreateFloat32Texture(int32_t width, int32_t height);
-    static Texture* CreateFloat32DepthTexture(int32_t width, int32_t height);
-    static Texture* CreateFloat32CubeTexture(int32_t width, int32_t height);
-    static Texture* CreateFloat16CubeTexture(int32_t width, int32_t height);
-    static Texture* CreateFloat323DTexture(int32_t width, int32_t height, int32_t depth);
+    static Texture* Create(int32_t width, int32_t height, bool enableMipmapping = true);
+    static Texture* CreateFloat32Texture(int32_t width, int32_t height, bool enableMipmapping = true);
+    static Texture* CreateFloat32DepthTexture(int32_t width, int32_t height, bool enableMipmapping = true);
+    static Texture* CreateFloat32CubeTexture(int32_t width, int32_t height, bool enableMipmapping = true);
+    static Texture* CreateFloat16CubeTexture(int32_t width, int32_t height, bool enableMipmapping = true);
+    static Texture* CreateFloat323DTexture(int32_t width, int32_t height, int32_t depth, bool enableMipmapping = true);
 
 public:
     int32_t GetID();

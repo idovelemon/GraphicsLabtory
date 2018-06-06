@@ -29,6 +29,7 @@ public:
     , hasMetallicTex(false)
     , hasAlphaTex(false)
     , hasNormalTex(false)
+    , hasEmissionTex(false)
     , hasDiffusePFCTex(false)
     , hasSpecularPFCTex(false)
     , hasTexcoord(false)
@@ -50,6 +51,7 @@ public:
     bool    hasMetallicTex;
     bool    hasAlphaTex;
     bool    hasNormalTex;
+    bool    hasEmissionTex;
     bool    hasDiffusePFCTex;
     bool    hasSpecularPFCTex;
     bool    hasTexcoord;
@@ -80,6 +82,7 @@ public:
         memset(metallicTexName, 0, sizeof(metallicTexName));
         memset(alphaTexName, 0, sizeof(alphaTexName));
         memset(normalTexName, 0, sizeof(normalTexName));
+        memset(emissionTexName, 0, sizeof(emissionTexName));
         memset(diffusePFCTexName, 0, sizeof(diffusePFCTexName));
         memset(specularPFCTexName, 0, sizeof(specularPFCTexName));
     }
@@ -101,6 +104,7 @@ public:
     char         metallicTexName[render::texture::kMaxTexNameLen];
     char         alphaTexName[render::texture::kMaxTexNameLen];
     char         normalTexName[render::texture::kMaxTexNameLen];
+    char         emissionTexName[render::texture::kMaxTexNameLen];
     char         diffusePFCTexName[render::texture::kMaxTexNameLen];
     char         specularPFCTexName[render::texture::kMaxTexNameLen];
     math::Vector boundboxMin;

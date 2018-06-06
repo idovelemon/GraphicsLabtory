@@ -41,6 +41,7 @@ enum {
     GLB_METALLICTEX,
     GLB_ALPHATEX,
     GLB_NORMALTEX,
+    GLB_EMISSIONTEX,
     GLB_REFLECT_TEX,
     GLB_SHADOWTEX0,
     GLB_SHADOWTEX1,
@@ -62,12 +63,6 @@ enum {
     GLB_GLOBALLIGHT_AMBIENT,
     GLB_PARALLELLIGHT_DIR,
     GLB_PARALLELLIGHT,
-    GLB_HDR_AVERAGE_LUM,
-    GLB_HDR_SCENE_TEX,
-    GLB_LOG_LUM_TEX,
-    GLB_BLOOM_TEX_WIDTH,
-    GLB_BLOOM_TEX_HEIGHT,
-    GLB_HDR_BLOOM_TEX,
     GLB_FAR_CLIP,
     GLB_SCREEN_WIDTH,
     GLB_SCREEN_HEIGHT,
@@ -75,8 +70,6 @@ enum {
     GLB_RANDOM_ROTATE_TEX,
     GLB_AO_TEX,
     GLB_BIBLUR_TEX,
-    GLB_EXPOSURE_LEVEL,
-    GLB_HIGH_LIGHT_BASE,
 };
 
 // Uniform table
@@ -102,6 +95,7 @@ static const struct {
     {"glb_MetallicTex",                     GLB_METALLICTEX,                    0},
     {"glb_AlphaTex",                        GLB_ALPHATEX,                       0},
     {"glb_NormalTex",                       GLB_NORMALTEX,                      0},
+    {"glb_EmissionTex",                     GLB_EMISSIONTEX,                    0},
     {"glb_ReflectTex",                      GLB_REFLECT_TEX,                    0},
     {"glb_ShadowTex0",                      GLB_SHADOWTEX0,                     0},
     {"glb_ShadowTex1",                      GLB_SHADOWTEX1,                     0},
@@ -123,12 +117,6 @@ static const struct {
     {"glb_GlobalLight_Ambient",             GLB_GLOBALLIGHT_AMBIENT,            1},
     {"glb_ParallelLight_Dir",               GLB_PARALLELLIGHT_DIR,              1},
     {"glb_ParallelLight",                   GLB_PARALLELLIGHT,                  1},
-    {"glb_AverageLum",                      GLB_HDR_AVERAGE_LUM,                1},
-    {"glb_HDRSceneTex",                     GLB_HDR_SCENE_TEX,                  1},
-    {"glb_LogLumTex",                       GLB_LOG_LUM_TEX,                    1},
-    {"glb_BloomTexWidth",                   GLB_BLOOM_TEX_WIDTH,                1},
-    {"glb_BloomTexHeight",                  GLB_BLOOM_TEX_HEIGHT,               1},
-    {"glb_Bloom",                           GLB_HDR_BLOOM_TEX,                  1},
     {"glb_FarClip",                         GLB_FAR_CLIP,                       1},
     {"glb_ScreenWidth",                     GLB_SCREEN_WIDTH,                   1},
     {"glb_ScreenHeight",                    GLB_SCREEN_HEIGHT,                  1},
@@ -136,8 +124,6 @@ static const struct {
     {"glb_RandRotateMap",                   GLB_RANDOM_ROTATE_TEX,              1},
     {"glb_AOMap",                           GLB_AO_TEX,                         1},
     {"glb_BiBlurMap",                       GLB_BIBLUR_TEX,                     1},
-    {"glb_ExposureLevel",                   GLB_EXPOSURE_LEVEL,                 1},
-    {"glb_HighLightBase",                   GLB_HIGH_LIGHT_BASE,                1},
 };
 
 // Uniform wrapper
@@ -209,6 +195,7 @@ Wrapper uniform_roughness_texslot_picker(scene::Object*);         // Pick glb_Ro
 Wrapper uniform_metallic_texslot_picker(scene::Object*);          // Pick glb_MetallicTex
 Wrapper uniform_alpha_texslot_picker(scene::Object*);             // Pick glb_AlphaTex
 Wrapper uniform_normal_texslot_picker(scene::Object*);            // Pick glb_NormalTex
+Wrapper uniform_emission_texslot_picker(scene::Object*);          // Pick glb_EmissionTex
 Wrapper uniform_reflect_texslot_picker(scene::Object*);           // Pick glb_ReflectTex
 Wrapper uniform_shadow0_texslot_picker(scene::Object*);           // Pick glb_ShadowTex0
 Wrapper uniform_shadow1_texslot_picker(scene::Object*);           // Pick glb_ShadowTex1
@@ -230,12 +217,6 @@ Wrapper uniform_look_at_picker(scene::Object*);                   // Pick glb_Lo
 Wrapper uniform_global_light_ambient_picker(scene::Object*);      // Pick glb_GlobalLight_Ambient
 Wrapper uniform_parallel_light_dir_picker(scene::Object*);        // Pick glb_ParallelLight_Dir
 Wrapper uniform_parallel_light_picker(scene::Object*);            // Pick glb_ParallelLight
-Wrapper uniform_hdr_average_lum_picker(scene::Object*);           // Pick glb_AverageLum
-Wrapper uniform_hdr_scene_tex_picker(scene::Object*);             // Pick glb_HDRSceneTex
-Wrapper uniform_log_lum_tex_picker(scene::Object*);               // Pick glb_LogLumTex
-Wrapper uniform_bloom_tex_width_picker(scene::Object*);           // Pick glb_BloomTexWidth
-Wrapper uniform_bloom_tex_height_picker(scene::Object*);          // Pick glb_BloomTexHeight
-Wrapper uniform_hdr_bloom_tex_picker(scene::Object*);             // Pick glb_Bloom
 Wrapper uniform_far_clip_picker(scene::Object*);                  // Pick glb_FarClip
 Wrapper uniform_screen_width_picker(scene::Object*);              // Pick glb_ScreenWidth
 Wrapper uniform_screen_height_picker(scene::Object*);             // Pick glb_ScreenHeight
@@ -243,8 +224,6 @@ Wrapper uniform_depth_tex_picker(scene::Object*);                 // Pick glb_De
 Wrapper uniform_random_rotate_tex_picker(scene::Object*);         // Pick glb_RandRotateMap
 Wrapper uniform_ao_tex_picker(scene::Object*);                    // Pick glb_AOMap
 Wrapper uniform_biblur_tex_picker(scene::Object*);                // Pick glb_BiBlurMap
-Wrapper uniform_exposure_level_picker(scene::Object*);            // Pick glb_ExposureLevel
-Wrapper uniform_high_light_base_picker(scene::Object*);           // Pick glb_HighLightBase
 
 // Uniform picker table
 static const struct {
@@ -268,6 +247,7 @@ static const struct {
     {uniform_metallic_texslot_picker,           GLB_METALLICTEX},
     {uniform_alpha_texslot_picker,              GLB_ALPHATEX},
     {uniform_normal_texslot_picker,             GLB_NORMALTEX},
+    {uniform_emission_texslot_picker,           GLB_EMISSIONTEX},
     {uniform_reflect_texslot_picker,            GLB_REFLECT_TEX},
     {uniform_shadow0_texslot_picker,            GLB_SHADOWTEX0},
     {uniform_shadow1_texslot_picker,            GLB_SHADOWTEX1},
@@ -289,12 +269,6 @@ static const struct {
     {uniform_global_light_ambient_picker,       GLB_GLOBALLIGHT_AMBIENT},
     {uniform_parallel_light_dir_picker,         GLB_PARALLELLIGHT_DIR},
     {uniform_parallel_light_picker,             GLB_PARALLELLIGHT},
-    {uniform_hdr_average_lum_picker,            GLB_HDR_AVERAGE_LUM},
-    {uniform_hdr_scene_tex_picker,              GLB_HDR_SCENE_TEX},
-    {uniform_log_lum_tex_picker,                GLB_LOG_LUM_TEX},
-    {uniform_bloom_tex_width_picker,            GLB_BLOOM_TEX_WIDTH},
-    {uniform_bloom_tex_height_picker,           GLB_BLOOM_TEX_HEIGHT},
-    {uniform_hdr_bloom_tex_picker,              GLB_HDR_BLOOM_TEX},
     {uniform_far_clip_picker,                   GLB_FAR_CLIP},
     {uniform_screen_width_picker,               GLB_SCREEN_WIDTH},
     {uniform_screen_height_picker,              GLB_SCREEN_HEIGHT},
@@ -302,8 +276,6 @@ static const struct {
     {uniform_random_rotate_tex_picker,          GLB_RANDOM_ROTATE_TEX},
     {uniform_ao_tex_picker,                     GLB_AO_TEX},
     {uniform_biblur_tex_picker,                 GLB_BIBLUR_TEX},
-    {uniform_exposure_level_picker,             GLB_EXPOSURE_LEVEL},
-    {uniform_high_light_base_picker,            GLB_HIGH_LIGHT_BASE},
 };
 
 // Uniform entry

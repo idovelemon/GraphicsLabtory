@@ -9,7 +9,7 @@
 in vec2 vs_texcoord;
 out vec3 color;
 
-uniform sampler2D glb_Bloom;
+uniform sampler2D glb_BloomTex;
 uniform float glb_BloomTexHeight;
 
 // const float kGaussNum[10] = {
@@ -39,16 +39,16 @@ float kGaussNum[10] = float[]
 );
 
 void main() {
-    color = texture2D(glb_Bloom, vs_texcoord).xyz * kGaussNum[0];
+    color = texture(glb_BloomTex, vs_texcoord).xyz * kGaussNum[0];
     float step = 1.0 / glb_BloomTexHeight;
 
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 5; i++) {
         if (vs_texcoord.y - i * step >= 0.0) {
-            color += texture2D(glb_Bloom, vec2(vs_texcoord.x, vs_texcoord.y - i * step)).xyz * kGaussNum[i];
+            color += texture2D(glb_BloomTex, vec2(vs_texcoord.x, vs_texcoord.y - i * step)).xyz * kGaussNum[i];
         }
 
         if (vs_texcoord.y + i * step <= 1.0) {
-            color += texture2D(glb_Bloom, vec2(vs_texcoord.x, vs_texcoord.y + i * step)).xyz * kGaussNum[i];
+            color += texture2D(glb_BloomTex, vec2(vs_texcoord.x, vs_texcoord.y + i * step)).xyz * kGaussNum[i];
         }
     }
 }

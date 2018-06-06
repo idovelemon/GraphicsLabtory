@@ -35,6 +35,7 @@ enum {
     GLB_ENABLE_METALLIC_TEX,
     GLB_ENABLE_ALPHA_TEX,
     GLB_ENABLE_NORMAL_TEX,
+    GLB_ENABLE_EMISSION_TEX,
     GLB_ENABLE_AO,
     GLB_ENABLE_REFLECT_TEX,
 };
@@ -55,6 +56,7 @@ static const char* kEnableMacros[] = {
     "#define GLB_ENABLE_METALLIC_TEX\n",
     "#define GLB_ENABLE_ALPHA_TEX\n",
     "#define GLB_ENABLE_NORMAL_TEX\n",
+    "#define GLB_ENABLE_EMISSION_TEX\n"
     "#define GLB_ENABLE_AO\n",
     "#define GLB_ENABLE_REFLECT_TEX\n",
 };

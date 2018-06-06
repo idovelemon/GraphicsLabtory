@@ -73,9 +73,9 @@ Texture::~Texture() {
     Destroy();
 }
 
-Texture* Texture::Create(const char* texture_name) {
+Texture* Texture::Create(const char* texture_name, bool enableMipmapping) {
     Texture* tex = NULL;
-    Texture::Imp* imp = Texture::Imp::Create(texture_name);
+    Texture::Imp* imp = Texture::Imp::Create(texture_name, enableMipmapping);
 
     if (imp != NULL) {
         tex = new Texture;
@@ -127,9 +127,9 @@ Texture* Texture::CreatePrefilterTableMap(const char* textureName) {
     return tex;
 }
 
-Texture* Texture::Create(int32_t width, int32_t height) {
+Texture* Texture::Create(int32_t width, int32_t height, bool enableMipmapping) {
     Texture* tex = NULL;
-    Texture::Imp* imp = Texture::Imp::Create(width, height);
+    Texture::Imp* imp = Texture::Imp::Create(width, height, enableMipmapping);
 
     if (imp != NULL) {
         tex = new Texture;
@@ -145,9 +145,9 @@ Texture* Texture::Create(int32_t width, int32_t height) {
     return tex;
 }
 
-Texture* Texture::CreateFloat32Texture(int32_t width, int32_t height) {
+Texture* Texture::CreateFloat32Texture(int32_t width, int32_t height, bool enableMipmapping) {
     Texture* tex = NULL;
-    Texture::Imp* imp = Texture::Imp::CreateFloat32Texture(width, height);
+    Texture::Imp* imp = Texture::Imp::CreateFloat32Texture(width, height, enableMipmapping);
 
     if (imp != NULL) {
         tex = new Texture;
@@ -163,9 +163,9 @@ Texture* Texture::CreateFloat32Texture(int32_t width, int32_t height) {
     return tex;
 }
 
-Texture* Texture::CreateFloat32DepthTexture(int32_t width, int32_t height) {
+Texture* Texture::CreateFloat32DepthTexture(int32_t width, int32_t height, bool enableMipmapping) {
     Texture* tex = NULL;
-    Texture::Imp* imp = Texture::Imp::CreateFloat32DepthTexture(width, height);
+    Texture::Imp* imp = Texture::Imp::CreateFloat32DepthTexture(width, height, enableMipmapping);
 
     if (imp != NULL) {
         tex = new Texture;
@@ -181,9 +181,9 @@ Texture* Texture::CreateFloat32DepthTexture(int32_t width, int32_t height) {
     return tex;
 }
 
-Texture* Texture::CreateFloat32CubeTexture(int32_t width, int32_t height) {
+Texture* Texture::CreateFloat32CubeTexture(int32_t width, int32_t height, bool enableMipmapping) {
     Texture* tex = NULL;
-    Texture::Imp* imp = Texture::Imp::CreateFloat32CubeTexture(width, height);
+    Texture::Imp* imp = Texture::Imp::CreateFloat32CubeTexture(width, height, enableMipmapping);
 
     if (imp != NULL) {
         tex = new Texture;
@@ -199,9 +199,9 @@ Texture* Texture::CreateFloat32CubeTexture(int32_t width, int32_t height) {
     return tex;
 }
 
-Texture* Texture::CreateFloat16CubeTexture(int32_t width, int32_t height) {
+Texture* Texture::CreateFloat16CubeTexture(int32_t width, int32_t height, bool enableMipmapping) {
     Texture* tex = NULL;
-    Texture::Imp* imp = Texture::Imp::CreateFloat16CubeTexture(width, height);
+    Texture::Imp* imp = Texture::Imp::CreateFloat16CubeTexture(width, height, enableMipmapping);
 
     if (imp != NULL) {
         tex = new Texture;
@@ -217,9 +217,9 @@ Texture* Texture::CreateFloat16CubeTexture(int32_t width, int32_t height) {
     return tex;
 }
 
-Texture* Texture::CreateFloat323DTexture(int32_t width, int32_t height, int32_t depth) {
+Texture* Texture::CreateFloat323DTexture(int32_t width, int32_t height, int32_t depth, bool enableMipmapping) {
     Texture* tex = NULL;
-    Texture::Imp* imp = Texture::Imp::CreateFloat323DTexture(width, height, depth);
+    Texture::Imp* imp = Texture::Imp::CreateFloat323DTexture(width, height, depth, enableMipmapping);
 
     if (imp != NULL) {
         tex = new Texture;

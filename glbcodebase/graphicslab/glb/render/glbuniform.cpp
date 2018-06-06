@@ -291,6 +291,20 @@ Wrapper uniform_normal_texslot_picker(scene::Object* obj) {
     return wrapper;
 }
 
+Wrapper uniform_emission_texslot_picker(scene::Object* obj) {
+    Wrapper wrapper;
+    wrapper.SetFormat(Wrapper::FMT_SAMPLER2D);
+
+    if (obj != NULL) {
+        wrapper.SetSampler2D(render::TS_EMISSION);
+    } else {
+        GLB_SAFE_ASSERT(false);
+        wrapper.SetSampler2D(0);
+    }
+
+    return wrapper;
+}
+
 Wrapper uniform_reflect_texslot_picker(scene::Object* obj) {
     Wrapper wrapper;
     wrapper.SetFormat(Wrapper::FMT_SAMPLERCUBE);
@@ -552,48 +566,6 @@ Wrapper uniform_parallel_light_picker(scene::Object*) {
     return wrapper;
 }
 
-Wrapper uniform_hdr_average_lum_picker(scene::Object*) {
-    Wrapper wrapper;
-    wrapper.SetFormat(Wrapper::FMT_FLOAT);
-    wrapper.SetFloat(render::Render::GetHDRAverageLum());
-    return wrapper;
-}
-
-Wrapper uniform_hdr_scene_tex_picker(scene::Object*) {
-    Wrapper wrapper;
-    wrapper.SetFormat(Wrapper::FMT_SAMPLER2D);
-    wrapper.SetSampler2D(render::TS_HDRSCENE);
-    return wrapper;
-}
-
-Wrapper uniform_log_lum_tex_picker(scene::Object*) {
-    Wrapper wrapper;
-    wrapper.SetFormat(Wrapper::FMT_SAMPLER2D);
-    wrapper.SetSampler2D(render::TS_LOG_LUM);
-    return wrapper;
-}
-
-Wrapper uniform_bloom_tex_width_picker(scene::Object*) {
-    Wrapper wrapper;
-    wrapper.SetFormat(Wrapper::FMT_FLOAT);
-    wrapper.SetFloat(render::Render::GetBloomWidth());
-    return wrapper;
-}
-
-Wrapper uniform_bloom_tex_height_picker(scene::Object*) {
-    Wrapper wrapper;
-    wrapper.SetFormat(Wrapper::FMT_FLOAT);
-    wrapper.SetFloat(render::Render::GetBloomHeight());
-    return wrapper;
-}
-
-Wrapper uniform_hdr_bloom_tex_picker(scene::Object*) {
-    Wrapper wrapper;
-    wrapper.SetFormat(Wrapper::FMT_SAMPLER2D);
-    wrapper.SetSampler2D(render::TS_HDR_BLOOM);
-    return wrapper;
-}
-
 Wrapper uniform_far_clip_picker(scene::Object*) {
     Wrapper wrapper;
     wrapper.SetFormat(Wrapper::FMT_FLOAT);
@@ -640,20 +612,6 @@ Wrapper uniform_biblur_tex_picker(scene::Object*) {
     Wrapper wrapper;
     wrapper.SetFormat(Wrapper::FMT_SAMPLER2D);
     wrapper.SetSampler2D(render::TS_BI_BLUR_MAP);
-    return wrapper;
-}
-
-Wrapper uniform_exposure_level_picker(scene::Object*) {
-    Wrapper wrapper;
-    wrapper.SetFormat(Wrapper::FMT_FLOAT);
-    wrapper.SetFloat(render::Render::GetExposureLevel());
-    return wrapper;
-}
-
-Wrapper uniform_high_light_base_picker(scene::Object*) {
-    Wrapper wrapper;
-    wrapper.SetFormat(Wrapper::FMT_FLOAT);
-    wrapper.SetFloat(render::Render::GetHighLightBase());
     return wrapper;
 }
 };  // namespace uniform

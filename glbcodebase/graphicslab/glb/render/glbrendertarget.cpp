@@ -112,6 +112,30 @@ void* RenderTarget::GetNativeRenderTarget() {
     return rt;
 }
 
+int32_t RenderTarget::GetWidth() const {
+    int32_t result = 0;
+
+    if (m_Imp != NULL) {
+        result = m_Imp->GetWidth();
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return result;
+}
+
+int32_t RenderTarget::GetHeight() const {
+    int32_t result = 0;
+
+    if (m_Imp != NULL) {
+        result = m_Imp->GetHeight();
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return result;
+}
+
 };  // namespace render
 
 };  // namespace glb

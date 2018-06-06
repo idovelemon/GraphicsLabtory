@@ -60,6 +60,7 @@ enum TextureSlot {
     TS_METALLIC,
     TS_ALPHA,
     TS_NORMAL,
+    TS_EMISSION,
     TS_REFLECT,
     TS_SHADOW0,
     TS_SHADOW1,
