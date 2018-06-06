@@ -4,6 +4,7 @@ This project is for computer graphics learning
 ## Feature
 - .obj model file analysis
 - Physical based Lighting(Direct)
+- Image based Lighting
 - Basic Normal Mapping
 
 ## Gallery
