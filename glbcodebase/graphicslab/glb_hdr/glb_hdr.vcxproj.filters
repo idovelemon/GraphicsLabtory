@@ -38,13 +38,7 @@
     <ClCompile Include="glb_hdr.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\glb\comm.cpp">
-      <Filter>源文件\glb</Filter>
-    </ClCompile>
     <ClCompile Include="..\glb\glbapplication.cpp">
-      <Filter>源文件\glb</Filter>
-    </ClCompile>
-    <ClCompile Include="..\glb\glbeditorcomm.cpp">
       <Filter>源文件\glb</Filter>
     </ClCompile>
     <ClCompile Include="..\glb\glbinput.cpp">
@@ -137,24 +131,18 @@
     <ClCompile Include="..\glb\util\glbutil.cpp">
       <Filter>源文件\glb\util</Filter>
     </ClCompile>
+    <ClCompile Include="..\glb\util\glbtexturewriter.cpp">
+      <Filter>源文件\glb\util</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="glb_hdr.h">
       <Filter>源文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\glb\comm.h">
-      <Filter>源文件\glb</Filter>
-    </ClInclude>
     <ClInclude Include="..\glb\glb.h">
       <Filter>源文件\glb</Filter>
     </ClInclude>
     <ClInclude Include="..\glb\glbapplication.h">
-      <Filter>源文件\glb</Filter>
-    </ClInclude>
-    <ClInclude Include="..\glb\glbcomm.h">
-      <Filter>源文件\glb</Filter>
-    </ClInclude>
-    <ClInclude Include="..\glb\glbeditorcomm.h">
       <Filter>源文件\glb</Filter>
     </ClInclude>
     <ClInclude Include="..\glb\glbinput.h">
@@ -266,6 +254,15 @@
       <Filter>源文件\glb\util</Filter>
     </ClInclude>
     <ClInclude Include="resource.h" />
+    <ClInclude Include="..\glb\util\glbddsformat.h">
+      <Filter>源文件\glb\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\util\glbtextureinfo.h">
+      <Filter>源文件\glb\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\util\glbtexturewriter.h">
+      <Filter>源文件\glb\util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\glb\math\glbvector.inl">

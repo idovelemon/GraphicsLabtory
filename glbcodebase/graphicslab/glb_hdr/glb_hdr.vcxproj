@@ -69,7 +69,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_GL|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)$(ProjectName)\</OutDir>
-    <TargetName>$(ProjectName)_D</TargetName>
+    <TargetName>$(ProjectName)_DGL</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_DX|Win32'">
     <LinkIncremental>true</LinkIncremental>
@@ -93,13 +93,14 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;GLB_PLATFORM_OPENGL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)\glb;$(SolutionDir)\..\glew\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\glb;$(SolutionDir)\..\glew\include;$(DXSDK_DIR)\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ObjectFileName>$(IntDir)/%(RelativeDir)/</ObjectFileName>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)\..\glew\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glew32.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)\..\glew\lib\Release\Win32;$(DXSDK_DIR)\Lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glew32.lib;opengl32.lib;dinput8.lib;dxguid.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ImageHasSafeExceptionHandlers>true</ImageHasSafeExceptionHandlers>
     </Link>
   </ItemDefinitionGroup>
@@ -163,9 +164,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\glb\comm.cpp" />
     <ClCompile Include="..\glb\glbapplication.cpp" />
-    <ClCompile Include="..\glb\glbeditorcomm.cpp" />
     <ClCompile Include="..\glb\glbinput.cpp" />
     <ClCompile Include="..\glb\math\glbbv.cpp" />
     <ClCompile Include="..\glb\math\glbmath.cpp" />
@@ -195,15 +194,13 @@
     <ClCompile Include="..\glb\util\glblog.cpp" />
     <ClCompile Include="..\glb\util\glbprofile.cpp" />
     <ClCompile Include="..\glb\util\glbtexturereader.cpp" />
+    <ClCompile Include="..\glb\util\glbtexturewriter.cpp" />
     <ClCompile Include="..\glb\util\glbutil.cpp" />
     <ClCompile Include="glb_hdr.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\glb\comm.h" />
     <ClInclude Include="..\glb\glb.h" />
     <ClInclude Include="..\glb\glbapplication.h" />
-    <ClInclude Include="..\glb\glbcomm.h" />
-    <ClInclude Include="..\glb\glbeditorcomm.h" />
     <ClInclude Include="..\glb\glbinput.h" />
     <ClInclude Include="..\glb\math\glbbv.h" />
     <ClInclude Include="..\glb\math\glbmath.h" />
@@ -235,10 +232,13 @@
     <ClInclude Include="..\glb\scene\glbmodelfile.h" />
     <ClInclude Include="..\glb\scene\glbobject.h" />
     <ClInclude Include="..\glb\scene\glbscene.h" />
+    <ClInclude Include="..\glb\util\glbddsformat.h" />
     <ClInclude Include="..\glb\util\glblog.h" />
     <ClInclude Include="..\glb\util\glbmacro.h" />
     <ClInclude Include="..\glb\util\glbprofile.h" />
+    <ClInclude Include="..\glb\util\glbtextureinfo.h" />
     <ClInclude Include="..\glb\util\glbtexturereader.h" />
+    <ClInclude Include="..\glb\util\glbtexturewriter.h" />
     <ClInclude Include="..\glb\util\glbutil.h" />
     <ClInclude Include="glb_hdr.h" />
     <ClInclude Include="resource.h" />

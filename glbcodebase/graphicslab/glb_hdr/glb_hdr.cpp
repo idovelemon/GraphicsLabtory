@@ -20,42 +20,41 @@ public:
 public:
     bool Initialize() {
         // Camera
-        scene::FreeCamera* cam = scene::FreeCamera::Create(math::Vector(0.0f, 0.0f, 200.0f), math::Vector(0.0f, 0.0f, 0.0));
+        scene::FreeCamera* cam = scene::FreeCamera::Create(math::Vector(0.0f, 100.0f, 300.0f), math::Vector(0.0f, 0.0f, 0.0));
         scene::Scene::SetCamera(glb::scene::PRIMIAY_CAM, cam);
 
         // Light
+        scene::Light ambient(scene::AMBIENT_LIGHT);
+        ambient.color = math::Vector(0.1f, 0.1f, 0.1f);
+        scene::Scene::SetLight(ambient, 0);
+
         scene::Light light(scene::PARALLEL_LIGHT);
-        light.ambient = math::Vector(0.2f, 0.2f, 0.2f);
-        light.diffuse = math::Vector(2.0f, 2.0f, 2.0f);
-        light.specular = math::Vector(2.0f, 2.0f, 2.0f);
+        light.color = math::Vector(1.2f, 1.2f, 1.2f);
         light.dir = math::Vector(-1.0f, -1.0f, 1.0f);
         light.dir.Normalize();
-        light.pow = 128.0f;
-        scene::Scene::SetLight(light, 0);
+        scene::Scene::SetLight(light, 1);
 
         // Perspective
         render::Render::SetPerspective(glb::render::Render::PRIMARY_PERS, 69.0f, 800 * 1.0f / 600, 0.1f, 500.0f);
 
         // HDR
-        glb::render::Render::SetExposureLevel(0.7f);
-        glb::render::Render::SetLightAdaption(0.04f);
-        glb::render::Render::SetHighLightBase(0.85f);
+        glb::render::Render::SetHighLightBase(1.5f);
 
         //glb::scene::Scene::AddSkyObject("sky.obj");
 
-        int32_t floor = glb::scene::Scene::AddObject("floor.obj");
+        int32_t floor = glb::scene::Scene::AddObject("res/floor.obj");
         glb::scene::Scene::GetObjectById(floor)->SetCullFaceEnable(true);
         glb::scene::Scene::GetObjectById(floor)->SetCullFaceMode(glb::render::CULL_BACK);
         glb::scene::Scene::GetObjectById(floor)->SetDepthTestEnable(true);
         glb::scene::Scene::GetObjectById(floor)->SetPos(math::Vector(0.0, 0.0, 0.0));
 
-        int32_t cube = glb::scene::Scene::AddObject("cube.obj");
+        int32_t cube = glb::scene::Scene::AddObject("res/cube.obj");
         glb::scene::Scene::GetObjectById(cube)->SetCullFaceEnable(true);
         glb::scene::Scene::GetObjectById(cube)->SetCullFaceMode(glb::render::CULL_BACK);
         glb::scene::Scene::GetObjectById(cube)->SetDepthTestEnable(true);
         glb::scene::Scene::GetObjectById(cube)->SetPos(math::Vector(70.0f, 50.0f, 0.0f));
 
-        cube = glb::scene::Scene::AddObject("cube.obj");
+        cube = glb::scene::Scene::AddObject("res/cube.obj");
         glb::scene::Scene::GetObjectById(cube)->SetCullFaceEnable(true);
         glb::scene::Scene::GetObjectById(cube)->SetCullFaceMode(glb::render::CULL_BACK);
         glb::scene::Scene::GetObjectById(cube)->SetDepthTestEnable(true);
@@ -68,13 +67,26 @@ public:
         util::ProfileTime time;
         time.BeginProfile();
 
+        glb::Input::Update();
+
         // Update scene
-        scene::Light lit = scene::Scene::GetLight(0);
+        math::Vector pos = glb::scene::Scene::GetCurCamera()->GetPos();
+        math::Vector target = glb::scene::Scene::GetCurCamera()->GetTarget();
+        math::Vector look = pos - target;
+        math::Matrix rotCamera;
+        rotCamera.MakeRotateYMatrix(Input::GetMouseMoveX() * 0.1f);
+        look = rotCamera * look;
+        pos = target + look;
+        glb::scene::Scene::GetCurCamera()->SetPos(pos);
+        glb::scene::Scene::GetCurCamera()->Update(1.0f);
+
+        // Update scene
+        scene::Light lit = scene::Scene::GetLight(1);
         float rotY = 1.0f;
         math::Matrix rot;
         rot.MakeRotateYMatrix(rotY);
         lit.dir = rot * lit.dir;
-        //glb::scene::Scene::SetLight(lit, 0);
+        //glb::scene::Scene::SetLight(lit, 1);
         glb::scene::Scene::Update();
 
         // Draw scene
