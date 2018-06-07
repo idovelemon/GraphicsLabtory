@@ -37,6 +37,7 @@ struct AppConfig {
     int32_t platform_api;
     int32_t icon;
     wchar_t caption[128];
+    HWND    wnd;
 
     AppConfig()
     : screen_width(0)
@@ -44,7 +45,8 @@ struct AppConfig {
     , shadow_map_width(0)
     , shadow_map_height(0)
     , platform_api(0)
-    , icon(0) {
+    , icon(0)
+    , wnd(NULL) {
         memset(caption, 0, sizeof(caption));
     }
 };

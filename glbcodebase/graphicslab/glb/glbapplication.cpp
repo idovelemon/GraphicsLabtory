@@ -59,7 +59,7 @@ public:
     int32_t GetShadowMapHeight();
 
 protected:
-    bool CreateWnd(HINSTANCE hInstance, int32_t width, int32_t height, const wchar_t* caption, int32_t icon);
+    bool CreateWnd(HINSTANCE hInstance, HWND hWnd, int32_t width, int32_t height, const wchar_t* caption, int32_t icon);
     bool SetupGLBBeforeUserApp(int32_t width, int32_t height);
     bool SetupGLBAfterUserApp();
 
@@ -118,7 +118,7 @@ bool ApplicationImp::Initialize(APPLICATION_CREATOR creator, HINSTANCE hInstance
     }
 
     // Create window
-    if (!CreateWnd(hInstance, config.screen_width, config.screen_height, config.caption, config.icon)) {
+    if (!CreateWnd(hInstance, config.wnd, config.screen_width, config.screen_height, config.caption, config.icon)) {
         result = false;
         GLB_SAFE_ASSERT(false);
         return result;
@@ -149,15 +149,21 @@ bool ApplicationImp::Initialize(APPLICATION_CREATOR creator, HINSTANCE hInstance
 }
 
 void ApplicationImp::Update() {
-    MSG msg = {0};
-    while (msg.message != WM_QUIT) {
-        if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
-            TranslateMessage(&msg);
-            DispatchMessage(&msg);
-        } else {
-            if (m_Application) {
-                m_Application->Update(1.0f);
+    if (!m_Config.wnd) {
+        MSG msg = {0};
+        while (msg.message != WM_QUIT) {
+            if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
+                TranslateMessage(&msg);
+                DispatchMessage(&msg);
+            } else {
+                if (m_Application) {
+                    m_Application->Update(1.0f);
+                }
             }
+        }
+    } else {
+        if (m_Application) {
+            m_Application->Update(1.0f);
         }
     }
 }
@@ -205,37 +211,41 @@ int32_t ApplicationImp::GetShadowMapHeight() {
     return m_Config.shadow_map_height;
 }
 
-bool ApplicationImp::CreateWnd(HINSTANCE hInstance, int32_t width, int32_t height, const wchar_t* caption, int32_t icon) {
-    // Register window class
-    WNDCLASSEX wnd;
-    wnd.cbClsExtra = 0;
-    wnd.cbSize = sizeof(wnd);
-    wnd.cbWndExtra = NULL;
-    wnd.hbrBackground = HBRUSH(COLOR_WINDOW + 1);
-    wnd.hCursor = LoadCursor(NULL, IDC_ARROW);
-    wnd.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(icon));
-    wnd.hIconSm = NULL;
-    wnd.hInstance = hInstance;
-    wnd.lpfnWndProc = GLB_WndProc;
-    wnd.lpszClassName = L"GraphicsLab";
-    wnd.lpszMenuName = NULL;
-    wnd.style = CS_HREDRAW | CS_VREDRAW;
-    int32_t err = GetLastError();
+bool ApplicationImp::CreateWnd(HINSTANCE hInstance, HWND hWnd, int32_t width, int32_t height, const wchar_t* caption, int32_t icon) {
+    if (!hWnd) {
+        // Register window class
+        WNDCLASSEX wnd;
+        wnd.cbClsExtra = 0;
+        wnd.cbSize = sizeof(wnd);
+        wnd.cbWndExtra = NULL;
+        wnd.hbrBackground = HBRUSH(COLOR_WINDOW + 1);
+        wnd.hCursor = LoadCursor(NULL, IDC_ARROW);
+        wnd.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(icon));
+        wnd.hIconSm = NULL;
+        wnd.hInstance = hInstance;
+        wnd.lpfnWndProc = GLB_WndProc;
+        wnd.lpszClassName = L"GraphicsLab";
+        wnd.lpszMenuName = NULL;
+        wnd.style = CS_HREDRAW | CS_VREDRAW;
+        int32_t err = GetLastError();
 
-    if (!RegisterClassEx(&wnd)) {
-        return false;
+        if (!RegisterClassEx(&wnd)) {
+            return false;
+        }
+
+        // Create window
+        RECT client_rect = {0, 0, static_cast<LONG>(width), static_cast<LONG>(height)};
+        AdjustWindowRect(&client_rect, WS_OVERLAPPEDWINDOW, FALSE);
+        m_WndHandle = CreateWindow(L"GraphicsLab", caption, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT
+            , client_rect.right - client_rect.left, client_rect.bottom - client_rect.top, NULL, NULL, hInstance, NULL);
+        if (m_WndHandle == NULL) {
+            return false;
+        }
+
+        ShowWindow(m_WndHandle, SW_SHOW);
+    } else {
+        m_WndHandle = hWnd;
     }
-
-    // Create window
-    RECT client_rect = {0, 0, static_cast<LONG>(width), static_cast<LONG>(height)};
-    AdjustWindowRect(&client_rect, WS_OVERLAPPEDWINDOW, FALSE);
-    m_WndHandle = CreateWindow(L"GraphicsLab", caption, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT
-        , client_rect.right - client_rect.left, client_rect.bottom - client_rect.top, NULL, NULL, hInstance, NULL);
-    if (m_WndHandle == NULL) {
-        return false;
-    }
-
-    ShowWindow(m_WndHandle, SW_SHOW);
 
     m_WndInstance = hInstance;
 
