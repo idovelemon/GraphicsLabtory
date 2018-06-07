@@ -677,9 +677,11 @@ void Texture::Imp::Save(const char* fileName, util::TEXTURE_FILE_TYPE fileType) 
     if (m_Type == TEX_2D) {
         int8_t* pixel = new int8_t[m_Width * m_Height * m_BPP];
 
-        util::TEXTURE_PIXEL_FORMAT_TYPE pixel_format = util::TPFT_UNKOWN;
+        util::TEXTURE_PIXEL_FORMAT_TYPE pixelFormat = util::TPFT_UNKOWN;
         if (m_Format == FMT_R8G8B8A8) {
-            pixel_format = util::TPFT_R8G8B8A8;
+            pixelFormat = util::TPFT_R8G8B8A8;
+        } else if (m_Format == FMT_R32G32B32A32F) {
+            pixelFormat = util::TPFT_R32G32B32A32F;
         } else {
             // TODO: do not support now
             GLB_SAFE_ASSERT(false);
@@ -687,7 +689,7 @@ void Texture::Imp::Save(const char* fileName, util::TEXTURE_FILE_TYPE fileType) 
 
         GetTextureData(pixel, 0);
 
-        // util::TextureWriter::Write(file_name, pixel, m_Width, m_Height, pixel_format, m_BPP, file_type);
+        util::TextureWriter::Write(fileName, pixel, m_Width, m_Height, pixelFormat, m_BPP, fileType);
     } else if (m_Type == TEX_CUBE) {
 
     } else {

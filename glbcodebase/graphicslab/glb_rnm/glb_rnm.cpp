@@ -15,7 +15,7 @@ class ApplicationRadiosityNormalMap : public glb::app::ApplicationBase {
 public:
     ApplicationRadiosityNormalMap()
     : m_CurIterateNum(0)
-    , m_TotalIterateNum(3)
+    , m_TotalIterateNum(1)
     , m_CurValidPatchIndex(0)
     , m_NormalMap(NULL)
     , m_Camera(NULL)
@@ -349,6 +349,12 @@ public:
                 BuildLightMap();
 
                 printf(">> Baking Light Map([%d]): OK", m_CurIterateNum);
+
+                if (m_CurIterateNum >= m_TotalIterateNum) {
+                    m_LightMap[0]->Save("res/lightmap0.hdr", util::TFT_HDR);
+                    m_LightMap[1]->Save("res/lightmap1.hdr", util::TFT_HDR);
+                    m_LightMap[2]->Save("res/lightmap2.hdr", util::TFT_HDR);
+                }
                 //MessageBox(NULL, L"Baking Light Map: OK", L"Message", MB_OK);
             }
         }

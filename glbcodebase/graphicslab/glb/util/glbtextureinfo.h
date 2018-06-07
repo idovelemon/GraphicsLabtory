@@ -14,6 +14,7 @@ namespace util {
 // Texture file's type
 enum TEXTURE_FILE_TYPE {
     TFT_DDS = 0,
+    TFT_HDR,
     TFT_PFC,  // Prefilter CubeMap file format <Customize>
     TFT_PFT,  // Prefilter Table file format <Customize>
     TFT_UNKOWN,

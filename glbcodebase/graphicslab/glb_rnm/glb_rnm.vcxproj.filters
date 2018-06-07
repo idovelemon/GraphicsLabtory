@@ -43,15 +43,12 @@
     <Filter Include="Source Files\glb\render\imp\dx11">
       <UniqueIdentifier>{c847f6ba-e82c-4402-84c6-3080ac999f62}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\glb\thirdparty\rgbe">
+      <UniqueIdentifier>{5380f20a-34bd-410e-8ce7-f862a9ac28bb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\glb\comm.cpp">
-      <Filter>Source Files\glb</Filter>
-    </ClCompile>
     <ClCompile Include="..\glb\glbapplication.cpp">
-      <Filter>Source Files\glb</Filter>
-    </ClCompile>
-    <ClCompile Include="..\glb\glbeditorcomm.cpp">
       <Filter>Source Files\glb</Filter>
     </ClCompile>
     <ClCompile Include="..\glb\glbinput.cpp">
@@ -150,21 +147,15 @@
     <ClCompile Include="glb_rnm.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\glb\thirdparty\rgbe\rgbe.cpp">
+      <Filter>Source Files\glb\thirdparty\rgbe</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\glb\comm.h">
-      <Filter>Source Files\glb</Filter>
-    </ClInclude>
     <ClInclude Include="..\glb\glb.h">
       <Filter>Source Files\glb</Filter>
     </ClInclude>
     <ClInclude Include="..\glb\glbapplication.h">
-      <Filter>Source Files\glb</Filter>
-    </ClInclude>
-    <ClInclude Include="..\glb\glbcomm.h">
-      <Filter>Source Files\glb</Filter>
-    </ClInclude>
-    <ClInclude Include="..\glb\glbeditorcomm.h">
       <Filter>Source Files\glb</Filter>
     </ClInclude>
     <ClInclude Include="..\glb\glbinput.h">
@@ -293,6 +284,9 @@
     <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\glb\thirdparty\rgbe\rgbe.h">
+      <Filter>Source Files\glb\thirdparty\rgbe</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\glb\math\glbvector.inl">
@@ -308,5 +302,10 @@
     <Image Include="res\glb.ico">
       <Filter>Resource Files</Filter>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\glb\thirdparty\rgbe\rgbe.txt">
+      <Filter>Source Files\glb\thirdparty\rgbe</Filter>
+    </Text>
   </ItemGroup>
 </Project>

@@ -11,6 +11,8 @@
 #include <xtgmath.h>
 #include <memory.h>
 
+#include "thirdparty/rgbe/rgbe.h"
+
 #include "glbddsformat.h"
 #include "glbmacro.h"
 
@@ -43,6 +45,21 @@ class DDSWriter : public TextureWriterBase {
 public:
     DDSWriter();
     virtual ~DDSWriter();
+
+public:
+    virtual bool Write(const char* file_name, int8_t* data, int32_t width, int32_t height, int32_t pixel_format, int32_t bit_count);
+
+protected:
+    void SetRGBAMask(DDSPixelFormat& pf, int32_t pixel_format);
+    void ReorganizeRGBData(int8_t* data, TEXTURE_PIXEL_FORMAT_TYPE type);
+};
+
+//--------------------------------------------------------------------------------
+
+class HDRWriter : public TextureWriterBase {
+public:
+    HDRWriter();
+    virtual ~HDRWriter();
 
 public:
     virtual bool Write(const char* file_name, int8_t* data, int32_t width, int32_t height, int32_t pixel_format, int32_t bit_count);
@@ -178,6 +195,46 @@ void DDSWriter::ReorganizeRGBData(int8_t* data, TEXTURE_PIXEL_FORMAT_TYPE type) 
 
 //--------------------------------------------------------------------------------
 
+HDRWriter::HDRWriter() {
+}
+
+HDRWriter::~HDRWriter() {
+}
+
+bool HDRWriter::Write(const char* fileName, int8_t* data, int32_t width, int32_t height, int32_t pixelFormat, int32_t bitCount) {
+    bool result = false;
+
+    FILE* file = fopen(fileName, "wb");
+
+    if (file) {
+        if (pixelFormat == TPFT_R32G32B32A32F) {
+            float* fp = new float[width * height * 3];
+            float* pixel = reinterpret_cast<float*>(data);
+            for (int32_t i = 0; i < width * height; i++) {
+                fp[i * 3 + 0] = pixel[i * 4 + 0];
+                fp[i * 3 + 1] = pixel[i * 4 + 1];
+                fp[i * 3 + 2] = pixel[i * 4 + 2];
+            }
+
+            RGBE_WriteHeader(file, width, height, NULL);
+            RGBE_WritePixels(file, fp, width * height);
+
+            delete[] fp;
+            fp = NULL;
+            result = true;
+        } else {
+            // TODO: do not support now
+            GLB_SAFE_ASSERT(false);
+        }
+    }
+
+    fclose(file);
+
+    return result;
+}
+
+//--------------------------------------------------------------------------------
+
 PFCWriter::PFCWriter() {
 }
 
@@ -236,18 +293,21 @@ bool PFTWriter::Write(const char* file_name, int8_t* data, int32_t width, int32_
 
 //--------------------------------------------------------------------------------
 
-bool TextureWriter::Write(const char* file_name, int8_t* data, int32_t width, int32_t height, int32_t pixel_format, int32_t bit_count, int32_t format) {
+bool TextureWriter::Write(const char* fileName, int8_t* data, int32_t width, int32_t height, int32_t pixelFormat, int32_t bitCount, int32_t format) {
     bool result = false;
 
     if (format == TFT_DDS) {
         DDSWriter writer;
-        result = writer.Write(file_name, data, width, height, pixel_format, bit_count);
+        result = writer.Write(fileName, data, width, height, pixelFormat, bitCount);
+    } else if (format == TFT_HDR) {
+        HDRWriter writer;
+        result = writer.Write(fileName, data, width, height, pixelFormat, bitCount);
     } else if (format == TFT_PFC) {
         PFCWriter writer;
-        result = writer.Write(file_name, data, width, height, pixel_format, bit_count);
+        result = writer.Write(fileName, data, width, height, pixelFormat, bitCount);
     } else if (format == TFT_PFT) {
         PFTWriter writer;
-        result = writer.Write(file_name, data, width, height, pixel_format, bit_count);
+        result = writer.Write(fileName, data, width, height, pixelFormat, bitCount);
     } else {
         // TODO: Only support dds file now
         GLB_SAFE_ASSERT(false);
