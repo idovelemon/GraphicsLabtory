@@ -51,6 +51,7 @@ END_MESSAGE_MAP()
 
 CGLBLightStudioDlg::CGLBLightStudioDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CGLBLightStudioDlg::IDD, pParent)
+    , m_ProjectXML(NULL)
 {
     // Using GLB icon
 	//m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
@@ -59,7 +60,13 @@ CGLBLightStudioDlg::CGLBLightStudioDlg(CWnd* pParent /*=NULL*/)
 
 void CGLBLightStudioDlg::DoDataExchange(CDataExchange* pDX)
 {
-	CDialogEx::DoDataExchange(pDX);
+    CDialogEx::DoDataExchange(pDX);
+    if (m_ProjectXML)
+    {
+        delete m_ProjectXML;
+        m_ProjectXML = NULL;
+    }
+    DDX_Control(pDX, IDC_OUTLINE_LIST, m_OutlineList);
 }
 
 BEGIN_MESSAGE_MAP(CGLBLightStudioDlg, CDialogEx)
@@ -68,6 +75,10 @@ BEGIN_MESSAGE_MAP(CGLBLightStudioDlg, CDialogEx)
 	ON_WM_QUERYDRAGICON()
     ON_MESSAGE_VOID(WM_KICKIDLE, OnKickIdle)
     ON_WM_CLOSE()
+    ON_COMMAND(ID_FILE_NEW, &CGLBLightStudioDlg::OnFileNew)
+    ON_COMMAND(ID_FILE_SAVE, &CGLBLightStudioDlg::OnFileSave)
+    ON_COMMAND(ID_ADD_SCENE, &CGLBLightStudioDlg::OnAddScene)
+    ON_COMMAND(ID_ADD_LIGHT, &CGLBLightStudioDlg::OnAddLight)
 END_MESSAGE_MAP()
 
 
@@ -111,10 +122,22 @@ BOOL CGLBLightStudioDlg::OnInitDialog()
     config.screen_height = rect.bottom - rect.top;
     config.shadow_map_width = 32;
     config.shadow_map_height = 32;
-    if (!glb::app::Application::Initialize(ApplicationCore::Create, AfxGetInstanceHandle(), config)) {
+    if (!glb::app::Application::Initialize(ApplicationCore::Create, AfxGetInstanceHandle(), config))
+    {
         ::MessageBox(NULL, L"Initliaze GLB library failed", L"ERROR", MB_OK);
         exit(0);
     }
+
+    // Hide Viewport first
+    GetDlgItem(IDC_VIEW)->ShowWindow(SW_HIDE);
+
+    // Disable menu
+    GetMenu()->EnableMenuItem(ID_FILE_SAVE, MF_DISABLED);
+    GetMenu()->EnableMenuItem(ID_ADD_SCENE, MF_DISABLED);
+    GetMenu()->EnableMenuItem(ID_ADD_LIGHT, MF_DISABLED);
+
+    // Hide control
+    m_OutlineList.ShowWindow(SW_HIDE);
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
@@ -178,4 +201,80 @@ void CGLBLightStudioDlg::OnClose()
     // TODO: Add your message handler code here and/or call default
     glb::app::Application::Destroy();
     CDialogEx::OnClose();
+}
+
+
+void CGLBLightStudioDlg::OnFileNew()
+{
+    // If project active
+    if (m_ProjectXML)
+    {
+        if (::MessageBox(NULL, L"Do you want to save old project?", L"Info", MB_OKCANCEL)) {
+            OnFileSave();
+        }
+
+        if (m_ProjectXML) {
+            delete m_ProjectXML;
+            m_ProjectXML = NULL;
+        }
+    }
+
+    // Create new project
+    m_ProjectXML = new TiXmlDocument();
+
+    TiXmlElement* root = new TiXmlElement("GLB_LIGHT_STUDIO");
+    root->SetAttribute("Author", "GLB");
+    m_ProjectXML->LinkEndChild(root);
+
+    // Display view
+    GetDlgItem(IDC_VIEW)->ShowWindow(SW_SHOW);
+
+    // Enable Save menu
+    GetMenu()->EnableMenuItem(ID_FILE_SAVE, MF_ENABLED);
+    GetMenu()->EnableMenuItem(ID_ADD_SCENE, MF_ENABLED);
+    GetMenu()->EnableMenuItem(ID_ADD_LIGHT, MF_ENABLED);
+
+    // Display control
+    m_OutlineList.ShowWindow(SW_SHOW);
+}
+
+
+void CGLBLightStudioDlg::OnFileSave()
+{
+    if (!strcmp(m_ProjectXML->Value(), ""))
+    {
+        TCHAR szFilter[] = L"XML File(*.xml)|*.txt|All Files(*.*)|*.*||";
+        CFileDialog fileDlg(FALSE, L"txt", L"Untitled.xml", OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, szFilter, this);
+
+        if (IDOK == fileDlg.DoModal())
+        {
+            CString filePath = fileDlg.GetPathName();
+
+            char *pcstr = (char *)new char[2 * wcslen(filePath.GetBuffer(0))+1] ;
+            memset(pcstr , 0 , 2 * wcslen(filePath.GetBuffer(0))+1 );
+            wcstombs(pcstr, filePath.GetBuffer(0), wcslen(filePath.GetBuffer(0))) ;
+
+            m_ProjectXML->SetValue(pcstr);
+            m_ProjectXML->SaveFile();
+
+            delete[] pcstr;
+            pcstr = NULL;
+        }
+    }
+    else
+    {
+        m_ProjectXML->SaveFile();
+    }
+}
+
+
+void CGLBLightStudioDlg::OnAddScene()
+{
+    // TODO: Add your command handler code here
+}
+
+
+void CGLBLightStudioDlg::OnAddLight()
+{
+    // TODO: Add your command handler code here
 }
