@@ -1,0 +1,342 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="glb">
+      <UniqueIdentifier>{5a15b418-620d-47c2-b9a9-1bfcdc5d1205}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="glb\render">
+      <UniqueIdentifier>{16e0abfe-c2c4-4148-a4fd-f94c6aad4a78}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="glb\math">
+      <UniqueIdentifier>{e7a7ebd0-af2d-4096-9653-26af4c412106}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="glb\util">
+      <UniqueIdentifier>{68a434cc-7384-4f0a-ad40-538dce9d6433}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="glb\scene">
+      <UniqueIdentifier>{5ff8fed2-66eb-4b22-8b8f-333040506cd8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="glb\thirdparty">
+      <UniqueIdentifier>{a49934e5-78ec-4a5d-8cd5-693906d585ad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="glb\thirdparty\stb_image">
+      <UniqueIdentifier>{036db9d7-d3f2-4f94-8f48-6803b80250d0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="glb\thirdparty\rgbe">
+      <UniqueIdentifier>{cdcc66a3-0087-4260-b1aa-13632e9ca82a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="glb\render\imp">
+      <UniqueIdentifier>{fe81c3c2-5b0d-4c3c-a23a-9aabd27a947b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="glb\render\imp\gl">
+      <UniqueIdentifier>{d2a352ea-be4e-49f2-8bd1-1e5b63fab3ed}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="glb\render\imp\dx11">
+      <UniqueIdentifier>{82e25574-859e-4da1-a85a-6f4fc7a56d8d}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+    <Text Include="..\glb\thirdparty\rgbe\rgbe.txt">
+      <Filter>glb\thirdparty\rgbe</Filter>
+    </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="glb_lightstudio.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="glb_lightstudioDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\glb.h">
+      <Filter>glb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\glbapplication.h">
+      <Filter>glb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\glbinput.h">
+      <Filter>glb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\math\glbbv.h">
+      <Filter>glb\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\math\glbmath.h">
+      <Filter>glb\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\math\glbmatrix.cpp.h">
+      <Filter>glb\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\math\glbmatrix.h">
+      <Filter>glb\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\math\glbvector.h">
+      <Filter>glb\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\thirdparty\stb_image\std_image.h">
+      <Filter>glb\thirdparty\stb_image</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\thirdparty\rgbe\rgbe.h">
+      <Filter>glb\thirdparty\rgbe</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\scene\glbcamera.h">
+      <Filter>glb\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\scene\glblight.h">
+      <Filter>glb\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\scene\glbmodel.h">
+      <Filter>glb\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\scene\glbmodelfile.h">
+      <Filter>glb\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\scene\glbobject.h">
+      <Filter>glb\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\scene\glbscene.h">
+      <Filter>glb\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\util\glbddsformat.h">
+      <Filter>glb\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\util\glblog.h">
+      <Filter>glb\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\util\glbmacro.h">
+      <Filter>glb\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\util\glbprofile.h">
+      <Filter>glb\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\util\glbtextureinfo.h">
+      <Filter>glb\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\util\glbtexturereader.h">
+      <Filter>glb\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\util\glbtexturewriter.h">
+      <Filter>glb\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\util\glbutil.h">
+      <Filter>glb\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\render\glbmaterial.h">
+      <Filter>glb\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\render\glbmesh.h">
+      <Filter>glb\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\render\glbrender.h">
+      <Filter>glb\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\render\glbrenderdevice.h">
+      <Filter>glb\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\render\glbrendertarget.h">
+      <Filter>glb\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\render\glbshader.h">
+      <Filter>glb\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\render\glbstructs.h">
+      <Filter>glb\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\render\glbtexture.h">
+      <Filter>glb\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\render\glbuniform.h">
+      <Filter>glb\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\render\imp\gl\glbmeshimp.h">
+      <Filter>glb\render\imp\gl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\render\imp\gl\glbrenderdeviceimp.h">
+      <Filter>glb\render\imp\gl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\render\imp\gl\glbrendertargetimp.h">
+      <Filter>glb\render\imp\gl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\render\imp\gl\glbshaderimp.h">
+      <Filter>glb\render\imp\gl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\render\imp\gl\glbtextureimp.h">
+      <Filter>glb\render\imp\gl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\render\imp\dx11\glbmeshimp.h">
+      <Filter>glb\render\imp\dx11</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\render\imp\dx11\glbrenderdeviceimp.h">
+      <Filter>glb\render\imp\dx11</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\render\imp\dx11\glbrendertargetimp.h">
+      <Filter>glb\render\imp\dx11</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\render\imp\dx11\glbshaderimp.h">
+      <Filter>glb\render\imp\dx11</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\render\imp\dx11\glbtextureimp.h">
+      <Filter>glb\render\imp\dx11</Filter>
+    </ClInclude>
+    <ClInclude Include="glb_lightstudio_core.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="glb_lightstudio.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="glb_lightstudioDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\glbapplication.cpp">
+      <Filter>glb</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\glbinput.cpp">
+      <Filter>glb</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\math\glbbv.cpp">
+      <Filter>glb\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\math\glbmath.cpp">
+      <Filter>glb\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\thirdparty\rgbe\rgbe.cpp">
+      <Filter>glb\thirdparty\rgbe</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\scene\glbcamera.cpp">
+      <Filter>glb\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\scene\glbmodel.cpp">
+      <Filter>glb\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\scene\glbmodelfile.cpp">
+      <Filter>glb\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\scene\glbobject.cpp">
+      <Filter>glb\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\scene\glbscene.cpp">
+      <Filter>glb\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\util\glblog.cpp">
+      <Filter>glb\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\util\glbprofile.cpp">
+      <Filter>glb\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\util\glbtexturereader.cpp">
+      <Filter>glb\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\util\glbtexturewriter.cpp">
+      <Filter>glb\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\util\glbutil.cpp">
+      <Filter>glb\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\render\glbmaterial.cpp">
+      <Filter>glb\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\render\glbmesh.cpp">
+      <Filter>glb\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\render\glbrender.cpp">
+      <Filter>glb\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\render\glbrenderdevice.cpp">
+      <Filter>glb\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\render\glbrendertarget.cpp">
+      <Filter>glb\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\render\glbshader.cpp">
+      <Filter>glb\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\render\glbtexture.cpp">
+      <Filter>glb\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\render\glbuniform.cpp">
+      <Filter>glb\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\render\imp\gl\glbmeshimp.cpp">
+      <Filter>glb\render\imp\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\render\imp\gl\glbrenderdeivceimp.cpp">
+      <Filter>glb\render\imp\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\render\imp\gl\glbrendertargetimp.cpp">
+      <Filter>glb\render\imp\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\render\imp\gl\glbshaderimp.cpp">
+      <Filter>glb\render\imp\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\render\imp\gl\glbtextureimp.cpp">
+      <Filter>glb\render\imp\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\render\imp\dx11\glbmeshimp.cpp">
+      <Filter>glb\render\imp\dx11</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\render\imp\dx11\glbrenderdeviceimp.cpp">
+      <Filter>glb\render\imp\dx11</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\render\imp\dx11\glbrendertargetimp.cpp">
+      <Filter>glb\render\imp\dx11</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\render\imp\dx11\glbshaderimp.cpp">
+      <Filter>glb\render\imp\dx11</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\render\imp\dx11\glbtextureimp.cpp">
+      <Filter>glb\render\imp\dx11</Filter>
+    </ClCompile>
+    <ClCompile Include="glb_lightstudio_core.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="glb_lightstudio.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\glb_lightstudio.rc2">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\glb\math\glbvector.inl">
+      <Filter>glb\math</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\glb_lightstudio.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\icon1.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\glb.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+</Project>
