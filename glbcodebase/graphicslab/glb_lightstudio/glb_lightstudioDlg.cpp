@@ -87,6 +87,8 @@ BEGIN_MESSAGE_MAP(CGLBLightStudioDlg, CDialog)
     ON_BN_CLICKED(IDC_BAKE_BUTTON, &CGLBLightStudioDlg::OnBnClickedBakeButton)
     ON_BN_CLICKED(IDC_BAKE_CANCEL_BUTTON, &CGLBLightStudioDlg::OnBnClickedBakeCancelButton)
     ON_NOTIFY(NM_CUSTOMDRAW, IDC_OUTLINE_LIST, &CGLBLightStudioDlg::OnNMCustomdrawOutlineList)
+    ON_NOTIFY(HDN_ITEMCLICK, 0, &CGLBLightStudioDlg::OnHdnItemclickOutlineList)
+    ON_NOTIFY(NM_CLICK, IDC_OUTLINE_LIST, &CGLBLightStudioDlg::OnNMClickOutlineList)
 END_MESSAGE_MAP()
 
 
@@ -239,7 +241,7 @@ void CGLBLightStudioDlg::OnClose()
         m_SceneConfigDlg = NULL;
     }
 
-    for (std::map<std::string, CGLBLightSourceConfigDlg*>::iterator it = m_LightSourceConfigDlgs.begin(); it != m_LightSourceConfigDlgs.end(); ++it)
+    for (LightSourceDlgArray::iterator it = m_LightSourceConfigDlgs.begin(); it != m_LightSourceConfigDlgs.end(); ++it)
     {
         delete it->second;
         it->second = NULL;
@@ -410,7 +412,7 @@ void CGLBLightStudioDlg::OnAddLight()
         dlg->Create(IDD_LIGHT_SOURCE_CONFIG_DIALOG);
         dlg->ShowWindow(SW_SHOW);
         dlg->MoveWindow(kSubDialogPosX, kSubDialogPosY, kSubDialogWidth, kSubDialogHeight, TRUE);
-        m_LightSourceConfigDlgs.insert(std::pair<std::string, CGLBLightSourceConfigDlg*>(std::string(pcstr), dlg));
+        m_LightSourceConfigDlgs.insert(std::pair<int, CGLBLightSourceConfigDlg*>(id, dlg));
 
         // Set current display config dialog
         if (m_CurDispConfigDlg)
@@ -476,4 +478,58 @@ void CGLBLightStudioDlg::OnNMCustomdrawOutlineList(NMHDR *pNMHDR, LRESULT *pResu
     NMLVCUSTOMDRAW* pLVCD = reinterpret_cast<NMLVCUSTOMDRAW*>( pNMHDR );
 
     *pResult = 0;
+}
+
+
+void CGLBLightStudioDlg::OnHdnItemclickOutlineList(NMHDR *pNMHDR, LRESULT *pResult)
+{
+    LPNMHEADER phdr = reinterpret_cast<LPNMHEADER>(pNMHDR);
+    // TODO: Add your control notification handler code here
+    *pResult = 0;
+}
+
+
+void CGLBLightStudioDlg::OnNMClickOutlineList(NMHDR *pNMHDR, LRESULT *pResult)
+{
+    LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
+    // TODO: Add your control notification handler code here
+    *pResult = 0;
+
+    int index = pNMItemActivate->iItem;
+    CListCtrl* ctrl = static_cast<CListCtrl*>(GetDlgItem(IDC_OUTLINE_LIST));
+    CString type = ctrl->GetItemText(index, 0);
+    CString id = ctrl->GetItemText(index, 1);
+    if (!type.Compare(L"Scene"))
+    {
+        if (m_CurDispConfigDlg)
+        {
+            m_CurDispConfigDlg->ShowWindow(SW_HIDE);
+        }
+        m_SceneConfigDlg->ShowWindow(SW_SHOW);
+        m_CurDispConfigDlg = m_SceneConfigDlg;
+    }
+    else
+    {
+        char *pcstr = (char *)new char[2 * wcslen(id.GetBuffer(0))+1];
+        memset(pcstr , 0 , 2 * wcslen(id.GetBuffer(0))+1 );
+        wcstombs(pcstr, id.GetBuffer(0), wcslen(id.GetBuffer(0)));
+
+        LightSourceDlgArray::iterator it = m_LightSourceConfigDlgs.find(atoi(pcstr));
+        if (it != m_LightSourceConfigDlgs.end())
+        {
+            if (m_CurDispConfigDlg)
+            {
+                m_CurDispConfigDlg->ShowWindow(SW_HIDE);
+            }
+            it->second->ShowWindow(SW_SHOW);
+            m_CurDispConfigDlg = it->second;
+        }
+        else
+        {
+            assert(false);
+        }
+
+        delete[] pcstr;
+        pcstr = NULL;
+    }
 }

@@ -48,8 +48,11 @@ protected:
 private:
     CListCtrl m_OutlineList;
     CGLBSceneConfigDlg* m_SceneConfigDlg;
-    std::map<std::string, CGLBLightSourceConfigDlg*> m_LightSourceConfigDlgs;
+    typedef std::map<int, CGLBLightSourceConfigDlg*> LightSourceDlgArray;
+    LightSourceDlgArray m_LightSourceConfigDlgs;
     CWnd*   m_CurDispConfigDlg;
 public:
     afx_msg void OnNMCustomdrawOutlineList(NMHDR *pNMHDR, LRESULT *pResult);
+    afx_msg void OnHdnItemclickOutlineList(NMHDR *pNMHDR, LRESULT *pResult);
+    afx_msg void OnNMClickOutlineList(NMHDR *pNMHDR, LRESULT *pResult);
 };
