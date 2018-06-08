@@ -148,7 +148,8 @@ BOOL CGLBLightStudioDlg::OnInitDialog()
     DWORD style = m_OutlineList.GetExtendedStyle();
     m_OutlineList.SetExtendedStyle(style | LVS_EX_FULLROWSELECT);
     m_OutlineList.InsertColumn(0, L"Type", LVCFMT_CENTER, 100);
-    m_OutlineList.InsertColumn(1, L"File", LVCFMT_CENTER, 100);
+    m_OutlineList.InsertColumn(1, L"ID", LVCFMT_CENTER, 100);
+    m_OutlineList.InsertColumn(2, L"File", LVCFMT_CENTER, 100);
     m_OutlineList.ShowWindow(SW_HIDE);
 
     GetDlgItem(IDC_BAKE_BUTTON)->ShowWindow(SW_HIDE);
@@ -339,10 +340,14 @@ void CGLBLightStudioDlg::OnAddScene()
 
         // Set Outline text
         int count = m_OutlineList.GetItemCount();
+        CString id;
+        id.Format(L"%d", 1);
+
         m_OutlineList.InsertItem(count, L"");
         m_OutlineList.SetItemText(count, 0, L"Scene");
-        m_OutlineList.SetItemText(count, 1, filePath.GetBuffer(0));
-        m_OutlineList.SetSelectionMark(count);
+        m_OutlineList.SetItemText(count, 1, id);
+        m_OutlineList.SetItemText(count, 2, filePath);
+
         m_OutlineList.SetItemState(count, LVIS_SELECTED, LVIS_SELECTED);
 
         // Create scene config dialog
@@ -380,7 +385,8 @@ void CGLBLightStudioDlg::OnAddLight()
         memset(pcstr , 0 , 2 * wcslen(filePath.GetBuffer(0))+1 );
         wcstombs(pcstr, filePath.GetBuffer(0), wcslen(filePath.GetBuffer(0))) ;
 
-        if (!ApplicationCore::GetInstance()->AddLightMesh(pcstr))
+        int id = ApplicationCore::GetInstance()->AddLightMesh(pcstr);
+        if (id == -1)
         {
             ::MessageBox(NULL, L"Invalid light source mesh object file", L"ERROR", MB_OK);
             delete[] pcstr;
@@ -390,10 +396,13 @@ void CGLBLightStudioDlg::OnAddLight()
 
         // Set Outline text
         int count = m_OutlineList.GetItemCount();
+        CString idStr;
+        idStr.Format(L"%d", id);
+
         m_OutlineList.InsertItem(count, L"");
         m_OutlineList.SetItemText(count, 0, L"Light");
-        m_OutlineList.SetItemText(count, 1, filePath.GetBuffer(0));
-        //m_OutlineList.SetSelectionMark(count);
+        m_OutlineList.SetItemText(count, 1, idStr);
+        m_OutlineList.SetItemText(count, 2, filePath);
         m_OutlineList.SetItemState(count, LVIS_SELECTED | LVIS_FOCUSED, LVIS_SELECTED | LVIS_FOCUSED);
 
         // Create light source config dialog

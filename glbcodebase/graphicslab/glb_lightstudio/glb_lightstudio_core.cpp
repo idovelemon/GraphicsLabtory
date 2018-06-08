@@ -12,6 +12,7 @@ using namespace glb;
 
 static const int32_t kLightPatchSize = 1024; // At least 128*128
 ApplicationCore* ApplicationCore::s_Instance = NULL;
+int ApplicationCore::sIdGen = 0;
 
 ApplicationCore::ApplicationCore()
 : m_Camera(NULL)
@@ -199,17 +200,20 @@ bool ApplicationCore::AddSceneMesh(const char* name) {
     return true;
 }
 
-bool ApplicationCore::AddLightMesh(const char* name) {
+int ApplicationCore::AddLightMesh(const char* name) {
+    int result = -1;
     scene::Object* light = scene::Object::Create(name);
     if (light) {
         LightSourceEntry entry;
         entry.obj = light;
-        m_LightSource.insert(std::pair<std::string, LightSourceEntry>(std::string(name), entry));
+        entry.id  = sIdGen++;
+        m_LightSource.insert(std::pair<int, LightSourceEntry>(entry.id, entry));
+        result = entry.id;
     } else {
         GLB_SAFE_ASSERT(false);
     }
 
-    return true;
+    return result;
 }
 
 void ApplicationCore::ChangeLightMapSize(int width, int height) {
@@ -251,8 +255,8 @@ bool ApplicationCore::IsBaking() const {
     return m_EnableBake;
 }
 
-void ApplicationCore::SetLightSourcePos(const char* name, float px, float py, float pz) {
-    LightSourceArray::iterator it = m_LightSource.find(std::string(name));
+void ApplicationCore::SetLightSourcePos(int id, float px, float py, float pz) {
+    LightSourceArray::iterator it = m_LightSource.find(id);
     if (it != m_LightSource.end()) {
         it->second.obj->SetPos(math::Vector(px, py, pz));
     } else {
@@ -260,8 +264,8 @@ void ApplicationCore::SetLightSourcePos(const char* name, float px, float py, fl
     }
 }
 
-void ApplicationCore::SetLightSourceRot(const char* name, float rx, float ry, float rz) {
-    LightSourceArray::iterator it = m_LightSource.find(std::string(name));
+void ApplicationCore::SetLightSourceRot(int id, float rx, float ry, float rz) {
+    LightSourceArray::iterator it = m_LightSource.find(id);
     if (it != m_LightSource.end()) {
         it->second.obj->SetRotation(math::Vector(rx, ry, rz));
     } else {
@@ -269,17 +273,17 @@ void ApplicationCore::SetLightSourceRot(const char* name, float rx, float ry, fl
     }
 }
 
-void ApplicationCore::SetLightSourceScale(const char* name, float sx, float sy, float sz) {
-    LightSourceArray::iterator it = m_LightSource.find(std::string(name));
+void ApplicationCore::SetLightSourceScale(int id, float sx, float sy, float sz) {
+    LightSourceArray::iterator it = m_LightSource.find(id);
     if (it != m_LightSource.end()) {
-        it->second.obj->SetRotation(math::Vector(sx, sy, sz));
+        it->second.obj->SetScale(math::Vector(sx, sy, sz));
     } else {
         GLB_SAFE_ASSERT(false);
     }
 }
 
-void ApplicationCore::SetLightSourceColor(const char* name, float cx, float cy, float cz) {
-    LightSourceArray::iterator it = m_LightSource.find(std::string(name));
+void ApplicationCore::SetLightSourceColor(int id, float cx, float cy, float cz) {
+    LightSourceArray::iterator it = m_LightSource.find(id);
     if (it != m_LightSource.end()) {
         it->second.color = math::Vector(cx, cy, cz);
     } else {
@@ -402,6 +406,7 @@ void ApplicationCore::DrawScene() {
             math::Matrix proj;
             proj.MakeProjectionMatrix(app::Application::GetWindowWidth() * 1.0f / app::Application::GetWindowHeight(), 75.0f, 0.001f, 10000.0f);
             math::Matrix world;
+            it->second.obj->Update();
             world = it->second.obj->GetWorldMatrix();
             render::Device::SetUniformMatrix(m_LightProgram->GetUniformLocation("glb_MVP"), proj * m_Camera->GetViewMatrix() * world);
             render::Device::SetUniform3f(m_LightProgram->GetUniformLocation("glb_LightColor"), color);

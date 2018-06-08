@@ -26,17 +26,17 @@ public:
     virtual void Destroy();
 
     bool AddSceneMesh(const char* name);
-    bool AddLightMesh(const char* name);
+    int AddLightMesh(const char* name);
     void ChangeLightMapSize(int width, int height);
     void SetBakeIterate(int iterate);
     void Bake();
     void CancelBake();
     float GetCurProgress();
     bool IsBaking() const;
-    void SetLightSourcePos(const char* name, float px, float py, float pz);
-    void SetLightSourceRot(const char* name, float rx, float ry, float rz);
-    void SetLightSourceScale(const char* name, float sx, float sy, float sz);
-    void SetLightSourceColor(const char* name, float cx, float cy, float cz);
+    void SetLightSourcePos(int id, float px, float py, float pz);
+    void SetLightSourceRot(int id, float rx, float ry, float rz);
+    void SetLightSourceScale(int id, float sx, float sy, float sz);
+    void SetLightSourceColor(int id, float cx, float cy, float cz);
 
 protected:
     void PreGenerate();
@@ -59,6 +59,7 @@ protected:
 
 private:
     static ApplicationCore*             s_Instance;
+    static int                          sIdGen;
 
     glb::scene::CameraBase*             m_Camera;
     glb::render::mesh::ScreenMesh*      m_ScreenMesh;
@@ -66,13 +67,15 @@ private:
     struct LightSourceEntry {
         glb::math::Vector color;
         glb::scene::Object* obj;
+        int id;
 
         LightSourceEntry()
         : color(0.0f, 0.0f, 0.0f)
-        , obj(NULL) {
+        , obj(NULL)
+        , id(-1) {
         }
     };
-    typedef std::map<std::string, LightSourceEntry> LightSourceArray;
+    typedef std::map<int, LightSourceEntry> LightSourceArray;
     LightSourceArray                    m_LightSource;
     glb::render::shader::UserProgram*   m_LightProgram;
 

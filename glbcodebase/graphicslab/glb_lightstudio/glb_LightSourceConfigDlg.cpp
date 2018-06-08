@@ -21,9 +21,9 @@ CGLBLightSourceConfigDlg::CGLBLightSourceConfigDlg(CWnd* pParent /*=NULL*/)
     , m_LightSourceRotX(0)
     , m_LightSourceRotY(0)
     , m_LightSourceRotZ(0)
-    , m_LightSourceScaleX(0)
-    , m_LightSourceScaleY(0)
-    , m_LightSourceScaleZ(0)
+    , m_LightSourceScaleX(1.0f)
+    , m_LightSourceScaleY(1.0f)
+    , m_LightSourceScaleZ(1.0f)
     , m_LightSourceColorX(0)
     , m_LightSourceColorY(0)
     , m_LightSourceColorZ(0)
@@ -55,19 +55,21 @@ void CGLBLightSourceConfigDlg::DoDataExchange(CDataExchange* pDX)
 void CGLBLightSourceConfigDlg::UpdateLightSourceInfo()
 {
     CListCtrl* list = static_cast<CListCtrl*>(GetParent()->GetDlgItem(IDC_OUTLINE_LIST));
-    int line = list->GetSelectionMark();
-    if (line != -1)
+    POSITION pos = list->GetFirstSelectedItemPosition();
+    if (pos != NULL)
     {
-        CString lightSourcePath = list->GetItemText(line, 1);
+        int index = list->GetNextSelectedItem(pos);
+        CString lightSourceId = list->GetItemText(index, 1);
 
-        char *pcstr = (char *)new char[2 * wcslen(lightSourcePath.GetBuffer(0))+1] ;
-        memset(pcstr , 0 , 2 * wcslen(lightSourcePath.GetBuffer(0))+1 );
-        wcstombs(pcstr, lightSourcePath.GetBuffer(0), wcslen(lightSourcePath.GetBuffer(0))) ;
+        char *pcstr = (char *)new char[2 * wcslen(lightSourceId.GetBuffer(0))+1] ;
+        memset(pcstr , 0 , 2 * wcslen(lightSourceId.GetBuffer(0))+1 );
+        wcstombs(pcstr, lightSourceId.GetBuffer(0), wcslen(lightSourceId.GetBuffer(0)));
+        int id = atoi(pcstr);
 
-        ApplicationCore::GetInstance()->SetLightSourcePos(pcstr, m_LightSourcePosX, m_LightSourcePosX, m_LightSourcePosZ);
-        ApplicationCore::GetInstance()->SetLightSourceRot(pcstr, m_LightSourceRotX, m_LightSourceRotX, m_LightSourceRotZ);
-        ApplicationCore::GetInstance()->SetLightSourceScale(pcstr, m_LightSourceScaleX, m_LightSourceScaleX, m_LightSourceScaleZ);
-        ApplicationCore::GetInstance()->SetLightSourceColor(pcstr, m_LightSourceColorX, m_LightSourceColorX, m_LightSourceColorZ);
+        ApplicationCore::GetInstance()->SetLightSourcePos(id, m_LightSourcePosX, m_LightSourcePosY, m_LightSourcePosZ);
+        ApplicationCore::GetInstance()->SetLightSourceRot(id, m_LightSourceRotX, m_LightSourceRotY, m_LightSourceRotZ);
+        ApplicationCore::GetInstance()->SetLightSourceScale(id, m_LightSourceScaleX, m_LightSourceScaleY, m_LightSourceScaleZ);
+        ApplicationCore::GetInstance()->SetLightSourceColor(id, m_LightSourceColorX, m_LightSourceColorY, m_LightSourceColorZ);
 
         delete[] pcstr;
         pcstr = NULL;
@@ -116,7 +118,7 @@ BOOL CGLBLightSourceConfigDlg::PreTranslateMessage(MSG* pMsg)
         bool isEditorControl = false;
         for (int i = 0; i < sizeof(editID) / sizeof(editID[0]); i++)
         {
-            if (GetDlgItem(editID[i])->m_hWnd == pMsg->hwnd)
+            if (GetDlgItem(editID[i])->m_hWnd == pMsg->hwnd && pMsg->wParam == VK_RETURN)
             {
                 isEditorControl = true;
                 break;
