@@ -6,6 +6,10 @@
 
 #include "tinyxml/tinyxml.h"
 #include "afxcmn.h"
+#include "glb_sceneConfigDlg.h"
+#include "glb_LightSourceConfigDlg.h"
+
+#include <map>
 
 // CGLBLightStudioDlg dialog
 class CGLBLightStudioDlg : public CDialog
@@ -37,8 +41,15 @@ protected:
     afx_msg void OnFileSave();
     afx_msg void OnAddScene();
     afx_msg void OnAddLight();
+    afx_msg void OnBnClickedBakeButton();
+    afx_msg void OnBnClickedBakeCancelButton();
 	DECLARE_MESSAGE_MAP()
 
 private:
     CListCtrl m_OutlineList;
+    CGLBSceneConfigDlg* m_SceneConfigDlg;
+    std::map<std::string, CGLBLightSourceConfigDlg*> m_LightSourceConfigDlgs;
+    CWnd*   m_CurDispConfigDlg;
+public:
+    afx_msg void OnNMCustomdrawOutlineList(NMHDR *pNMHDR, LRESULT *pResult);
 };

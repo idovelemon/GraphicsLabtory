@@ -151,9 +151,11 @@
     <ClInclude Include="..\glb\util\glbtexturereader.h" />
     <ClInclude Include="..\glb\util\glbtexturewriter.h" />
     <ClInclude Include="..\glb\util\glbutil.h" />
+    <ClInclude Include="glb_LightSourceConfigDlg.h" />
     <ClInclude Include="glb_lightstudio.h" />
     <ClInclude Include="glb_lightstudioDlg.h" />
     <ClInclude Include="glb_lightstudio_core.h" />
+    <ClInclude Include="glb_sceneConfigDlg.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
@@ -194,9 +196,11 @@
     <ClCompile Include="..\glb\util\glbtexturereader.cpp" />
     <ClCompile Include="..\glb\util\glbtexturewriter.cpp" />
     <ClCompile Include="..\glb\util\glbutil.cpp" />
+    <ClCompile Include="glb_LightSourceConfigDlg.cpp" />
     <ClCompile Include="glb_lightstudio.cpp" />
     <ClCompile Include="glb_lightstudioDlg.cpp" />
     <ClCompile Include="glb_lightstudio_core.cpp" />
+    <ClCompile Include="glb_sceneConfigDlg.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
