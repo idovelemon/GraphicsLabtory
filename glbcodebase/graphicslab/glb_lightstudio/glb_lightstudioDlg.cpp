@@ -50,7 +50,7 @@ END_MESSAGE_MAP()
 
 
 CGLBLightStudioDlg::CGLBLightStudioDlg(CWnd* pParent /*=NULL*/)
-	: CDialogEx(CGLBLightStudioDlg::IDD, pParent)
+	: CDialog(CGLBLightStudioDlg::IDD, pParent)
     , m_ProjectXML(NULL)
 {
     // Using GLB icon
@@ -60,7 +60,7 @@ CGLBLightStudioDlg::CGLBLightStudioDlg(CWnd* pParent /*=NULL*/)
 
 void CGLBLightStudioDlg::DoDataExchange(CDataExchange* pDX)
 {
-    CDialogEx::DoDataExchange(pDX);
+    CDialog::DoDataExchange(pDX);
     if (m_ProjectXML)
     {
         delete m_ProjectXML;
@@ -69,7 +69,7 @@ void CGLBLightStudioDlg::DoDataExchange(CDataExchange* pDX)
     DDX_Control(pDX, IDC_OUTLINE_LIST, m_OutlineList);
 }
 
-BEGIN_MESSAGE_MAP(CGLBLightStudioDlg, CDialogEx)
+BEGIN_MESSAGE_MAP(CGLBLightStudioDlg, CDialog)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
@@ -86,7 +86,7 @@ END_MESSAGE_MAP()
 
 BOOL CGLBLightStudioDlg::OnInitDialog()
 {
-	CDialogEx::OnInitDialog();
+	CDialog::OnInitDialog();
 
 	// Add "About..." menu item to system menu.
 
@@ -137,6 +137,8 @@ BOOL CGLBLightStudioDlg::OnInitDialog()
     GetMenu()->EnableMenuItem(ID_ADD_LIGHT, MF_DISABLED);
 
     // Hide control
+    m_OutlineList.InsertColumn(0, L"Type", LVCFMT_CENTER, 100);
+    m_OutlineList.InsertColumn(1, L"File", LVCFMT_CENTER, 100);
     m_OutlineList.ShowWindow(SW_HIDE);
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
@@ -151,7 +153,7 @@ void CGLBLightStudioDlg::OnSysCommand(UINT nID, LPARAM lParam)
 	}
 	else
 	{
-		CDialogEx::OnSysCommand(nID, lParam);
+		CDialog::OnSysCommand(nID, lParam);
 	}
 }
 
@@ -180,7 +182,7 @@ void CGLBLightStudioDlg::OnPaint()
 	}
 	else
 	{
-		CDialogEx::OnPaint();
+		CDialog::OnPaint();
 	}
 }
 
@@ -200,7 +202,7 @@ void CGLBLightStudioDlg::OnClose()
 {
     // TODO: Add your message handler code here and/or call default
     glb::app::Application::Destroy();
-    CDialogEx::OnClose();
+    CDialog::OnClose();
 }
 
 
@@ -243,8 +245,8 @@ void CGLBLightStudioDlg::OnFileSave()
 {
     if (!strcmp(m_ProjectXML->Value(), ""))
     {
-        TCHAR szFilter[] = L"XML File(*.xml)|*.txt|All Files(*.*)|*.*||";
-        CFileDialog fileDlg(FALSE, L"txt", L"Untitled.xml", OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, szFilter, this);
+        TCHAR szFilter[] = L"XML File(*.xml)|*.xml|All Files(*.*)|*.*||";
+        CFileDialog fileDlg(FALSE, L"xml", L"Untitled.xml", OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, szFilter, this);
 
         if (IDOK == fileDlg.DoModal())
         {
@@ -270,11 +272,37 @@ void CGLBLightStudioDlg::OnFileSave()
 
 void CGLBLightStudioDlg::OnAddScene()
 {
-    // TODO: Add your command handler code here
+    TCHAR szFilter[] = L"Wave Object File(*.obj)|*.obj||";
+    CFileDialog fileDlg(TRUE, L"obj", L"", OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, szFilter, this);
+
+    if (IDOK == fileDlg.DoModal())
+    {
+        CString filePath = fileDlg.GetPathName();
+
+        char *pcstr = (char *)new char[2 * wcslen(filePath.GetBuffer(0))+1] ;
+        memset(pcstr , 0 , 2 * wcslen(filePath.GetBuffer(0))+1 );
+        wcstombs(pcstr, filePath.GetBuffer(0), wcslen(filePath.GetBuffer(0))) ;
+
+        if (!ApplicationCore::GetInstance()->AddSceneMesh(pcstr))
+        {
+            ::MessageBox(NULL, L"Invalid scene mesh object file", L"ERROR", MB_OK);
+        }
+
+        delete[] pcstr;
+        pcstr = NULL;
+
+        // Hide ADD-Scene menu
+        GetMenu()->EnableMenuItem(ID_ADD_SCENE, MF_DISABLED);
+
+        // Set Outline text
+        int count = m_OutlineList.GetItemCount();
+        m_OutlineList.InsertItem(count, L"");
+        m_OutlineList.SetItemText(count, 0, L"Scene");
+        m_OutlineList.SetItemText(count, 1, filePath.GetBuffer(0));
+    }
 }
 
 
 void CGLBLightStudioDlg::OnAddLight()
 {
-    // TODO: Add your command handler code here
 }

@@ -23,8 +23,24 @@ public:
     virtual void Update(float dt);
     virtual void Destroy();
 
+    bool AddSceneMesh(const char* name);
+
+protected:
+    void UpdateCamera();
+    void DrawScene();
+
 private:
     static ApplicationCore* s_Instance;
+
+    glb::scene::CameraBase* m_Camera;
+
+    glb::scene::Model*              m_SceneMesh;
+
+    glb::render::texture::Texture*  m_LightMap[3];
+    int32_t                         m_LightMapWidth;
+    int32_t                         m_LightMapHeight;
+
+    glb::render::shader::UserProgram*   m_SceneProgram;
 };
 
 #endif  // GLB_GLB_LIGHT_STUDIO_CORE_H_

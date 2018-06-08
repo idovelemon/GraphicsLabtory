@@ -8,7 +8,7 @@
 #include "afxcmn.h"
 
 // CGLBLightStudioDlg dialog
-class CGLBLightStudioDlg : public CDialogEx
+class CGLBLightStudioDlg : public CDialog
 {
 // Construction
 public:

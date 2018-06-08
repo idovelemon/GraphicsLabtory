@@ -42,6 +42,7 @@ enum ButtonKey {
     BK_I = 0x17,
     BK_O = 0x18,
     BK_P = 0x19,
+    BK_LCONTROL = 0x1D,
     BK_A = 0x1E,
     BK_S = 0x1F,
     BK_D = 0x20,
