@@ -32,7 +32,7 @@ vec3 calc_radiosity_normal_map_color(vec2 uv) {
 }
 
 void main() {
-    oColor = (calc_radiosity_normal_map_color(vsTexCoord) + vec3(0.2, 0.2, 0.2)) * texture(glb_AlbedoMap, vsTexCoord).xyz;
+    oColor = (calc_radiosity_normal_map_color(vsTexCoord) + vec3(0.05, 0.05, 0.05)) * texture(glb_AlbedoMap, vsTexCoord).xyz;
     oColor = oColor / (vec3(1.0, 1.0, 1.0) + oColor);
     oColor = pow(oColor, vec3(1.0 / 2.2, 1.0 / 2.2, 1.0 / 2.2));
 }

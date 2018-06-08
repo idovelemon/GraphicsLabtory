@@ -36,7 +36,8 @@ ApplicationCore::ApplicationCore()
 , m_TotalWeightColorLoc(-1)
 , m_WeightMapLoc(-1)
 , m_Patch(NULL)
-, m_LightPatchProgram(NULL)
+, m_LightPatchSceneProgram(NULL)
+, m_LightPatchLightProgram(NULL)
 , m_LightPatchMVPLoc(-1)
 , m_NormlaizeWeightMapLoc(-1)
 , m_LightPatchAlbedoMapLoc(-1)
@@ -62,6 +63,9 @@ ApplicationCore* ApplicationCore::GetInstance() {
 }
 
 bool ApplicationCore::Initialize() {
+    // Turn off VSync
+    render::Device::SetupVSync(false);
+
     // Create Shader
     m_SceneProgram = render::shader::UserProgram::Create("res/draw.vs", "res/draw.fs");
 
@@ -76,15 +80,17 @@ bool ApplicationCore::Initialize() {
     m_TotalWeightColorLoc = m_NormalizeWeightProgram->GetUniformLocation("glb_TotalColor");
     m_WeightMapLoc = m_NormalizeWeightProgram->GetUniformLocation("glb_WeightMap");
 
-    m_LightPatchProgram = render::shader::UserProgram::Create("res/lightPatch.vs", "res/lightPatch.fs");
-    m_LightPatchMVPLoc = m_LightPatchProgram->GetUniformLocation("glb_MVP");
-    m_NormlaizeWeightMapLoc = m_LightPatchProgram->GetUniformLocation("glb_NormalizeWeightMap");
-    m_LightMapLoc[0] = m_LightPatchProgram->GetUniformLocation("glb_LightMap[0]");
-    m_LightMapLoc[1] = m_LightPatchProgram->GetUniformLocation("glb_LightMap[1]");
-    m_LightMapLoc[2] = m_LightPatchProgram->GetUniformLocation("glb_LightMap[2]");
-    m_LightPatchAlbedoMapLoc = m_LightPatchProgram->GetUniformLocation("glb_AlbedoMap");
-    m_LightPatchNormalMapLoc = m_LightPatchProgram->GetUniformLocation("glb_NormalMap");
-    m_LightPatchFaceLoc = m_LightPatchProgram->GetUniformLocation("glb_Face");
+    m_LightPatchSceneProgram = render::shader::UserProgram::Create("res/lightPatch.vs", "res/lightPatchScene.fs");
+    m_LightPatchMVPLoc = m_LightPatchSceneProgram->GetUniformLocation("glb_MVP");
+    m_NormlaizeWeightMapLoc = m_LightPatchSceneProgram->GetUniformLocation("glb_NormalizeWeightMap");
+    m_LightMapLoc[0] = m_LightPatchSceneProgram->GetUniformLocation("glb_LightMap[0]");
+    m_LightMapLoc[1] = m_LightPatchSceneProgram->GetUniformLocation("glb_LightMap[1]");
+    m_LightMapLoc[2] = m_LightPatchSceneProgram->GetUniformLocation("glb_LightMap[2]");
+    m_LightPatchAlbedoMapLoc = m_LightPatchSceneProgram->GetUniformLocation("glb_AlbedoMap");
+    m_LightPatchNormalMapLoc = m_LightPatchSceneProgram->GetUniformLocation("glb_NormalMap");
+    m_LightPatchFaceLoc = m_LightPatchSceneProgram->GetUniformLocation("glb_Face");
+
+    m_LightPatchLightProgram = render::shader::UserProgram::Create("res/lightPatch.vs", "res/lightPatchLight.fs");
 
     // Create Camera
     m_Camera = scene::ModelCamera::Create(math::Vector(0.0f, 250.0f, 150.0f), math::Vector(0.0f, 0.0f, 0.0f));
@@ -175,6 +181,15 @@ void ApplicationCore::Destroy() {
         GLB_SAFE_DELETE(m_NormalizeWeightMap[i]);
     }
     GLB_SAFE_DELETE(m_NormalizeWeightProgram);
+
+    for (int32_t i = 0; i < 3; i++) {
+        GLB_SAFE_DELETE(m_LightPatchRT[i]);
+        for (int32_t j = 0; j < 5; j++) {
+            GLB_SAFE_DELETE(m_LightPatchMap[i][j]);
+        }
+    }
+    GLB_SAFE_DELETE(m_LightPatchSceneProgram);
+    GLB_SAFE_DELETE(m_LightPatchLightProgram);
 }
 
 bool ApplicationCore::AddSceneMesh(const char* name) {
@@ -317,11 +332,7 @@ void ApplicationCore::UpdateCamera() {
 void ApplicationCore::BakeLightMap() {
     if (m_EnableBake) {
         if (m_CurBakeIterate < m_TotalBakeIterate) {
-            GLB_CHECK_GL_ERROR;
-
             DrawHemiCube();
-
-            GLB_CHECK_GL_ERROR;
 
             CalcLightPatchColor();
 
@@ -410,7 +421,6 @@ void ApplicationCore::DrawScene() {
             world = it->second.obj->GetWorldMatrix();
             render::Device::SetUniformMatrix(m_LightProgram->GetUniformLocation("glb_MVP"), proj * m_Camera->GetViewMatrix() * world);
             render::Device::SetUniform3f(m_LightProgram->GetUniformLocation("glb_LightColor"), color);
-            render::Device::SetUniform1i(m_LightProgram->GetUniformLocation("glb_EnableTonemapping"), 1);
 
             // Draw
             render::Device::Draw(render::PT_TRIANGLES, 0, render::mesh::Mgr::GetMeshById(lightModel->GetMeshId())->GetVertexNum());
@@ -735,10 +745,8 @@ void ApplicationCore::DrawHemiCube() {
 
             {  // Draw Scene
                 // Setup Shader
-                render::Device::SetShader(m_LightPatchProgram);
-                render::Device::SetShaderLayout(m_LightPatchProgram->GetShaderLayout());
-
-                GLB_CHECK_GL_ERROR;
+                render::Device::SetShader(m_LightPatchSceneProgram);
+                render::Device::SetShaderLayout(m_LightPatchSceneProgram->GetShaderLayout());
 
                 // Setup Texture
                 render::Device::ClearTexture();
@@ -752,8 +760,6 @@ void ApplicationCore::DrawHemiCube() {
                 // Setup Vertex
                 render::Device::SetVertexLayout(render::mesh::Mgr::GetMeshById(m_SceneMesh->GetMeshId())->GetVertexLayout());
                 render::Device::SetVertexBuffer(render::mesh::Mgr::GetMeshById(m_SceneMesh->GetMeshId())->GetVertexBuffer());
-
-                GLB_CHECK_GL_ERROR;
 
                 // Setup Uniform
                 math::Matrix world;
@@ -771,12 +777,41 @@ void ApplicationCore::DrawHemiCube() {
                 render::Device::SetUniformSampler2D(m_LightPatchAlbedoMapLoc, 4);
                 render::Device::SetUniformSampler2D(m_LightPatchNormalMapLoc, 5);
 
-                GLB_CHECK_GL_ERROR;
-
                 // Draw
                 render::Device::Draw(render::PT_TRIANGLES, 0, render::mesh::Mgr::GetMeshById(m_SceneMesh->GetMeshId())->GetVertexNum());
+            }
 
-                GLB_CHECK_GL_ERROR;
+            {  // Draw Light
+                for (LightSourceArray::iterator it = m_LightSource.begin(); it != m_LightSource.end(); ++it) {
+                    scene::Model* lightModel = it->second.obj->GetModel();
+                    math::Vector color = it->second.color;
+
+                    // Setup Shader
+                    render::Device::SetShader(m_LightPatchLightProgram);
+                    render::Device::SetShaderLayout(m_LightPatchLightProgram->GetShaderLayout());
+
+                    // Setup Texture
+                    render::Device::ClearTexture();
+                    render::Device::SetTexture(0, m_NormalizeWeightMap[j], 0);
+
+                    // Setup Vertex
+                    render::Device::SetVertexLayout(render::mesh::Mgr::GetMeshById(lightModel->GetMeshId())->GetVertexLayout());
+                    render::Device::SetVertexBuffer(render::mesh::Mgr::GetMeshById(lightModel->GetMeshId())->GetVertexBuffer());
+
+                    // Setup Uniform
+                    math::Matrix proj;
+                    proj.MakeProjectionMatrix(1.0f, 90.0f, 0.001f, 10000.0f);
+                    math::Matrix world;
+                    it->second.obj->Update();
+                    world = it->second.obj->GetWorldMatrix();
+                    render::Device::SetUniformMatrix(m_LightPatchLightProgram->GetUniformLocation("glb_MVP"), proj * views[j] * world);
+                    render::Device::SetUniform3f(m_LightPatchLightProgram->GetUniformLocation("glb_LightColor"), color);
+                    render::Device::SetUniform1i(m_LightPatchLightProgram->GetUniformLocation("glb_Face"), j);
+                    render::Device::SetUniformSampler2D(m_LightPatchLightProgram->GetUniformLocation("glb_NormalizeWeightMap"), 0);
+
+                    // Draw
+                    render::Device::Draw(render::PT_TRIANGLES, 0, render::mesh::Mgr::GetMeshById(lightModel->GetMeshId())->GetVertexNum());
+                }
             }
         }
     }

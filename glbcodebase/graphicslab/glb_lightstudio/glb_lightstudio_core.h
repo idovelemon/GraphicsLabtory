@@ -117,7 +117,8 @@ private:
     std::vector<LightPatch*>            m_ValidPatch;
     glb::render::RenderTarget*          m_LightPatchRT[3];
     glb::render::texture::Texture*      m_LightPatchMap[3][5];
-    glb::render::shader::UserProgram*   m_LightPatchProgram;
+    glb::render::shader::UserProgram*   m_LightPatchSceneProgram;
+    glb::render::shader::UserProgram*   m_LightPatchLightProgram;
     int32_t                             m_LightPatchMVPLoc;
     int32_t                             m_NormlaizeWeightMapLoc;
     int32_t                             m_LightMapLoc[3];
