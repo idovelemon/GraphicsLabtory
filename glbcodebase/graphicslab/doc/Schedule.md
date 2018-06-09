@@ -19,9 +19,10 @@ Light studio is used for baking Lightmap with Radiosity Normal Mapping(RNM) and 
 |Add light source mesh config interface|2018-06-08 15:50|2018-06-08 22:40|<font color="Green">Finish</font>|
 |Click outline to display matching config interface|2018-06-08 22:40|2018-06-08 23:00|<font color="Green">Finish</font>|
 |Add lighting for baking function|2018-06-08 23:00|2018-06-09 00:30|<font color="Green">Finish</font>|
-|Organize xml project file|2018-06-09 00:30||<font color="Blue">New</font>|
-|Load xml project file|2018-06-09 00:30||<font color="Blue">New</font>|
+|Organize xml project file|2018-06-09 00:30|2018-06-09 13:10|<font color="Green">Finish</font>|
+|Load xml project file|2018-06-09 00:30|2018-06-09 13:10|<font color="Green">Finish</font>|
 |Save baking light map to files|2018-06-09 00:30||<font color="Blue">New</font>|
+|Hide lights|2018-06-09 10:10||<font color="Blue">New</font>|
 
 <br>
 
@@ -34,3 +35,5 @@ Light studio is used for baking Lightmap with Radiosity Normal Mapping(RNM) and 
 |Using Color select dialog and intensity for light color|2018-06-08 22:35||<font color="Blue">New</font>|
 |Press tab to config data problem|2018-06-08 22:40||<font color="Blue">New</font>|
 |Move mouse to accelerate rendering speed problem|2018-06-09 0:15||<font color="Blue">New</font>|
+|Click empty space in outline when create new project, crash|2018-06-09 10:10||<font color="Blue">New</font>|
+|Disable all config interface and menu when baking|2018-06-09 13:05||<font color="Blue">New</font>|
