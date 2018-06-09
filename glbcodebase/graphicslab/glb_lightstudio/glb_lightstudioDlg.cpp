@@ -187,6 +187,7 @@ void CGLBLightStudioDlg::AddSceneMesh(const char* name)
     if (!ApplicationCore::GetInstance()->AddSceneMesh(name))
     {
         ::MessageBox(NULL, L"Invalid scene mesh object file", L"ERROR", MB_OK);
+        return;
     }
 
     // Hide ADD-Scene menu
@@ -579,7 +580,6 @@ void CGLBLightStudioDlg::OnFileNew()
     // Enable Save menu
     GetMenu()->EnableMenuItem(ID_FILE_SAVE, MF_ENABLED);
     GetMenu()->EnableMenuItem(ID_ADD_SCENE, MF_ENABLED);
-    GetMenu()->EnableMenuItem(ID_ADD_LIGHT, MF_ENABLED);
     GetMenu()->EnableMenuItem(ID_FILE_EXPORTLIGHTMAP, MF_ENABLED);
 
     // Display control
@@ -666,6 +666,9 @@ void CGLBLightStudioDlg::OnAddScene()
 
         delete[] pcstr;
         pcstr = NULL;
+
+        // Enable Add Light Menu
+        GetMenu()->EnableMenuItem(ID_ADD_LIGHT, MF_ENABLED);
     }
 }
 
@@ -767,40 +770,43 @@ void CGLBLightStudioDlg::OnNMClickOutlineList(NMHDR *pNMHDR, LRESULT *pResult)
     *pResult = 0;
 
     int index = pNMItemActivate->iItem;
-    CListCtrl* ctrl = static_cast<CListCtrl*>(GetDlgItem(IDC_OUTLINE_LIST));
-    CString type = ctrl->GetItemText(index, 0);
-    CString id = ctrl->GetItemText(index, 1);
-    if (!type.Compare(L"Scene"))
+    if (index != -1)
     {
-        if (m_CurDispConfigDlg)
-        {
-            m_CurDispConfigDlg->ShowWindow(SW_HIDE);
-        }
-        m_SceneConfigDlg->ShowWindow(SW_SHOW);
-        m_CurDispConfigDlg = m_SceneConfigDlg;
-    }
-    else
-    {
-        char *pcstr = (char *)new char[2 * wcslen(id.GetBuffer(0))+1];
-        memset(pcstr , 0 , 2 * wcslen(id.GetBuffer(0))+1 );
-        wcstombs(pcstr, id.GetBuffer(0), wcslen(id.GetBuffer(0)));
-
-        LightSourceDlgArray::iterator it = m_LightSourceConfigDlgs.find(atoi(pcstr));
-        if (it != m_LightSourceConfigDlgs.end())
+        CListCtrl* ctrl = static_cast<CListCtrl*>(GetDlgItem(IDC_OUTLINE_LIST));
+        CString type = ctrl->GetItemText(index, 0);
+        CString id = ctrl->GetItemText(index, 1);
+        if (!type.Compare(L"Scene"))
         {
             if (m_CurDispConfigDlg)
             {
                 m_CurDispConfigDlg->ShowWindow(SW_HIDE);
             }
-            it->second->ShowWindow(SW_SHOW);
-            m_CurDispConfigDlg = it->second;
+            m_SceneConfigDlg->ShowWindow(SW_SHOW);
+            m_CurDispConfigDlg = m_SceneConfigDlg;
         }
         else
         {
-            assert(false);
-        }
+            char *pcstr = (char *)new char[2 * wcslen(id.GetBuffer(0))+1];
+            memset(pcstr , 0 , 2 * wcslen(id.GetBuffer(0))+1 );
+            wcstombs(pcstr, id.GetBuffer(0), wcslen(id.GetBuffer(0)));
 
-        delete[] pcstr;
-        pcstr = NULL;
+            LightSourceDlgArray::iterator it = m_LightSourceConfigDlgs.find(atoi(pcstr));
+            if (it != m_LightSourceConfigDlgs.end())
+            {
+                if (m_CurDispConfigDlg)
+                {
+                    m_CurDispConfigDlg->ShowWindow(SW_HIDE);
+                }
+                it->second->ShowWindow(SW_SHOW);
+                m_CurDispConfigDlg = it->second;
+            }
+            else
+            {
+                assert(false);
+            }
+
+            delete[] pcstr;
+            pcstr = NULL;
+        }
     }
 }

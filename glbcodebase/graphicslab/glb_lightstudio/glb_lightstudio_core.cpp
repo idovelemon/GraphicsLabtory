@@ -193,22 +193,28 @@ void ApplicationCore::Destroy() {
 }
 
 bool ApplicationCore::AddSceneMesh(const char* name) {
+    bool result = true;
+
     if (!m_SceneMesh) {
         scene::Model* mesh = scene::Model::Create(name);
-        if (!mesh->HasAlbedoTexture()) return false;
-        if (!mesh->HasNormalTexture()) return false;
-        if (!mesh->HasNormal()) return false;
-        if (!mesh->HasTangent()) return false;
-        if (!mesh->HasBinormal()) return false;
+        if (!mesh->HasAlbedoTexture()) result = false;
+        if (!mesh->HasNormalTexture()) result = false;
+        if (!mesh->HasNormal()) result = false;
+        if (!mesh->HasTangent()) result = false;
+        if (!mesh->HasBinormal()) result = false;
 
-        m_SceneMesh = mesh;
-        memcpy(m_SceneMeshName, name, strlen(name));
-        m_SceneMeshName[strlen(name)] = '\0';
+        if (result) {
+            m_SceneMesh = mesh;
+            memcpy(m_SceneMeshName, name, strlen(name));
+            m_SceneMeshName[strlen(name)] = '\0';
+        } else {
+            GLB_SAFE_DELETE(m_SceneMesh);
+        }
     } else {
         GLB_SAFE_ASSERT(false);
     }
 
-    return true;
+    return result;
 }
 
 int ApplicationCore::AddLightMesh(int queryID, const char* name) {
