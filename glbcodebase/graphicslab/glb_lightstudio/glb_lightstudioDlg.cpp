@@ -277,6 +277,7 @@ BEGIN_MESSAGE_MAP(CGLBLightStudioDlg, CDialog)
     ON_NOTIFY(HDN_ITEMCLICK, 0, &CGLBLightStudioDlg::OnHdnItemclickOutlineList)
     ON_NOTIFY(NM_CLICK, IDC_OUTLINE_LIST, &CGLBLightStudioDlg::OnNMClickOutlineList)
     ON_COMMAND(ID_FILE_OPEN, &CGLBLightStudioDlg::OnFileOpen)
+    ON_COMMAND(ID_FILE_EXPORTLIGHTMAP, &CGLBLightStudioDlg::OnFileExportlightmap)
 END_MESSAGE_MAP()
 
 
@@ -320,6 +321,7 @@ BOOL CGLBLightStudioDlg::OnInitDialog()
     GetMenu()->EnableMenuItem(ID_FILE_SAVE, MF_DISABLED);
     GetMenu()->EnableMenuItem(ID_ADD_SCENE, MF_DISABLED);
     GetMenu()->EnableMenuItem(ID_ADD_LIGHT, MF_DISABLED);
+    GetMenu()->EnableMenuItem(ID_FILE_EXPORTLIGHTMAP, MF_DISABLED);
 
     // Hide control
     DWORD style = m_OutlineList.GetExtendedStyle();
@@ -538,6 +540,7 @@ void CGLBLightStudioDlg::OnFileOpen()
         GetMenu()->EnableMenuItem(ID_FILE_SAVE, MF_ENABLED);
         GetMenu()->EnableMenuItem(ID_ADD_SCENE, MF_DISABLED);
         GetMenu()->EnableMenuItem(ID_ADD_LIGHT, MF_ENABLED);
+        GetMenu()->EnableMenuItem(ID_FILE_EXPORTLIGHTMAP, MF_ENABLED);
 
         // Display control
         m_OutlineList.ShowWindow(SW_SHOW);
@@ -577,6 +580,7 @@ void CGLBLightStudioDlg::OnFileNew()
     GetMenu()->EnableMenuItem(ID_FILE_SAVE, MF_ENABLED);
     GetMenu()->EnableMenuItem(ID_ADD_SCENE, MF_ENABLED);
     GetMenu()->EnableMenuItem(ID_ADD_LIGHT, MF_ENABLED);
+    GetMenu()->EnableMenuItem(ID_FILE_EXPORTLIGHTMAP, MF_ENABLED);
 
     // Display control
     m_OutlineList.ShowWindow(SW_SHOW);
@@ -610,6 +614,29 @@ void CGLBLightStudioDlg::OnFileSave()
     else
     {
         m_ProjectXML->SaveFile();
+    }
+}
+
+
+void CGLBLightStudioDlg::OnFileExportlightmap()
+{
+    // TODO: Add your command handler code here
+    TCHAR szFilter[] = L"HDR File(*.hdr)|*.xml||";
+    CFileDialog fileDlg(FALSE, L"hdr", L"Untitled.hdr", OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, szFilter, this);
+    if (IDOK == fileDlg.DoModal())
+    {
+        CString filePath = fileDlg.GetPathName();
+
+        char *pcstr = (char *)new char[2 * wcslen(filePath.GetBuffer(0))+1];
+        memset(pcstr , 0 , 2 * wcslen(filePath.GetBuffer(0))+1 );
+        wcstombs(pcstr, filePath.GetBuffer(0), wcslen(filePath.GetBuffer(0)));
+
+        ApplicationCore::GetInstance()->SaveLightMap(pcstr);
+
+        delete[] pcstr;
+        pcstr = NULL;
+
+        ::MessageBox(NULL, L"Export Light Map OK", L"Export", MB_OK);
     }
 }
 
@@ -777,5 +804,3 @@ void CGLBLightStudioDlg::OnNMClickOutlineList(NMHDR *pNMHDR, LRESULT *pResult)
         pcstr = NULL;
     }
 }
-
-

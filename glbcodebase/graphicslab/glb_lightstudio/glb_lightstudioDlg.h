@@ -45,6 +45,7 @@ protected:
     afx_msg void OnFileOpen();
     afx_msg void OnFileNew();
     afx_msg void OnFileSave();
+    afx_msg void OnFileExportlightmap();
     afx_msg void OnAddScene();
     afx_msg void OnAddLight();
     afx_msg void OnBnClickedBakeButton();

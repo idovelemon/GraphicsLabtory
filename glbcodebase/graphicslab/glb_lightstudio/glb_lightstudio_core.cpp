@@ -309,6 +309,20 @@ void ApplicationCore::SetLightSourceColor(int id, float cx, float cy, float cz) 
     }
 }
 
+void ApplicationCore::SaveLightMap(const char* path) {
+    std::string pathString = std::string(path);
+    int32_t index = pathString.find_last_of(".");
+    std::string lightMap0Path = pathString;
+    lightMap0Path.insert(index, "0");
+    std::string lightMap1Path = pathString;
+    lightMap1Path.insert(index, "1");
+    std::string lightMap2Path = pathString;
+    lightMap2Path.insert(index, "2");
+    m_LightMap[0]->Save(lightMap0Path.c_str(), util::TFT_HDR);
+    m_LightMap[1]->Save(lightMap1Path.c_str(), util::TFT_HDR);
+    m_LightMap[2]->Save(lightMap2Path.c_str(), util::TFT_HDR);
+}
+
 void ApplicationCore::PreGenerate() {
     DrawWeightMap();
 

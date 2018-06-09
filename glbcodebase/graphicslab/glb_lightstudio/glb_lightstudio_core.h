@@ -38,6 +38,8 @@ public:
     void SetLightSourceScale(int id, float sx, float sy, float sz);
     void SetLightSourceColor(int id, float cx, float cy, float cz);
 
+    void SaveLightMap(const char* path);
+
 protected:
     void PreGenerate();
     void UpdateCamera();
