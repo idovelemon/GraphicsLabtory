@@ -79,7 +79,7 @@ void CGLBLightStudioDlg::ClearProject()
     // If project active
     if (m_ProjectXML)
     {
-        if (::MessageBox(NULL, L"Do you want to save old project?", L"Info", MB_OKCANCEL)) {
+        if (::MessageBox(NULL, L"Do you want to save old project?", L"Info", MB_OKCANCEL) == IDOK) {
             OnFileSave();  // Save old file
         }
 
@@ -414,20 +414,7 @@ void CGLBLightStudioDlg::OnKickIdle()
 void CGLBLightStudioDlg::OnClose()
 {
     // TODO: Add your message handler code here and/or call default
-    glb::app::Application::Destroy();
-
-    if (m_SceneConfigDlg)
-    {
-        delete m_SceneConfigDlg;
-        m_SceneConfigDlg = NULL;
-    }
-
-    for (LightSourceDlgArray::iterator it = m_LightSourceConfigDlgs.begin(); it != m_LightSourceConfigDlgs.end(); ++it)
-    {
-        delete it->second;
-        it->second = NULL;
-    }
-    m_LightSourceConfigDlgs.clear();
+    ClearProject();
 
     CDialog::OnClose();
 }

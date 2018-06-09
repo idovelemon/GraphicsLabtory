@@ -93,7 +93,7 @@ bool ApplicationCore::Initialize() {
     m_LightPatchLightProgram = render::shader::UserProgram::Create("res/lightPatch.vs", "res/lightPatchLight.fs");
 
     // Create Camera
-    m_Camera = scene::ModelCamera::Create(math::Vector(0.0f, 250.0f, 150.0f), math::Vector(0.0f, 0.0f, 0.0f));
+    m_Camera = scene::ModelCamera::Create(math::Vector(10.0f, 10.0f, 0.0), math::Vector(0.0f, 0.0f, 0.0f));
 
     // Create Screen Mesh
     m_ScreenMesh = render::mesh::ScreenMesh::Create();
