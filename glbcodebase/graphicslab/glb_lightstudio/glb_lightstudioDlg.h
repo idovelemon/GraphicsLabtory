@@ -41,6 +41,7 @@ protected:
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
     afx_msg void OnKickIdle();
+    afx_msg void OnTimer(UINT_PTR nIDEvent);
     afx_msg void OnClose();
     afx_msg void OnFileOpen();
     afx_msg void OnFileNew();

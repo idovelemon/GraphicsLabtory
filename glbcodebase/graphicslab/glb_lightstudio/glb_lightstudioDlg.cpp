@@ -266,7 +266,7 @@ BEGIN_MESSAGE_MAP(CGLBLightStudioDlg, CDialog)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
-    ON_MESSAGE_VOID(WM_KICKIDLE, OnKickIdle)
+    //ON_MESSAGE_VOID(WM_KICKIDLE, OnKickIdle)
     ON_WM_CLOSE()
     ON_COMMAND(ID_FILE_NEW, &CGLBLightStudioDlg::OnFileNew)
     ON_COMMAND(ID_FILE_SAVE, &CGLBLightStudioDlg::OnFileSave)
@@ -279,6 +279,7 @@ BEGIN_MESSAGE_MAP(CGLBLightStudioDlg, CDialog)
     ON_NOTIFY(NM_CLICK, IDC_OUTLINE_LIST, &CGLBLightStudioDlg::OnNMClickOutlineList)
     ON_COMMAND(ID_FILE_OPEN, &CGLBLightStudioDlg::OnFileOpen)
     ON_COMMAND(ID_FILE_EXPORTLIGHTMAP, &CGLBLightStudioDlg::OnFileExportlightmap)
+    ON_WM_TIMER()
 END_MESSAGE_MAP()
 
 
@@ -339,6 +340,9 @@ BOOL CGLBLightStudioDlg::OnInitDialog()
     CProgressCtrl* progress = reinterpret_cast<CProgressCtrl*>(GetDlgItem(IDC_BAKE_PROGRESS));
     progress->SetRange(0, 100);
 
+    // Set Timer
+    SetTimer(1, 1, NULL);
+
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
 
@@ -389,6 +393,31 @@ void CGLBLightStudioDlg::OnPaint()
 HCURSOR CGLBLightStudioDlg::OnQueryDragIcon()
 {
 	return static_cast<HCURSOR>(m_hIcon);
+}
+
+
+void CGLBLightStudioDlg::OnTimer(UINT_PTR nIDEvent)
+{
+    // TODO: Add your message handler code here and/or call default
+
+    if (m_ProjectXML)
+    {
+        glb::app::Application::Update();
+
+        CProgressCtrl* progress = reinterpret_cast<CProgressCtrl*>(GetDlgItem(IDC_BAKE_PROGRESS));
+        progress->SetPos(static_cast<int>(ApplicationCore::GetInstance()->GetCurProgress() * 100));
+
+        if (progress->GetPos() == 100)
+        {
+            // Enable Bake Button
+            GetDlgItem(IDC_BAKE_BUTTON)->EnableWindow(TRUE);
+
+            // Disable Cancel Button
+            GetDlgItem(IDC_BAKE_CANCEL_BUTTON)->EnableWindow(FALSE);
+        }
+    }
+
+    CDialog::OnTimer(nIDEvent);
 }
 
 void CGLBLightStudioDlg::OnKickIdle()
