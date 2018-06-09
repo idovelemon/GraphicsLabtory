@@ -118,7 +118,8 @@ BOOL CGLBLightSourceConfigDlg::PreTranslateMessage(MSG* pMsg)
         bool isEditorControl = false;
         for (int i = 0; i < sizeof(editID) / sizeof(editID[0]); i++)
         {
-            if (GetDlgItem(editID[i])->m_hWnd == pMsg->hwnd && pMsg->wParam == VK_RETURN)
+            if (GetDlgItem(editID[i])->m_hWnd == pMsg->hwnd
+                && (pMsg->wParam == VK_RETURN || pMsg->wParam == VK_TAB))
             {
                 isEditorControl = true;
                 break;
