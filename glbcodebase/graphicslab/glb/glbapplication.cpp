@@ -300,7 +300,7 @@ void Application::Update() {
     if (s_ApplicationImp != NULL) {
         s_ApplicationImp->Update();
     } else {
-        GLB_SAFE_ASSERT(false);
+        // GLB_SAFE_ASSERT(false);  // Allow multi-in
     }
 }
 
@@ -309,7 +309,7 @@ void Application::Destroy() {
         s_ApplicationImp->Destroy();
         GLB_SAFE_DELETE(s_ApplicationImp);
     } else {
-        GLB_SAFE_ASSERT(false);
+        // GLB_SAFE_ASSERT(false);  // Allow multi-in
     }
 }
 
