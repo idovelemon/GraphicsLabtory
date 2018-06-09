@@ -202,10 +202,6 @@ bool ApplicationCore::AddSceneMesh(const char* name) {
         if (!mesh->HasBinormal()) return false;
 
         m_SceneMesh = mesh;
-        m_LightMap[0] = render::texture::Texture::CreateFloat32Texture(m_LightMapWidth, m_LightMapHeight);
-        m_LightMap[1] = render::texture::Texture::CreateFloat32Texture(m_LightMapWidth, m_LightMapHeight);
-        m_LightMap[2] = render::texture::Texture::CreateFloat32Texture(m_LightMapWidth, m_LightMapHeight);
-
         memcpy(m_SceneMeshName, name, strlen(name));
         m_SceneMeshName[strlen(name)] = '\0';
     } else {
@@ -215,15 +211,22 @@ bool ApplicationCore::AddSceneMesh(const char* name) {
     return true;
 }
 
-int ApplicationCore::AddLightMesh(const char* name) {
+int ApplicationCore::AddLightMesh(int queryID, const char* name) {
     int result = -1;
+
     scene::Object* light = scene::Object::Create(name);
+
     if (light) {
         LightSourceEntry entry;
         entry.obj = light;
-        entry.id  = sIdGen++;
+        entry.id  = queryID != -1 ? queryID : sIdGen++;
         m_LightSource.insert(std::pair<int, LightSourceEntry>(entry.id, entry));
+
         result = entry.id;
+
+        if (queryID != -1 && queryID >= sIdGen) {
+            sIdGen = queryID + 1;
+        }
     } else {
         GLB_SAFE_ASSERT(false);
     }

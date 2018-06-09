@@ -22,6 +22,7 @@ protected:
 	DECLARE_MESSAGE_MAP()
     virtual void OnCancel();
     virtual void OnOK();
+
 private:
     float m_LightSourcePosX;
     float m_LightSourcePosY;
@@ -38,4 +39,22 @@ private:
 
 public:
     virtual BOOL PreTranslateMessage(MSG* pMsg);
+
+public:
+    float GetLightSourcePosX() const { return m_LightSourcePosX; }
+    float GetLightSourcePosY() const { return m_LightSourcePosY; }
+    float GetLightSourcePosZ() const { return m_LightSourcePosZ; }
+    float GetLightSourceRotX() const { return m_LightSourceRotX; }
+    float GetLightSourceRotY() const { return m_LightSourceRotY; }
+    float GetLightSourceRotZ() const { return m_LightSourceRotZ; }
+    float GetLightSourceScaleX() const { return m_LightSourceScaleX; }
+    float GetLightSourceScaleY() const { return m_LightSourceScaleY; }
+    float GetLightSourceScaleZ() const { return m_LightSourceScaleZ; }
+    float GetLightSourceColorX() const { return m_LightSourceColorX; }
+    float GetLightSourceColorY() const { return m_LightSourceColorY; }
+    float GetLightSourceColorZ() const { return m_LightSourceColorZ; }
+    void UpdateLightSourcePos(float x, float y, float z);
+    void UpdateLightSourceRot(float x, float y, float z);
+    void UpdateLightSourceScale(float x, float y, float z);
+    void UpdateLightSourceColor(float x, float y, float z);
 };

@@ -134,3 +134,39 @@ BOOL CGLBLightSourceConfigDlg::PreTranslateMessage(MSG* pMsg)
 
     return CDialogEx::PreTranslateMessage(pMsg);
 }
+
+
+void CGLBLightSourceConfigDlg::UpdateLightSourcePos(float x, float y, float z)
+{
+    m_LightSourcePosX = x;
+    m_LightSourcePosY = y;
+    m_LightSourcePosZ = z;
+    UpdateData(false);
+}
+
+
+void CGLBLightSourceConfigDlg::UpdateLightSourceRot(float x, float y, float z)
+{
+    m_LightSourceRotX = x;
+    m_LightSourceRotY = y;
+    m_LightSourceRotZ = z;
+    UpdateData(false);
+}
+
+
+void CGLBLightSourceConfigDlg::UpdateLightSourceScale(float x, float y, float z)
+{
+    m_LightSourceScaleX = x;
+    m_LightSourceScaleY = y;
+    m_LightSourceScaleZ = z;
+    UpdateData(false);
+}
+
+
+void CGLBLightSourceConfigDlg::UpdateLightSourceColor(float x, float y, float z)
+{
+    m_LightSourceColorX = x;
+    m_LightSourceColorY = y;
+    m_LightSourceColorZ = z;
+    UpdateData(false);
+}

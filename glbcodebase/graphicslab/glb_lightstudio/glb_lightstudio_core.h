@@ -26,7 +26,7 @@ public:
     virtual void Destroy();
 
     bool AddSceneMesh(const char* name);
-    int AddLightMesh(const char* name);
+    int AddLightMesh(int queryID, const char* name);
     void ChangeLightMapSize(int width, int height);
     void SetBakeIterate(int iterate);
     void Bake();

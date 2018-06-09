@@ -29,6 +29,8 @@ public:
     virtual void OnCancel();
 
 public:
+    void UpdateConfigLightMapSize(int width, int height);
+    void UpdateConfigLightIterate(int iterate);
     void GetConfigLightMapSize(int& width, int& height);
     int GetConfigLightMapIterate();
 

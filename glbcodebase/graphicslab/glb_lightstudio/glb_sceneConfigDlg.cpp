@@ -106,6 +106,27 @@ void CGLBSceneConfigDlg::OnDeltaposIterateSpin(NMHDR *pNMHDR, LRESULT *pResult)
     UpdateData(false);
 }
 
+void CGLBSceneConfigDlg::UpdateConfigLightMapSize(int width, int height) {
+    int sizeTbl[] = {32, 64, 128, 256, 512, 1024, 2048};
+    int sel = 0;
+    for (int i = 0; i < sizeof(sizeTbl) / sizeof(sizeTbl[0]); i++)
+    {
+        if (sizeTbl[i] == width)  // Assume width == height
+        {
+            sel = i;
+            break;
+        }
+    }
+
+    m_ResolutionComboBox.SetCurSel(sel);
+    UpdateData(false);
+}
+
+void CGLBSceneConfigDlg::UpdateConfigLightIterate(int iterate) {
+    m_LightMapBakeTotalIterate = iterate;
+    UpdateData(false);
+}
+
 void CGLBSceneConfigDlg::GetConfigLightMapSize(int& width, int& height)
 {
     UpdateData(true);

@@ -74,6 +74,193 @@ void CGLBLightStudioDlg::DoDataExchange(CDataExchange* pDX)
     DDX_Control(pDX, IDC_OUTLINE_LIST, m_OutlineList);
 }
 
+void CGLBLightStudioDlg::ClearProject()
+{
+    // If project active
+    if (m_ProjectXML)
+    {
+        if (::MessageBox(NULL, L"Do you want to save old project?", L"Info", MB_OKCANCEL)) {
+            OnFileSave();  // Save old file
+        }
+
+        if (m_ProjectXML) {
+            delete m_ProjectXML;
+            m_ProjectXML = NULL;
+        }
+    }
+
+    m_CurDispConfigDlg = NULL;
+
+    // Close scene config dialog
+    if (m_SceneConfigDlg)
+    {
+        m_SceneConfigDlg->SendMessage(WM_CLOSE);
+        delete m_SceneConfigDlg;
+        m_SceneConfigDlg = NULL;
+    }
+
+    // Close light source config dialog
+    for (LightSourceDlgArray::iterator it = m_LightSourceConfigDlgs.begin(); it != m_LightSourceConfigDlgs.end(); ++it)
+    {
+        if (it->second)
+        {
+            it->second->SendMessage(WM_CLOSE);
+            delete it->second;
+            it->second = NULL;
+        }
+    }
+    m_LightSourceConfigDlgs.clear();
+
+    // Clear outline
+    m_OutlineList.DeleteAllItems();
+
+    glb::app::Application::Destroy();
+}
+
+void CGLBLightStudioDlg::SaveProperties()
+{
+    if (m_ProjectXML)
+    {
+        // Find Root Element
+        TiXmlElement* root = m_ProjectXML->FirstChildElement();
+        TiXmlElement* child = root->FirstChildElement();
+        while (child != NULL)
+        {
+            if (!strcmp(child->Value(), "SCENE"))  // Is Scene Element?
+            {
+                if (m_SceneConfigDlg)
+                {
+                    int width = 0, height = 0;
+                    m_SceneConfigDlg->GetConfigLightMapSize(width, height);
+                    child->SetAttribute("LIGHT_MAP_WIDTH", width);
+                    child->SetAttribute("LIGHT_MAP_HEIGHT", height);
+
+                    child->SetAttribute("LIGHT_MAP_ITERATE", m_SceneConfigDlg->GetConfigLightMapIterate());
+                }
+                else
+                {
+                    assert(false);  // Must have a scene config dialog
+                }
+            }
+            else if (!strcmp(child->Value(), "LIGHT"))  // Is Light Element?
+            {
+                int lightID = -1;
+                child->Attribute("ID", &lightID);
+
+                LightSourceDlgArray::iterator it = m_LightSourceConfigDlgs.find(lightID);
+                if (it != m_LightSourceConfigDlgs.end())
+                {
+                    child->SetDoubleAttribute("POSITION_X", it->second->GetLightSourcePosX());
+                    child->SetDoubleAttribute("POSITION_Y", it->second->GetLightSourcePosY());
+                    child->SetDoubleAttribute("POSITION_Z", it->second->GetLightSourcePosZ());
+                    child->SetDoubleAttribute("ROTATION_X", it->second->GetLightSourceRotX());
+                    child->SetDoubleAttribute("ROTATION_Y", it->second->GetLightSourceRotY());
+                    child->SetDoubleAttribute("ROTATION_Z", it->second->GetLightSourceRotZ());
+                    child->SetDoubleAttribute("SCALE_X", it->second->GetLightSourceScaleX());
+                    child->SetDoubleAttribute("SCALE_Y", it->second->GetLightSourceScaleY());
+                    child->SetDoubleAttribute("SCALE_Z", it->second->GetLightSourceScaleZ());
+                    child->SetDoubleAttribute("COLOR_X", it->second->GetLightSourceColorX());
+                    child->SetDoubleAttribute("COLOR_Y", it->second->GetLightSourceColorY());
+                    child->SetDoubleAttribute("COLOR_Z", it->second->GetLightSourceColorZ());
+                }
+                else
+                {
+                    assert(false);  // Something wrong
+                }
+            }
+            else
+            {
+                assert(false);  // Unknown xml element
+            }
+
+            child = child->NextSiblingElement();
+        }
+    }
+    else
+    {
+        assert(false);  // Must have project xml file now
+    }
+}
+
+void CGLBLightStudioDlg::AddSceneMesh(const char* name)
+{
+    if (!ApplicationCore::GetInstance()->AddSceneMesh(name))
+    {
+        ::MessageBox(NULL, L"Invalid scene mesh object file", L"ERROR", MB_OK);
+    }
+
+    // Hide ADD-Scene menu
+    GetMenu()->EnableMenuItem(ID_ADD_SCENE, MF_DISABLED);
+
+    // Set Outline text
+    int count = m_OutlineList.GetItemCount();
+    CString id;
+    id.Format(L"%d", 1);
+
+    m_OutlineList.InsertItem(count, L"");
+    m_OutlineList.SetItemText(count, 0, L"Scene");
+    m_OutlineList.SetItemText(count, 1, id);
+    m_OutlineList.SetItemText(count, 2, CString(name));
+
+    m_OutlineList.SetItemState(count, LVIS_SELECTED, LVIS_SELECTED);
+
+    // Create scene config dialog
+    m_SceneConfigDlg = new CGLBSceneConfigDlg(this);
+    m_SceneConfigDlg->Create(IDD_SCENE_CONFIG);
+    m_SceneConfigDlg->ShowWindow(SW_SHOW);
+    m_SceneConfigDlg->MoveWindow(kSubDialogPosX, kSubDialogPosY, kSubDialogWidth, kSubDialogHeight, TRUE);
+
+    // Display bake button
+    GetDlgItem(IDC_BAKE_BUTTON)->ShowWindow(SW_SHOW);
+    GetDlgItem(IDC_BAKE_CANCEL_BUTTON)->ShowWindow(SW_SHOW);
+    GetDlgItem(IDC_BAKE_PROGRESS)->ShowWindow(SW_SHOW);
+    GetDlgItem(IDC_BAKE_CANCEL_BUTTON)->EnableWindow(FALSE);
+
+    // Set current display config dialog
+    if (m_CurDispConfigDlg)
+    {
+        m_CurDispConfigDlg->ShowWindow(SW_HIDE);
+    }
+    m_CurDispConfigDlg = m_SceneConfigDlg;
+}
+
+int CGLBLightStudioDlg::AddLightMesh(int lightID, const char* name)
+{
+    int id = ApplicationCore::GetInstance()->AddLightMesh(lightID, name);
+    if (id == -1)
+    {
+        ::MessageBox(NULL, L"Invalid light source mesh object file", L"ERROR", MB_OK);
+        return id;
+    }
+
+    // Set Outline text
+    int count = m_OutlineList.GetItemCount();
+    CString idStr;
+    idStr.Format(L"%d", id);
+
+    m_OutlineList.InsertItem(count, L"");
+    m_OutlineList.SetItemText(count, 0, L"Light");
+    m_OutlineList.SetItemText(count, 1, idStr);
+    m_OutlineList.SetItemText(count, 2, CString(name));
+    m_OutlineList.SetItemState(count, LVIS_SELECTED | LVIS_FOCUSED, LVIS_SELECTED | LVIS_FOCUSED);
+
+    // Create light source config dialog
+    CGLBLightSourceConfigDlg* dlg = new CGLBLightSourceConfigDlg(this);
+    dlg->Create(IDD_LIGHT_SOURCE_CONFIG_DIALOG);
+    dlg->ShowWindow(SW_SHOW);
+    dlg->MoveWindow(kSubDialogPosX, kSubDialogPosY, kSubDialogWidth, kSubDialogHeight, TRUE);
+    m_LightSourceConfigDlgs.insert(std::pair<int, CGLBLightSourceConfigDlg*>(id, dlg));
+
+    // Set current display config dialog
+    if (m_CurDispConfigDlg)
+    {
+        m_CurDispConfigDlg->ShowWindow(SW_HIDE);
+    }
+    m_CurDispConfigDlg = dlg;
+
+    return id;
+}
+
 BEGIN_MESSAGE_MAP(CGLBLightStudioDlg, CDialog)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
@@ -89,6 +276,7 @@ BEGIN_MESSAGE_MAP(CGLBLightStudioDlg, CDialog)
     ON_NOTIFY(NM_CUSTOMDRAW, IDC_OUTLINE_LIST, &CGLBLightStudioDlg::OnNMCustomdrawOutlineList)
     ON_NOTIFY(HDN_ITEMCLICK, 0, &CGLBLightStudioDlg::OnHdnItemclickOutlineList)
     ON_NOTIFY(NM_CLICK, IDC_OUTLINE_LIST, &CGLBLightStudioDlg::OnNMClickOutlineList)
+    ON_COMMAND(ID_FILE_OPEN, &CGLBLightStudioDlg::OnFileOpen)
 END_MESSAGE_MAP()
 
 
@@ -124,19 +312,6 @@ BOOL CGLBLightStudioDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// Set small icon
 
 	// TODO: Add extra initialization here
-    glb::app::AppConfig config;
-    config.wnd = GetDlgItem(IDC_VIEW)->GetSafeHwnd();
-    RECT rect;
-    GetDlgItem(IDC_VIEW)->GetClientRect(&rect);
-    config.screen_width = rect.right - rect.left;
-    config.screen_height = rect.bottom - rect.top;
-    config.shadow_map_width = 32;
-    config.shadow_map_height = 32;
-    if (!glb::app::Application::Initialize(ApplicationCore::Create, AfxGetInstanceHandle(), config))
-    {
-        ::MessageBox(NULL, L"Initliaze GLB library failed", L"ERROR", MB_OK);
-        exit(0);
-    }
 
     // Hide Viewport first
     GetDlgItem(IDC_VIEW)->ShowWindow(SW_HIDE);
@@ -215,18 +390,21 @@ HCURSOR CGLBLightStudioDlg::OnQueryDragIcon()
 
 void CGLBLightStudioDlg::OnKickIdle()
 {
-    glb::app::Application::Update();
-
-    CProgressCtrl* progress = reinterpret_cast<CProgressCtrl*>(GetDlgItem(IDC_BAKE_PROGRESS));
-    progress->SetPos(static_cast<int>(ApplicationCore::GetInstance()->GetCurProgress() * 100));
-
-    if (progress->GetPos() == 100)
+    if (m_ProjectXML)
     {
-        // Enable Bake Button
-        GetDlgItem(IDC_BAKE_BUTTON)->EnableWindow(TRUE);
+        glb::app::Application::Update();
 
-        // Disable Cancel Button
-        GetDlgItem(IDC_BAKE_CANCEL_BUTTON)->EnableWindow(FALSE);
+        CProgressCtrl* progress = reinterpret_cast<CProgressCtrl*>(GetDlgItem(IDC_BAKE_PROGRESS));
+        progress->SetPos(static_cast<int>(ApplicationCore::GetInstance()->GetCurProgress() * 100));
+
+        if (progress->GetPos() == 100)
+        {
+            // Enable Bake Button
+            GetDlgItem(IDC_BAKE_BUTTON)->EnableWindow(TRUE);
+
+            // Disable Cancel Button
+            GetDlgItem(IDC_BAKE_CANCEL_BUTTON)->EnableWindow(FALSE);
+        }
     }
 }
 
@@ -252,19 +430,137 @@ void CGLBLightStudioDlg::OnClose()
 }
 
 
-void CGLBLightStudioDlg::OnFileNew()
+void CGLBLightStudioDlg::OnFileOpen()
 {
-    // If project active
-    if (m_ProjectXML)
+    ClearProject();
+
+    glb::app::AppConfig config;
+    config.wnd = GetDlgItem(IDC_VIEW)->GetSafeHwnd();
+    RECT rect;
+    GetDlgItem(IDC_VIEW)->GetClientRect(&rect);
+    config.screen_width = rect.right - rect.left;
+    config.screen_height = rect.bottom - rect.top;
+    config.shadow_map_width = 32;
+    config.shadow_map_height = 32;
+    if (!glb::app::Application::Initialize(ApplicationCore::Create, AfxGetInstanceHandle(), config))
     {
-        if (::MessageBox(NULL, L"Do you want to save old project?", L"Info", MB_OKCANCEL)) {
-            OnFileSave();
+        ::MessageBox(NULL, L"Initliaze GLB library failed", L"ERROR", MB_OK);
+        exit(0);
+    }
+
+    TCHAR szFilter[] = L"XML File(*.xml)|*.xml||";
+    CFileDialog fileDlg(TRUE, L"xml", L"", OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, szFilter, this);
+    if (IDOK == fileDlg.DoModal())
+    {
+        CString filePath = fileDlg.GetPathName();
+
+        char *pcstr = (char *)new char[2 * wcslen(filePath.GetBuffer(0))+1] ;
+        memset(pcstr , 0 , 2 * wcslen(filePath.GetBuffer(0))+1 );
+        wcstombs(pcstr, filePath.GetBuffer(0), wcslen(filePath.GetBuffer(0))) ;
+
+        m_ProjectXML = new TiXmlDocument(pcstr);
+        m_ProjectXML->LoadFile();
+
+        delete[] pcstr;
+        pcstr = NULL;
+
+        TiXmlElement* root = m_ProjectXML->FirstChildElement();
+        TiXmlElement* child = root->FirstChildElement();
+
+        while (child != NULL)
+        {
+            if (!strcmp(child->Value(), "SCENE"))  // Is Scene Element?
+            {
+                int lightMapWidth = 0, lightMapHeight = 0, lightMapIterate = 1;
+                child->Attribute("LIGHT_MAP_WIDTH", &lightMapWidth);
+                child->Attribute("LIGHT_MAP_HEIGHT", &lightMapHeight);
+                child->Attribute("LIGHT_MAP_ITERATE", &lightMapIterate);
+
+                AddSceneMesh(child->Attribute("FILE"));
+
+                m_SceneConfigDlg->UpdateConfigLightMapSize(lightMapWidth, lightMapHeight);
+                m_SceneConfigDlg->UpdateConfigLightIterate(lightMapIterate);
+
+                ApplicationCore::GetInstance()->ChangeLightMapSize(lightMapWidth, lightMapHeight);
+                ApplicationCore::GetInstance()->SetBakeIterate(lightMapIterate);
+            }
+            else if (!strcmp(child->Value(), "LIGHT"))  // Is Light Element?
+            {
+                int id = -1;
+                child->Attribute("ID", &id);
+                AddLightMesh(id, child->Attribute("FILE"));
+
+                double px = 0.0f, py = 0.0f, pz = 0.0f;
+                double rx = 0.0f, ry = 0.0f, rz = 0.0f;
+                double sx = 0.0f, sy = 0.0f, sz = 0.0f;
+                double cx = 0.0f, cy = 0.0f, cz = 0.0f;
+                child->Attribute("POSITION_X", &px);
+                child->Attribute("POSITION_Y", &py);
+                child->Attribute("POSITION_Z", &pz);
+                child->Attribute("ROTATION_X", &rx);
+                child->Attribute("ROTATION_Y", &ry);
+                child->Attribute("ROTATION_Z", &rz);
+                child->Attribute("SCALE_X", &sx);
+                child->Attribute("SCALE_Y", &sy);
+                child->Attribute("SCALE_Z", &sz);
+                child->Attribute("COLOR_X", &cx);
+                child->Attribute("COLOR_Y", &cy);
+                child->Attribute("COLOR_Z", &cz);
+
+                LightSourceDlgArray::iterator it = m_LightSourceConfigDlgs.find(id);
+                if (it != m_LightSourceConfigDlgs.end() && it->second != NULL)
+                {
+                    it->second->UpdateLightSourcePos(static_cast<float>(px), static_cast<float>(py), static_cast<float>(pz));
+                    it->second->UpdateLightSourceRot(static_cast<float>(rx), static_cast<float>(ry), static_cast<float>(rz));
+                    it->second->UpdateLightSourceScale(static_cast<float>(sx), static_cast<float>(sy), static_cast<float>(sz));
+                    it->second->UpdateLightSourceColor(static_cast<float>(cx), static_cast<float>(cy), static_cast<float>(cz));
+                    ApplicationCore::GetInstance()->SetLightSourcePos(id, static_cast<float>(px), static_cast<float>(py), static_cast<float>(pz));
+                    ApplicationCore::GetInstance()->SetLightSourceRot(id, static_cast<float>(rx), static_cast<float>(ry), static_cast<float>(rz));
+                    ApplicationCore::GetInstance()->SetLightSourceScale(id, static_cast<float>(sx), static_cast<float>(sy), static_cast<float>(sz));
+                    ApplicationCore::GetInstance()->SetLightSourceColor(id, static_cast<float>(cx), static_cast<float>(cy), static_cast<float>(cz));
+                }
+                else
+                {
+                    assert(false);  // Something wrong
+                }
+            }
+            else
+            {
+                assert(false);  // Unknown xml element
+            }
+            child = child->NextSiblingElement();
         }
 
-        if (m_ProjectXML) {
-            delete m_ProjectXML;
-            m_ProjectXML = NULL;
-        }
+        // Display view
+        GetDlgItem(IDC_VIEW)->ShowWindow(SW_SHOW);
+
+        // Enable Save menu
+        GetMenu()->EnableMenuItem(ID_FILE_SAVE, MF_ENABLED);
+        GetMenu()->EnableMenuItem(ID_ADD_SCENE, MF_DISABLED);
+        GetMenu()->EnableMenuItem(ID_ADD_LIGHT, MF_ENABLED);
+
+        // Display control
+        m_OutlineList.ShowWindow(SW_SHOW);
+    }
+}
+
+
+void CGLBLightStudioDlg::OnFileNew()
+{
+    ClearProject();
+
+    glb::app::AppConfig config;
+    config.wnd = GetDlgItem(IDC_VIEW)->GetSafeHwnd();
+    RECT rect;
+    GetDlgItem(IDC_VIEW)->GetClientRect(&rect);
+    config.screen_width = rect.right - rect.left;
+    config.screen_height = rect.bottom - rect.top;
+    config.shadow_map_width = 32;
+    config.shadow_map_height = 32;
+    if (!glb::app::Application::Initialize(ApplicationCore::Create, AfxGetInstanceHandle(), config))
+    {
+        ::MessageBox(NULL, L"Initliaze GLB library failed", L"ERROR", MB_OK);
+        exit(0);
     }
 
     // Create new project
@@ -289,6 +585,8 @@ void CGLBLightStudioDlg::OnFileNew()
 
 void CGLBLightStudioDlg::OnFileSave()
 {
+    SaveProperties();
+
     if (!strcmp(m_ProjectXML->Value(), ""))
     {
         TCHAR szFilter[] = L"XML File(*.xml)|*.xml|All Files(*.*)|*.*||";
@@ -329,47 +627,18 @@ void CGLBLightStudioDlg::OnAddScene()
         memset(pcstr , 0 , 2 * wcslen(filePath.GetBuffer(0))+1 );
         wcstombs(pcstr, filePath.GetBuffer(0), wcslen(filePath.GetBuffer(0))) ;
 
-        if (!ApplicationCore::GetInstance()->AddSceneMesh(pcstr))
-        {
-            ::MessageBox(NULL, L"Invalid scene mesh object file", L"ERROR", MB_OK);
-        }
+        AddSceneMesh(pcstr);
+        ApplicationCore::GetInstance()->ChangeLightMapSize(32, 32);  // Create light map with default size
+
+        // Log to xml
+        TiXmlElement* sceneElement = new TiXmlElement("SCENE");
+        m_ProjectXML->FirstChildElement()->LinkEndChild(sceneElement);
+
+        sceneElement->SetAttribute("ID", 1);
+        sceneElement->SetAttribute("FILE", pcstr);
 
         delete[] pcstr;
         pcstr = NULL;
-
-        // Hide ADD-Scene menu
-        GetMenu()->EnableMenuItem(ID_ADD_SCENE, MF_DISABLED);
-
-        // Set Outline text
-        int count = m_OutlineList.GetItemCount();
-        CString id;
-        id.Format(L"%d", 1);
-
-        m_OutlineList.InsertItem(count, L"");
-        m_OutlineList.SetItemText(count, 0, L"Scene");
-        m_OutlineList.SetItemText(count, 1, id);
-        m_OutlineList.SetItemText(count, 2, filePath);
-
-        m_OutlineList.SetItemState(count, LVIS_SELECTED, LVIS_SELECTED);
-
-        // Create scene config dialog
-        m_SceneConfigDlg = new CGLBSceneConfigDlg(this);
-        m_SceneConfigDlg->Create(IDD_SCENE_CONFIG);
-        m_SceneConfigDlg->ShowWindow(SW_SHOW);
-        m_SceneConfigDlg->MoveWindow(kSubDialogPosX, kSubDialogPosY, kSubDialogWidth, kSubDialogHeight, TRUE);
-
-        // Display bake button
-        GetDlgItem(IDC_BAKE_BUTTON)->ShowWindow(SW_SHOW);
-        GetDlgItem(IDC_BAKE_CANCEL_BUTTON)->ShowWindow(SW_SHOW);
-        GetDlgItem(IDC_BAKE_PROGRESS)->ShowWindow(SW_SHOW);
-        GetDlgItem(IDC_BAKE_CANCEL_BUTTON)->EnableWindow(FALSE);
-
-        // Set current display config dialog
-        if (m_CurDispConfigDlg)
-        {
-            m_CurDispConfigDlg->ShowWindow(SW_HIDE);
-        }
-        m_CurDispConfigDlg = m_SceneConfigDlg;
     }
 }
 
@@ -387,39 +656,14 @@ void CGLBLightStudioDlg::OnAddLight()
         memset(pcstr , 0 , 2 * wcslen(filePath.GetBuffer(0))+1 );
         wcstombs(pcstr, filePath.GetBuffer(0), wcslen(filePath.GetBuffer(0))) ;
 
-        int id = ApplicationCore::GetInstance()->AddLightMesh(pcstr);
-        if (id == -1)
-        {
-            ::MessageBox(NULL, L"Invalid light source mesh object file", L"ERROR", MB_OK);
-            delete[] pcstr;
-            pcstr = NULL;
-            return;
-        }
+        int id = AddLightMesh(-1, pcstr);
 
-        // Set Outline text
-        int count = m_OutlineList.GetItemCount();
-        CString idStr;
-        idStr.Format(L"%d", id);
+        // Log to xml
+        TiXmlElement* lightElement = new TiXmlElement("LIGHT");
+        m_ProjectXML->FirstChildElement()->LinkEndChild(lightElement);
 
-        m_OutlineList.InsertItem(count, L"");
-        m_OutlineList.SetItemText(count, 0, L"Light");
-        m_OutlineList.SetItemText(count, 1, idStr);
-        m_OutlineList.SetItemText(count, 2, filePath);
-        m_OutlineList.SetItemState(count, LVIS_SELECTED | LVIS_FOCUSED, LVIS_SELECTED | LVIS_FOCUSED);
-
-        // Create light source config dialog
-        CGLBLightSourceConfigDlg* dlg = new CGLBLightSourceConfigDlg(this);
-        dlg->Create(IDD_LIGHT_SOURCE_CONFIG_DIALOG);
-        dlg->ShowWindow(SW_SHOW);
-        dlg->MoveWindow(kSubDialogPosX, kSubDialogPosY, kSubDialogWidth, kSubDialogHeight, TRUE);
-        m_LightSourceConfigDlgs.insert(std::pair<int, CGLBLightSourceConfigDlg*>(id, dlg));
-
-        // Set current display config dialog
-        if (m_CurDispConfigDlg)
-        {
-            m_CurDispConfigDlg->ShowWindow(SW_HIDE);
-        }
-        m_CurDispConfigDlg = dlg;
+        lightElement->SetAttribute("ID", id);
+        lightElement->SetAttribute("FILE", pcstr);
 
         delete[] pcstr;
         pcstr = NULL;
@@ -533,3 +777,5 @@ void CGLBLightStudioDlg::OnNMClickOutlineList(NMHDR *pNMHDR, LRESULT *pResult)
         pcstr = NULL;
     }
 }
+
+
