@@ -62,6 +62,7 @@ BEGIN_MESSAGE_MAP(Cglb_modeleditorDlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
+    ON_BN_CLICKED(IDOK, &Cglb_modeleditorDlg::OnBnClickedOk)
 END_MESSAGE_MAP()
 
 
@@ -150,3 +151,10 @@ HCURSOR Cglb_modeleditorDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
+
+
+void Cglb_modeleditorDlg::OnBnClickedOk()
+{
+    // TODO: Add your control notification handler code here
+    CDialogEx::OnOK();
+}
