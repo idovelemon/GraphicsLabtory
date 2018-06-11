@@ -49,13 +49,33 @@ END_MESSAGE_MAP()
 
 Cglb_modeleditorDlg::Cglb_modeleditorDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(Cglb_modeleditorDlg::IDD, pParent)
+    , m_AlbedoTexName(_T(""))
+    , m_RoughnessTexName(_T(""))
+    , m_MetallicTexName(_T(""))
+    , m_NormalTexName(_T(""))
+    , m_AlphaTexName(_T(""))
+    , m_EmissionTexName(_T(""))
+    , m_EnvTexName(_T(""))
+    , m_LightTex0Name(_T(""))
+    , m_LightTex1Name(_T(""))
+    , m_LightTex2Name(_T(""))
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
 
 void Cglb_modeleditorDlg::DoDataExchange(CDataExchange* pDX)
 {
-	CDialogEx::DoDataExchange(pDX);
+    CDialogEx::DoDataExchange(pDX);
+    DDX_Text(pDX, IDC_ALBEDO_EDIT, m_AlbedoTexName);
+    DDX_Text(pDX, IDC_ROUGHNESS_EDIT, m_RoughnessTexName);
+    DDX_Text(pDX, IDC_METALLIC_EDIT, m_MetallicTexName);
+    DDX_Text(pDX, IDC_NORMAL_EDIT, m_NormalTexName);
+    DDX_Text(pDX, IDC_ALPHA_EDIT, m_AlphaTexName);
+    DDX_Text(pDX, IDC_EMISSION_EDIT, m_EmissionTexName);
+    DDX_Text(pDX, IDC_ENV_EDIT, m_EnvTexName);
+    DDX_Text(pDX, IDC_LIGHT_0_EDIT, m_LightTex0Name);
+    DDX_Text(pDX, IDC_LIGHT_1_EDIT, m_LightTex1Name);
+    DDX_Text(pDX, IDC_LIGHT_2_EDIT, m_LightTex2Name);
 }
 
 BEGIN_MESSAGE_MAP(Cglb_modeleditorDlg, CDialogEx)
@@ -63,6 +83,18 @@ BEGIN_MESSAGE_MAP(Cglb_modeleditorDlg, CDialogEx)
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
     ON_BN_CLICKED(IDOK, &Cglb_modeleditorDlg::OnBnClickedOk)
+    ON_COMMAND(ID_FILE_IMPORT, &Cglb_modeleditorDlg::OnFileImport)
+    ON_COMMAND(ID_FILE_EXPORT, &Cglb_modeleditorDlg::OnFileExport)
+    ON_BN_CLICKED(IDC_ALBEDO_FILE_BUTTON, &Cglb_modeleditorDlg::OnBnClickedAlbedoFileButton)
+    ON_BN_CLICKED(IDC_ROUGHNESS_FILE_BUTTON, &Cglb_modeleditorDlg::OnBnClickedRoughnessFileButton)
+    ON_BN_CLICKED(IDC_METALLIC_FILE_BUTTON, &Cglb_modeleditorDlg::OnBnClickedMetallicFileButton)
+    ON_BN_CLICKED(IDC_NORMAL_FILE_BUTTON, &Cglb_modeleditorDlg::OnBnClickedNormalFileButton)
+    ON_BN_CLICKED(IDC_ALPHA_FILE_BUTTON, &Cglb_modeleditorDlg::OnBnClickedAlphaFileButton)
+    ON_BN_CLICKED(IDC_EMISSION_FILE_BUTTON, &Cglb_modeleditorDlg::OnBnClickedEmissionFileButton)
+    ON_BN_CLICKED(IDC_ENV_FILE_BUTTON, &Cglb_modeleditorDlg::OnBnClickedEnvFileButton)
+    ON_BN_CLICKED(IDC_LIGHT_0_FILE_BUTTON, &Cglb_modeleditorDlg::OnBnClickedLight0FileButton)
+    ON_BN_CLICKED(IDC_LIGHT_1_FILE_BUTTON, &Cglb_modeleditorDlg::OnBnClickedLight1FileButton)
+    ON_BN_CLICKED(IDC_LIGHT_2_FILE_BUTTON, &Cglb_modeleditorDlg::OnBnClickedLight2FileButton)
 END_MESSAGE_MAP()
 
 
@@ -98,6 +130,21 @@ BOOL Cglb_modeleditorDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// Set small icon
 
 	// TODO: Add extra initialization here
+    // Disable menu
+    GetMenu()->EnableMenuItem(ID_FILE_IMPORT, MF_ENABLED);
+    GetMenu()->EnableMenuItem(ID_FILE_EXPORT, MF_DISABLED);
+
+    // Disable button
+    GetDlgItem(IDC_ALBEDO_FILE_BUTTON)->EnableWindow(FALSE);
+    GetDlgItem(IDC_ROUGHNESS_FILE_BUTTON)->EnableWindow(FALSE);
+    GetDlgItem(IDC_METALLIC_FILE_BUTTON)->EnableWindow(FALSE);
+    GetDlgItem(IDC_NORMAL_FILE_BUTTON)->EnableWindow(FALSE);
+    GetDlgItem(IDC_ALPHA_FILE_BUTTON)->EnableWindow(FALSE);
+    GetDlgItem(IDC_EMISSION_FILE_BUTTON)->EnableWindow(FALSE);
+    GetDlgItem(IDC_ENV_FILE_BUTTON)->EnableWindow(FALSE);
+    GetDlgItem(IDC_LIGHT_0_FILE_BUTTON)->EnableWindow(FALSE);
+    GetDlgItem(IDC_LIGHT_1_FILE_BUTTON)->EnableWindow(FALSE);
+    GetDlgItem(IDC_LIGHT_2_FILE_BUTTON)->EnableWindow(FALSE);
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
@@ -157,4 +204,90 @@ void Cglb_modeleditorDlg::OnBnClickedOk()
 {
     // TODO: Add your control notification handler code here
     CDialogEx::OnOK();
+}
+
+
+void Cglb_modeleditorDlg::OnFileImport()
+{
+    // TODO: Add your command handler code here
+    // Disable menu
+    GetMenu()->EnableMenuItem(ID_FILE_EXPORT, MF_ENABLED);
+
+    // Disable button
+    GetDlgItem(IDC_ALBEDO_FILE_BUTTON)->EnableWindow(TRUE);
+    GetDlgItem(IDC_ROUGHNESS_FILE_BUTTON)->EnableWindow(TRUE);
+    GetDlgItem(IDC_METALLIC_FILE_BUTTON)->EnableWindow(TRUE);
+    GetDlgItem(IDC_NORMAL_FILE_BUTTON)->EnableWindow(TRUE);
+    GetDlgItem(IDC_ALPHA_FILE_BUTTON)->EnableWindow(TRUE);
+    GetDlgItem(IDC_EMISSION_FILE_BUTTON)->EnableWindow(TRUE);
+    GetDlgItem(IDC_ENV_FILE_BUTTON)->EnableWindow(TRUE);
+    GetDlgItem(IDC_LIGHT_0_FILE_BUTTON)->EnableWindow(TRUE);
+    GetDlgItem(IDC_LIGHT_1_FILE_BUTTON)->EnableWindow(TRUE);
+    GetDlgItem(IDC_LIGHT_2_FILE_BUTTON)->EnableWindow(TRUE);
+}
+
+
+void Cglb_modeleditorDlg::OnFileExport()
+{
+    // TODO: Add your command handler code here
+}
+
+
+void Cglb_modeleditorDlg::OnBnClickedAlbedoFileButton()
+{
+    // TODO: Add your control notification handler code here
+}
+
+
+void Cglb_modeleditorDlg::OnBnClickedRoughnessFileButton()
+{
+    // TODO: Add your control notification handler code here
+}
+
+
+void Cglb_modeleditorDlg::OnBnClickedMetallicFileButton()
+{
+    // TODO: Add your control notification handler code here
+}
+
+
+void Cglb_modeleditorDlg::OnBnClickedNormalFileButton()
+{
+    // TODO: Add your control notification handler code here
+}
+
+
+void Cglb_modeleditorDlg::OnBnClickedAlphaFileButton()
+{
+    // TODO: Add your control notification handler code here
+}
+
+
+void Cglb_modeleditorDlg::OnBnClickedEmissionFileButton()
+{
+    // TODO: Add your control notification handler code here
+}
+
+
+void Cglb_modeleditorDlg::OnBnClickedEnvFileButton()
+{
+    // TODO: Add your control notification handler code here
+}
+
+
+void Cglb_modeleditorDlg::OnBnClickedLight0FileButton()
+{
+    // TODO: Add your control notification handler code here
+}
+
+
+void Cglb_modeleditorDlg::OnBnClickedLight1FileButton()
+{
+    // TODO: Add your control notification handler code here
+}
+
+
+void Cglb_modeleditorDlg::OnBnClickedLight2FileButton()
+{
+    // TODO: Add your control notification handler code here
 }
