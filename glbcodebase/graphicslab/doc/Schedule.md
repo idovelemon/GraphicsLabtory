@@ -77,9 +77,18 @@ GLB ModelEditor is used for convert DCC tool's export file format to GLB library
 |Display view after import model|2018-06-11 10:35|2018-06-11 11:00|<font color="Green">Finish</font>|
 |Display model after import model|2018-06-11 11:00|2018-06-11 15:25|<font color="Green">Finish</font>|
 |Add texture dynamic|2018-06-11 15:25|2018-06-11 16:40|<font color="Green">Finish</font>|
-|Export model as glb build-in mesh file|2018-06-11 16:40||<font color="Green">Finish</font>|
+|Export model as glb build-in mesh file|2018-06-11 16:40|2018-06-11 22:30|<font color="Green">Finish</font>|
+|Add preview menu|2018-06-11 21:15|2018-06-11 22:30|<font color="Green">Finish</font>|
+|Change modelEditor's icon|2018-06-11 22:00||<font color="Blue">New</font>|
+|Support for second uv|2018-06-11 22:35|2018-06-11 23:05|<font color="Green">Finish</font>|
+|Support for alpha texture|2018-06-11 22:35||<font color="Blue">New</font>|
+|Support for emission texture|2018-06-11 22:35||<font color="Blue">New</font>|
+|Support for diffuse and specular environment texture|2018-06-11 22:35||<font color="Blue">New</font>|
+|Support for light map texture|2018-06-11 22:35||<font color="Blue">New</font>|
+|Copy texture when export model|2018-06-11 23:10||<font color="Blue">New</font>|
 
 |Bug|Begin Time|Fnish Time|Status|
 |-|-|-|-|
 |Menu turn gray after click it|2018-06-11 10:40|2018-06-11 16:50|<font color="Green">Finish</font>|
 |Remove cursor in editor control|2018-06-11 11:10||<font color="Blue">New</font>|
+|Disabled preview after import a model|2018-06-11 22:30||<font color="Blue">New</font>|
