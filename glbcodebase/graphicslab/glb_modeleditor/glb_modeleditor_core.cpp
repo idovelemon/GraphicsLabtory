@@ -96,6 +96,7 @@ bool ApplicationCore::AddModel(const char* name) {
         int32_t trianglesNum = scene->mMeshes[0]->mNumFaces;
         float* vertexBuf = new float[trianglesNum * 3 * 3];
         float* texcoordBuf = mesh->HasTextureCoords(0) ? new float[trianglesNum * 3 * 2] : NULL;
+        float* lightMapTexCoordBuf = mesh->HasTextureCoords(1) ? new float[trianglesNum * 3 * 2] : NULL;
         float* normalBuf = mesh->HasNormals() ? new float[trianglesNum * 3 * 3] : NULL;
         float* tangentBuf = mesh->HasTangentsAndBitangents() ? new float[trianglesNum * 3 * 3] : NULL;
         float* binormalBuf = mesh->HasTangentsAndBitangents() ? new float[trianglesNum * 3 * 3] : NULL;
@@ -115,6 +116,14 @@ bool ApplicationCore::AddModel(const char* name) {
                     for (int32_t j = 0; j < 3; j++) {
                         texcoordBuf[i * 3 * 2 + j * 2 + 0] = mesh->mTextureCoords[0][face.mIndices[j]].x;
                         texcoordBuf[i * 3 * 2 + j * 2 + 1] = mesh->mTextureCoords[0][face.mIndices[j]].y;
+                    }
+                }
+
+                // Vertex Second UV
+                if (mesh->HasTextureCoords(1)) {
+                    for (int32_t j = 0; j < 3; j++) {
+                        lightMapTexCoordBuf[i * 3 * 2 + j * 2 + 0] = mesh->mTextureCoords[1][face.mIndices[j]].x;
+                        lightMapTexCoordBuf[i * 3 * 2 + j * 2 + 1] = mesh->mTextureCoords[1][face.mIndices[j]].y;
                     }
                 }
 
@@ -143,7 +152,7 @@ bool ApplicationCore::AddModel(const char* name) {
             }
         }
 
-        scene::Model* model = scene::Model::Create(trianglesNum, vertexBuf, texcoordBuf, normalBuf, tangentBuf, binormalBuf);
+        scene::Model* model = scene::Model::Create(trianglesNum, vertexBuf, texcoordBuf, lightMapTexCoordBuf, normalBuf, tangentBuf, binormalBuf);
         int32_t modelId = scene::Scene::AddObject(model);
         if (modelId != -1) {
             scene::Scene::GetObjectById(modelId)->SetCullFaceEnable(true);
