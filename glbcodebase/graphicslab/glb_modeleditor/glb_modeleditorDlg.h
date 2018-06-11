@@ -31,6 +31,7 @@ protected:
     afx_msg void OnBnClickedOk();
     afx_msg void OnFileImport();
     afx_msg void OnFileExport();
+    afx_msg void OnFilePreview();
     afx_msg void OnBnClickedAlbedoFileButton();
     afx_msg void OnBnClickedRoughnessFileButton();
     afx_msg void OnBnClickedMetallicFileButton();
@@ -41,6 +42,7 @@ protected:
     afx_msg void OnBnClickedLight0FileButton();
     afx_msg void OnBnClickedLight1FileButton();
     afx_msg void OnBnClickedLight2FileButton();
+    afx_msg void OnTimer(UINT_PTR nIDEvent);
 	DECLARE_MESSAGE_MAP()
 
 private:
@@ -54,6 +56,4 @@ private:
     CString m_LightTex0Name;
     CString m_LightTex1Name;
     CString m_LightTex2Name;
-public:
-    afx_msg void OnTimer(UINT_PTR nIDEvent);
 };

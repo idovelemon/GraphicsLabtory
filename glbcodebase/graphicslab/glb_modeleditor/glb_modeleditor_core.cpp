@@ -59,13 +59,6 @@ bool ApplicationCore::Initialize() {
     // HDR
     glb::render::Render::SetHighLightBase(1.5f);
 
-    // TEST
-    int32_t cube = scene::Scene::AddObject("res/Untitled.obj");
-    scene::Scene::GetObjectById(cube)->SetCullFaceEnable(true);
-    scene::Scene::GetObjectById(cube)->SetCullFaceMode(glb::render::CULL_BACK);
-    scene::Scene::GetObjectById(cube)->SetDepthTestEnable(true);
-    scene::Scene::GetObjectById(cube)->SetPos(math::Vector(0.0, 0.0, 0.0));
-
     return true;
 }
 
@@ -332,12 +325,63 @@ bool ApplicationCore::SaveModel(const char* name) {
                 // TODO: Move emission texture to destination path
             }
 
+            // Diffuse Prefilter Cube Map?
+            if (model->HasDiffusePFCTexture()) {
+                const char* path = render::texture::Mgr::GetTextureById(model->GetTexId(scene::Model::MT_DIFFUSE_PFC))->GetName();
+                std::string name = util::path_get_name(path);
+                output << "tdiffusepfc " << name.c_str() << "\n";
+
+                // TODO: Move diffuse texture to destination path
+            }
+
+            // Specular Prefilter Cube Map?
+            if (model->HasSpecularPFCTexture()) {
+                const char* path = render::texture::Mgr::GetTextureById(model->GetTexId(scene::Model::MT_SPECULAR_PFC))->GetName();
+                std::string name = util::path_get_name(path);
+                output << "tspecularpfc " << name.c_str() << "\n";
+
+                // TODO: Move specular texture to destination path
+            }
+
+            // Accept light?
+            if (model->IsAcceptLight()) {
+                output << "al " << 1 << "\n";
+            } else {
+                output << "al " << 0 << "\n";
+            }
+
+            // Accept shadow?
+            if (model->IsAcceptShadow()) {
+                output << "as " << 1 << "\n";
+            } else {
+                output << "as " << 0 << "\n";
+            }
+
+            // Cast shadow?
+            if (model->IsCastShadow()) {
+                output << "cs " << 1 << "\n";
+            } else {
+                output << "cs " << 0 << "\n";
+            }
+
             output.close();
             result = true;
         }
     }
 
     return result;
+}
+
+bool ApplicationCore::Preview(const char* name) {
+    m_SceneMesh = scene::Scene::AddObject(name);
+    if (m_SceneMesh != -1) {
+        scene::Scene::GetObjectById(m_SceneMesh)->SetCullFaceEnable(true);
+        scene::Scene::GetObjectById(m_SceneMesh)->SetCullFaceMode(glb::render::CULL_BACK);
+        scene::Scene::GetObjectById(m_SceneMesh)->SetDepthTestEnable(true);
+        scene::Scene::GetObjectById(m_SceneMesh)->SetPos(math::Vector(0.0, 0.0, 0.0));
+    }
+
+    return m_SceneMesh != -1;
 }
 
 bool ApplicationCore::SetModelAlbedoTexture(const char* name) {
@@ -410,6 +454,66 @@ bool ApplicationCore::SetModelNormalTexture(const char* name) {
     }
 
     return result;
+}
+
+const char* ApplicationCore::GetModelAlbedoTextureName() {
+    if (m_SceneMesh != -1) {
+        int32_t texID = scene::Scene::GetObjectById(m_SceneMesh)->GetTexId(scene::Model::MT_ALBEDO);
+        if (texID != -1) {
+            return render::texture::Mgr::GetTextureById(texID)->GetName();
+        } else {
+            return NULL;
+        }
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return NULL;
+}
+
+const char* ApplicationCore::GetModelRoughnessTextureName() {
+    if (m_SceneMesh != -1) {
+        int32_t texID = scene::Scene::GetObjectById(m_SceneMesh)->GetTexId(scene::Model::MT_ROUGHNESS);
+        if (texID != -1) {
+            return render::texture::Mgr::GetTextureById(texID)->GetName();
+        } else {
+            return NULL;
+        }
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return NULL;
+}
+
+const char* ApplicationCore::GetModelMetallicTextureName() {
+    if (m_SceneMesh != -1) {
+        int32_t texID = scene::Scene::GetObjectById(m_SceneMesh)->GetTexId(scene::Model::MT_METALLIC);
+        if (texID != -1) {
+            return render::texture::Mgr::GetTextureById(texID)->GetName();
+        } else {
+            return NULL;
+        }
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return NULL;
+}
+
+const char* ApplicationCore::GetModelNormalTextureName() {
+    if (m_SceneMesh != -1) {
+        int32_t texID = scene::Scene::GetObjectById(m_SceneMesh)->GetTexId(scene::Model::MT_NORMAL);
+        if (texID != -1) {
+            return render::texture::Mgr::GetTextureById(texID)->GetName();
+        } else {
+            return NULL;
+        }
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return NULL;
 }
 
 void ApplicationCore::UpdateCamera() {

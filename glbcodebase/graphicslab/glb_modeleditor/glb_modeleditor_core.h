@@ -27,10 +27,15 @@ public:
 
     bool AddModel(const char* name);
     bool SaveModel(const char* name);
+    bool Preview(const char* name);
     bool SetModelAlbedoTexture(const char* name);
     bool SetModelMetallicTexture(const char* name);
     bool SetModelRoughnessTexture(const char* name);
     bool SetModelNormalTexture(const char* name);
+    const char* GetModelAlbedoTextureName();
+    const char* GetModelMetallicTextureName();
+    const char* GetModelRoughnessTextureName();
+    const char* GetModelNormalTextureName();
 
 protected:
     void UpdateCamera();

@@ -98,6 +98,7 @@ BEGIN_MESSAGE_MAP(Cglb_modeleditorDlg, CDialog)
     ON_BN_CLICKED(IDC_LIGHT_1_FILE_BUTTON, &Cglb_modeleditorDlg::OnBnClickedLight1FileButton)
     ON_BN_CLICKED(IDC_LIGHT_2_FILE_BUTTON, &Cglb_modeleditorDlg::OnBnClickedLight2FileButton)
     ON_WM_TIMER()
+    ON_COMMAND(ID_FILE_PREVIEW, &Cglb_modeleditorDlg::OnFilePreview)
 END_MESSAGE_MAP()
 
 
@@ -257,11 +258,11 @@ void Cglb_modeleditorDlg::OnFileImport()
         memset(pcstr , 0 , 2 * wcslen(filePath.GetBuffer(0))+1 );
         wcstombs(pcstr, filePath.GetBuffer(0), wcslen(filePath.GetBuffer(0))) ;
 
-        //if (!ApplicationCore::GetInstance()->AddModel(pcstr))
-        //{
-        //    ::MessageBox(NULL, L"Invalid file format", L"ERROR", MB_OK);
-        //    exit(0);
-        //}
+        if (!ApplicationCore::GetInstance()->AddModel(pcstr))
+        {
+            ::MessageBox(NULL, L"Invalid file format", L"ERROR", MB_OK);
+            exit(0);
+        }
 
         delete[] pcstr;
         pcstr = NULL;
@@ -291,6 +292,70 @@ void Cglb_modeleditorDlg::OnFileExport()
 
         delete[] pcstr;
         pcstr = NULL;
+    }
+}
+
+
+void Cglb_modeleditorDlg::OnFilePreview()
+{
+    // TODO: Add your command handler code here
+    TCHAR szFilter[] = L"Obj File(*.obj)|*.obj||";
+    CFileDialog fileDlg(TRUE, L"", L"", OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, szFilter, this);
+    if (IDOK == fileDlg.DoModal())
+    {
+        CString filePath = fileDlg.GetPathName();
+
+        // Disable menu
+        GetMenu()->EnableMenuItem(ID_FILE_IMPORT, MF_DISABLED);
+        GetMenu()->EnableMenuItem(ID_FILE_EXPORT, MF_DISABLED);
+        GetMenu()->EnableMenuItem(ID_FILE_PREVIEW, MF_DISABLED);
+
+        // Disable button
+        GetDlgItem(IDC_ALBEDO_FILE_BUTTON)->EnableWindow(TRUE);
+        GetDlgItem(IDC_ROUGHNESS_FILE_BUTTON)->EnableWindow(TRUE);
+        GetDlgItem(IDC_METALLIC_FILE_BUTTON)->EnableWindow(TRUE);
+        GetDlgItem(IDC_NORMAL_FILE_BUTTON)->EnableWindow(TRUE);
+        GetDlgItem(IDC_ALPHA_FILE_BUTTON)->EnableWindow(TRUE);
+        GetDlgItem(IDC_EMISSION_FILE_BUTTON)->EnableWindow(TRUE);
+        GetDlgItem(IDC_ENV_FILE_BUTTON)->EnableWindow(TRUE);
+        GetDlgItem(IDC_LIGHT_0_FILE_BUTTON)->EnableWindow(TRUE);
+        GetDlgItem(IDC_LIGHT_1_FILE_BUTTON)->EnableWindow(TRUE);
+        GetDlgItem(IDC_LIGHT_2_FILE_BUTTON)->EnableWindow(TRUE);
+
+        // Initialize glb
+        glb::app::AppConfig config;
+        config.wnd = GetDlgItem(IDC_VIEW)->GetSafeHwnd();
+        RECT rect;
+        GetDlgItem(IDC_VIEW)->GetClientRect(&rect);
+        config.screen_width = rect.right - rect.left;
+        config.screen_height = rect.bottom - rect.top;
+        config.shadow_map_width = 32;
+        config.shadow_map_height = 32;
+        if (!glb::app::Application::Initialize(ApplicationCore::Create, AfxGetInstanceHandle(), config))
+        {
+            ::MessageBox(NULL, L"Initialize GLB library failed", L"ERROR", MB_OK);
+            exit(0);
+        }
+
+        // Try add model
+        char *pcstr = (char *)new char[2 * wcslen(filePath.GetBuffer(0))+1] ;
+        memset(pcstr , 0 , 2 * wcslen(filePath.GetBuffer(0))+1 );
+        wcstombs(pcstr, filePath.GetBuffer(0), wcslen(filePath.GetBuffer(0))) ;
+
+        if (!ApplicationCore::GetInstance()->Preview(pcstr))
+        {
+            ::MessageBox(NULL, L"Invalid file format", L"ERROR", MB_OK);
+            exit(0);
+        }
+
+        delete[] pcstr;
+        pcstr = NULL;
+
+        m_AlbedoTexName = ApplicationCore::GetInstance()->GetModelAlbedoTextureName();
+        m_RoughnessTexName = ApplicationCore::GetInstance()->GetModelRoughnessTextureName();
+        m_MetallicTexName = ApplicationCore::GetInstance()->GetModelMetallicTextureName();
+        m_NormalTexName = ApplicationCore::GetInstance()->GetModelNormalTextureName();
+        UpdateData(false);
     }
 }
 
