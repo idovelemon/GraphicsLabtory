@@ -8,6 +8,7 @@ GLB(GraphicsLabtory) library is a light-weight 3D rendering library.
 |Task|Begin Time|Fnish Time|Status|
 |-|-|-|-|
 |Resource System problem:When destroy an object, how to deal with the mesh and texture resource associated with it? |2018-06-09 10:10||<font color="Blue">New</font>|
+|Model Editor|2018-06-10 22:40||<font color="Blue">New</font>|
 
 ## GLB LightStudio
 Light studio is used for baking Lightmap with Radiosity Normal Mapping(RNM) and precompute LightProbe for image based lighting
@@ -35,6 +36,8 @@ Light studio is used for baking Lightmap with Radiosity Normal Mapping(RNM) and 
 |Accelerate key|2018-06-09 15:50||<font color="Blue">New</font>|
 |Light map preview|2018-06-09 15:50||<font color="Blue">New</font>|
 |Light probe baking|2018-06-09 15:50||<font color="Blue">New</font>|
+|Release a beta version|2018-06-09 16:00|2018-06-09 16:15|<font color="Green">Finish</font>|
+|Sperate lightmap uv from albedo/roughness/metallic/normal uv|2018-06-09 20:37||<font color="Blue">New</font>|
 
 <br>
 
@@ -53,3 +56,19 @@ Light studio is used for baking Lightmap with Radiosity Normal Mapping(RNM) and 
 |Step1:New -> Step2:Open undefine behaivor|2018-06-09 14:50|2018-06-09 0:15|2018-06-09 15:50|<font color="Green">Finish</font>|
 |Overhead test|2018-06-09 15:55||<font color="Blue">New</font>|
 |Memory leak test|2018-06-09 15:55||<font color="Blue">New</font>|
+
+## GLB ModelEditor
+GLB ModelEditor is used for convert DCC tool's export file format to GLB library build-in file formats
+<li> Convert mesh data
+<li> Edit material
+<li> Model preview
+
+|Task|Begin Time|Fnish Time|Status|
+|-|-|-|-|
+|Setup GLB ModelEditor project|2018-06-10 23:20|2018-06-11 06:35|<font color="Green">Finish</font>|
+|Basic GUI|2018-06-11 06:35|2018-06-11 07:20|<font color="Green">Finish</font>|
+|Basic interactive|2018-06-11 07:20||<font color="Blue">New</font>|
+|Download assimp library|2018-06-10 23:20||<font color="Blue">New</font>|
+
+|Bug|Begin Time|Fnish Time|Status|
+|-|-|-|-|
