@@ -1,5 +1,5 @@
 <GLB_LIGHT_STUDIO Author="GLB">
-    <SCENE ID="1" FILE="D:\Document\Github\GraphicsLabtory\glbcodebase\graphicslab\glb_lightstudio\project\plane.obj" LIGHT_MAP_WIDTH="64" LIGHT_MAP_HEIGHT="64" LIGHT_MAP_ITERATE="1" />
+    <SCENE ID="1" FILE="D:\Document\Github\GraphicsLabtory\glbcodebase\graphicslab\glb_lightstudio\project\plane.obj" LIGHT_MAP_WIDTH="32" LIGHT_MAP_HEIGHT="32" LIGHT_MAP_ITERATE="1" />
     <LIGHT ID="0" FILE="D:\Document\Github\GraphicsLabtory\glbcodebase\graphicslab\glb_lightstudio\project\sphereLight.obj" POSITION_X="0" POSITION_Y="1" POSITION_Z="0" ROTATION_X="0" ROTATION_Y="0" ROTATION_Z="0" SCALE_X="0.5" SCALE_Y="0.5" SCALE_Z="0.5" COLOR_X="10" COLOR_Y="10" COLOR_Z="0" />
     <LIGHT ID="1" FILE="D:\Document\Github\GraphicsLabtory\glbcodebase\graphicslab\glb_lightstudio\project\sphereLight.obj" POSITION_X="10" POSITION_Y="1" POSITION_Z="0" ROTATION_X="0" ROTATION_Y="0" ROTATION_Z="0" SCALE_X="0.5" SCALE_Y="0.5" SCALE_Z="0.5" COLOR_X="10" COLOR_Y="0" COLOR_Z="0" />
     <LIGHT ID="2" FILE="D:\Document\Github\GraphicsLabtory\glbcodebase\graphicslab\glb_lightstudio\project\sphereLight.obj" POSITION_X="-10" POSITION_Y="1" POSITION_Z="0" ROTATION_X="0" ROTATION_Y="0" ROTATION_Z="0" SCALE_X="0.5" SCALE_Y="0.5" SCALE_Z="0.5" COLOR_X="0" COLOR_Y="10" COLOR_Z="0" />
