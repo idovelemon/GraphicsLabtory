@@ -34,7 +34,7 @@ public:
 
 public:
     static Model* Create(const char* file_name);
-    static Model* Create(int32_t numTriangles, float* vertexBuf, float* texBuf = NULL, float* normalBuf = NULL, float* tangentBuf = NULL, float* binormalBuf = NULL);
+    static Model* Create(int32_t numTriangles, float* vertexBuf, float* texBuf = NULL, float* lightMapTexCoordBuf = NULL, float* normalBuf = NULL, float* tangentBuf = NULL, float* binormalBuf = NULL);
 
 public:
     std::string GetName() const;

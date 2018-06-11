@@ -52,7 +52,7 @@ protected:
 class TriangleMesh::Imp {
 public:
     virtual ~Imp();
-    static TriangleMesh::Imp* Create(int32_t triangle_num, float* vertex_buf, float* coord_buf = 0, float* normal_buf = 0, float* tanget_buf = 0, float* binormal_buf = 0);
+    static TriangleMesh::Imp* Create(int32_t triangle_num, float* vertex_buf, float* coord_buf = 0, float* lightMapTexCoordBuf = 0, float* normal_buf = 0, float* tanget_buf = 0, float* binormal_buf = 0);
 
 public:
     void SetId(int32_t id);

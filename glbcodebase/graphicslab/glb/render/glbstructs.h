@@ -27,6 +27,7 @@ enum VertexAttribute {
     VA_UNKNOWN = 0,
     VA_POS,
     VA_TEXCOORD,
+    VA_LIGHT_MAP_TEXCOORD,
     VA_NORMAL,
     VA_TANGENT,
     VA_BINORMAL,

@@ -69,10 +69,10 @@ TriangleMesh::~TriangleMesh() {
     GLB_SAFE_DELETE(m_Imp);
 }
 
-TriangleMesh* TriangleMesh::Create(int32_t triangle_num, float* vertices, float* tex_coords, float* normals, float* tangets, float* binormals) {
+TriangleMesh* TriangleMesh::Create(int32_t triangle_num, float* vertices, float* tex_coords, float* lightMapTexCoordBuf, float* normals, float* tangets, float* binormals) {
     TriangleMesh* triangle_mesh = NULL;
 
-    TriangleMesh::Imp* imp = TriangleMesh::Imp::Create(triangle_num, vertices, tex_coords, normals, tangets, binormals);
+    TriangleMesh::Imp* imp = TriangleMesh::Imp::Create(triangle_num, vertices, tex_coords, lightMapTexCoordBuf, normals, tangets, binormals);
     if (imp != NULL) {
         triangle_mesh = new TriangleMesh;
         triangle_mesh->m_Imp = imp;

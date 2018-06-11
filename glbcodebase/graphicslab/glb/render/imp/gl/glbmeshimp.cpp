@@ -85,7 +85,7 @@ TriangleMesh::Imp::~Imp() {
     GLB_SAFE_DELETE(m_VertexBuffer);
 }
 
-TriangleMesh::Imp* TriangleMesh::Imp::Create(int32_t triangle_num, float* vertices, float* tex_coords, float* normals, float* tangets, float* binormals) {
+TriangleMesh::Imp* TriangleMesh::Imp::Create(int32_t triangle_num, float* vertices, float* tex_coords, float* lightMapTexCoordBuf, float* normals, float* tangets, float* binormals) {
     TriangleMesh::Imp* triangle_mesh = NULL;
 
     if (triangle_num > 0 && vertices != NULL) {
@@ -108,12 +108,20 @@ TriangleMesh::Imp* TriangleMesh::Imp::Create(int32_t triangle_num, float* vertic
             layout.count++;
         }
 
+        int32_t lightMapTexCoordsBufSize = 0;
+        if (lightMapTexCoordBuf) {
+            lightMapTexCoordsBufSize = 3 * triangle_num * 2 * sizeof(float);
+            layout.layouts[layout.count].attriType = VA_LIGHT_MAP_TEXCOORD;
+            layout.layouts[layout.count].size = tex_coords_buf_size + vertices_buf_size;
+            layout.count++;
+        }
+
         int32_t normal_buf_size = 0;
         if (normals) {
             normal_buf_size = 3 * triangle_num * 3 * sizeof(float);
             layout.layouts[layout.count].attriType = VA_NORMAL;
             layout.layouts[layout.count].size = normal_buf_size;
-            layout.layouts[layout.count].offset = vertices_buf_size + tex_coords_buf_size;
+            layout.layouts[layout.count].offset = vertices_buf_size + tex_coords_buf_size + lightMapTexCoordsBufSize;
             layout.count++;
         }
 
@@ -122,7 +130,7 @@ TriangleMesh::Imp* TriangleMesh::Imp::Create(int32_t triangle_num, float* vertic
             tanget_buf_size = 3 * triangle_num * 3 * sizeof(float);
             layout.layouts[layout.count].attriType = VA_TANGENT;
             layout.layouts[layout.count].size = tanget_buf_size;
-            layout.layouts[layout.count].offset = vertices_buf_size + tex_coords_buf_size + normal_buf_size;
+            layout.layouts[layout.count].offset = vertices_buf_size + tex_coords_buf_size + lightMapTexCoordsBufSize + normal_buf_size;
             layout.count++;
         }
 
@@ -131,11 +139,11 @@ TriangleMesh::Imp* TriangleMesh::Imp::Create(int32_t triangle_num, float* vertic
             binormal_buf_size = 3 * triangle_num * 3 * sizeof(float);
             layout.layouts[layout.count].attriType = VA_BINORMAL;
             layout.layouts[layout.count].size = binormal_buf_size;
-            layout.layouts[layout.count].offset = vertices_buf_size + tex_coords_buf_size + normal_buf_size + tanget_buf_size;
+            layout.layouts[layout.count].offset = vertices_buf_size + tex_coords_buf_size + lightMapTexCoordsBufSize + normal_buf_size + tanget_buf_size;
             layout.count++;
         }
 
-        int32_t buf_size = vertices_buf_size + tex_coords_buf_size + normal_buf_size + tanget_buf_size + binormal_buf_size;
+        int32_t buf_size = vertices_buf_size + tex_coords_buf_size + lightMapTexCoordsBufSize + normal_buf_size + tanget_buf_size + binormal_buf_size;
 
         // Create vertex array object
         VertexBuffer* vbuf = new VertexBuffer;
@@ -154,20 +162,25 @@ TriangleMesh::Imp* TriangleMesh::Imp::Create(int32_t triangle_num, float* vertic
             glBufferSubData(GL_ARRAY_BUFFER, vertices_buf_size, tex_coords_buf_size, tex_coords);
         }
 
+        // Update light map texture data
+        if (lightMapTexCoordBuf) {
+            glBufferSubData(GL_ARRAY_BUFFER, vertices_buf_size + tex_coords_buf_size, lightMapTexCoordsBufSize, lightMapTexCoordBuf);
+        }
+
         // Update normal data
         if (normals) {
-            glBufferSubData(GL_ARRAY_BUFFER, vertices_buf_size + tex_coords_buf_size, normal_buf_size, normals);
+            glBufferSubData(GL_ARRAY_BUFFER, vertices_buf_size + tex_coords_buf_size + lightMapTexCoordsBufSize, normal_buf_size, normals);
         }
 
         // Update tanget data
         if (tangets) {
-            glBufferSubData(GL_ARRAY_BUFFER, vertices_buf_size + tex_coords_buf_size + normal_buf_size
+            glBufferSubData(GL_ARRAY_BUFFER, vertices_buf_size + tex_coords_buf_size + lightMapTexCoordsBufSize + normal_buf_size
                 , tanget_buf_size, tangets);
         }
 
         // Update binormal data
         if (binormals) {
-            glBufferSubData(GL_ARRAY_BUFFER, vertices_buf_size + tex_coords_buf_size + normal_buf_size + tanget_buf_size
+            glBufferSubData(GL_ARRAY_BUFFER, vertices_buf_size + tex_coords_buf_size + lightMapTexCoordsBufSize + normal_buf_size + tanget_buf_size
                 , binormal_buf_size, binormals);
         }
 

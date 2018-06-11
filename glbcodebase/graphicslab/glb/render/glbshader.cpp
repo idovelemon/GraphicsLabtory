@@ -314,6 +314,8 @@ VertexAttribute UberProgram::GetVertexAttribute(const char* attribute_name) {
             result = VA_COLOR;
         } else if (!strcmp("glb_TexCoord", attribute_name)) {
             result = VA_TEXCOORD;
+        } else if (!strcmp("glb_LightMapTexCoord", attribute_name)) {
+            result = VA_LIGHT_MAP_TEXCOORD;
         } else if (!strcmp("glb_Normal", attribute_name)) {
             result = VA_NORMAL;
         } else if (!strcmp("glb_Tangent", attribute_name)) {
@@ -431,6 +433,8 @@ VertexAttribute UserProgram::GetVertexAttribute(const char* attribute_name) {
             result = VA_COLOR;
         } else if (!strcmp("glb_TexCoord", attribute_name)) {
             result = VA_TEXCOORD;
+        } else if (!strcmp("glb_LightMapTexCoord", attribute_name)) {
+            result = VA_LIGHT_MAP_TEXCOORD;
         } else if (!strcmp("glb_Normal", attribute_name)) {
             result = VA_NORMAL;
         } else if (!strcmp("glb_Tangent", attribute_name)) {

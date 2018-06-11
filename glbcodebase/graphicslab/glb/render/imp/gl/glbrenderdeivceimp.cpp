@@ -614,6 +614,24 @@ void DeviceImp::SetupVertexLayout() {
             }
             break;
 
+        case VA_LIGHT_MAP_TEXCOORD:
+            {
+                int32_t location = -1;
+                for (int32_t j = 0; j < m_ShaderLayout.count; j++) {
+                    if (m_ShaderLayout.layouts[j].attriType == VA_LIGHT_MAP_TEXCOORD) {
+                        location = m_ShaderLayout.layouts[j].location;
+                        break;
+                    }
+                }
+
+                // Texture Coordinate is optional
+                if (location != -1) {
+                    glEnableVertexAttribArray(location);
+                    glVertexAttribPointer(location, 2, GL_FLOAT, GL_FALSE, 0, reinterpret_cast<GLvoid*>(m_VertexLayout.layouts[i].offset));
+                }
+            }
+            break;
+
         case VA_NORMAL:
             {
                 int32_t location = -1;

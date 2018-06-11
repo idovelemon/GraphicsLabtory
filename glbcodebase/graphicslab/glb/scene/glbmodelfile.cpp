@@ -52,6 +52,7 @@ public:
         ModelMaterialParam& material_param,
         float** vertex_buf,
         float** texcoord_buf = NULL,
+        float** lightMapTexCoordBuf = NULL,
         float** normal_buf = NULL,
         float** tangent_buf = NULL,
         float** binormal_buf = NULL
@@ -73,13 +74,14 @@ class ObjModelFile:public ModelFileBase {
         ModelMaterialParam& material_param,
         float** vertex_buf,
         float** texcoord_buf = NULL,
+        float** lightMapTexCoordBuf = NULL,
         float** normal_buf = NULL,
         float** tangent_buf = NULL,
         float** binormal_buf = NULL
         );
 
  protected:
-     void ExtractFaceData(const char* buffer, int32_t& vertex_index, int32_t& texcoord_index, int32_t& normal_index, int32_t& tangent_index, int32_t& binormal_index);
+     void ExtractFaceData(const char* buffer, int32_t& vertex_index, int32_t& texcoord_index, int32_t& light_map_tex_index, int32_t& normal_index, int32_t& tanget_index, int32_t& binormal_index);
 };
 
 //----------------------------------------------------------------------------------------
@@ -93,6 +95,7 @@ class ObjFace {
 public:
     int32_t vertex_index[3];
     int32_t texcoord_index[3];
+    int32_t lightmap_texcoord_index[3];
     int32_t normal_index[3];
     int32_t tangent_index[3];
     int32_t binormal_index[3];
@@ -100,6 +103,7 @@ public:
     ObjFace() {
         memset(vertex_index, 0, sizeof(vertex_index));
         memset(texcoord_index, 0, sizeof(texcoord_index));
+        memset(lightmap_texcoord_index, 0, sizeof(lightmap_texcoord_index));
         memset(normal_index, 0, sizeof(normal_index));
         memset(tangent_index, 0, sizeof(tangent_index));
         memset(binormal_index, 0, sizeof(binormal_index));
@@ -117,6 +121,7 @@ int32_t ObjModelFile::ExtractModelData(
         ModelMaterialParam& materialParam,
         float** vertexBuf,
         float** texcoordBuf,
+        float** lightMapTexCoordBuf,
         float** normalBuf,
         float** tangentBuf,
         float** binormalBuf
@@ -130,6 +135,7 @@ int32_t ObjModelFile::ExtractModelData(
         if (!input.fail()) {
             std::vector<math::Vector> vertexArray;
             std::vector<math::Vector> texArray;
+            std::vector<math::Vector> lightMapTexArray;
             std::vector<math::Vector> normalArray;
             std::vector<math::Vector> tangentArray;
             std::vector<math::Vector> binormalArray;
@@ -175,11 +181,17 @@ int32_t ObjModelFile::ExtractModelData(
                 } else if (!strcmp(prefix, "vt")) {
                     // Texture Coordinate
                     math::Vector texcoord;
-                    // input >> texcoord.x >> texcoord.y >> texcoord.z;
-                    input >> texcoord.x >> texcoord.y;  // .obj from blender do not have z value for texture coordinate
+                    input >> texcoord.x >> texcoord.y;
                     texArray.push_back(texcoord);
 
                     effectParam.hasTexcoord = true;
+                } else if (!strcmp(prefix, "vlightmapt")) {
+                    // Light Map Texture Coordinate
+                    math::Vector texcoord;
+                    input >> texcoord.x >> texcoord.y;
+                    lightMapTexArray.push_back(texcoord);
+
+                    effectParam.hasLightMapTexCoord = true;
                 } else if (!strcmp(prefix, "vn")) {
                     // Normal
                     math::Vector normal;
@@ -204,7 +216,7 @@ int32_t ObjModelFile::ExtractModelData(
                     
                     for (int32_t i = 0; i < kVertexPerTri; i++) {
                         input >> buffer;
-                        ExtractFaceData(buffer, face.vertex_index[i], face.texcoord_index[i], face.normal_index[i], face.tangent_index[i], face.binormal_index[i]);
+                        ExtractFaceData(buffer, face.vertex_index[i], face.texcoord_index[i], face.lightmap_texcoord_index[i], face.normal_index[i], face.tangent_index[i], face.binormal_index[i]);
                     }
 
                     faceArray.push_back(face);
@@ -379,6 +391,16 @@ int32_t ObjModelFile::ExtractModelData(
                 }
             }
 
+            if (lightMapTexArray.size() > 0 && lightMapTexCoordBuf != NULL) {
+                *lightMapTexCoordBuf = new float[kVertexPerTri * triangle_num * kObjFloatPerTexcoord];
+                for (int32_t i = 0; i < triangle_num; i++) {
+                    for (int32_t j = 0; j < kVertexPerTri; j++) {
+                        (*lightMapTexCoordBuf)[i * kVertexPerTri * kObjFloatPerTexcoord + j * kObjFloatPerTexcoord + 0] = lightMapTexArray[faceArray[i].lightmap_texcoord_index[j] - 1].x;
+                        (*lightMapTexCoordBuf)[i * kVertexPerTri * kObjFloatPerTexcoord + j * kObjFloatPerTexcoord + 1] = lightMapTexArray[faceArray[i].lightmap_texcoord_index[j] - 1].y;
+                    }
+                }
+            }
+
             if (normalArray.size() > 0 && normalBuf != NULL) {
                 *normalBuf = new float[kVertexPerTri * triangle_num * kObjFloatPerNormal];
                 for (int32_t i = 0; i < triangle_num; i++) {
@@ -425,7 +447,7 @@ int32_t ObjModelFile::ExtractModelData(
     return result;
 }
 
-void ObjModelFile::ExtractFaceData(const char* buffer, int32_t& vertex_index, int32_t& texcoord_index, int32_t& normal_index, int32_t& tanget_index, int32_t& binormal_index) {
+void ObjModelFile::ExtractFaceData(const char* buffer, int32_t& vertex_index, int32_t& texcoord_index, int32_t& light_map_tex_index, int32_t& normal_index, int32_t& tanget_index, int32_t& binormal_index) {
     if (buffer != NULL) {
         // Extract vertex index
         vertex_index = atoi(buffer);
@@ -444,6 +466,18 @@ void ObjModelFile::ExtractFaceData(const char* buffer, int32_t& vertex_index, in
                 const char* tex_index_buf = reinterpret_cast<const char*>(buffer + index + 1);
                 texcoord_index = atoi(tex_index_buf);
             }
+        }
+
+        // Has light map texture coordinate index ?
+        for (index = index+ 1; index < buf_len; index++) {
+            if (buffer[index] == '/') {
+                break;
+            }
+        }
+
+        if (index < buf_len - 1) {
+            const char* light_map_tex_index_buf = reinterpret_cast<const char*>(buffer + index + 1);
+            light_map_tex_index = atoi(light_map_tex_index_buf);
         }
 
         // Has normal index ?
@@ -494,6 +528,7 @@ int32_t ModelFile::ExtractModelData(const char* model_file_name,
                                     ModelMaterialParam& material_param,
                                     float** vertex_buf,
                                     float** texcoord_buf,
+                                    float** lightMapTexCoordBuf,
                                     float** normal_buf,
                                     float** tanget_buf,
                                     float** binormal_buf) {
@@ -522,6 +557,7 @@ int32_t ModelFile::ExtractModelData(const char* model_file_name,
                     material_param,
                     vertex_buf,
                     texcoord_buf,
+                    lightMapTexCoordBuf,
                     normal_buf,
                     tanget_buf,
                     binormal_buf);
@@ -536,7 +572,7 @@ int32_t ModelFile::ExtractModelData(const char* model_file_name,
     return result;
 }
 
-void ModelFile::RelaseBuf(float** vertex_buf, float** texcoord_buf, float** normal_buf, float** tanget_buf, float** binormal_buf) {
+void ModelFile::RelaseBuf(float** vertex_buf, float** texcoord_buf, float** lightMapTexCoordBuf, float** normal_buf, float** tanget_buf, float** binormal_buf) {
     if (vertex_buf != NULL) {
         float* buf = *vertex_buf;
         if (buf != NULL) {
@@ -553,6 +589,15 @@ void ModelFile::RelaseBuf(float** vertex_buf, float** texcoord_buf, float** norm
             buf = NULL;
         }
         *texcoord_buf = NULL;
+    }
+
+    if (lightMapTexCoordBuf != NULL) {
+        float* buf = *lightMapTexCoordBuf;
+        if (buf != NULL) {
+            delete[] buf;
+            buf = NULL;
+        }
+        *lightMapTexCoordBuf = NULL;
     }
 
     if (normal_buf != NULL) {

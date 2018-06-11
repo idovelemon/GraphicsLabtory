@@ -49,6 +49,8 @@ public:
     // and each vertex has three float value, so this buffer's size must be [3 * triangle_num * 3 * sizeof(float)] bytes
     // @param: coord_buf The buffer of the texture coordinate. This is an optional parameter.
     // Each vertex has one texture coordinate with it and each texture coordinate has two float value,
+    // @param: lightMapTexCoordBuf The buffer of the light map texture coordinate. This is an optional parameter.
+    // Each vertex has one light map texture coordinate with it and each light map texture coordinate has two float value,
     // so this buffer's size must be [3 * triangle_num * 2 * sizeof(float)] bytes
     // @param: normal_buf The buffer of the vertex normal. This is an optional parameter.
     // Each vertex has one normal and each normal has three float value,
@@ -60,7 +62,7 @@ public:
     // Each vertex has one binormal and each binormal has three float value,
     // so this buffer's size must be [3 * triangle_num * 3 * sizeof(float)] bytes
     //----------------------------------------------------------------------------------------------------
-    static TriangleMesh* Create(int32_t triangle_num, float* vertex_buf, float* coord_buf = 0, float* normal_buf = 0, float* tanget_buf = 0, float* binormal_buf = 0);
+    static TriangleMesh* Create(int32_t triangle_num, float* vertex_buf, float* coord_buf = 0, float* lightMapTexCoordBuf = 0, float* normal_buf = 0, float* tanget_buf = 0, float* binormal_buf = 0);
 
 public:
     void SetId(int32_t id);

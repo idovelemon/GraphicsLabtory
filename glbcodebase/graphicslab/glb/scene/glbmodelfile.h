@@ -33,6 +33,7 @@ public:
     , hasDiffusePFCTex(false)
     , hasSpecularPFCTex(false)
     , hasTexcoord(false)
+    , hasLightMapTexCoord(false)
     , hasNormal(false)
     , hasTanget(false)
     , hasBinormal(false)
@@ -55,6 +56,7 @@ public:
     bool    hasDiffusePFCTex;
     bool    hasSpecularPFCTex;
     bool    hasTexcoord;
+    bool    hasLightMapTexCoord;
     bool    hasNormal;
     bool    hasTanget;
     bool    hasBinormal;
@@ -131,6 +133,7 @@ public:
         ModelMaterialParam& material_param,
         float** vertex_buf,
         float** texcoord_buf = NULL,
+        float** lightMapTexCoordBuf = NULL,
         float** normal_buf = NULL,
         float** tangent_buf = NULL,
         float** binormal_buf = NULL
@@ -144,7 +147,7 @@ public:
     // @param: tangent_buf The buffer pointer hold the tangent data
     // @param: binormal_buf The buffer pointer hold the binormal data
     //----------------------------------------------------------------------------------------------
-    static void RelaseBuf(float** vertex_buf, float** texcoord_buf = NULL, float** normal_buf = NULL
+    static void RelaseBuf(float** vertex_buf, float** texcoord_buf = NULL, float** lightMapTexCoordBuf = NULL, float** normal_buf = NULL
         , float** tangent_buf = NULL, float** binormal_buf = NULL);
 };
 

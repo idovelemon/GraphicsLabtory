@@ -81,6 +81,7 @@ Model* Model::Create(const char* fileName) {
 
         float* vertexBuf = NULL;
         float* texBuf = NULL;
+        float* lightMapTexBuf = NULL;
         float* normalBuf = NULL;
         float* tangentBuf = NULL;
         float* binormalBuf = NULL;
@@ -93,12 +94,13 @@ Model* Model::Create(const char* fileName) {
             materialParam,
             &vertexBuf,
             &texBuf,
+            &lightMapTexBuf,
             &normalBuf,
             &tangentBuf,
             &binormalBuf
             );
         if (num_triangles > 0) {
-            mesh = render::mesh::TriangleMesh::Create(num_triangles, vertexBuf, texBuf, normalBuf, tangentBuf, binormalBuf);
+            mesh = render::mesh::TriangleMesh::Create(num_triangles, vertexBuf, texBuf, lightMapTexBuf, normalBuf, tangentBuf, binormalBuf);
             render::mesh::Mgr::AddMesh(mesh);
 
             if (effectParam.hasAlbedoTex) {
@@ -197,12 +199,12 @@ Model* Model::Create(const char* fileName) {
     return model;
 }
 
-Model* Model::Create(int32_t numTriangles, float* vertexBuf, float* texBuf, float* normalBuf, float* tangentBuf, float* binormalBuf) {
+Model* Model::Create(int32_t numTriangles, float* vertexBuf, float* texBuf, float* lightMapTexCoordBuf, float* normalBuf, float* tangentBuf, float* binormalBuf) {
     Model* model = NULL;
     render::mesh::TriangleMesh* mesh = NULL;
 
     if (numTriangles > 0 && vertexBuf) {
-        mesh = render::mesh::TriangleMesh::Create(numTriangles, vertexBuf, texBuf, normalBuf, tangentBuf, binormalBuf);
+        mesh = render::mesh::TriangleMesh::Create(numTriangles, vertexBuf, texBuf, lightMapTexCoordBuf, normalBuf, tangentBuf, binormalBuf);
         render::mesh::Mgr::AddMesh(mesh);
 
         model = new Model;
