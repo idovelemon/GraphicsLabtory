@@ -6,7 +6,7 @@
 // and some sort of that will be implemented in this shader.
 //----------------------------------------------------
 
-#extension GL_NV_shadow_samplers_cube : enable
+//#extension GL_NV_shadow_samplers_cube : enable
 
 // Constant
 const float PI = 3.1415927;
@@ -359,7 +359,7 @@ vec3 calc_direct_lighting(vec3 n, vec3 v, vec3 l, vec3 h, vec3 albedo, float rou
     float ndotl = max(dot(n, l), 0.0);
 	result = (Diffuse + Specular) * light * (ndotl);
 #endif
-return result;
+	return result;
 }
 
 vec3 calc_ibl_lighting(vec3 n, vec3 v, vec3 albedo, float roughness, float metalic) {
@@ -383,7 +383,7 @@ vec3 calc_ibl_lighting(vec3 n, vec3 v, vec3 albedo, float roughness, float metal
     vec2 dfg = textureLod(glb_BRDFPFTTex, vec2(ndotv, roughness), 0.0).xy;
     vec3 specular = ld * (F0 * dfg.x + dfg.y);
 
-    return diffuse + specular;
+    result = diffuse + specular;
 #endif
 
 	return result;
@@ -408,7 +408,7 @@ void main() {
 	vec3 normal = calc_normal();
 	vec3 view = calc_view();
 	vec3 light = calc_light_dir();	
-	vec3 half = normalize(view + light);
+	vec3 h = normalize(view + light);
 
 	vec3 albedo = vec3(0.0, 0.0, 0.0);
 	float roughness = 0.0;
@@ -419,7 +419,7 @@ void main() {
 	vec3 direct_light_color = calc_direct_light_color();
 
 	// vec3 n, vec3 v, vec3 l, vec3 h, vec3 albedo, float roughness, float metalic, vec3 light
-	vec3 direct_color = calc_direct_lighting(normal, view, light, half, albedo, roughness, metallic, direct_light_color);
+	vec3 direct_color = calc_direct_lighting(normal, view, light, h, albedo, roughness, metallic, direct_light_color);
 
 	// vec3 n, vec3 v, vec3 albedo, float roughness, float metalic
 	vec3 ibl_color = calc_ibl_lighting(normal, view, albedo, roughness, metallic);

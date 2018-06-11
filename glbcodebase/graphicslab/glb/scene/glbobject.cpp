@@ -65,6 +65,29 @@ Object* Object::Create(const char* file_name, math::Vector pos, math::Vector sca
     return obj;
 }
 
+Object* Object::Create(scene::Model* model, math::Vector pos, math::Vector scale, math::Vector rotation) {
+    Object* obj = NULL;
+
+    if (model) {
+        obj = new Object();
+        if (obj) {
+            ModelMgr::AddModel(model);
+            obj->m_Model = model;
+            obj->m_Pos = pos;
+            obj->m_Scale = scale;
+            obj->m_Rotation = rotation;
+            obj->m_WorldMatrix.MakeIdentityMatrix();
+            obj->m_ShaderDesc = obj->CalculateShaderDesc();
+        } else {
+            GLB_SAFE_ASSERT(false);
+        }
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return obj;
+}
+
 void Object::SetDead(bool dead) {
     m_IsDead = dead;
 }
@@ -184,12 +207,28 @@ render::CullMode Object::GetCullFaceMode() {
 void Object::SetTexWithId(int32_t slot, int32_t tex_id) {
     if (m_Model) {
         switch (slot) {
+        case Model::MT_ALBEDO:
+            m_ShaderDesc.SetFlag(render::shader::GLB_ENABLE_ALBEDO_TEX, true);
+            break;
+
+        case Model::MT_ROUGHNESS:
+            m_ShaderDesc.SetFlag(render::shader::GLB_ENABLE_ROUGHNESS_TEX, true);
+            break;
+
+        case Model::MT_METALLIC:
+            m_ShaderDesc.SetFlag(render::shader::GLB_ENABLE_METALLIC_TEX, true);
+            break;
+
         case Model::MT_ALPHA:
             m_ShaderDesc.SetFlag(render::shader::GLB_ENABLE_ALPHA_TEX, true);
             break;
 
         case Model::MT_NORMAL:
             m_ShaderDesc.SetFlag(render::shader::GLB_ENABLE_NORMAL_TEX, true);
+            break;
+
+        case Model::MT_EMISSION:
+            m_ShaderDesc.SetFlag(render::shader::GLB_ENABLE_EMISSION_TEX, true);
             break;
 
         case Model::MT_REFLECT:

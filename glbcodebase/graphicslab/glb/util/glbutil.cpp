@@ -31,6 +31,24 @@ std::string path_get_dir(const char* path) {
     return dir;
 }
 
+std::string path_get_name(const char* path) {
+    std::string name("");
+
+    if (path != NULL) {
+        std::string path_s(path);
+        int32_t offset0 = path_s.find_last_of("/");
+        int32_t offset1 = path_s.find_last_of("\\");
+        if (offset0 >= 0) {
+            name = path_s.substr(offset0 + 2, path_s.length());
+        }
+        if (offset1 >= 0) {
+            name = path_s.substr(offset1 + 1, path_s.length());
+        }
+    }
+
+    return name;
+}
+
 };
 
 };

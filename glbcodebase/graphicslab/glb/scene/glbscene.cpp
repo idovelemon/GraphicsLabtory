@@ -49,6 +49,7 @@ public:
 
     // Object
     int32_t AddObject(const char* object_file);
+    int32_t AddObject(scene::Model* model);
     int32_t AddSkyObject(const char* object_file);
     Object* GetObjectById(int32_t id);
     Object* GetSkyObject();
@@ -195,6 +196,26 @@ int32_t SceneImp::AddObject(const char* object_file) {
         }
     } else {
         GLB_SAFE_ASSERT(false);
+    }
+
+    return id;
+}
+
+int32_t SceneImp::AddObject(scene::Model* model) {
+    int32_t id = -1;
+
+    if (model != NULL) {
+        Object* obj = Object::Create(model);
+        if (obj != NULL) {
+            id = FindEmptyID();
+            if (id != -1) {
+                m_ObjectDataBase[id] = obj;
+            } else {
+                GLB_SAFE_ASSERT(false);
+            }
+        } else {
+            GLB_SAFE_ASSERT(false);
+        }
     }
 
     return id;
@@ -403,6 +424,18 @@ int32_t Scene::AddObject(const char* object_file) {
 
     if (s_SceneImp != NULL) {
         result = s_SceneImp->AddObject(object_file);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return result;
+}
+
+int32_t Scene::AddObject(scene::Model* model) {
+    int32_t result = -1;
+
+    if (s_SceneImp != NULL) {
+        result = s_SceneImp->AddObject(model);
     } else {
         GLB_SAFE_ASSERT(false);
     }

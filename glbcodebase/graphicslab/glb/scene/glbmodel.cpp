@@ -36,6 +36,7 @@ public:
     void Initialize();
     void Destroy();
     Model* AddModel(const char* file_name);
+    void AddModel(Model* model);
     Model* GetModelByName(const char* file_name);
 
 private:
@@ -196,6 +197,50 @@ Model* Model::Create(const char* fileName) {
     return model;
 }
 
+Model* Model::Create(int32_t numTriangles, float* vertexBuf, float* texBuf, float* normalBuf, float* tangentBuf, float* binormalBuf) {
+    Model* model = NULL;
+    render::mesh::TriangleMesh* mesh = NULL;
+
+    if (numTriangles > 0 && vertexBuf) {
+        mesh = render::mesh::TriangleMesh::Create(numTriangles, vertexBuf, texBuf, normalBuf, tangentBuf, binormalBuf);
+        render::mesh::Mgr::AddMesh(mesh);
+
+        model = new Model;
+        model->m_Name = std::string("DefaultMesh");
+        model->m_Mesh = mesh->GetId();
+
+        model->m_ModelEffectParam.hasAlbedoTex = false;
+        model->m_ModelEffectParam.hasRoughnessTex = false;
+        model->m_ModelEffectParam.hasMetallicTex = false;
+        model->m_ModelEffectParam.hasAlphaTex = false;
+        model->m_ModelEffectParam.hasNormalTex = false;
+        model->m_ModelEffectParam.hasEmissionTex = false;
+        model->m_ModelEffectParam.hasDiffusePFCTex = true;
+        model->m_ModelEffectParam.hasSpecularPFCTex = true;
+        model->m_ModelEffectParam.hasTexcoord = texBuf ? true : false;
+        model->m_ModelEffectParam.hasNormal = normalBuf ? true : false;
+        model->m_ModelEffectParam.hasTanget = tangentBuf ? true : false;
+        model->m_ModelEffectParam.hasBinormal = binormalBuf ? true : false;
+        model->m_ModelEffectParam.acceptLight = true;
+        model->m_ModelEffectParam.acceptShadow = false;
+        model->m_ModelEffectParam.castShadow = false;
+        model->m_ModelEffectParam.useAO = false;
+
+        model->m_Tex[MT_DIFFUSE_PFC] = render::texture::Mgr::LoadPFCTexture("..\\glb\\resource\\texture\\diffuse.pfc");
+        model->m_Tex[MT_SPECULAR_PFC] = render::texture::Mgr::LoadPFCTexture("..\\glb\\resource\\texture\\specular.pfc");
+
+        render::material::Material material;
+        material.albedo = math::Vector(1.0f, 1.0f, 1.0f);
+        material.roughness = 0.5f;
+        material.metallic = 0.5f;
+        model->m_Material = render::material::Mgr::AddMaterial(material);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return model;
+}
+
 std::string Model::GetName() const {
     return m_Name;
 }
@@ -314,6 +359,33 @@ bool Model::IsUseAO() const {
 void Model::SetTexWithId(int32_t slot, int32_t tex_id) {
     if (0 <= slot && slot < MT_MAX) {
         m_Tex[slot] = tex_id;
+
+        // Update model effect parameters
+        switch (slot) {
+        case MT_ALBEDO:
+            m_ModelEffectParam.hasAlbedoTex = true;
+            break;
+
+        case MT_ROUGHNESS:
+            m_ModelEffectParam.hasRoughnessTex = true;
+            break;
+
+        case MT_METALLIC:
+            m_ModelEffectParam.hasMetallicTex = true;
+            break;
+
+        case MT_NORMAL:
+            m_ModelEffectParam.hasNormalTex = true;
+            break;
+
+        case MT_ALPHA:
+            m_ModelEffectParam.hasAlphaTex = true;
+            break;
+
+        case MT_EMISSION:
+            m_ModelEffectParam.hasEmissionTex = true;
+            break;
+        }
     } else {
         GLB_SAFE_ASSERT(false);
     }
@@ -350,6 +422,14 @@ Model* ModelMgrImp::AddModel(const char* file_name) {
     }
 
     return model;
+}
+
+void ModelMgrImp::AddModel(Model* model) {
+    if (model != NULL) {
+        m_ModelDataBase.push_back(model);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
 }
 
 Model* ModelMgrImp::GetModelByName(const char* file_name) {
@@ -402,6 +482,14 @@ Model* ModelMgr::AddModel(const char* file_name) {
     }
 
     return model;
+}
+
+void ModelMgr::AddModel(Model* model) {
+    if (s_ModelMgrImp != NULL) {
+        s_ModelMgrImp->AddModel(model);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
 }
 
 Model* ModelMgr::GetModelByName(const char* file_name) {

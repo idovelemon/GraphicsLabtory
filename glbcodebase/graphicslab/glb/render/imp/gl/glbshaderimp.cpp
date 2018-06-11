@@ -513,6 +513,7 @@ UberProgram::Imp* UberProgram::Imp::Create(const char* vertex_shader_file, const
                     shader_program->m_FragmentShader = fragment_shader;
                     memcpy(&shader_program->m_ShaderLayout, &layout, sizeof(layout));
                     shader_program->m_Uniforms = uniforms;
+                    shader_program->m_Type = UBER_PROGRAM;
                 } else {
                     GLB_SAFE_ASSERT(false);
                 }
@@ -531,7 +532,7 @@ UberProgram::Imp* UberProgram::Imp::Create(Descriptor desc) {
     UberProgram::Imp* shader_program = NULL;
 
     std::vector<std::string> enable_macros;
-    enable_macros.push_back("#version 330 core\n");
+    enable_macros.push_back("#version 450\n");
     for (int32_t i = 0; i < Descriptor::kFlagBitNum; i++) {
         if (desc.GetFlag(i)) {
             enable_macros.push_back(std::string(kEnableMacros[i]));
@@ -609,6 +610,7 @@ UberProgram::Imp* UberProgram::Imp::Create(Descriptor desc) {
                     memcpy(&shader_program->m_ShaderLayout, &layout, sizeof(layout));
                     shader_program->m_Uniforms = uniforms;
                     shader_program->m_ShaderDescptor = desc;
+                    shader_program->m_Type = UBER_PROGRAM;
                 } else {
                     GLB_SAFE_ASSERT(false);
                 }
@@ -730,6 +732,7 @@ UserProgram::Imp* UserProgram::Imp::Create(const char* vertex_shader_file, const
                     shader_program->m_VertexShader = vertex_shader;
                     shader_program->m_FragmentShader = fragment_shader;
                     memcpy(&shader_program->m_ShaderLayout, &layout, sizeof(layout));
+                    shader_program->m_Type = USER_PROGRAM;
                 } else {
                     GLB_SAFE_ASSERT(false);
                 }

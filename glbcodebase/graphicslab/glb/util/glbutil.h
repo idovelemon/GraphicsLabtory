@@ -14,6 +14,7 @@ namespace glb {
 namespace util {
 // Path
 std::string path_get_dir(const char* path);
+std::string path_get_name(const char* path);
 
 };  // namespace util
 

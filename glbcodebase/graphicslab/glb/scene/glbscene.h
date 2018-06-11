@@ -18,6 +18,7 @@ namespace glb {
 namespace scene {
 
 class CameraBase;
+class Model;
 class Object;
 
 //-----------------------------------------------------------------------------------
@@ -53,6 +54,7 @@ public:
 
     // Object
     static int32_t AddObject(const char* object_file);
+    static int32_t AddObject(Model* model);
     static int32_t AddSkyObject(const char* object_file);
     static Object* GetObjectById(int32_t object_id);
     static Object* GetSkyObject();
