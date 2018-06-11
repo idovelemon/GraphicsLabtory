@@ -207,6 +207,9 @@
     <ClInclude Include="tinyxml\tinyxml.h">
       <Filter>tinyxml</Filter>
     </ClInclude>
+    <ClInclude Include="glb_modeleditor_core.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="glb_modeleditor.cpp">
@@ -328,6 +331,9 @@
     </ClCompile>
     <ClCompile Include="tinyxml\tinyxmlparser.cpp">
       <Filter>tinyxml</Filter>
+    </ClCompile>
+    <ClCompile Include="glb_modeleditor_core.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

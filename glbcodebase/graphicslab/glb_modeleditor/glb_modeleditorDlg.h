@@ -6,7 +6,7 @@
 
 
 // Cglb_modeleditorDlg dialog
-class Cglb_modeleditorDlg : public CDialogEx
+class Cglb_modeleditorDlg : public CDialog
 {
 // Construction
 public:
@@ -54,4 +54,6 @@ private:
     CString m_LightTex0Name;
     CString m_LightTex1Name;
     CString m_LightTex2Name;
+public:
+    afx_msg void OnTimer(UINT_PTR nIDEvent);
 };

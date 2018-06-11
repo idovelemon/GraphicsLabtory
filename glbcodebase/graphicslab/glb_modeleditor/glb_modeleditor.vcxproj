@@ -55,15 +55,15 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;GLB_PLATFORM_OPENGL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)\glb;$(SolutionDir)\..\glew\include;$(DXSDK_DIR)\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\glb;$(SolutionDir)\..\glew\include;$(DXSDK_DIR)\Include;$(SolutionDir)$(ProjectName)\assimp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ObjectFileName>$(IntDir)/%(RelativeDir)/</ObjectFileName>
       <AdditionalOptions>/D_CRT_SECURE_NO_WARNINGS %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)\..\glew\lib\Release\Win32;$(DXSDK_DIR)\Lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glew32.lib;opengl32.lib;dinput8.lib;dxguid.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)\..\glew\lib\Release\Win32;$(DXSDK_DIR)\Lib\x86;$(SolutionDir)$(ProjectName)\assimp\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glew32.lib;opengl32.lib;dinput8.lib;dxguid.lib;assimp-vc110-mt.lib;zlibstatic.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -153,6 +153,7 @@
     <ClInclude Include="..\glb\util\glbutil.h" />
     <ClInclude Include="glb_modeleditor.h" />
     <ClInclude Include="glb_modeleditorDlg.h" />
+    <ClInclude Include="glb_modeleditor_core.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
@@ -195,6 +196,7 @@
     <ClCompile Include="..\glb\util\glbutil.cpp" />
     <ClCompile Include="glb_modeleditor.cpp" />
     <ClCompile Include="glb_modeleditorDlg.cpp" />
+    <ClCompile Include="glb_modeleditor_core.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
