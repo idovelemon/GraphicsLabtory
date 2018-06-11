@@ -10,6 +10,10 @@ GLB(GraphicsLabtory) library is a light-weight 3D rendering library.
 |Resource System problem:When destroy an object, how to deal with the mesh and texture resource associated with it? |2018-06-09 10:10||<font color="Blue">New</font>|
 |Model Editor|2018-06-10 22:40||<font color="Blue">New</font>|
 
+|Bug|Begin Time|Fnish Time|Status|
+|-|-|-|-|
+|Missing shader type when create shader|2018-06-11 15:20||<font color="Blue">New</font>|
+
 ## GLB LightStudio
 Light studio is used for baking Lightmap with Radiosity Normal Mapping(RNM) and precompute LightProbe for image based lighting
 
@@ -67,8 +71,15 @@ GLB ModelEditor is used for convert DCC tool's export file format to GLB library
 |-|-|-|-|
 |Setup GLB ModelEditor project|2018-06-10 23:20|2018-06-11 06:35|<font color="Green">Finish</font>|
 |Basic GUI|2018-06-11 06:35|2018-06-11 07:20|<font color="Green">Finish</font>|
-|Basic interactive|2018-06-11 07:20||<font color="Blue">New</font>|
-|Download assimp library|2018-06-10 23:20||<font color="Blue">New</font>|
+|Basic interactive|2018-06-11 07:20|2018-06-11 09:45|<font color="Green">Finish</font>|
+|Download assimp library|2018-06-10 23:20|2018-06-11 10:35|<font color="Green">Finish</font>|
+|Add import model function|2018-06-11 10:35|2018-06-11 10:40|<font color="Green">Finish</font>|
+|Display view after import model|2018-06-11 10:35|2018-06-11 11:00|<font color="Green">Finish</font>|
+|Display model after import model|2018-06-11 11:00|2018-06-11 15:25|<font color="Green">Finish</font>|
+|Add texture dynamic|2018-06-11 15:25|2018-06-11 16:40|<font color="Green">Finish</font>|
+|Export model as glb build-in mesh file|2018-06-11 16:40||<font color="Green">Finish</font>|
 
 |Bug|Begin Time|Fnish Time|Status|
 |-|-|-|-|
+|Menu turn gray after click it|2018-06-11 10:40|2018-06-11 16:50|<font color="Green">Finish</font>|
+|Remove cursor in editor control|2018-06-11 11:10||<font color="Blue">New</font>|
