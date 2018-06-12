@@ -61,8 +61,11 @@ Cglb_modeleditorDlg::Cglb_modeleditorDlg(CWnd* pParent /*=NULL*/)
     , m_LightTex0Name(_T(""))
     , m_LightTex1Name(_T(""))
     , m_LightTex2Name(_T(""))
+    , m_DiffusePFCTexName(_T(""))
+    , m_SpecularPFCTexName(_T(""))
 {
-	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+	//m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+    m_hIcon = AfxGetApp()->LoadIcon(IDI_ICON1);
 }
 
 void Cglb_modeleditorDlg::DoDataExchange(CDataExchange* pDX)
@@ -74,10 +77,11 @@ void Cglb_modeleditorDlg::DoDataExchange(CDataExchange* pDX)
     DDX_Text(pDX, IDC_NORMAL_EDIT, m_NormalTexName);
     DDX_Text(pDX, IDC_ALPHA_EDIT, m_AlphaTexName);
     DDX_Text(pDX, IDC_EMISSION_EDIT, m_EmissionTexName);
-    DDX_Text(pDX, IDC_ENV_EDIT, m_EnvTexName);
     DDX_Text(pDX, IDC_LIGHT_0_EDIT, m_LightTex0Name);
     DDX_Text(pDX, IDC_LIGHT_1_EDIT, m_LightTex1Name);
     DDX_Text(pDX, IDC_LIGHT_2_EDIT, m_LightTex2Name);
+    DDX_Text(pDX, IDC_DIFFUSE_PFC_EDIT, m_DiffusePFCTexName);
+    DDX_Text(pDX, IDC_SPECULAR_PFC_EDIT, m_SpecularPFCTexName);
 }
 
 BEGIN_MESSAGE_MAP(Cglb_modeleditorDlg, CDialog)
@@ -93,12 +97,24 @@ BEGIN_MESSAGE_MAP(Cglb_modeleditorDlg, CDialog)
     ON_BN_CLICKED(IDC_NORMAL_FILE_BUTTON, &Cglb_modeleditorDlg::OnBnClickedNormalFileButton)
     ON_BN_CLICKED(IDC_ALPHA_FILE_BUTTON, &Cglb_modeleditorDlg::OnBnClickedAlphaFileButton)
     ON_BN_CLICKED(IDC_EMISSION_FILE_BUTTON, &Cglb_modeleditorDlg::OnBnClickedEmissionFileButton)
-    ON_BN_CLICKED(IDC_ENV_FILE_BUTTON, &Cglb_modeleditorDlg::OnBnClickedEnvFileButton)
+    ON_BN_CLICKED(IDC_DIFFUSE_PFC_FILE_BUTTON, &Cglb_modeleditorDlg::OnBnClickedDiffusePFCFileButton)
+    ON_BN_CLICKED(IDC_SPECULAR_PFC_FILE_BUTTON, &Cglb_modeleditorDlg::OnBnClickedDiffusePFCFileButton)
     ON_BN_CLICKED(IDC_LIGHT_0_FILE_BUTTON, &Cglb_modeleditorDlg::OnBnClickedLight0FileButton)
     ON_BN_CLICKED(IDC_LIGHT_1_FILE_BUTTON, &Cglb_modeleditorDlg::OnBnClickedLight1FileButton)
     ON_BN_CLICKED(IDC_LIGHT_2_FILE_BUTTON, &Cglb_modeleditorDlg::OnBnClickedLight2FileButton)
     ON_WM_TIMER()
     ON_COMMAND(ID_FILE_PREVIEW, &Cglb_modeleditorDlg::OnFilePreview)
+    ON_EN_SETFOCUS(IDC_ALBEDO_EDIT, &Cglb_modeleditorDlg::OnEnSetfocusAlbedoEdit)
+    ON_EN_SETFOCUS(IDC_ROUGHNESS_EDIT, &Cglb_modeleditorDlg::OnEnSetfocusRoughnessEdit)
+    ON_EN_SETFOCUS(IDC_METALLIC_EDIT, &Cglb_modeleditorDlg::OnEnSetfocusMetallicEdit)
+    ON_EN_SETFOCUS(IDC_NORMAL_EDIT, &Cglb_modeleditorDlg::OnEnSetfocusNormalEdit)
+    ON_EN_SETFOCUS(IDC_ALPHA_EDIT, &Cglb_modeleditorDlg::OnEnSetfocusAlphaEdit)
+    ON_EN_SETFOCUS(IDC_EMISSION_EDIT, &Cglb_modeleditorDlg::OnEnSetfocusEmissionEdit)
+    ON_EN_SETFOCUS(IDC_DIFFUSE_PFC_EDIT, &Cglb_modeleditorDlg::OnEnSetfocusDiffusePFCEdit)
+    ON_EN_SETFOCUS(IDC_SPECULAR_PFC_EDIT, &Cglb_modeleditorDlg::OnEnSetfocusSpecularPFCEdit)
+    ON_EN_SETFOCUS(IDC_LIGHT_0_EDIT, &Cglb_modeleditorDlg::OnEnSetfocusLight0Edit)
+    ON_EN_SETFOCUS(IDC_LIGHT_1_EDIT, &Cglb_modeleditorDlg::OnEnSetfocusLight1Edit)
+    ON_EN_SETFOCUS(IDC_LIGHT_2_EDIT, &Cglb_modeleditorDlg::OnEnSetfocusLight2Edit)
 END_MESSAGE_MAP()
 
 
@@ -148,7 +164,8 @@ BOOL Cglb_modeleditorDlg::OnInitDialog()
     GetDlgItem(IDC_NORMAL_FILE_BUTTON)->EnableWindow(FALSE);
     GetDlgItem(IDC_ALPHA_FILE_BUTTON)->EnableWindow(FALSE);
     GetDlgItem(IDC_EMISSION_FILE_BUTTON)->EnableWindow(FALSE);
-    GetDlgItem(IDC_ENV_FILE_BUTTON)->EnableWindow(FALSE);
+    GetDlgItem(IDC_DIFFUSE_PFC_FILE_BUTTON)->EnableWindow(FALSE);
+    GetDlgItem(IDC_SPECULAR_PFC_FILE_BUTTON)->EnableWindow(FALSE);
     GetDlgItem(IDC_LIGHT_0_FILE_BUTTON)->EnableWindow(FALSE);
     GetDlgItem(IDC_LIGHT_1_FILE_BUTTON)->EnableWindow(FALSE);
     GetDlgItem(IDC_LIGHT_2_FILE_BUTTON)->EnableWindow(FALSE);
@@ -225,6 +242,7 @@ void Cglb_modeleditorDlg::OnFileImport()
 
         // Disable menu
         GetMenu()->EnableMenuItem(ID_FILE_EXPORT, MF_ENABLED);
+        GetMenu()->EnableMenuItem(ID_FILE_PREVIEW, MF_DISABLED);
 
         // Disable button
         GetDlgItem(IDC_ALBEDO_FILE_BUTTON)->EnableWindow(TRUE);
@@ -233,7 +251,8 @@ void Cglb_modeleditorDlg::OnFileImport()
         GetDlgItem(IDC_NORMAL_FILE_BUTTON)->EnableWindow(TRUE);
         GetDlgItem(IDC_ALPHA_FILE_BUTTON)->EnableWindow(TRUE);
         GetDlgItem(IDC_EMISSION_FILE_BUTTON)->EnableWindow(TRUE);
-        GetDlgItem(IDC_ENV_FILE_BUTTON)->EnableWindow(TRUE);
+        GetDlgItem(IDC_DIFFUSE_PFC_FILE_BUTTON)->EnableWindow(TRUE);
+        GetDlgItem(IDC_SPECULAR_PFC_FILE_BUTTON)->EnableWindow(TRUE);
         GetDlgItem(IDC_LIGHT_0_FILE_BUTTON)->EnableWindow(TRUE);
         GetDlgItem(IDC_LIGHT_1_FILE_BUTTON)->EnableWindow(TRUE);
         GetDlgItem(IDC_LIGHT_2_FILE_BUTTON)->EnableWindow(TRUE);
@@ -263,6 +282,11 @@ void Cglb_modeleditorDlg::OnFileImport()
             ::MessageBox(NULL, L"Invalid file format", L"ERROR", MB_OK);
             exit(0);
         }
+
+        // Display default diffuse and specular prefilter cube map
+        m_DiffusePFCTexName = ApplicationCore::GetInstance()->GetModelDiffusePFCTextureName();
+        m_SpecularPFCTexName = ApplicationCore::GetInstance()->GetModelSpecularPFCTextureName();
+        UpdateData(false);
 
         delete[] pcstr;
         pcstr = NULL;
@@ -310,18 +334,6 @@ void Cglb_modeleditorDlg::OnFilePreview()
         GetMenu()->EnableMenuItem(ID_FILE_EXPORT, MF_DISABLED);
         GetMenu()->EnableMenuItem(ID_FILE_PREVIEW, MF_DISABLED);
 
-        // Disable button
-        GetDlgItem(IDC_ALBEDO_FILE_BUTTON)->EnableWindow(TRUE);
-        GetDlgItem(IDC_ROUGHNESS_FILE_BUTTON)->EnableWindow(TRUE);
-        GetDlgItem(IDC_METALLIC_FILE_BUTTON)->EnableWindow(TRUE);
-        GetDlgItem(IDC_NORMAL_FILE_BUTTON)->EnableWindow(TRUE);
-        GetDlgItem(IDC_ALPHA_FILE_BUTTON)->EnableWindow(TRUE);
-        GetDlgItem(IDC_EMISSION_FILE_BUTTON)->EnableWindow(TRUE);
-        GetDlgItem(IDC_ENV_FILE_BUTTON)->EnableWindow(TRUE);
-        GetDlgItem(IDC_LIGHT_0_FILE_BUTTON)->EnableWindow(TRUE);
-        GetDlgItem(IDC_LIGHT_1_FILE_BUTTON)->EnableWindow(TRUE);
-        GetDlgItem(IDC_LIGHT_2_FILE_BUTTON)->EnableWindow(TRUE);
-
         // Initialize glb
         glb::app::AppConfig config;
         config.wnd = GetDlgItem(IDC_VIEW)->GetSafeHwnd();
@@ -355,6 +367,10 @@ void Cglb_modeleditorDlg::OnFilePreview()
         m_RoughnessTexName = ApplicationCore::GetInstance()->GetModelRoughnessTextureName();
         m_MetallicTexName = ApplicationCore::GetInstance()->GetModelMetallicTextureName();
         m_NormalTexName = ApplicationCore::GetInstance()->GetModelNormalTextureName();
+        m_AlphaTexName = ApplicationCore::GetInstance()->GetModelAlphaTextureName();
+        m_EmissionTexName = ApplicationCore::GetInstance()->GetModelEmissionTextureName();
+        m_DiffusePFCTexName = ApplicationCore::GetInstance()->GetModelDiffusePFCTextureName();
+        m_SpecularPFCTexName = ApplicationCore::GetInstance()->GetModelSpecularPFCTextureName();
         UpdateData(false);
     }
 }
@@ -471,16 +487,64 @@ void Cglb_modeleditorDlg::OnBnClickedNormalFileButton()
 void Cglb_modeleditorDlg::OnBnClickedAlphaFileButton()
 {
     // TODO: Add your control notification handler code here
+    TCHAR szFilter[] = L"DDS File(*.dds)|*.dds|BMP File(*.bmp)|*.bmp||";
+    CFileDialog fileDlg(TRUE, L"", L"", OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, szFilter, this);
+    if (IDOK == fileDlg.DoModal())
+    {
+        m_AlphaTexName = fileDlg.GetPathName();
+        UpdateData(false);
+
+        // Try add model
+        char *pcstr = (char *)new char[2 * wcslen(m_AlphaTexName.GetBuffer(0))+1] ;
+        memset(pcstr , 0 , 2 * wcslen(m_AlphaTexName.GetBuffer(0))+1 );
+        wcstombs(pcstr, m_AlphaTexName.GetBuffer(0), wcslen(m_AlphaTexName.GetBuffer(0))) ;
+
+        if (!ApplicationCore::GetInstance()->SetModelAlphaTexture(pcstr))
+        {
+            ::MessageBox(NULL, L"Invalid file format", L"ERROR", MB_OK);
+            exit(0);
+        }
+
+        delete[] pcstr;
+        pcstr = NULL;
+    }
 }
 
 
 void Cglb_modeleditorDlg::OnBnClickedEmissionFileButton()
 {
     // TODO: Add your control notification handler code here
+    TCHAR szFilter[] = L"DDS File(*.dds)|*.dds|BMP File(*.bmp)|*.bmp||";
+    CFileDialog fileDlg(TRUE, L"", L"", OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, szFilter, this);
+    if (IDOK == fileDlg.DoModal())
+    {
+        m_EmissionTexName = fileDlg.GetPathName();
+        UpdateData(false);
+
+        // Try add emission
+        char *pcstr = (char *)new char[2 * wcslen(m_EmissionTexName.GetBuffer(0))+1] ;
+        memset(pcstr , 0 , 2 * wcslen(m_EmissionTexName.GetBuffer(0))+1 );
+        wcstombs(pcstr, m_EmissionTexName.GetBuffer(0), wcslen(m_EmissionTexName.GetBuffer(0))) ;
+
+        if (!ApplicationCore::GetInstance()->SetModelEmissionTexture(pcstr))
+        {
+            ::MessageBox(NULL, L"Invalid file format", L"ERROR", MB_OK);
+            exit(0);
+        }
+
+        delete[] pcstr;
+        pcstr = NULL;
+    }
 }
 
 
-void Cglb_modeleditorDlg::OnBnClickedEnvFileButton()
+void Cglb_modeleditorDlg::OnBnClickedDiffusePFCFileButton()
+{
+    // TODO: Add your control notification handler code here
+}
+
+
+void Cglb_modeleditorDlg::OnBnClickedSpecularPFCFileButton()
 {
     // TODO: Add your control notification handler code here
 }
@@ -510,4 +574,81 @@ void Cglb_modeleditorDlg::OnTimer(UINT_PTR nIDEvent)
     glb::app::Application::Update();
 
     CDialog::OnTimer(nIDEvent);
+}
+
+
+void Cglb_modeleditorDlg::OnEnSetfocusAlbedoEdit()
+{
+    // TODO: Add your control notification handler code here
+    GetDlgItem(IDC_ALBEDO_EDIT)->HideCaret();
+}
+
+
+void Cglb_modeleditorDlg::OnEnSetfocusRoughnessEdit()
+{
+    // TODO: Add your control notification handler code here
+    GetDlgItem(IDC_ROUGHNESS_EDIT)->HideCaret();
+}
+
+
+void Cglb_modeleditorDlg::OnEnSetfocusMetallicEdit()
+{
+    // TODO: Add your control notification handler code here
+    GetDlgItem(IDC_METALLIC_EDIT)->HideCaret();
+}
+
+
+void Cglb_modeleditorDlg::OnEnSetfocusNormalEdit()
+{
+    // TODO: Add your control notification handler code here
+    GetDlgItem(IDC_NORMAL_EDIT)->HideCaret();
+}
+
+
+void Cglb_modeleditorDlg::OnEnSetfocusAlphaEdit()
+{
+    // TODO: Add your control notification handler code here
+    GetDlgItem(IDC_ALPHA_EDIT)->HideCaret();
+}
+
+
+void Cglb_modeleditorDlg::OnEnSetfocusEmissionEdit()
+{
+    // TODO: Add your control notification handler code here
+    GetDlgItem(IDC_EMISSION_EDIT)->HideCaret();
+}
+
+
+void Cglb_modeleditorDlg::OnEnSetfocusDiffusePFCEdit()
+{
+    // TODO: Add your control notification handler code here
+    GetDlgItem(IDC_DIFFUSE_PFC_EDIT)->HideCaret();
+}
+
+
+void Cglb_modeleditorDlg::OnEnSetfocusSpecularPFCEdit()
+{
+    // TODO: Add your control notification handler code here
+    GetDlgItem(IDC_SPECULAR_PFC_EDIT)->HideCaret();
+}
+
+
+void Cglb_modeleditorDlg::OnEnSetfocusLight0Edit()
+{
+    // TODO: Add your control notification handler code here
+    GetDlgItem(IDC_LIGHT_0_EDIT)->HideCaret();
+}
+
+
+void Cglb_modeleditorDlg::OnEnSetfocusLight1Edit()
+{
+    // TODO: Add your control notification handler code here
+    GetDlgItem(IDC_LIGHT_1_EDIT)->HideCaret();
+}
+
+
+void Cglb_modeleditorDlg::OnEnSetfocusLight2Edit()
+{
+    // TODO: Add your control notification handler code here
+    GetDlgItem(IDC_LIGHT_2_EDIT)->HideCaret();
 }

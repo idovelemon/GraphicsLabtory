@@ -38,7 +38,8 @@ protected:
     afx_msg void OnBnClickedNormalFileButton();
     afx_msg void OnBnClickedAlphaFileButton();
     afx_msg void OnBnClickedEmissionFileButton();
-    afx_msg void OnBnClickedEnvFileButton();
+    afx_msg void OnBnClickedDiffusePFCFileButton();
+    afx_msg void OnBnClickedSpecularPFCFileButton();
     afx_msg void OnBnClickedLight0FileButton();
     afx_msg void OnBnClickedLight1FileButton();
     afx_msg void OnBnClickedLight2FileButton();
@@ -56,4 +57,19 @@ private:
     CString m_LightTex0Name;
     CString m_LightTex1Name;
     CString m_LightTex2Name;
+public:
+    afx_msg void OnEnSetfocusAlbedoEdit();
+    afx_msg void OnEnSetfocusRoughnessEdit();
+    afx_msg void OnEnSetfocusMetallicEdit();
+    afx_msg void OnEnSetfocusNormalEdit();
+    afx_msg void OnEnSetfocusAlphaEdit();
+    afx_msg void OnEnSetfocusEmissionEdit();
+    afx_msg void OnEnSetfocusDiffusePFCEdit();
+    afx_msg void OnEnSetfocusSpecularPFCEdit();
+    afx_msg void OnEnSetfocusLight0Edit();
+    afx_msg void OnEnSetfocusLight1Edit();
+    afx_msg void OnEnSetfocusLight2Edit();
+private:
+    CString m_DiffusePFCTexName;
+    CString m_SpecularPFCTexName;
 };

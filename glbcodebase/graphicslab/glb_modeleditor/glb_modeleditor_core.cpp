@@ -85,8 +85,8 @@ void ApplicationCore::Destroy() {
 
 bool ApplicationCore::AddModel(const char* name) {
     Assimp::Importer importer;
-    GLB_SAFE_ASSERT(importer.ValidateFlags(aiProcess_CalcTangentSpace | aiProcess_Triangulate | aiProcess_FixInfacingNormals) == true);
-    const aiScene* scene = importer.ReadFile(name, aiProcess_CalcTangentSpace | aiProcess_Triangulate | aiProcess_FixInfacingNormals);
+    GLB_SAFE_ASSERT(importer.ValidateFlags(aiProcess_CalcTangentSpace | aiProcess_Triangulate) == true);
+    const aiScene* scene = importer.ReadFile(name, aiProcess_CalcTangentSpace | aiProcess_Triangulate);
 
     bool result = false;
     if (scene && scene->HasMeshes())
@@ -190,7 +190,7 @@ bool ApplicationCore::AddModel(const char* name) {
     return result;
 }
 
-bool ApplicationCore::SaveModel(const char* name) {
+bool ApplicationCore::SaveModel(const char* filePath) {
     Assimp::Importer importer;
     GLB_SAFE_ASSERT(importer.ValidateFlags(aiProcess_CalcTangentSpace | aiProcess_Triangulate | aiProcess_FixInfacingNormals) == true);
     const aiScene* scene = importer.ReadFile(m_SceneMeshName, aiProcess_CalcTangentSpace | aiProcess_Triangulate | aiProcess_FixInfacingNormals);
@@ -199,7 +199,7 @@ bool ApplicationCore::SaveModel(const char* name) {
     if (scene && scene->HasMeshes())
     {
         std::ofstream output;
-        output.open(name);
+        output.open(filePath);
         if (!output.fail())
         {
             // Only deal with mesh 0 now
@@ -229,6 +229,19 @@ bool ApplicationCore::SaveModel(const char* name) {
                             output << "vt ";
                             output << mesh->mTextureCoords[0][face.mIndices[j]].x << " ";
                             output << mesh->mTextureCoords[0][face.mIndices[j]].y << "\n";
+
+                            char temp[64];
+                            sprintf_s(temp, "%d", i * 3 + j + 1);
+                            faceStr[j] = faceStr[j] + "/" + temp;
+                        }
+                    }
+
+                    // Vertex Second UV
+                    if (mesh->HasTextureCoords(1)) {
+                        for (int32_t j = 0; j < 3; j++) {
+                            output << "vlightmapt ";
+                            output << mesh->mTextureCoords[1][face.mIndices[j]].x << " ";
+                            output << mesh->mTextureCoords[1][face.mIndices[j]].y << "\n";
 
                             char temp[64];
                             sprintf_s(temp, "%d", i * 3 + j + 1);
@@ -286,7 +299,10 @@ bool ApplicationCore::SaveModel(const char* name) {
                 std::string name = util::path_get_name(path);
                 output << "talbedo " << name.c_str() << "\n";
 
-                // TODO: Move albedo texture to destination path
+                // Move albedo texture to destination path
+                std::string destFile = util::path_get_dir(filePath);
+                destFile = destFile + name;
+                CopyFileA(path, destFile.c_str(), FALSE);
             }
 
             // Metallic texture?
@@ -295,7 +311,10 @@ bool ApplicationCore::SaveModel(const char* name) {
                 std::string name = util::path_get_name(path);
                 output << "tmetallic " << name.c_str() << "\n";
 
-                // TODO: Move metallic texture to destination path
+                // Move metallic texture to destination path
+                std::string destFile = util::path_get_dir(filePath);
+                destFile = destFile + name;
+                CopyFileA(path, destFile.c_str(), FALSE);
             }
 
             // Roughness texture?
@@ -304,7 +323,10 @@ bool ApplicationCore::SaveModel(const char* name) {
                 std::string name = util::path_get_name(path);
                 output << "troughness " << name.c_str() << "\n";
 
-                // TODO: Move roughness texture to destination path
+                // Move roughness texture to destination path
+                std::string destFile = util::path_get_dir(filePath);
+                destFile = destFile + name;
+                CopyFileA(path, destFile.c_str(), FALSE);
             }
 
             // Normal texture?
@@ -313,7 +335,10 @@ bool ApplicationCore::SaveModel(const char* name) {
                 std::string name = util::path_get_name(path);
                 output << "tnormal " << name.c_str() << "\n";
 
-                // TODO: Move normal texture to destination path
+                // Move normal texture to destination path
+                std::string destFile = util::path_get_dir(filePath);
+                destFile = destFile + name;
+                CopyFileA(path, destFile.c_str(), FALSE);
             }
 
             // Alpha texture?
@@ -322,7 +347,10 @@ bool ApplicationCore::SaveModel(const char* name) {
                 std::string name = util::path_get_name(path);
                 output << "talpha " << name.c_str() << "\n";
 
-                // TODO: Move alpha texture to destination path
+                // Move alpha texture to destination path
+                std::string destFile = util::path_get_dir(filePath);
+                destFile = destFile + name;
+                CopyFileA(path, destFile.c_str(), FALSE);
             }
 
             // Emission texture?
@@ -331,7 +359,10 @@ bool ApplicationCore::SaveModel(const char* name) {
                 std::string name = util::path_get_name(path);
                 output << "temission " << name.c_str() << "\n";
 
-                // TODO: Move emission texture to destination path
+                // Move emission texture to destination path
+                std::string destFile = util::path_get_dir(filePath);
+                destFile = destFile + name;
+                CopyFileA(path, destFile.c_str(), FALSE);
             }
 
             // Diffuse Prefilter Cube Map?
@@ -340,7 +371,10 @@ bool ApplicationCore::SaveModel(const char* name) {
                 std::string name = util::path_get_name(path);
                 output << "tdiffusepfc " << name.c_str() << "\n";
 
-                // TODO: Move diffuse texture to destination path
+                // Move diffuse texture to destination path
+                std::string destFile = util::path_get_dir(filePath);
+                destFile = destFile + name;
+                CopyFileA(path, destFile.c_str(), FALSE);
             }
 
             // Specular Prefilter Cube Map?
@@ -349,7 +383,10 @@ bool ApplicationCore::SaveModel(const char* name) {
                 std::string name = util::path_get_name(path);
                 output << "tspecularpfc " << name.c_str() << "\n";
 
-                // TODO: Move specular texture to destination path
+                // Move specular texture to destination path
+                std::string destFile = util::path_get_dir(filePath);
+                destFile = destFile + name;
+                CopyFileA(path, destFile.c_str(), FALSE);
             }
 
             // Accept light?
@@ -373,6 +410,13 @@ bool ApplicationCore::SaveModel(const char* name) {
                 output << "cs " << 0 << "\n";
             }
 
+            // Material
+            const render::material::Material mat = render::material::Mgr::GetMaterial(model->GetMaterial());
+            output << "malbedo " << mat.albedo.x << " " << mat.albedo.y << " " << mat.albedo.z << "\n";
+            output << "mroughness " << mat.roughness << "\n";
+            output << "mmetallic " << mat.metallic << "\n";
+            output << "me " << mat.emission.x << " " << mat.emission.y << " " << mat.emission.z << "\n";
+
             output.close();
             result = true;
         }
@@ -384,10 +428,18 @@ bool ApplicationCore::SaveModel(const char* name) {
 bool ApplicationCore::Preview(const char* name) {
     m_SceneMesh = scene::Scene::AddObject(name);
     if (m_SceneMesh != -1) {
-        scene::Scene::GetObjectById(m_SceneMesh)->SetCullFaceEnable(true);
-        scene::Scene::GetObjectById(m_SceneMesh)->SetCullFaceMode(glb::render::CULL_BACK);
         scene::Scene::GetObjectById(m_SceneMesh)->SetDepthTestEnable(true);
         scene::Scene::GetObjectById(m_SceneMesh)->SetPos(math::Vector(0.0, 0.0, 0.0));
+
+        if (scene::Scene::GetObjectById(m_SceneMesh)->GetModel()->HasAlphaTexture()) {
+            scene::Scene::GetObjectById(m_SceneMesh)->SetCullFaceEnable(false);
+            scene::Scene::GetObjectById(m_SceneMesh)->SetAlphaBlendEnable(true);
+            scene::Scene::GetObjectById(m_SceneMesh)->SetAlphaBlendFunc(render::FACTOR_SRC, render::FUNC_SRC_ALPHA);
+            scene::Scene::GetObjectById(m_SceneMesh)->SetAlphaBlendFunc(render::FACTOR_DST, render::FUNC_ONE);
+        } else {
+            scene::Scene::GetObjectById(m_SceneMesh)->SetCullFaceEnable(true);
+            scene::Scene::GetObjectById(m_SceneMesh)->SetCullFaceMode(glb::render::CULL_BACK);
+        }
     }
 
     return m_SceneMesh != -1;
@@ -465,6 +517,51 @@ bool ApplicationCore::SetModelNormalTexture(const char* name) {
     return result;
 }
 
+bool ApplicationCore::SetModelAlphaTexture(const char* name) {
+    bool result = false;
+
+    if (m_SceneMesh != -1) {
+        int32_t texID = render::texture::Mgr::LoadTexture(name);
+        if (texID != -1) {
+            scene::Scene::GetObjectById(m_SceneMesh)->SetTexWithId(scene::Model::MT_ALPHA, texID);
+            scene::Scene::GetObjectById(m_SceneMesh)->SetAlphaBlendEnable(true);
+            scene::Scene::GetObjectById(m_SceneMesh)->SetAlphaBlendFunc(render::FACTOR_SRC, render::FUNC_SRC_ALPHA);
+            scene::Scene::GetObjectById(m_SceneMesh)->SetAlphaBlendFunc(render::FACTOR_DST, render::FUNC_ONE);
+            scene::Scene::GetObjectById(m_SceneMesh)->SetCullFaceEnable(false);
+            result = true;
+        } else {
+            GLB_SAFE_ASSERT(false);
+        }
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return result;
+}
+
+bool ApplicationCore::SetModelEmissionTexture(const char* name) {
+    bool result = false;
+
+    if (m_SceneMesh != -1) {
+        int32_t texID = render::texture::Mgr::LoadTexture(name);
+        if (texID != -1) {
+            scene::Scene::GetObjectById(m_SceneMesh)->SetTexWithId(scene::Model::MT_EMISSION, texID);
+            const render::material::Material defaultMaterial = render::material::Mgr::GetMaterial(scene::Scene::GetObjectById(m_SceneMesh)->GetModel()->GetMaterial());
+            render::material::Material emissionMaterial;
+            memcpy(&emissionMaterial, &defaultMaterial, sizeof(defaultMaterial));
+            emissionMaterial.emission = math::Vector(2.0f, 2.0f, 2.0f);
+            render::material::Mgr::ChangeMaterial(emissionMaterial, scene::Scene::GetObjectById(m_SceneMesh)->GetModel()->GetMaterial());
+            result = true;
+        } else {
+            GLB_SAFE_ASSERT(false);
+        }
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return result;
+}
+
 const char* ApplicationCore::GetModelAlbedoTextureName() {
     if (m_SceneMesh != -1) {
         int32_t texID = scene::Scene::GetObjectById(m_SceneMesh)->GetTexId(scene::Model::MT_ALBEDO);
@@ -513,6 +610,66 @@ const char* ApplicationCore::GetModelMetallicTextureName() {
 const char* ApplicationCore::GetModelNormalTextureName() {
     if (m_SceneMesh != -1) {
         int32_t texID = scene::Scene::GetObjectById(m_SceneMesh)->GetTexId(scene::Model::MT_NORMAL);
+        if (texID != -1) {
+            return render::texture::Mgr::GetTextureById(texID)->GetName();
+        } else {
+            return NULL;
+        }
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return NULL;
+}
+
+const char* ApplicationCore::GetModelAlphaTextureName() {
+    if (m_SceneMesh != -1) {
+        int32_t texID = scene::Scene::GetObjectById(m_SceneMesh)->GetTexId(scene::Model::MT_ALPHA);
+        if (texID != -1) {
+            return render::texture::Mgr::GetTextureById(texID)->GetName();
+        } else {
+            return NULL;
+        }
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return NULL;
+}
+
+const char* ApplicationCore::GetModelEmissionTextureName() {
+    if (m_SceneMesh != -1) {
+        int32_t texID = scene::Scene::GetObjectById(m_SceneMesh)->GetTexId(scene::Model::MT_EMISSION);
+        if (texID != -1) {
+            return render::texture::Mgr::GetTextureById(texID)->GetName();
+        } else {
+            return NULL;
+        }
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return NULL;
+}
+
+const char* ApplicationCore::GetModelDiffusePFCTextureName() {
+    if (m_SceneMesh != -1) {
+        int32_t texID = scene::Scene::GetObjectById(m_SceneMesh)->GetTexId(scene::Model::MT_DIFFUSE_PFC);
+        if (texID != -1) {
+            return render::texture::Mgr::GetTextureById(texID)->GetName();
+        } else {
+            return NULL;
+        }
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return NULL;
+}
+
+const char* ApplicationCore::GetModelSpecularPFCTextureName() {
+    if (m_SceneMesh != -1) {
+        int32_t texID = scene::Scene::GetObjectById(m_SceneMesh)->GetTexId(scene::Model::MT_SPECULAR_PFC);
         if (texID != -1) {
             return render::texture::Mgr::GetTextureById(texID)->GetName();
         } else {
