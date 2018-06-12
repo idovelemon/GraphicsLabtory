@@ -112,7 +112,8 @@ TriangleMesh::Imp* TriangleMesh::Imp::Create(int32_t triangle_num, float* vertic
         if (lightMapTexCoordBuf) {
             lightMapTexCoordsBufSize = 3 * triangle_num * 2 * sizeof(float);
             layout.layouts[layout.count].attriType = VA_LIGHT_MAP_TEXCOORD;
-            layout.layouts[layout.count].size = tex_coords_buf_size + vertices_buf_size;
+            layout.layouts[layout.count].size = lightMapTexCoordsBufSize;
+            layout.layouts[layout.count].offset = tex_coords_buf_size + vertices_buf_size;
             layout.count++;
         }
 

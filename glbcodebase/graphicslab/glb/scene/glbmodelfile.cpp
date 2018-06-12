@@ -213,7 +213,32 @@ int32_t ObjModelFile::ExtractModelData(
                 } else if (!strcmp(prefix, "f")) {
                     // Triangle
                     ObjFace face;
-                    
+
+                    if (!effectParam.hasTexcoord) {
+                        for (int32_t i = 0; i < kVertexPerTri; i++) {
+                            face.texcoord_index[i] = -1;  // Indicate do not have texture coordinate
+                        }
+                    }
+                    if (!effectParam.hasLightMapTexCoord) {
+                        for (int32_t i = 0; i < kVertexPerTri; i++) {
+                            face.lightmap_texcoord_index[i] = -1;  // Indicate do not have light map texture coordinate
+                        }
+                    }
+                    if (!effectParam.hasNormal) {
+                        for (int32_t i = 0; i < kVertexPerTri; i++) {
+                            face.normal_index[i] = -1;  // Indicate do not have normal
+                        }
+                    }
+                    if (!effectParam.hasTanget) {
+                        for (int32_t i = 0; i < kVertexPerTri; i++) {
+                            face.tangent_index[i] = -1;  // Indicate do not have tangent
+                        }
+                    }
+                    if (!effectParam.hasBinormal) {
+                        for (int32_t i = 0; i < kVertexPerTri; i++) {
+                            face.binormal_index[i] = -1;  // Indicate do not have binormal
+                        }
+                    }
                     for (int32_t i = 0; i < kVertexPerTri; i++) {
                         input >> buffer;
                         ExtractFaceData(buffer, face.vertex_index[i], face.texcoord_index[i], face.lightmap_texcoord_index[i], face.normal_index[i], face.tangent_index[i], face.binormal_index[i]);
@@ -455,65 +480,76 @@ void ObjModelFile::ExtractFaceData(const char* buffer, int32_t& vertex_index, in
         // Has texture coordinate index ?
         int32_t index = 0;
         int32_t buf_len = strlen(buffer);
-        for (index = 0; index < buf_len; index++) {
-            if (buffer[index] == '/') {
-                break;
-            }
-        }
 
-        if (index < buf_len - 1) {
-            if (buffer[index + 1] != '/') {
-                const char* tex_index_buf = reinterpret_cast<const char*>(buffer + index + 1);
-                texcoord_index = atoi(tex_index_buf);
+        if (texcoord_index != -1) {
+            for (index = 0; index < buf_len; index++) {
+                if (buffer[index] == '/') {
+                    break;
+                }
+            }
+
+            if (index < buf_len - 1) {
+                if (buffer[index + 1] != '/') {
+                    const char* tex_index_buf = reinterpret_cast<const char*>(buffer + index + 1);
+                    texcoord_index = atoi(tex_index_buf);
+                }
             }
         }
 
         // Has light map texture coordinate index ?
-        for (index = index+ 1; index < buf_len; index++) {
-            if (buffer[index] == '/') {
-                break;
+        if (light_map_tex_index != -1) {
+            for (index = index+ 1; index < buf_len; index++) {
+                if (buffer[index] == '/') {
+                    break;
+                }
             }
-        }
 
-        if (index < buf_len - 1) {
-            const char* light_map_tex_index_buf = reinterpret_cast<const char*>(buffer + index + 1);
-            light_map_tex_index = atoi(light_map_tex_index_buf);
+            if (index < buf_len - 1) {
+                const char* light_map_tex_index_buf = reinterpret_cast<const char*>(buffer + index + 1);
+                light_map_tex_index = atoi(light_map_tex_index_buf);
+            }
         }
 
         // Has normal index ?
-        for (index = index + 1; index < buf_len; index++) {
-            if (buffer[index] == '/') {
-                break;
+        if (normal_index != -1) {
+            for (index = index + 1; index < buf_len; index++) {
+                if (buffer[index] == '/') {
+                    break;
+                }
             }
-        }
 
-        if (index < buf_len - 1) {
-            const char* normal_index_buf = reinterpret_cast<const char*>(buffer + index + 1);
-            normal_index = atoi(normal_index_buf);
+            if (index < buf_len - 1) {
+                const char* normal_index_buf = reinterpret_cast<const char*>(buffer + index + 1);
+                normal_index = atoi(normal_index_buf);
+            }
         }
 
         // Has tanget index ?
-        for (index = index + 1; index < buf_len; index++) {
-            if (buffer[index] == '/') {
-                break;
+        if (tanget_index != -1) {
+            for (index = index + 1; index < buf_len; index++) {
+                if (buffer[index] == '/') {
+                    break;
+                }
             }
-        }
 
-        if (index < buf_len - 1) {
-            const char* tanget_index_buf = reinterpret_cast<const char*>(buffer + index + 1);
-            tanget_index = atoi(tanget_index_buf);
+            if (index < buf_len - 1) {
+                const char* tanget_index_buf = reinterpret_cast<const char*>(buffer + index + 1);
+                tanget_index = atoi(tanget_index_buf);
+            }
         }
 
         // Has binormal index ?
-        for (index = index + 1; index < buf_len; index++) {
-            if (buffer[index] == '/') {
-                break;
+        if (binormal_index != -1) {
+            for (index = index + 1; index < buf_len; index++) {
+                if (buffer[index] == '/') {
+                    break;
+                }
             }
-        }
 
-        if (index < buf_len - 1) {
-            const char* binormal_index_buf = reinterpret_cast<const char*>(buffer + index + 1);
-            binormal_index = atoi(binormal_index_buf);
+            if (index < buf_len - 1) {
+                const char* binormal_index_buf = reinterpret_cast<const char*>(buffer + index + 1);
+                binormal_index = atoi(binormal_index_buf);
+            }
         }
     } else {
         GLB_SAFE_ASSERT(false);

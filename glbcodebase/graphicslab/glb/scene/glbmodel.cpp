@@ -235,6 +235,7 @@ Model* Model::Create(int32_t numTriangles, float* vertexBuf, float* texBuf, floa
         material.albedo = math::Vector(1.0f, 1.0f, 1.0f);
         material.roughness = 0.5f;
         material.metallic = 0.5f;
+        material.emission = math::Vector(0.0f, 0.0f, 0.0f);
         model->m_Material = render::material::Mgr::AddMaterial(material);
     } else {
         GLB_SAFE_ASSERT(false);
@@ -312,6 +313,10 @@ bool Model::HasDiffusePFCTexture() const {
 
 bool Model::HasSpecularPFCTexture() const {
     return m_ModelEffectParam.hasSpecularPFCTex;
+}
+
+bool Model::HasLightMapTexCoord() const {
+    return m_ModelEffectParam.hasLightMapTexCoord;
 }
 
 bool Model::HasTexCoord() const {

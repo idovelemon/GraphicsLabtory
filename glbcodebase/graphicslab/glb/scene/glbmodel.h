@@ -53,6 +53,7 @@ public:
     bool HasReflectTexture() const;
     bool HasDiffusePFCTexture() const;
     bool HasSpecularPFCTexture() const;
+    bool HasLightMapTexCoord() const;
     bool HasTexCoord() const;
     bool HasNormal() const;
     bool HasTangent() const;
