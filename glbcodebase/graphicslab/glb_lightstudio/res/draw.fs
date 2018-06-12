@@ -1,6 +1,7 @@
 #version 450
 
 in vec2 vsTexCoord;
+in vec2 vsLightMapTexCoord;
 in vec3 vsNormal;
 
 uniform sampler2D glb_LightMap[3];
@@ -9,7 +10,7 @@ uniform sampler2D glb_NormalMap;
 
 out vec3 oColor;
 
-vec3 calc_radiosity_normal_map_color(vec2 uv) {
+vec3 calc_radiosity_normal_map_color(vec2 uv, vec2 lightMapUV) {
     // Calculate normal
     vec3 normal = texture(glb_NormalMap, uv).xyz;
     normal -= vec3(0.5, 0.5, 0.5);  
@@ -24,15 +25,15 @@ vec3 calc_radiosity_normal_map_color(vec2 uv) {
     normalize(bais1);
     normalize(bais2);
 
-    vec3 lightMapColor0 = texture(glb_LightMap[0], uv).rgb;
-    vec3 lightMapColor1 = texture(glb_LightMap[1], uv).rgb;
-    vec3 lightMapColor2 = texture(glb_LightMap[2], uv).rgb;
+    vec3 lightMapColor0 = texture(glb_LightMap[0], lightMapUV).rgb;
+    vec3 lightMapColor1 = texture(glb_LightMap[1], lightMapUV).rgb;
+    vec3 lightMapColor2 = texture(glb_LightMap[2], lightMapUV).rgb;
 
     return lightMapColor0 * max(0.0, dot(bais0, normal)) + lightMapColor1 * max(0.0, dot(bais1, normal)) + lightMapColor2 * max(0.0, dot(bais2, normal));
 }
 
 void main() {
-    oColor = (calc_radiosity_normal_map_color(vsTexCoord) + vec3(0.05, 0.05, 0.05)) * texture(glb_AlbedoMap, vsTexCoord).xyz;
+    oColor = (calc_radiosity_normal_map_color(vsTexCoord, vsLightMapTexCoord) + vec3(0.05, 0.05, 0.05)) * texture(glb_AlbedoMap, vsTexCoord).xyz;
     oColor = oColor / (vec3(1.0, 1.0, 1.0) + oColor);
     oColor = pow(oColor, vec3(1.0 / 2.2, 1.0 / 2.2, 1.0 / 2.2));
 }

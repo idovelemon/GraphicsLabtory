@@ -197,6 +197,8 @@ bool ApplicationCore::AddSceneMesh(const char* name) {
 
     if (!m_SceneMesh) {
         scene::Model* mesh = scene::Model::Create(name);
+        if (!mesh->HasTexCoord()) result = false;
+        if (!mesh->HasLightMapTexCoord()) result = false;
         if (!mesh->HasAlbedoTexture()) result = false;
         if (!mesh->HasNormalTexture()) result = false;
         if (!mesh->HasNormal()) result = false;
@@ -604,18 +606,19 @@ void ApplicationCore::PrepareLightPatch() {
     scene::ModelMaterialParam materialParam;
     float* vertexBuf = NULL;
     float* texBuf = NULL;
+    float* lightTexBuf = NULL;
     float* normalBuf = NULL;
     float* tangentBuf = NULL;
     float* binormalBuf = NULL;
-    int32_t faceNum = scene::ModelFile::ExtractModelData(m_SceneMeshName, effectParam, materialParam, &vertexBuf, &texBuf, &normalBuf, &tangentBuf, &binormalBuf);
+    int32_t faceNum = scene::ModelFile::ExtractModelData(m_SceneMeshName, effectParam, materialParam, &vertexBuf, &texBuf, &lightTexBuf, &normalBuf, &tangentBuf, &binormalBuf);
 
     int32_t vertexOffset = 0, uvOffset = 0, normalOffset = 0, tangentOffset = 0, binormalOffset = 0;
     for (int32_t i = 0; i < faceNum; i++) {
         Face face;
 
         for (int32_t j = 0; j < 3; j++) {
-            face.vertex[j].uv.x = texBuf[uvOffset++];
-            face.vertex[j].uv.y = texBuf[uvOffset++];
+            face.vertex[j].uv.x = lightTexBuf[uvOffset++];
+            face.vertex[j].uv.y = lightTexBuf[uvOffset++];
             face.vertex[j].uv.z = 0.0f;
             face.vertex[j].uv.w = 0.0f;
             face.vertex[j].pos.x = vertexBuf[vertexOffset++];
@@ -639,7 +642,7 @@ void ApplicationCore::PrepareLightPatch() {
         faces.push_back(face);
     }
 
-    scene::ModelFile::RelaseBuf(&vertexBuf, &texBuf, &normalBuf, &tangentBuf, &binormalBuf);
+    scene::ModelFile::RelaseBuf(&vertexBuf, &texBuf, &lightTexBuf, &normalBuf, &tangentBuf, &binormalBuf);
 
     // Calculate data for every patch
     for (int32_t h = 0; h < m_LightMapHeight; h++) {
@@ -679,7 +682,7 @@ void ApplicationCore::PrepareLightPatch() {
                 //normal.Normalize();
                 math::Vector tangent = faces[i].vertex[0].tangent;
                 math::Vector binormal = faces[i].vertex[0].binormal;
-                math::Vector normal = math::Cross(tangent, binormal);
+                math::Vector normal = faces[i].vertex[0].normal;
 
                 math::Matrix tbn;
                 tbn.MakeIdentityMatrix();

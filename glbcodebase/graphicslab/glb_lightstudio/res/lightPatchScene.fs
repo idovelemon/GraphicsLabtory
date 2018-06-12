@@ -1,6 +1,7 @@
 #version 450
 
 in vec2 vsTexCoord;
+in vec2 vsLightMapTexCoord;
 in vec3 vsVertex;
 
 out vec3 oColor;
@@ -11,7 +12,7 @@ uniform sampler2D glb_AlbedoMap;
 uniform sampler2D glb_NormalMap;
 uniform int glb_Face;
 
-vec3 calc_radiosity_normal_map_color(vec2 uv) {
+vec3 calc_radiosity_normal_map_color(vec2 uv, vec2 lightMapUV) {
     // Calculate normal
     vec3 normal = texture(glb_NormalMap, uv).xyz;
     normal -= vec3(0.5, 0.5, 0.5);  
@@ -26,24 +27,24 @@ vec3 calc_radiosity_normal_map_color(vec2 uv) {
     normalize(bais1);
     normalize(bais2);
 
-    vec3 lightMapColor0 = texture(glb_LightMap[0], uv).rgb;
-    vec3 lightMapColor1 = texture(glb_LightMap[1], uv).rgb;
-    vec3 lightMapColor2 = texture(glb_LightMap[2], uv).rgb;
+    vec3 lightMapColor0 = texture(glb_LightMap[0], lightMapUV).rgb;
+    vec3 lightMapColor1 = texture(glb_LightMap[1], lightMapUV).rgb;
+    vec3 lightMapColor2 = texture(glb_LightMap[2], lightMapUV).rgb;
 
     return lightMapColor0 * max(0.0, dot(bais0, normal)) + lightMapColor1 * max(0.0, dot(bais1, normal)) + lightMapColor2 * max(0.0, dot(bais2, normal));
 }
 
 void main() {
     if (glb_Face == 0 && vsVertex.x <= 0.0) {  // Right face
-        oColor = calc_radiosity_normal_map_color(vsTexCoord);
+        oColor = calc_radiosity_normal_map_color(vsTexCoord, vsLightMapTexCoord);
     } else if (glb_Face == 1 && vsVertex.x >= 0.0) {  // Left face
-        oColor = calc_radiosity_normal_map_color(vsTexCoord);
+        oColor = calc_radiosity_normal_map_color(vsTexCoord, vsLightMapTexCoord);
     } else if (glb_Face == 2 && vsVertex.y <= 0.0) { // Up face
-        oColor = calc_radiosity_normal_map_color(vsTexCoord);
+        oColor = calc_radiosity_normal_map_color(vsTexCoord, vsLightMapTexCoord);
     } else if (glb_Face == 3 && vsVertex.y >= 0.0) { // Down face
-        oColor = calc_radiosity_normal_map_color(vsTexCoord);
+        oColor = calc_radiosity_normal_map_color(vsTexCoord, vsLightMapTexCoord);
     } else if (glb_Face == 4) {  // Front face
-        oColor = calc_radiosity_normal_map_color(vsTexCoord);
+        oColor = calc_radiosity_normal_map_color(vsTexCoord, vsLightMapTexCoord);
     } else {
         oColor = vec3(0.0, 0.0, 0.0);
     }
