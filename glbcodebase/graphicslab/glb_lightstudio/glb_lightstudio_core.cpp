@@ -671,7 +671,7 @@ void ApplicationCore::PrepareLightPatch() {
                 float lambda2 = 1.0f - lambda0 - lambda1;
                 if (lambda2 < 0.0f || lambda2 > 1.0f) continue;
 
-                m_Patch[h * m_LightMapWidth + w].pos = faces[i].vertex[0].pos * lambda0 + faces[i].vertex[1].pos * lambda1 + faces[i].vertex[2].pos * lambda2;
+                m_Patch[h * m_LightMapWidth + w].pos = (faces[i].vertex[0].pos * lambda0 + faces[i].vertex[1].pos * lambda1 + faces[i].vertex[2].pos * lambda2) + faces[i].vertex[0].normal * 0.01f;
                 m_Patch[h * m_LightMapWidth + w].valid = true;
 
                 //math::Vector tangent = faces[i].vertex[0].tangent * lambda0 + faces[i].vertex[1].tangent * lambda1 + faces[i].vertex[2].tangent * lambda2;
@@ -736,11 +736,11 @@ void ApplicationCore::DrawHemiCube() {
         up.Normalize();
 
         math::Matrix views[5];
-        views[0].MakeViewMatrix(pos - normal * 0.001f, normal, up, -right);  // Right
-        views[1].MakeViewMatrix(pos - normal * 0.001f, -normal, up, right);  // Left
-        views[2].MakeViewMatrix(pos - normal * 0.001f, right, normal, -up);  // Up
-        views[3].MakeViewMatrix(pos - normal * 0.001f, right, -normal, up);  // Down
-        views[4].MakeViewMatrix(pos - normal * 0.001f, right, up, normal);  // Front
+        views[0].MakeViewMatrix(pos, normal, up, -right);  // Right
+        views[1].MakeViewMatrix(pos, -normal, up, right);  // Left
+        views[2].MakeViewMatrix(pos, right, normal, -up);  // Up
+        views[3].MakeViewMatrix(pos, right, -normal, up);  // Down
+        views[4].MakeViewMatrix(pos, right, up, normal);  // Front
 
         // Setup Viewport
         render::Device::SetViewport(0, 0, kLightPatchSize, kLightPatchSize);
