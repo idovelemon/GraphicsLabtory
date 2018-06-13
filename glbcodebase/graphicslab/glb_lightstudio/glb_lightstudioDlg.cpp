@@ -402,18 +402,25 @@ void CGLBLightStudioDlg::OnTimer(UINT_PTR nIDEvent)
 
     if (m_ProjectXML)
     {
-        glb::app::Application::Update();
-
-        CProgressCtrl* progress = reinterpret_cast<CProgressCtrl*>(GetDlgItem(IDC_BAKE_PROGRESS));
-        progress->SetPos(static_cast<int>(ApplicationCore::GetInstance()->GetCurProgress() * 100));
-
-        if (progress->GetPos() == 100)
+        while (true)
         {
-            // Enable Bake Button
-            GetDlgItem(IDC_BAKE_BUTTON)->EnableWindow(TRUE);
+            glb::app::Application::Update();
 
-            // Disable Cancel Button
-            GetDlgItem(IDC_BAKE_CANCEL_BUTTON)->EnableWindow(FALSE);
+            CProgressCtrl* progress = reinterpret_cast<CProgressCtrl*>(GetDlgItem(IDC_BAKE_PROGRESS));
+            progress->SetPos(static_cast<int>(ApplicationCore::GetInstance()->GetCurProgress() * 100));
+
+            if (progress->GetPos() == 100)
+            {
+                // Enable Bake Button
+                GetDlgItem(IDC_BAKE_BUTTON)->EnableWindow(TRUE);
+
+                // Disable Cancel Button
+                GetDlgItem(IDC_BAKE_CANCEL_BUTTON)->EnableWindow(FALSE);
+
+                break;
+            }
+
+            if (!ApplicationCore::GetInstance()->IsBaking()) break;
         }
     }
 
