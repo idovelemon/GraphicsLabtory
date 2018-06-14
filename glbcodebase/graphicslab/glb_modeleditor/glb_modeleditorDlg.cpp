@@ -553,18 +553,81 @@ void Cglb_modeleditorDlg::OnBnClickedSpecularPFCFileButton()
 void Cglb_modeleditorDlg::OnBnClickedLight0FileButton()
 {
     // TODO: Add your control notification handler code here
+    TCHAR szFilter[] = L"HDR File(*.hdr)|*.hdr||";
+    CFileDialog fileDlg(TRUE, L"", L"", OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, szFilter, this);
+    if (IDOK == fileDlg.DoModal())
+    {
+        m_LightTex0Name = fileDlg.GetPathName();
+        UpdateData(false);
+
+        // Try add light 0 map
+        char *pcstr = (char *)new char[2 * wcslen(m_LightTex0Name.GetBuffer(0))+1] ;
+        memset(pcstr , 0 , 2 * wcslen(m_LightTex0Name.GetBuffer(0))+1 );
+        wcstombs(pcstr, m_LightTex0Name.GetBuffer(0), wcslen(m_LightTex0Name.GetBuffer(0))) ;
+
+        if (!ApplicationCore::GetInstance()->SetModelLightTexture(0, pcstr))
+        {
+            ::MessageBox(NULL, L"Invalid file format", L"ERROR", MB_OK);
+            exit(0);
+        }
+
+        delete[] pcstr;
+        pcstr = NULL;
+    }
 }
 
 
 void Cglb_modeleditorDlg::OnBnClickedLight1FileButton()
 {
     // TODO: Add your control notification handler code here
+    TCHAR szFilter[] = L"HDR File(*.hdr)|*.hdr||";
+    CFileDialog fileDlg(TRUE, L"", L"", OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, szFilter, this);
+    if (IDOK == fileDlg.DoModal())
+    {
+        m_LightTex1Name = fileDlg.GetPathName();
+        UpdateData(false);
+
+        // Try add light 0 map
+        char *pcstr = (char *)new char[2 * wcslen(m_LightTex1Name.GetBuffer(0))+1] ;
+        memset(pcstr , 0 , 2 * wcslen(m_LightTex1Name.GetBuffer(0))+1 );
+        wcstombs(pcstr, m_LightTex1Name.GetBuffer(0), wcslen(m_LightTex1Name.GetBuffer(0))) ;
+
+        if (!ApplicationCore::GetInstance()->SetModelLightTexture(1, pcstr))
+        {
+            ::MessageBox(NULL, L"Invalid file format", L"ERROR", MB_OK);
+            exit(0);
+        }
+
+        delete[] pcstr;
+        pcstr = NULL;
+    }
 }
 
 
 void Cglb_modeleditorDlg::OnBnClickedLight2FileButton()
 {
     // TODO: Add your control notification handler code here
+    TCHAR szFilter[] = L"HDR File(*.hdr)|*.hdr||";
+    CFileDialog fileDlg(TRUE, L"", L"", OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, szFilter, this);
+    if (IDOK == fileDlg.DoModal())
+    {
+        m_LightTex2Name = fileDlg.GetPathName();
+        UpdateData(false);
+
+        // Try add light 0 map
+        char *pcstr = (char *)new char[2 * wcslen(m_LightTex2Name.GetBuffer(0))+1] ;
+        memset(pcstr , 0 , 2 * wcslen(m_LightTex2Name.GetBuffer(0))+1 );
+        wcstombs(pcstr, m_LightTex2Name.GetBuffer(0), wcslen(m_LightTex2Name.GetBuffer(0))) ;
+
+        if (!ApplicationCore::GetInstance()->SetModelLightTexture(2, pcstr))
+        {
+            ::MessageBox(NULL, L"Invalid file format", L"ERROR", MB_OK);
+            exit(0);
+        }
+
+        delete[] pcstr;
+        pcstr = NULL;
+    }
 }
 
 

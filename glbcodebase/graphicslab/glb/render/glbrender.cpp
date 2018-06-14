@@ -1585,6 +1585,11 @@ void RenderImp::DrawLightLoopCore() {
             if (obj->GetModel()->HasSpecularPFCTexture()) {
                 render::Device::SetTexture(render::TS_SPECULAR_PFC, texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(scene::Model::MT_SPECULAR_PFC)), texUnit++);
             }
+            if (obj->GetModel()->HasLightTexture()) {
+                render::Device::SetTexture(render::TS_LIGHT0, texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(scene::Model::MT_LIGHT0)), texUnit++);
+                render::Device::SetTexture(render::TS_LIGHT1, texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(scene::Model::MT_LIGHT1)), texUnit++);
+                render::Device::SetTexture(render::TS_LIGHT2, texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(scene::Model::MT_LIGHT2)), texUnit++);
+            }
 
             // Object Uniform
             for (int32_t k = 0; k < static_cast<int32_t>(uniforms.size()); k++) {

@@ -9,46 +9,54 @@
 in vec3 glb_Pos;
 
 #ifdef GLB_COLOR_IN_VERTEX
-in vec3 glb_Color;
+	in vec3 glb_Color;
 #endif
 
 #ifdef GLB_NORMAL_IN_VERTEX
-in vec3 glb_Normal;
+	in vec3 glb_Normal;
 #endif
 
 #ifdef GLB_TANGENT_IN_VERTEX
-in vec3 glb_Tangent;
+	in vec3 glb_Tangent;
 #endif
 
 #ifdef GLB_BINORMAL_IN_VERTEX
-in vec3 glb_Binormal;
+	in vec3 glb_Binormal;
 #endif
 
 #ifdef GLB_TEXCOORD_IN_VERTEX
-in vec2 glb_TexCoord;
+	in vec2 glb_TexCoord;
+#endif
+
+#ifdef GLB_LIGHT_TEXCOORD_IN_VERTEX
+	in vec2 glb_LightMapTexCoord;
 #endif
 
 // Output attributes
 out vec3 vs_Vertex;
 
 #ifdef GLB_COLOR_IN_VERTEX
-out vec3 vs_Color;
+	out vec3 vs_Color;
 #endif
 
 #ifdef GLB_NORMAL_IN_VERTEX
-out vec3 vs_Normal;
+	out vec3 vs_Normal;
 #endif
 
 #ifdef GLB_TANGENT_IN_VERTEX
-out vec3 vs_Tangent;
+	out vec3 vs_Tangent;
 #endif
 
 #ifdef GLB_BINORMAL_IN_VERTEX
-out vec3 vs_Binormal;
+	out vec3 vs_Binormal;
 #endif
 
 #ifdef GLB_TEXCOORD_IN_VERTEX
-out vec2 vs_TexCoord;
+	out vec2 vs_TexCoord;
+#endif
+
+#ifdef GLB_LIGHT_TEXCOORD_IN_VERTEX
+	out vec2 vs_LightMapTexCoord;
 #endif
 
 uniform mat4 glb_ProjM;
@@ -78,5 +86,9 @@ void main() {
 
 #ifdef GLB_TEXCOORD_IN_VERTEX
 	vs_TexCoord = glb_TexCoord;
+#endif
+
+#ifdef GLB_LIGHT_TEXCOORD_IN_VERTEX
+	vs_LightMapTexCoord = glb_LightMapTexCoord;
 #endif
 }

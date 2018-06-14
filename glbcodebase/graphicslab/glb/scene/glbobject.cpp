@@ -205,6 +205,7 @@ render::CullMode Object::GetCullFaceMode() {
 }
 
 void Object::SetTexWithId(int32_t slot, int32_t tex_id) {
+    bool bTryUsingLightMapping = false;
     if (m_Model) {
         switch (slot) {
         case Model::MT_ALBEDO:
@@ -231,11 +232,22 @@ void Object::SetTexWithId(int32_t slot, int32_t tex_id) {
             m_ShaderDesc.SetFlag(render::shader::GLB_ENABLE_EMISSION_TEX, true);
             break;
 
+        case Model::MT_LIGHT0:
+        case Model::MT_LIGHT1:
+        case Model::MT_LIGHT2:
+            bTryUsingLightMapping = true;
+            break;
+
         case Model::MT_REFLECT:
             m_ShaderDesc.SetFlag(render::shader::GLB_ENABLE_REFLECT_TEX, true);
             break;
         }
+
         m_Model->SetTexWithId(slot, tex_id);
+
+        if (bTryUsingLightMapping && m_Model->GetTexId(Model::MT_LIGHT0) != -1 && m_Model->GetTexId(Model::MT_LIGHT1) != -1 && m_Model->GetTexId(Model::MT_LIGHT2) != -1) {
+            m_ShaderDesc.SetFlag(render::shader::GLB_ENABLE_LIGHT_TEX, true);
+        }
     } else {
         GLB_SAFE_ASSERT(false);
     }
@@ -269,6 +281,10 @@ render::shader::Descriptor Object::CalculateShaderDesc() {
 
     if (m_Model->HasTexCoord()) {
         desc.SetFlag(render::shader::GLB_TEXCOORD_IN_VERTEX, true);
+    }
+
+    if (m_Model->HasLightMapTexCoord()) {
+        desc.SetFlag(render::shader::GLB_LIGHT_TEXCOORD_IN_VERTEX, true);
     }
 
     if (m_Model->HasAlbedoTexture()) {

@@ -220,6 +220,7 @@ Model* Model::Create(int32_t numTriangles, float* vertexBuf, float* texBuf, floa
         model->m_ModelEffectParam.hasDiffusePFCTex = true;
         model->m_ModelEffectParam.hasSpecularPFCTex = true;
         model->m_ModelEffectParam.hasTexcoord = texBuf ? true : false;
+        model->m_ModelEffectParam.hasLightMapTexCoord = lightMapTexCoordBuf ? true : false;
         model->m_ModelEffectParam.hasNormal = normalBuf ? true : false;
         model->m_ModelEffectParam.hasTanget = tangentBuf ? true : false;
         model->m_ModelEffectParam.hasBinormal = binormalBuf ? true : false;
@@ -315,6 +316,10 @@ bool Model::HasSpecularPFCTexture() const {
     return m_ModelEffectParam.hasSpecularPFCTex;
 }
 
+bool Model::HasLightTexture() const {
+    return m_ModelEffectParam.hasLightTex;
+}
+
 bool Model::HasLightMapTexCoord() const {
     return m_ModelEffectParam.hasLightMapTexCoord;
 }
@@ -391,6 +396,14 @@ void Model::SetTexWithId(int32_t slot, int32_t tex_id) {
 
         case MT_EMISSION:
             m_ModelEffectParam.hasEmissionTex = true;
+            break;
+
+        case MT_LIGHT0:
+        case MT_LIGHT1:
+        case MT_LIGHT2:
+            if (m_Tex[MT_LIGHT0] != -1 && m_Tex[MT_LIGHT1] != -1 && m_Tex[MT_LIGHT2] != -1) {
+                m_ModelEffectParam.hasLightTex = true;
+            }
             break;
         }
     } else {

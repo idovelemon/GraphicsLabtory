@@ -7,6 +7,7 @@
 |GLB_TANGENT_IN_VERTEX|Vertex data hold tangent information|
 |GLB_BINORMAL_IN_VERTEX|Vertex data hold binormal information|
 |GLB_TEXCOORD_IN_VERTEX|Vertex data hold texture coordinate information|
+|GLB_LIGHT_TEXCOORD_IN_VERTEX|Vertex data hold light map texture coordinate information|
 |GLB_ENABLE_LIGHTING|When rendering this model, it need lighting calculation|
 |GLB_ENABLE_SHADOW|When rendering this model, it need shadow calculation|
 |GLB_ENABLE_AO|Discard|
@@ -16,5 +17,6 @@
 |GLB_ENABLE_METALLIC_TEX|Model hold a metallic texture|
 |GLB_ENABLE_ALPHA_TEX|Model hold a alpha texture|
 |GLB_ENABLE_EMISSION_TEX|Model hold a emission texture|
+|GLB_ENABLE_LIGHT_TEX|Enable using light map for object|
 |GLB_ENABLE_REFLECT_TEX|Discard|
             

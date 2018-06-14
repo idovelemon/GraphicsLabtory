@@ -69,6 +69,9 @@ enum TextureSlot {
     TS_DIFFUSE_PFC,
     TS_SPECULAR_PFC,
     TS_BRDF_PFT,
+    TS_LIGHT0,
+    TS_LIGHT1,
+    TS_LIGHT2,
     TS_MAX,
 };
 

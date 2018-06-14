@@ -6,7 +6,8 @@
 |glb_Normal|vec3|Normal of vertex|
 |glb_Tangent|vec3|Tangent of vertex|
 |glb_Binormal|vec3|Binormal of vertex|
-|glb_TexCoord|vec3|Texcoord of vertex|
+|glb_TexCoord|vec2|Texcoord of vertex|
+|glb_LightMapTexCoord|vec2|Light map texcoord of vertex|
 |glb_ProjM|mat4|Projection matrix of camera|
 |glb_ViewM|mat4|View matrix of camera|
 |glb_WorldM|mat4|World matrix of model|
@@ -29,6 +30,9 @@
 |glb_DiffusePFCTex|samplerCube|Prefilter diffuse cubemap for IBL|
 |glb_SpecularPFCTex|samplerCube|Prefilter specular cubemap for IBL|
 |glb_BRDFPFTTex|sampler2D|Precompute brdf table texture for IBL|
+|glb_Light0Tex|sampler2D|Precompute Radiosity Light Map 0|
+|glb_Light1Tex|sampler2D|Precompute Radiosity Light Map 1|
+|glb_Light2Tex|sampler2D|Precompute Radiosity Light Map 2|
 |glb_ShadowTex0|sampler2D|Shadow map 0|
 |glb_ShadowTex1|sampler2D|Shadow map 1|
 |glb_ShadowTex2|sampler2D|Shadow map 2|

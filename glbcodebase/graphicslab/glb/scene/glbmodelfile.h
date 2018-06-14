@@ -32,6 +32,7 @@ public:
     , hasEmissionTex(false)
     , hasDiffusePFCTex(false)
     , hasSpecularPFCTex(false)
+    , hasLightTex(false)
     , hasTexcoord(false)
     , hasLightMapTexCoord(false)
     , hasNormal(false)
@@ -55,6 +56,7 @@ public:
     bool    hasEmissionTex;
     bool    hasDiffusePFCTex;
     bool    hasSpecularPFCTex;
+    bool    hasLightTex;
     bool    hasTexcoord;
     bool    hasLightMapTexCoord;
     bool    hasNormal;

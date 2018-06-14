@@ -34,6 +34,7 @@ public:
     bool SetModelNormalTexture(const char* name);
     bool SetModelAlphaTexture(const char* name);
     bool SetModelEmissionTexture(const char* name);
+    bool SetModelLightTexture(int index, const char* name);
     const char* GetModelAlbedoTextureName();
     const char* GetModelMetallicTextureName();
     const char* GetModelRoughnessTextureName();

@@ -25,6 +25,9 @@ public:
         MT_EMISSION,
         MT_DIFFUSE_PFC,
         MT_SPECULAR_PFC,
+        MT_LIGHT0,
+        MT_LIGHT1,
+        MT_LIGHT2,
         MT_REFLECT,
         MT_MAX,
     };
@@ -53,6 +56,7 @@ public:
     bool HasReflectTexture() const;
     bool HasDiffusePFCTexture() const;
     bool HasSpecularPFCTexture() const;
+    bool HasLightTexture() const;
     bool HasLightMapTexCoord() const;
     bool HasTexCoord() const;
     bool HasNormal() const;

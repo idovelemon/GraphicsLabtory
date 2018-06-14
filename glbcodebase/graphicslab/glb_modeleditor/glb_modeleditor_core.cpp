@@ -562,6 +562,25 @@ bool ApplicationCore::SetModelEmissionTexture(const char* name) {
     return result;
 }
 
+bool ApplicationCore::SetModelLightTexture(int index, const char* name) {
+    bool result = false;
+
+    if (m_SceneMesh != -1 && 0 <= index && index < 3) {
+        int32_t texID = render::texture::Mgr::LoadTexture(name);
+        if (texID != -1) {
+            int32_t slots[] = {scene::Model::MT_LIGHT0, scene::Model::MT_LIGHT1, scene::Model::MT_LIGHT2};
+            scene::Scene::GetObjectById(m_SceneMesh)->SetTexWithId(slots[index], texID);
+            result = true;
+        } else {
+            GLB_SAFE_ASSERT(false);
+        }
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return result;
+}
+
 const char* ApplicationCore::GetModelAlbedoTextureName() {
     if (m_SceneMesh != -1) {
         int32_t texID = scene::Scene::GetObjectById(m_SceneMesh)->GetTexId(scene::Model::MT_ALBEDO);

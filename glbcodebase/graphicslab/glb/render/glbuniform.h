@@ -50,6 +50,9 @@ enum {
     GLB_DIFFUSEPFCTEX,
     GLB_SPECULARPFCTEX,
     GLB_BRDFPFTTEX,
+    GLB_LIGHT0TEX,
+    GLB_LIGHT1TEX,
+    GLB_LIGHT2TEX,
     GLB_MATERIAL_AMBIENT,
     GLB_MATERIAL_DIFFUSE,
     GLB_MATERIAL_SPECULAR,
@@ -100,6 +103,9 @@ static const struct {
     {"glb_DiffusePFCTex",                   GLB_DIFFUSEPFCTEX,                  0},
     {"glb_SpecularPFCTex",                  GLB_SPECULARPFCTEX,                 0},
     {"glb_BRDFPFTTex",                      GLB_BRDFPFTTEX,                     1},
+    {"glb_Light0Tex",                       GLB_LIGHT0TEX,                      0},
+    {"glb_Light1Tex",                       GLB_LIGHT1TEX,                      0},
+    {"glb_Light2Tex",                       GLB_LIGHT2TEX,                      0},
     {"glb_Material_Ambient",                GLB_MATERIAL_AMBIENT,               0},
     {"glb_Material_Diffuse",                GLB_MATERIAL_DIFFUSE,               0},
     {"glb_Material_Specular",               GLB_MATERIAL_SPECULAR,              0},
@@ -196,6 +202,9 @@ Wrapper uniform_shadow3_texslot_picker(scene::Object*);           // Pick glb_Sh
 Wrapper uniform_diffuse_pfc_texslot_picker(scene::Object* obj);   // Pick glb_DiffusePFC
 Wrapper uniform_specular_pfc_texslot_picker(scene::Object* obj);  // Pick glb_SpecularPFC
 Wrapper uniform_brdf_pft_texslot_picker(scene::Object* obj);      // Pick glb_BRDFPFT
+Wrapper uniform_light0_texslot_picker(scene::Object* obj);        // Pick glb_Light0Tex
+Wrapper uniform_light1_texslot_picker(scene::Object* obj);        // Pick glb_Light1Tex
+Wrapper uniform_light2_texslot_picker(scene::Object* obj);        // Pick glb_Light2Tex
 Wrapper uniform_material_ambient_picker(scene::Object*);          // Pick glb_Material_Ambient
 Wrapper uniform_material_diffuse_picker(scene::Object*);          // Pick glb_Material_Diffuse
 Wrapper uniform_material_specular_picker(scene::Object*);         // Pick glb_Material_Specular
@@ -244,6 +253,9 @@ static const struct {
     {uniform_diffuse_pfc_texslot_picker,        GLB_DIFFUSEPFCTEX},
     {uniform_specular_pfc_texslot_picker,       GLB_SPECULARPFCTEX},
     {uniform_brdf_pft_texslot_picker,           GLB_BRDFPFTTEX},
+    {uniform_light0_texslot_picker,             GLB_LIGHT0TEX},
+    {uniform_light1_texslot_picker,             GLB_LIGHT1TEX},
+    {uniform_light2_texslot_picker,             GLB_LIGHT2TEX},
     {uniform_material_ambient_picker,           GLB_MATERIAL_AMBIENT},
     {uniform_material_diffuse_picker,           GLB_MATERIAL_DIFFUSE},
     {uniform_material_specular_picker,          GLB_MATERIAL_SPECULAR},

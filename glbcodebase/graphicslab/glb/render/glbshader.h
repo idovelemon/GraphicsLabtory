@@ -27,6 +27,7 @@ enum {
     GLB_TANGENT_IN_VERTEX,
     GLB_BINORMAL_IN_VERTEX,
     GLB_TEXCOORD_IN_VERTEX,
+    GLB_LIGHT_TEXCOORD_IN_VERTEX,
     GLB_ENABLE_LIGHTING,
     GLB_ENABLE_SHADOW,
     GLB_USE_PARALLEL_LIGHT,
@@ -36,6 +37,7 @@ enum {
     GLB_ENABLE_ALPHA_TEX,
     GLB_ENABLE_NORMAL_TEX,
     GLB_ENABLE_EMISSION_TEX,
+    GLB_ENABLE_LIGHT_TEX,
     GLB_ENABLE_AO,
     GLB_ENABLE_REFLECT_TEX,
 };
@@ -48,6 +50,7 @@ static const char* kEnableMacros[] = {
     "#define GLB_TANGENT_IN_VERTEX\n",
     "#define GLB_BINORMAL_IN_VERTEX\n",
     "#define GLB_TEXCOORD_IN_VERTEX\n",
+    "#define GLB_LIGHT_TEXCOORD_IN_VERTEX\n",
     "#define GLB_ENABLE_LIGHTING\n",
     "#define GLB_ENABLE_SHADOW\n",
     "#define GLB_USE_PARALLEL_LIGHT\n",
@@ -56,7 +59,8 @@ static const char* kEnableMacros[] = {
     "#define GLB_ENABLE_METALLIC_TEX\n",
     "#define GLB_ENABLE_ALPHA_TEX\n",
     "#define GLB_ENABLE_NORMAL_TEX\n",
-    "#define GLB_ENABLE_EMISSION_TEX\n"
+    "#define GLB_ENABLE_EMISSION_TEX\n",
+    "#define GLB_ENABLE_LIGHT_TEX\n",
     "#define GLB_ENABLE_AO\n",
     "#define GLB_ENABLE_REFLECT_TEX\n",
 };
