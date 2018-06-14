@@ -89,6 +89,7 @@ public:
         memset(emissionTexName, 0, sizeof(emissionTexName));
         memset(diffusePFCTexName, 0, sizeof(diffusePFCTexName));
         memset(specularPFCTexName, 0, sizeof(specularPFCTexName));
+        memset(lightTexName, 0, sizeof(lightTexName));
     }
 
     virtual ~ModelMaterialParam() {
@@ -111,6 +112,7 @@ public:
     char         emissionTexName[render::texture::kMaxTexNameLen];
     char         diffusePFCTexName[render::texture::kMaxTexNameLen];
     char         specularPFCTexName[render::texture::kMaxTexNameLen];
+    char         lightTexName[3][render::texture::kMaxTexNameLen];
     math::Vector boundboxMin;
     math::Vector boundboxMax;
 };

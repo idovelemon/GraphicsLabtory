@@ -371,6 +371,9 @@ void Cglb_modeleditorDlg::OnFilePreview()
         m_EmissionTexName = ApplicationCore::GetInstance()->GetModelEmissionTextureName();
         m_DiffusePFCTexName = ApplicationCore::GetInstance()->GetModelDiffusePFCTextureName();
         m_SpecularPFCTexName = ApplicationCore::GetInstance()->GetModelSpecularPFCTextureName();
+        m_LightTex0Name = ApplicationCore::GetInstance()->GetModelLightTextureName(0);
+        m_LightTex1Name = ApplicationCore::GetInstance()->GetModelLightTextureName(1);
+        m_LightTex2Name = ApplicationCore::GetInstance()->GetModelLightTextureName(2);
         UpdateData(false);
     }
 }

@@ -77,6 +77,9 @@ Model* Model::Create(const char* fileName) {
         int32_t emissionTex = -1;
         int32_t diffusePFCTex = -1;
         int32_t specularPFCTex = -1;
+        int32_t light0Tex = -1;
+        int32_t light1Tex = -1;
+        int32_t light2Tex = -1;
         int32_t material = -1;
 
         float* vertexBuf = NULL;
@@ -143,6 +146,17 @@ Model* Model::Create(const char* fileName) {
                 specularPFCTex = render::texture::Mgr::LoadPFCTexture(specularPFCTexPath.c_str());
             }
 
+            if (effectParam.hasLightTex) {
+                std::string light0TexPath = dir + materialParam.lightTexName[0];
+                light0Tex = render::texture::Mgr::LoadTexture(light0TexPath.c_str());
+
+                std::string light1TexPath = dir + materialParam.lightTexName[1];
+                light1Tex = render::texture::Mgr::LoadTexture(light1TexPath.c_str());
+
+                std::string light2TexPath = dir + materialParam.lightTexName[2];
+                light2Tex = render::texture::Mgr::LoadTexture(light2TexPath.c_str());
+            }
+
             ModelFile::RelaseBuf(&vertexBuf, &texBuf, &normalBuf, &tangentBuf, &binormalBuf);
         } else {
             GLB_SAFE_ASSERT(false);
@@ -187,6 +201,11 @@ Model* Model::Create(const char* fileName) {
         }
         if (effectParam.hasSpecularPFCTex) {
             model->m_Tex[MT_SPECULAR_PFC] = specularPFCTex;
+        }
+        if (effectParam.hasLightTex) {
+            model->m_Tex[MT_LIGHT0] = light0Tex;
+            model->m_Tex[MT_LIGHT1] = light1Tex;
+            model->m_Tex[MT_LIGHT2] = light2Tex;
         }
         model->m_Material = material;
         model->m_ModelEffectParam = effectParam;

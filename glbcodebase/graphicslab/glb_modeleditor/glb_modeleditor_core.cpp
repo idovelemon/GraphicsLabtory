@@ -731,6 +731,22 @@ const char* ApplicationCore::GetModelSpecularPFCTextureName() {
     return NULL;
 }
 
+const char* ApplicationCore::GetModelLightTextureName(int32_t index) {
+    if (m_SceneMesh != -1 && 0 <= index && index < 3) {
+        int32_t slots[] = {scene::Model::MT_LIGHT0, scene::Model::MT_LIGHT1, scene::Model::MT_LIGHT2};
+        int32_t texID = scene::Scene::GetObjectById(m_SceneMesh)->GetTexId(slots[index]);
+        if (texID != -1) {
+            return render::texture::Mgr::GetTextureById(texID)->GetName();
+        } else {
+            return NULL;
+        }
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return NULL;
+}
+
 void ApplicationCore::UpdateCamera() {
     if (Input::IsKeyboardButtonPressed(BK_LCONTROL) && Input::IsMouseButtonPressed(BM_LEFT)) {
         static float sRot = 0.0f;

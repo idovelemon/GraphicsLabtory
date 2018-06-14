@@ -151,6 +151,8 @@ int32_t ObjModelFile::ExtractModelData(
             materialParam.boundboxMax.y = 0.0f;
             materialParam.boundboxMax.z = 0.0f;
 
+            bool hasLight0Tex = false, hasLight1Tex = false, hasLight2Tex = false;
+
             // Read the data from file
             while (!input.eof()) {
                 input >> prefix;
@@ -309,6 +311,30 @@ int32_t ObjModelFile::ExtractModelData(
                     int32_t len = strlen(buffer);
                     memcpy(materialParam.specularPFCTexName, buffer, len);
                     materialParam.specularPFCTexName[len] = '\0';
+                } else if (!strcmp(prefix, "tlight0")) {
+                    // Light Texture 0
+                    input >> buffer;
+                    hasLight0Tex = true;
+
+                    int32_t len = strlen(buffer);
+                    memcpy(materialParam.lightTexName[0], buffer, len);
+                    materialParam.lightTexName[0][len] = '\0';
+                } else if (!strcmp(prefix, "tlight1")) {
+                    // Light Texture 1
+                    input >> buffer;
+                    hasLight1Tex = true;
+
+                    int32_t len = strlen(buffer);
+                    memcpy(materialParam.lightTexName[1], buffer, len);
+                    materialParam.lightTexName[1][len] = '\0';
+                } else if (!strcmp(prefix, "tlight2")) {
+                    // Light Texture 2
+                    input >> buffer;
+                    hasLight2Tex = true;
+
+                    int32_t len = strlen(buffer);
+                    memcpy(materialParam.lightTexName[2], buffer, len);
+                    materialParam.lightTexName[2][len] = '\0';
                 } else if (!strcmp(prefix, "al")) {
                     // Accept light
                     int32_t temp = 0;
@@ -394,6 +420,10 @@ int32_t ObjModelFile::ExtractModelData(
             }
 
             input.close();
+
+            if (hasLight0Tex && hasLight1Tex && hasLight2Tex) {
+                effectParam.hasLightTex = true;
+            }
 
             // Generate the buffer
             int32_t triangle_num = faceArray.size();

@@ -311,6 +311,10 @@ render::shader::Descriptor Object::CalculateShaderDesc() {
         desc.SetFlag(render::shader::GLB_ENABLE_EMISSION_TEX, true);
     }
 
+    if (m_Model->HasLightTexture()) {
+        desc.SetFlag(render::shader::GLB_ENABLE_LIGHT_TEX, true);
+    }
+
     if (m_Model->HasNormal()) {
         desc.SetFlag(render::shader::GLB_NORMAL_IN_VERTEX, true);
     }

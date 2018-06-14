@@ -43,6 +43,7 @@ public:
     const char* GetModelEmissionTextureName();
     const char* GetModelDiffusePFCTextureName();
     const char* GetModelSpecularPFCTextureName();
+    const char* GetModelLightTextureName(int32_t index);
 
 protected:
     void UpdateCamera();
