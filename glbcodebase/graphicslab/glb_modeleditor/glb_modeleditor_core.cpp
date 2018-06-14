@@ -389,6 +389,36 @@ bool ApplicationCore::SaveModel(const char* filePath) {
                 CopyFileA(path, destFile.c_str(), FALSE);
             }
 
+            // Light Texture?
+            if (model->HasLightTexture()) {
+                const char* path0 = render::texture::Mgr::GetTextureById(model->GetTexId(scene::Model::MT_LIGHT0))->GetName();
+                std::string name0 = util::path_get_name(path0);
+                output << "tlight0 " << name0.c_str() << "\n";
+
+                // Move texture to destination path
+                std::string destFile0 = util::path_get_dir(filePath);
+                destFile0 = destFile0 + name0;
+                CopyFileA(path0, destFile0.c_str(), FALSE);
+
+                const char* path1 = render::texture::Mgr::GetTextureById(model->GetTexId(scene::Model::MT_LIGHT1))->GetName();
+                std::string name1 = util::path_get_name(path1);
+                output << "tlight1 " << name1.c_str() << "\n";
+
+                // Move texture to destination path
+                std::string destFile1 = util::path_get_dir(filePath);
+                destFile1 = destFile1 + name1;
+                CopyFileA(path1, destFile1.c_str(), FALSE);
+
+                const char* path2 = render::texture::Mgr::GetTextureById(model->GetTexId(scene::Model::MT_LIGHT2))->GetName();
+                std::string name2 = util::path_get_name(path2);
+                output << "tlight2 " << name2.c_str() << "\n";
+
+                // Move texture to destination path
+                std::string destFile2 = util::path_get_dir(filePath);
+                destFile2 = destFile2 + name2;
+                CopyFileA(path2, destFile2.c_str(), FALSE);
+            }
+
             // Accept light?
             if (model->IsAcceptLight()) {
                 output << "al " << 1 << "\n";
