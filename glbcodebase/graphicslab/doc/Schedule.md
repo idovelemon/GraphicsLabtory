@@ -41,7 +41,7 @@ Light studio is used for baking Lightmap with Radiosity Normal Mapping(RNM) and 
 |Light map preview|2018-06-09 15:50||<font color="Blue">New</font>|
 |Light probe baking|2018-06-09 15:50||<font color="Blue">New</font>|
 |Release a beta version|2018-06-09 16:00|2018-06-09 16:15|<font color="Green">Finish</font>|
-|Sperate lightmap uv from albedo/roughness/metallic/normal uv|2018-06-09 20:37||<font color="Blue">New</font>|
+|Sperate lightmap uv from albedo/roughness/metallic/normal uv|2018-06-09 20:37|2018-06-14 21:35|<font color="Green">Finish</font>|
 
 <br>
 
@@ -79,16 +79,19 @@ GLB ModelEditor is used for convert DCC tool's export file format to GLB library
 |Add texture dynamic|2018-06-11 15:25|2018-06-11 16:40|<font color="Green">Finish</font>|
 |Export model as glb build-in mesh file|2018-06-11 16:40|2018-06-11 22:30|<font color="Green">Finish</font>|
 |Add preview menu|2018-06-11 21:15|2018-06-11 22:30|<font color="Green">Finish</font>|
-|Change modelEditor's icon|2018-06-11 22:00||<font color="Blue">New</font>|
+|Change modelEditor's icon|2018-06-11 22:00|2018-06-12 9:55|<font color="Green">Finish</font>|
 |Support for second uv|2018-06-11 22:35|2018-06-11 23:05|<font color="Green">Finish</font>|
-|Support for alpha texture|2018-06-11 22:35||<font color="Blue">New</font>|
-|Support for emission texture|2018-06-11 22:35||<font color="Blue">New</font>|
+|Support for alpha texture|2018-06-11 22:35|2018-06-12 10:35|<font color="Green">Finish</font>|
+|Support for emission texture|2018-06-11 22:35|2018-06-12 11:05|<font color="Green">Finish</font>|
 |Support for diffuse and specular environment texture|2018-06-11 22:35||<font color="Blue">New</font>|
-|Support for light map texture|2018-06-11 22:35||<font color="Blue">New</font>|
-|Copy texture when export model|2018-06-11 23:10||<font color="Blue">New</font>|
+|Support for light map texture|2018-06-11 22:35|2018-06-15 07:50|<font color="Green">Finish</font>|
+|Copy texture when export model|2018-06-11 23:10|2018-06-12 11:15|<font color="Green">Finish</font>|
+|Clear texture in editor mode|2018-06-12 12:35||<font color="Blue">New</font>|
 
 |Bug|Begin Time|Fnish Time|Status|
 |-|-|-|-|
 |Menu turn gray after click it|2018-06-11 10:40|2018-06-11 16:50|<font color="Green">Finish</font>|
-|Remove cursor in editor control|2018-06-11 11:10||<font color="Blue">New</font>|
-|Disabled preview after import a model|2018-06-11 22:30||<font color="Blue">New</font>|
+|Remove cursor in editor control|2018-06-11 11:10|2018-06-12 11:55|<font color="Green">Finish</font>|
+|Disabled preview after import a model|2018-06-11 22:30|2018-06-12 11:55|<font color="Green">Finish</font>|
+|Do not enable texture file browser button after preview a model|2018-06-12 11:05|2018-06-12 11:55|<font color="Green">Finish</font>|
+|Display default environment cube map|2018-06-12 11:15|2018-06-12 12:20|<font color="Green">Finish</font>|
