@@ -55,6 +55,7 @@ CGLBLightStudioDlg::CGLBLightStudioDlg(CWnd* pParent /*=NULL*/)
 	: CDialog(CGLBLightStudioDlg::IDD, pParent)
     , m_ProjectXML(NULL)
     , m_SceneConfigDlg(NULL)
+    , m_SunConfigDlg(NULL)
     , m_CurDispConfigDlg(NULL)
 {
     // Using GLB icon
@@ -168,6 +169,25 @@ void CGLBLightStudioDlg::SaveProperties()
                     assert(false);  // Something wrong
                 }
             }
+            else if (!strcmp(child->Value(), "SUN"))  // Is Sun Element?
+            {
+                int lightID = -1;
+                child->Attribute("ID", &lightID);
+
+                if (m_SunConfigDlg)
+                {
+                    child->SetDoubleAttribute("COLOR_X", m_SunConfigDlg->GetSunColorX());
+                    child->SetDoubleAttribute("COLOR_Y", m_SunConfigDlg->GetSunColorY());
+                    child->SetDoubleAttribute("COLOR_Z", m_SunConfigDlg->GetSunColorZ());
+                    child->SetDoubleAttribute("ROTATION_X", m_SunConfigDlg->GetSunRotX());
+                    child->SetDoubleAttribute("ROTATION_Y", m_SunConfigDlg->GetSunRotY());
+                    child->SetDoubleAttribute("ROTATION_Z", m_SunConfigDlg->GetSunRotZ());
+                }
+                else
+                {
+                    assert(false);  // Something wrong
+                }
+            }
             else
             {
                 assert(false);  // Unknown xml element
@@ -262,6 +282,43 @@ int CGLBLightStudioDlg::AddLightMesh(int lightID, const char* name)
     return id;
 }
 
+
+int CGLBLightStudioDlg::AddSunMesh(const char* name)
+{
+    int id = ApplicationCore::GetInstance()->AddSunMesh(name);
+    if (id == -1)
+    {
+        ::MessageBox(NULL, L"Invalid light source mesh object file", L"ERROR", MB_OK);
+        return id;
+    }
+
+    // Set Outline text
+    int count = m_OutlineList.GetItemCount();
+    CString idStr;
+    idStr.Format(L"%d", id);
+
+    m_OutlineList.InsertItem(count, L"");
+    m_OutlineList.SetItemText(count, 0, L"Sun");
+    m_OutlineList.SetItemText(count, 1, idStr);
+    m_OutlineList.SetItemText(count, 2, CString(name));
+    m_OutlineList.SetItemState(count, LVIS_SELECTED | LVIS_FOCUSED, LVIS_SELECTED | LVIS_FOCUSED);
+
+    // Create sun source config dialog
+    m_SunConfigDlg = new CGLBSunConfigDlg(this);
+    m_SunConfigDlg->Create(IDD_SUN_CONFIG_DIALOG);
+    m_SunConfigDlg->ShowWindow(SW_SHOW);
+    m_SunConfigDlg->MoveWindow(kSubDialogPosX, kSubDialogPosY, kSubDialogWidth, kSubDialogHeight, TRUE);
+
+    // Set current display config dialog
+    if (m_CurDispConfigDlg)
+    {
+        m_CurDispConfigDlg->ShowWindow(SW_HIDE);
+    }
+    m_CurDispConfigDlg = m_SunConfigDlg;
+
+    return id;
+}
+
 BEGIN_MESSAGE_MAP(CGLBLightStudioDlg, CDialog)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
@@ -280,6 +337,7 @@ BEGIN_MESSAGE_MAP(CGLBLightStudioDlg, CDialog)
     ON_COMMAND(ID_FILE_OPEN, &CGLBLightStudioDlg::OnFileOpen)
     ON_COMMAND(ID_FILE_EXPORTLIGHTMAP, &CGLBLightStudioDlg::OnFileExportlightmap)
     ON_WM_TIMER()
+    ON_COMMAND(ID_ADD_SUN, &CGLBLightStudioDlg::OnAddSun)
 END_MESSAGE_MAP()
 
 
@@ -404,6 +462,11 @@ void CGLBLightStudioDlg::OnTimer(UINT_PTR nIDEvent)
     {
         while (true)
         {
+            if (m_SunConfigDlg)
+            {
+                ApplicationCore::GetInstance()->SetSunRotation(m_SunConfigDlg->GetSunRotX() * 360.0f, m_SunConfigDlg->GetSunRotY() * 360.0f, m_SunConfigDlg->GetSunRotZ() * 360.0f);
+            }
+
             glb::app::Application::Update();
 
             CProgressCtrl* progress = reinterpret_cast<CProgressCtrl*>(GetDlgItem(IDC_BAKE_PROGRESS));
@@ -549,6 +612,23 @@ void CGLBLightStudioDlg::OnFileOpen()
                 {
                     assert(false);  // Something wrong
                 }
+            }
+            else if (!strcmp(child->Value(), "SUN"))  // Is Sun Element?
+            {
+                AddSunMesh("res/sun.obj");
+
+                double rx = 0.0f, ry = 0.0f, rz = 0.0f;
+                double cx = 0.0f, cy = 0.0f, cz = 0.0f;
+                child->Attribute("ROTATION_X", &rx);
+                child->Attribute("ROTATION_Y", &ry);
+                child->Attribute("ROTATION_Z", &rz);
+                child->Attribute("COLOR_X", &cx);
+                child->Attribute("COLOR_Y", &cy);
+                child->Attribute("COLOR_Z", &cz);
+                m_SunConfigDlg->UpdateSunColor(cx, cy, cz);
+                m_SunConfigDlg->UpdateSunRotation(rx, ry, rz);
+                ApplicationCore::GetInstance()->SetSunColor(cx, cy, cz);
+                ApplicationCore::GetInstance()->SetSunRotation(rx * 360.0f, ry * 360.0f, rz * 360.0f);
             }
             else
             {
@@ -724,6 +804,21 @@ void CGLBLightStudioDlg::OnAddLight()
 }
 
 
+void CGLBLightStudioDlg::OnAddSun()
+{
+    // TODO: Add your command handler code here
+    char sunName[] = "res/sun.obj";
+    int id = AddSunMesh(sunName);
+
+    // Log to xml
+    TiXmlElement* lightElement = new TiXmlElement("SUN");
+    m_ProjectXML->FirstChildElement()->LinkEndChild(lightElement);
+
+    lightElement->SetAttribute("ID", id);
+    lightElement->SetAttribute("FILE", sunName);
+}
+
+
 void CGLBLightStudioDlg::OnBnClickedBakeButton()
 {
     // TODO: Add your control notification handler code here
@@ -806,6 +901,15 @@ void CGLBLightStudioDlg::OnNMClickOutlineList(NMHDR *pNMHDR, LRESULT *pResult)
             }
             m_SceneConfigDlg->ShowWindow(SW_SHOW);
             m_CurDispConfigDlg = m_SceneConfigDlg;
+        }
+        else if (!type.Compare(L"Sun"))
+        {
+            if (m_CurDispConfigDlg)
+            {
+                m_CurDispConfigDlg->ShowWindow(SW_HIDE);
+            }
+            m_SunConfigDlg->ShowWindow(SW_SHOW);
+            m_CurDispConfigDlg = m_SunConfigDlg;
         }
         else
         {

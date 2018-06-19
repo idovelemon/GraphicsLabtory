@@ -216,6 +216,9 @@
     <ClInclude Include="glb_LightSourceConfigDlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="glb_sunConfigDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="glb_lightstudio.cpp">
@@ -345,6 +348,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="glb_LightSourceConfigDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="glb_sunConfigDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

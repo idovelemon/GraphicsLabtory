@@ -18,6 +18,11 @@ ApplicationCore::ApplicationCore()
 : m_Camera(NULL)
 , m_SceneMesh(NULL)
 , m_ScreenMesh(NULL)
+, m_LightProgram(NULL)
+, m_SunLight(NULL)
+, m_SunProgram(NULL)
+, m_SunColor(1.0f, 1.0f, 1.0f)
+, m_SunDirection(1.0f, 0.0f, 0.0f)
 , m_SceneProgram(NULL)
 , m_LightMapWidth(128)
 , m_LightMapHeight(128)
@@ -38,6 +43,7 @@ ApplicationCore::ApplicationCore()
 , m_Patch(NULL)
 , m_LightPatchSceneProgram(NULL)
 , m_LightPatchLightProgram(NULL)
+, m_LightPatchSunProgram(NULL)
 , m_LightPatchMVPLoc(-1)
 , m_NormlaizeWeightMapLoc(-1)
 , m_LightPatchAlbedoMapLoc(-1)
@@ -67,6 +73,8 @@ bool ApplicationCore::Initialize() {
     render::Device::SetupVSync(false);
 
     // Create Shader
+    m_SunProgram = render::shader::UserProgram::Create("res/sun.vs", "res/sun.fs");
+
     m_SceneProgram = render::shader::UserProgram::Create("res/draw.vs", "res/draw.fs");
 
     m_LightProgram = render::shader::UserProgram::Create("res/light.vs", "res/light.fs");
@@ -91,6 +99,8 @@ bool ApplicationCore::Initialize() {
     m_LightPatchFaceLoc = m_LightPatchSceneProgram->GetUniformLocation("glb_Face");
 
     m_LightPatchLightProgram = render::shader::UserProgram::Create("res/lightPatch.vs", "res/lightPatchLight.fs");
+
+    m_LightPatchSunProgram = render::shader::UserProgram::Create("res/lightPatch.vs", "res/lightPatchSun.fs");
 
     // Create Camera
     m_Camera = scene::ModelCamera::Create(math::Vector(10.0f, 10.0f, 0.0), math::Vector(0.0f, 0.0f, 0.0f));
@@ -125,6 +135,11 @@ bool ApplicationCore::Initialize() {
         m_NormalizeWeightMap[i] = render::texture::Texture::CreateFloat32Texture(kLightPatchSize, kLightPatchSize);
         m_NormalizeWeightRT->AttachColorTexture(drawBuf[i], m_NormalizeWeightMap[i]);
     }
+
+    // Create Light Map
+    m_LightMap[0] = render::texture::Texture::CreateFloat32Texture(m_LightMapWidth, m_LightMapHeight);
+    m_LightMap[1] = render::texture::Texture::CreateFloat32Texture(m_LightMapWidth, m_LightMapHeight);
+    m_LightMap[2] = render::texture::Texture::CreateFloat32Texture(m_LightMapWidth, m_LightMapHeight);
 
     return true;
 }
@@ -164,6 +179,9 @@ void ApplicationCore::Destroy() {
         GLB_SAFE_DELETE(it->second.obj);
     }
     m_LightSource.clear();
+    GLB_SAFE_DELETE(m_LightProgram);
+    GLB_SAFE_DELETE(m_SunLight);
+    GLB_SAFE_DELETE(m_SunProgram);
 
     GLB_SAFE_DELETE(m_SceneProgram);
     GLB_SAFE_DELETE(m_SceneMesh);
@@ -190,6 +208,7 @@ void ApplicationCore::Destroy() {
     }
     GLB_SAFE_DELETE(m_LightPatchSceneProgram);
     GLB_SAFE_DELETE(m_LightPatchLightProgram);
+    GLB_SAFE_DELETE(m_LightPatchSunProgram);
 }
 
 bool ApplicationCore::AddSceneMesh(const char* name) {
@@ -235,6 +254,21 @@ int ApplicationCore::AddLightMesh(int queryID, const char* name) {
         if (queryID != -1 && queryID >= sIdGen) {
             sIdGen = queryID + 1;
         }
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return result;
+}
+
+int ApplicationCore::AddSunMesh(const char* name) {
+    int result = -1;
+
+    scene::Object* light = scene::Object::Create(name);
+
+    if (light) {
+        m_SunLight = light;
+        result = 0;
     } else {
         GLB_SAFE_ASSERT(false);
     }
@@ -317,6 +351,18 @@ void ApplicationCore::SetLightSourceColor(int id, float cx, float cy, float cz) 
     }
 }
 
+void ApplicationCore::SetSunColor(float cx, float cy, float cz) {
+    m_SunColor = math::Vector(cx, cy, cz);
+}
+
+void ApplicationCore::SetSunRotation(float rx, float ry, float rz) {
+    math::Matrix rot;
+    rot.MakeRotateXYZMatrix(rx, ry, rz);
+    m_SunDirection = rot * math::Vector(1.0f, 0.0f, 0.0f);
+    m_SunDirection = math::Vector(-1.0f, 0.5f, 0.0f);  // TODO: Using sun config to set rotation
+    m_SunDirection.Normalize();
+}
+
 void ApplicationCore::SaveLightMap(const char* path) {
     std::string pathString = std::string(path);
     int32_t index = pathString.find_last_of(".");
@@ -387,9 +433,6 @@ void ApplicationCore::DrawScene() {
     // Setup Render State
     render::Device::SetClearColor(0.0f, 0.0f, 0.0f);
     render::Device::SetClearDepth(1.0f);
-    render::Device::SetDepthTestEnable(true);
-    render::Device::SetCullFaceEnable(true);
-    render::Device::SetCullFaceMode(render::CULL_BACK);
 
     // Setup Texture
     render::Device::ClearTexture();
@@ -401,6 +444,40 @@ void ApplicationCore::DrawScene() {
 
     // Clear
     render::Device::Clear(render::CLEAR_COLOR | render::CLEAR_DEPTH);
+
+    render::Device::SetDepthTestEnable(false);
+    render::Device::SetCullFaceEnable(false);
+    //render::Device::SetCullFaceMode(render::CULL_BACK);
+
+    {  // Draw Sun
+        if (m_SunLight) {
+            // Setup Shader
+            render::Device::SetShader(m_SunProgram);
+            render::Device::SetShaderLayout(m_SunProgram->GetShaderLayout());
+
+            // Setup Vertex
+            render::Device::SetVertexLayout(render::mesh::Mgr::GetMeshById(m_SunLight->GetModel()->GetMeshId())->GetVertexLayout());
+            render::Device::SetVertexBuffer(render::mesh::Mgr::GetMeshById(m_SunLight->GetModel()->GetMeshId())->GetVertexBuffer());
+
+            // Setup Uniform
+            math::Matrix proj;
+            proj.MakeProjectionMatrix(app::Application::GetWindowWidth() * 1.0f / app::Application::GetWindowHeight(), 75.0f, 0.001f, 10000.0f);
+            math::Matrix world;
+            world.MakeTranslateMatrix(m_Camera->GetPos().x, m_Camera->GetPos().y, m_Camera->GetPos().z);
+            render::Device::SetUniformMatrix(m_SunProgram->GetUniformLocation("glb_MVP"), proj * m_Camera->GetViewMatrix() * world);
+            render::Device::SetUniform3f(m_SunProgram->GetUniformLocation("glb_LightColor"), m_SunColor);
+            render::Device::SetUniformMatrix(m_SunProgram->GetUniformLocation("glb_World"), world);
+            render::Device::SetUniform3f(m_SunProgram->GetUniformLocation("glb_SunDir"), m_SunDirection);
+            render::Device::SetUniform3f(m_SunProgram->GetUniformLocation("glb_EyePos"), m_Camera->GetPos());
+
+            // Draw
+            render::Device::Draw(render::PT_TRIANGLES, 0, render::mesh::Mgr::GetMeshById(m_SunLight->GetModel()->GetMeshId())->GetVertexNum());
+        }
+    }
+
+    render::Device::SetDepthTestEnable(true);
+    render::Device::SetCullFaceEnable(true);
+    render::Device::SetCullFaceMode(render::CULL_BACK);
 
     {  // Draw Scene
         // Setup Shader
@@ -768,6 +845,45 @@ void ApplicationCore::DrawHemiCube() {
 
             // Clear
             render::Device::Clear(render::CLEAR_COLOR | render::CLEAR_DEPTH);
+
+            {  // Draw Sun
+                render::Device::SetDepthTestEnable(false);
+                render::Device::SetCullFaceEnable(false);
+
+                if (m_SunLight) {
+                    // Setup Shader
+                    render::Device::SetShader(m_LightPatchSunProgram);
+                    render::Device::SetShaderLayout(m_LightPatchSunProgram->GetShaderLayout());
+
+                    // Setup Texture
+                    render::Device::ClearTexture();
+                    render::Device::SetTexture(0, m_NormalizeWeightMap[j], 0);
+
+                    // Setup Vertex
+                    render::Device::SetVertexLayout(render::mesh::Mgr::GetMeshById(m_SunLight->GetModel()->GetMeshId())->GetVertexLayout());
+                    render::Device::SetVertexBuffer(render::mesh::Mgr::GetMeshById(m_SunLight->GetModel()->GetMeshId())->GetVertexBuffer());
+
+                    // Setup Uniform
+                    math::Matrix proj;
+                    proj.MakeProjectionMatrix(1.0f, 90.0f, 0.001f, 10000.0f);
+                    math::Matrix world;
+                    world.MakeTranslateMatrix(pos.x, pos.y, pos.z);
+                    render::Device::SetUniformMatrix(m_LightPatchSunProgram->GetUniformLocation("glb_MVP"), proj * views[j] * world);
+                    render::Device::SetUniform3f(m_LightPatchSunProgram->GetUniformLocation("glb_LightColor"), m_SunColor);
+                    render::Device::SetUniformMatrix(m_LightPatchSunProgram->GetUniformLocation("glb_World"), world);
+                    render::Device::SetUniform3f(m_LightPatchSunProgram->GetUniformLocation("glb_SunDir"), m_SunDirection);
+                    render::Device::SetUniform3f(m_LightPatchSunProgram->GetUniformLocation("glb_EyePos"), pos);
+                    render::Device::SetUniform1i(m_LightPatchSunProgram->GetUniformLocation("glb_Face"), j);
+                    render::Device::SetUniformSampler2D(m_LightPatchSunProgram->GetUniformLocation("glb_NormalizeWeightMap"), 0);
+
+                    // Draw
+                    render::Device::Draw(render::PT_TRIANGLES, 0, render::mesh::Mgr::GetMeshById(m_SunLight->GetModel()->GetMeshId())->GetVertexNum());
+                }
+            }
+
+            render::Device::SetDepthTestEnable(true);
+            render::Device::SetCullFaceEnable(true);
+            render::Device::SetCullFaceMode(render::CULL_BACK);
 
             {  // Draw Scene
                 // Setup Shader

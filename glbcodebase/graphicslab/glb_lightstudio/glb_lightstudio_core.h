@@ -27,6 +27,7 @@ public:
 
     bool AddSceneMesh(const char* name);
     int AddLightMesh(int queryID, const char* name);
+    int AddSunMesh(const char* name);
     void ChangeLightMapSize(int width, int height);
     void SetBakeIterate(int iterate);
     void Bake();
@@ -37,6 +38,8 @@ public:
     void SetLightSourceRot(int id, float rx, float ry, float rz);
     void SetLightSourceScale(int id, float sx, float sy, float sz);
     void SetLightSourceColor(int id, float cx, float cy, float cz);
+    void SetSunColor(float cx, float cy, float cz);
+    void SetSunRotation(float rx, float ry, float rz);
 
     void SaveLightMap(const char* path);
 
@@ -80,6 +83,10 @@ private:
     typedef std::map<int, LightSourceEntry> LightSourceArray;
     LightSourceArray                    m_LightSource;
     glb::render::shader::UserProgram*   m_LightProgram;
+    glb::scene::Object*                 m_SunLight;
+    glb::render::shader::UserProgram*   m_SunProgram;
+    glb::math::Vector                   m_SunColor;
+    glb::math::Vector                   m_SunDirection;
 
     char                                m_SceneMeshName[256];
     glb::scene::Model*                  m_SceneMesh;
@@ -121,6 +128,7 @@ private:
     glb::render::texture::Texture*      m_LightPatchMap[3][5];
     glb::render::shader::UserProgram*   m_LightPatchSceneProgram;
     glb::render::shader::UserProgram*   m_LightPatchLightProgram;
+    glb::render::shader::UserProgram*   m_LightPatchSunProgram;
     int32_t                             m_LightPatchMVPLoc;
     int32_t                             m_NormlaizeWeightMapLoc;
     int32_t                             m_LightMapLoc[3];

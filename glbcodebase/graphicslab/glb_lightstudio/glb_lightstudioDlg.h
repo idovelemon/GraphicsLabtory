@@ -8,6 +8,7 @@
 #include "afxcmn.h"
 #include "glb_sceneConfigDlg.h"
 #include "glb_LightSourceConfigDlg.h"
+#include "glb_sunConfigDlg.h"
 
 #include <map>
 
@@ -34,6 +35,7 @@ protected:
     void SaveProperties();
     void AddSceneMesh(const char* name);
     int AddLightMesh(int lightID, const char* name);
+    int AddSunMesh(const char* name);
 
 	// Generated message map functions
 	virtual BOOL OnInitDialog();
@@ -49,6 +51,7 @@ protected:
     afx_msg void OnFileExportlightmap();
     afx_msg void OnAddScene();
     afx_msg void OnAddLight();
+    afx_msg void OnAddSun();
     afx_msg void OnBnClickedBakeButton();
     afx_msg void OnBnClickedBakeCancelButton();
     afx_msg void OnNMCustomdrawOutlineList(NMHDR *pNMHDR, LRESULT *pResult);
@@ -61,5 +64,6 @@ private:
     CGLBSceneConfigDlg* m_SceneConfigDlg;
     typedef std::map<int, CGLBLightSourceConfigDlg*> LightSourceDlgArray;
     LightSourceDlgArray m_LightSourceConfigDlgs;
+    CGLBSunConfigDlg*   m_SunConfigDlg;
     CWnd*   m_CurDispConfigDlg;
 };

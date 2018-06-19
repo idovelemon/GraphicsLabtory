@@ -15,23 +15,27 @@ const float PI = 3.1415927;
 in vec3 vs_Vertex;
 
 #ifdef GLB_COLOR_IN_VERTEX
-in vec3 vs_Color;
+	in vec3 vs_Color;
 #endif
 
 #ifdef GLB_NORMAL_IN_VERTEX
-in vec3 vs_Normal;
+	in vec3 vs_Normal;
 #endif
 
 #ifdef GLB_TANGENT_IN_VERTEX
-in vec3 vs_Tangent;
+	in vec3 vs_Tangent;
 #endif
 
 #ifdef GLB_BINORMAL_IN_VERTEX
-in vec3 vs_Binormal;
+	in vec3 vs_Binormal;
 #endif
 
 #ifdef GLB_TEXCOORD_IN_VERTEX
-in vec2 vs_TexCoord;
+	in vec2 vs_TexCoord;
+#endif
+
+#ifdef GLB_LIGHT_TEXCOORD_IN_VERTEX
+	in vec2 vs_LightMapTexCoord;
 #endif
 
 // Output color
@@ -40,80 +44,97 @@ out vec4 oColor;
 // Uniform
 #ifdef GLB_TEXCOORD_IN_VERTEX
 
-#ifdef GLB_ENABLE_ALBEDO_TEX
-uniform sampler2D glb_AlbedoTex;
-#endif
+	#ifdef GLB_ENABLE_ALBEDO_TEX
+		uniform sampler2D glb_AlbedoTex;
+	#endif
 
-#ifdef GLB_ENABLE_ROUGHNESS_TEX
-uniform sampler2D glb_RoughnessTex;
-#endif
+	#ifdef GLB_ENABLE_ROUGHNESS_TEX
+		uniform sampler2D glb_RoughnessTex;
+	#endif
 
-#ifdef GLB_ENABLE_METALLIC_TEX
-uniform sampler2D glb_MetallicTex;
-#endif
+	#ifdef GLB_ENABLE_METALLIC_TEX
+		uniform sampler2D glb_MetallicTex;
+	#endif
 
-#ifdef GLB_ENABLE_ALPHA_TEX
-uniform sampler2D glb_AlphaTex;
-#endif
+	#ifdef GLB_ENABLE_ALPHA_TEX
+		uniform sampler2D glb_AlphaTex;
+	#endif
 
-#ifdef GLB_ENABLE_NORMAL_TEX
-uniform sampler2D glb_NormalTex;
+	#ifdef GLB_ENABLE_NORMAL_TEX
 
-#ifdef GLB_TANGENT_IN_VERTEX
-#ifdef GLB_BINORMAL_IN_VERTEX
-#ifdef GLB_ENABLE_NORMAL_TEX
-	#define GLB_ENABLE_NORMAL_MAPPING
-#endif
-#endif
-#endif
+		uniform sampler2D glb_NormalTex;
 
-#endif
+		#ifdef GLB_TANGENT_IN_VERTEX
+		#ifdef GLB_BINORMAL_IN_VERTEX
+		#ifdef GLB_ENABLE_NORMAL_TEX
+			#define GLB_ENABLE_NORMAL_MAPPING
+		#endif
+		#endif
+		#endif
 
-#ifdef GLB_ENABLE_EMISSION_TEX
-uniform sampler2D glb_EmissionTex;
-#endif
+	#endif
 
-#ifdef GLB_ENABLE_REFLECT_TEX
-uniform samplerCube glb_ReflectTex;
-#endif
+	#ifdef GLB_ENABLE_EMISSION_TEX
+		uniform sampler2D glb_EmissionTex;
+	#endif
 
+	#ifdef GLB_ENABLE_REFLECT_TEX
+		uniform samplerCube glb_ReflectTex;
+	#endif
+
+#endif  // GLB_TEXCOORD_IN_VERTEX
+
+#ifdef GLB_LIGHT_TEXCOORD_IN_VERTEX
+	#ifdef GLB_ENABLE_LIGHT_TEX
+
+		uniform sampler2D glb_Light0Tex;
+		uniform sampler2D glb_Light1Tex;
+		uniform sampler2D glb_Light2Tex;
+
+		#ifdef GLB_ENABLE_NORMAL_MAPPING
+			#define GLB_ENABLE_RADIOSITY_NORMAL_MAPPING
+		#endif
+
+	#endif
 #endif
 
 #ifdef GLB_ENABLE_SHADOW
-uniform sampler2D glb_ShadowTex0;
-uniform sampler2D glb_ShadowTex1;
-uniform sampler2D glb_ShadowTex2;
-uniform sampler2D glb_ShadowTex3;
-uniform mat4 glb_ShadowM0;
-uniform mat4 glb_ShadowM1;
-uniform mat4 glb_ShadowM2;
-uniform mat4 glb_ShadowM3;
-uniform float glb_ShadowSplit0;
-uniform float glb_ShadowSplit1;
-uniform float glb_ShadowSplit2;
 
-int calc_current_shadow_index(vec3 vtx, vec3 eye_pos, vec3 look_at, float sp0, float sp1, float sp2) {
-	int index = -1;
-	vec3 to_vtx = eye_pos - vtx;
-	float z_value = dot(to_vtx, look_at);
-	if (z_value < sp0) {
-		index = 0;
-	} else if (sp0 < z_value && z_value < sp1) {
-		index = 1;
-	} else if (sp1 < z_value && z_value < sp2) {
-		index = 2;
-	} else if (z_value > sp2) {
-		index = 3;
+	uniform sampler2D glb_ShadowTex0;
+	uniform sampler2D glb_ShadowTex1;
+	uniform sampler2D glb_ShadowTex2;
+	uniform sampler2D glb_ShadowTex3;
+	uniform mat4 glb_ShadowM0;
+	uniform mat4 glb_ShadowM1;
+	uniform mat4 glb_ShadowM2;
+	uniform mat4 glb_ShadowM3;
+	uniform float glb_ShadowSplit0;
+	uniform float glb_ShadowSplit1;
+	uniform float glb_ShadowSplit2;
+
+	int calc_current_shadow_index(vec3 vtx, vec3 eye_pos, vec3 look_at, float sp0, float sp1, float sp2) {
+		int index = -1;
+		vec3 to_vtx = eye_pos - vtx;
+		float z_value = dot(to_vtx, look_at);
+		if (z_value < sp0) {
+			index = 0;
+		} else if (sp0 < z_value && z_value < sp1) {
+			index = 1;
+		} else if (sp1 < z_value && z_value < sp2) {
+			index = 2;
+		} else if (z_value > sp2) {
+			index = 3;
+		}
+
+		return index;
 	}
 
-	return index;
-}
-#endif
+#endif  // GLB_ENABLE_SHADOW
 
 #ifdef GLB_ENABLE_AO
-uniform float glb_ScreenWidth;
-uniform float glb_ScreenHeight;
-uniform sampler2D glb_AOMap;
+	uniform float glb_ScreenWidth;
+	uniform float glb_ScreenHeight;
+	uniform sampler2D glb_AOMap;
 #endif
 
 #ifdef GLB_ENABLE_LIGHTING
@@ -125,82 +146,82 @@ uniform sampler2D glb_AOMap;
 #endif
 
 #ifdef GLB_ENABLE_EYE_POS
-uniform vec3 glb_EyePos;
-uniform vec3 glb_LookAt;
+	uniform vec3 glb_EyePos;
+	uniform vec3 glb_LookAt;
 #endif
 
 uniform vec3 glb_Material_Emission;
 
 #ifdef GLB_ENABLE_LIGHTING
-uniform vec3 glb_Material_Ambient;
-uniform vec3 glb_Material_Diffuse;
-uniform vec3 glb_Material_Specular;
-uniform float glb_Material_Pow;
-uniform vec3 glb_Material_Albedo;
-uniform float glb_Material_Roughness;
-uniform float glb_Material_Metallic;
+	uniform vec3 glb_Material_Ambient;
+	uniform vec3 glb_Material_Diffuse;
+	uniform vec3 glb_Material_Specular;
+	uniform float glb_Material_Pow;
+	uniform vec3 glb_Material_Albedo;
+	uniform float glb_Material_Roughness;
+	uniform float glb_Material_Metallic;
 
-uniform vec3 glb_GlobalLight_Ambient;
+	uniform vec3 glb_GlobalLight_Ambient;
 
-#ifdef GLB_USE_PARALLEL_LIGHT
-uniform vec3 glb_ParallelLight_Dir;
-uniform vec3 glb_ParallelLight;
-#else
-	#error No light source specified
-#endif
+	#ifdef GLB_USE_PARALLEL_LIGHT
+		uniform vec3 glb_ParallelLight_Dir;
+		uniform vec3 glb_ParallelLight;
+	#else
+		#error No light source specified
+	#endif
 
-uniform samplerCube glb_DiffusePFCTex;
-uniform samplerCube glb_SpecularPFCTex;
-uniform sampler2D glb_BRDFPFTTex;
+	uniform samplerCube glb_DiffusePFCTex;
+	uniform samplerCube glb_SpecularPFCTex;
+	uniform sampler2D glb_BRDFPFTTex;
 
-vec3 calc_fresnel(vec3 n, vec3 v, vec3 F0) {
-    float ndotv = max(dot(n, v), 0.0);
-    return F0 + (vec3(1.0, 1.0, 1.0) - F0) * pow(1.0 - ndotv, 5.0);
-}
+	vec3 calc_fresnel(vec3 n, vec3 v, vec3 F0) {
+		float ndotv = max(dot(n, v), 0.0);
+		return F0 + (vec3(1.0, 1.0, 1.0) - F0) * pow(1.0 - ndotv, 5.0);
+	}
 
-float calc_NDF_GGX(vec3 n, vec3 h, float roughness) {
-    float a = roughness * roughness;
-    float a2 = a * a;
-    float ndoth = max(dot(n, h), 0.0);
-    float ndoth2 = ndoth * ndoth;
-    float t = ndoth2 * (a2 - 1.0) + 1.0;
-    float t2 = t * t;
-    return a2 / (PI * t2);
-}
+	float calc_NDF_GGX(vec3 n, vec3 h, float roughness) {
+		float a = roughness * roughness;
+		float a2 = a * a;
+		float ndoth = max(dot(n, h), 0.0);
+		float ndoth2 = ndoth * ndoth;
+		float t = ndoth2 * (a2 - 1.0) + 1.0;
+		float t2 = t * t;
+		return a2 / (PI * t2);
+	}
 
-float calc_Geometry_GGX(float costheta, float roughness) {
-    float a = roughness;
-    float r = a + 1.0;
-    float r2 = r * r;
-    float k = r2 / 8.0;
+	float calc_Geometry_GGX(float costheta, float roughness) {
+		float a = roughness;
+		float r = a + 1.0;
+		float r2 = r * r;
+		float k = r2 / 8.0;
 
-    float t = costheta * (1.0 - k) + k;
+		float t = costheta * (1.0 - k) + k;
 
-    return costheta / t;
-}
+		return costheta / t;
+	}
 
-float calc_Geometry_Smith(vec3 n, vec3 v, vec3 l, float roughness) {
-    float ndotv = max(dot(n, v), 0.0);
-    float ndotl = max(dot(n, l), 0.0);
-    float ggx1 = calc_Geometry_GGX(ndotv, roughness);
-    float ggx2 = calc_Geometry_GGX(ndotl, roughness);
-    return ggx1 * ggx2;
-}
+	float calc_Geometry_Smith(vec3 n, vec3 v, vec3 l, float roughness) {
+		float ndotv = max(dot(n, v), 0.0);
+		float ndotl = max(dot(n, l), 0.0);
+		float ggx1 = calc_Geometry_GGX(ndotv, roughness);
+		float ggx2 = calc_Geometry_GGX(ndotl, roughness);
+		return ggx1 * ggx2;
+	}
 
-vec3 calc_fresnel_roughness(vec3 n, vec3 v, vec3 F0, float roughness) {
-    float ndotv = max(dot(n, v), 0.0);
-    return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(1.0 - ndotv, 5.0);
-}
+	vec3 calc_fresnel_roughness(vec3 n, vec3 v, vec3 F0, float roughness) {
+		float ndotv = max(dot(n, v), 0.0);
+		return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(1.0 - ndotv, 5.0);
+	}
 
-vec3 filtering_cube_map(samplerCube cube, vec3 n) {
-    n.yz = -n.yz;
-    return texture(cube, n).xyz;
-}
+	vec3 filtering_cube_map(samplerCube cube, vec3 n) {
+		n.yz = -n.yz;
+		return texture(cube, n).xyz;
+	}
 
-vec3 filtering_cube_map_lod(samplerCube cube, vec3 n, float lod) {
-    n.yz = -n.yz;
-    return textureLod(cube, n, lod).xyz;
-}
+	vec3 filtering_cube_map_lod(samplerCube cube, vec3 n, float lod) {
+		n.yz = -n.yz;
+		return textureLod(cube, n, lod).xyz;
+	}
 
 #endif  // GLB_ENABLE_LIGHTING
 
@@ -249,30 +270,27 @@ float calc_shadow() {
 		shadow_factor = 1.0;
 	}
 	shadow_coord = light_space_pos.xy;
-#endif
+#endif  // GLB_ENABLE_SHADOW
 
 	return shadow_factor;
 }
 
-vec3 calc_normal() {
-	vec3 normal = vec3(0.0, 0.0, 0.0);
-
+void calc_normal(out vec3 nw, out vec3 nt) {
 #ifdef GLB_NORMAL_IN_VERTEX
-	normal = normalize(vs_Normal);
+	nw = normalize(vs_Normal);
 #endif
 
 #ifdef GLB_ENABLE_NORMAL_MAPPING
-	normal = texture2D(glb_NormalTex, vs_TexCoord).xyz;
-	normal -= vec3(0.5, 0.5, 0.5);
-	normal *= 2.0;
-	normal = normalize(normal);
+	nw = texture2D(glb_NormalTex, vs_TexCoord).xyz;
+	nw -= vec3(0.5, 0.5, 0.5);
+	nw *= 2.0;
+	nw = normalize(nw);
+	nt = nw;
 
 	mat3 tbn = mat3(normalize(vs_Tangent), normalize(vs_Binormal), vs_Normal);
-	normal = tbn * normal;
-	normalize(normal);
+	nw = tbn * nw;
+	normalize(nw);
 #endif
-
-	return normal;	
 }
 
 vec3 calc_view() {
@@ -389,6 +407,29 @@ vec3 calc_ibl_lighting(vec3 n, vec3 v, vec3 albedo, float roughness, float metal
 	return result;
 }
 
+vec3 calc_light_mapping_lighting(vec3 n) {
+	vec3 result = vec3(0.0, 0.0, 0.0);
+
+#ifdef GLB_ENABLE_RADIOSITY_NORMAL_MAPPING
+    // Calculate bais
+    vec3 bais0 = vec3(sqrt(2.0 / 3.0), 0.0, sqrt(1.0 / 3.0));
+    vec3 bais1 = vec3(-sqrt(1.0 / 6.0), sqrt(1.0 / 2.0), sqrt(1.0 / 3.0));
+    vec3 bais2 = vec3(-sqrt(1.0 / 6.0), -sqrt(1.0 / 2.0), sqrt(1.0 / 3.0));
+    normalize(bais0);
+    normalize(bais1);
+    normalize(bais2);
+
+	vec2 uv = vec2(vs_LightMapTexCoord.x, vs_LightMapTexCoord.y);
+    vec3 lightMapColor0 = texture(glb_Light0Tex, uv).rgb;
+    vec3 lightMapColor1 = texture(glb_Light1Tex, uv).rgb;
+    vec3 lightMapColor2 = texture(glb_Light2Tex, uv).rgb;
+
+    result = lightMapColor0 * max(0.0, dot(bais0, n)) + lightMapColor1 * max(0.0, dot(bais1, n)) + lightMapColor2 * max(0.0, dot(bais2, n));	
+#endif
+
+	return result;
+}
+
 float calc_alpha() {
 	float alpha = 1.0;
 
@@ -404,10 +445,16 @@ float calc_alpha() {
 void main() {
 	oColor = vec4(0.0, 0.0, 0.0, 0.0);
 
+	vec3 normalInWorld = vec3(0.0, 0.0, 0.0);
+	vec3 normalInTangent = vec3(0.0, 0.0, 0.0);
+	calc_normal(normalInWorld, normalInTangent);
+
 	float shadow_factor = calc_shadow();
-	vec3 normal = calc_normal();
+
 	vec3 view = calc_view();
+
 	vec3 light = calc_light_dir();	
+
 	vec3 h = normalize(view + light);
 
 	vec3 albedo = vec3(0.0, 0.0, 0.0);
@@ -418,17 +465,17 @@ void main() {
 
 	vec3 direct_light_color = calc_direct_light_color();
 
-	// vec3 n, vec3 v, vec3 l, vec3 h, vec3 albedo, float roughness, float metalic, vec3 light
-	vec3 direct_color = calc_direct_lighting(normal, view, light, h, albedo, roughness, metallic, direct_light_color);
+	vec3 direct_color = calc_direct_lighting(normalInWorld, view, light, h, albedo, roughness, metallic, direct_light_color);
 
-	// vec3 n, vec3 v, vec3 albedo, float roughness, float metalic
-	vec3 ibl_color = calc_ibl_lighting(normal, view, albedo, roughness, metallic);
+	vec3 ibl_color = calc_ibl_lighting(normalInWorld, view, albedo, roughness, metallic);
 
-	oColor.xyz = (direct_color + ibl_color) * shadow_factor + emission;
+	vec3 light_mapping_color = calc_light_mapping_lighting(normalInTangent);
+
+	oColor.xyz = (direct_color + ibl_color + light_mapping_color) * shadow_factor + emission;
 
 	// TEST code
 #ifdef GLB_ENABLE_REFLECT_TEX
-    vec3 refl = reflect(-view, normal);
+    vec3 refl = reflect(-view, normalInWorld);
     refl = normalize(refl);
     refl.yz = -refl.yz;
     oColor.xyz = textureCube(glb_ReflectTex, refl).xyz;

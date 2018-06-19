@@ -214,9 +214,9 @@ bool HDRWriter::Write(const char* fileName, int8_t* data, int32_t width, int32_t
             // Flip upside down
             for (int32_t i = 0; i < height; i++) {
                 for (int32_t j = 0; j < width; j++) {
-                    fp[(i * width + j) * 3 + 0] =  pixel[((height - i) * width + j) * 4 + 0];
-                    fp[(i * width + j) * 3 + 1] =  pixel[((height - i) * width + j) * 4 + 1];
-                    fp[(i * width + j) * 3 + 2] =  pixel[((height - i) * width + j) * 4 + 2];
+                    fp[(i * width + j) * 3 + 0] =  pixel[((height - i - 1) * width + j) * 4 + 0];
+                    fp[(i * width + j) * 3 + 1] =  pixel[((height - i - 1) * width + j) * 4 + 1];
+                    fp[(i * width + j) * 3 + 2] =  pixel[((height - i - 1) * width + j) * 4 + 2];
                 }
             }
 
