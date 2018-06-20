@@ -381,6 +381,7 @@ BOOL CGLBLightStudioDlg::OnInitDialog()
     GetMenu()->EnableMenuItem(ID_FILE_SAVE, MF_DISABLED);
     GetMenu()->EnableMenuItem(ID_ADD_SCENE, MF_DISABLED);
     GetMenu()->EnableMenuItem(ID_ADD_LIGHT, MF_DISABLED);
+    GetMenu()->EnableMenuItem(ID_ADD_SUN, MF_DISABLED);
     GetMenu()->EnableMenuItem(ID_FILE_EXPORTLIGHTMAP, MF_DISABLED);
 
     // Hide control
@@ -644,6 +645,7 @@ void CGLBLightStudioDlg::OnFileOpen()
         GetMenu()->EnableMenuItem(ID_FILE_SAVE, MF_ENABLED);
         GetMenu()->EnableMenuItem(ID_ADD_SCENE, MF_DISABLED);
         GetMenu()->EnableMenuItem(ID_ADD_LIGHT, MF_ENABLED);
+        GetMenu()->EnableMenuItem(ID_ADD_SUN, MF_ENABLED);
         GetMenu()->EnableMenuItem(ID_FILE_EXPORTLIGHTMAP, MF_ENABLED);
 
         // Display control
@@ -772,6 +774,7 @@ void CGLBLightStudioDlg::OnAddScene()
 
         // Enable Add Light Menu
         GetMenu()->EnableMenuItem(ID_ADD_LIGHT, MF_ENABLED);
+        GetMenu()->EnableMenuItem(ID_ADD_SUN, MF_ENABLED);
     }
 }
 
