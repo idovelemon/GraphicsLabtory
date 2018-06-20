@@ -42,6 +42,7 @@ Light studio is used for baking Lightmap with Radiosity Normal Mapping(RNM) and 
 |Light probe baking|2018-06-09 15:50||<font color="Blue">New</font>|
 |Release a beta version|2018-06-09 16:00|2018-06-09 16:15|<font color="Green">Finish</font>|
 |Sperate lightmap uv from albedo/roughness/metallic/normal uv|2018-06-09 20:37|2018-06-14 21:35|<font color="Green">Finish</font>|
+|Add support for Directional light|2018-06-19 20:00|2018-06-20 8:10|<font color="Green">Finish</font>|
 
 <br>
 
@@ -55,11 +56,12 @@ Light studio is used for baking Lightmap with Radiosity Normal Mapping(RNM) and 
 |Press tab to config data problem|2018-06-08 22:40|2018-06-09 14:50|<font color="Green">Finish</font>|
 |Move mouse to accelerate rendering speed problem|2018-06-09 0:15|2018-06-09 15:50|<font color="Green">Finish</font>|
 |Click empty space in outline when create new project, crash|2018-06-09 10:10|2018-06-09 14:35|<font color="Green">Finish</font>|
-|Disable all config interface and menu when baking|2018-06-09 13:05||<font color="Blue">New</font>|
+|Disable all config interface and menu when baking|2018-06-09 13:05|2018-6-20 08:20|<font color="Green">Finish</font>|
 |Save project when close program|2018-06-09 14:10|2018-06-09 15:00|<font color="Green">Finish</font>|
-|Step1:New -> Step2:Open undefine behaivor|2018-06-09 14:50|2018-06-09 0:15|2018-06-09 15:50|<font color="Green">Finish</font>|
+|Step1:New -> Step2:Open undefine behaivor|2018-06-09 14:50|2018-06-09 0:15|<font color="Green">Finish</font>|
 |Overhead test|2018-06-09 15:55||<font color="Blue">New</font>|
 |Memory leak test|2018-06-09 15:55||<font color="Blue">New</font>|
+|Disable Add->Sun if there is no scene added|2018-6-19 23:15|2018-6-20 08:20|<font color="Green">Finish</font>|
 
 ## GLB ModelEditor
 GLB ModelEditor is used for convert DCC tool's export file format to GLB library build-in file formats
@@ -95,3 +97,4 @@ GLB ModelEditor is used for convert DCC tool's export file format to GLB library
 |Disabled preview after import a model|2018-06-11 22:30|2018-06-12 11:55|<font color="Green">Finish</font>|
 |Do not enable texture file browser button after preview a model|2018-06-12 11:05|2018-06-12 11:55|<font color="Green">Finish</font>|
 |Display default environment cube map|2018-06-12 11:15|2018-06-12 12:20|<font color="Green">Finish</font>|
+|Import a model again : GLB init failed|2018-06-20 8:00||<font color="Blue">New</font>|
