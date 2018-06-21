@@ -26,13 +26,34 @@ def main():
         core = EntityCreate()
         EntityAddTransformCom(core, 0.0, 1.2, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0)
         EntityAddRenderCom(core, "res/model/core/core.obj", 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0)
-        EntityAddScriptCom(core, "core")
+        EntityAddScriptCom(core, "EntityCoreUpdater")
 
         # Create Core Rot Entity
         coreRot = EntityCreate()
         EntityAddTransformCom(coreRot, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0)
         EntityAddRenderCom(coreRot, "res/model/core/coreRot.obj", 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0)
-        EntityAddScriptCom(coreRot, "coreRot")
+        EntityAddScriptCom(coreRot, "EntityCoreRotUpdater")
+
+        # Create Four Normal Emitter
+        backNormalEmitter = EntityCreate()
+        EntityAddTransformCom(backNormalEmitter, 0.0, 0.75, 1.8, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0)
+        EntityAddRenderCom(backNormalEmitter, "res/model/emitter/normal_Emitter.obj", 0.0, 0.75, 1.8, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0)
+        EntityAddScriptCom(backNormalEmitter, "EntityNormalEmitterUpdater")
+
+        frontNormalEmitter = EntityCreate()
+        EntityAddTransformCom(frontNormalEmitter, 0.0, 0.75, -1.8, 0.0, 180.0, 0.0, 1.0, 1.0, 1.0)
+        EntityAddRenderCom(frontNormalEmitter, "res/model/emitter/normal_Emitter.obj", 0.0, 0.75, -1.8, 0.0, 180.0, 0.0, 1.0, 1.0, 1.0)
+        EntityAddScriptCom(frontNormalEmitter, "EntityNormalEmitterUpdater")
+
+        leftNormalEmitter = EntityCreate()
+        EntityAddTransformCom(leftNormalEmitter, -1.8, 0.75, 0.0, 0.0, -90.0, 0.0, 1.0, 1.0, 1.0)
+        EntityAddRenderCom(leftNormalEmitter, "res/model/emitter/normal_Emitter.obj", -1.8, 0.75, 0.0, 0.0, -90.0, 0.0, 1.0, 1.0, 1.0)
+        EntityAddScriptCom(leftNormalEmitter, "EntityNormalEmitterUpdater")
+
+        rightNormalEmitter = EntityCreate()
+        EntityAddTransformCom(rightNormalEmitter, 1.8, 0.75, 0.0, 0.0, 90.0, 0.0, 1.0, 1.0, 1.0)
+        EntityAddRenderCom(rightNormalEmitter, "res/model/emitter/normal_Emitter.obj", 1.8, 0.75, 0.0, 0.0, 90.0, 0.0, 1.0, 1.0, 1.0)
+        EntityAddScriptCom(rightNormalEmitter, "EntityNormalEmitterUpdater")        
 
     if LEVEL_COUNT == 20:
         DebugPrint("TD Level0 Finish\n")

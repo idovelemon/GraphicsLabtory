@@ -31,6 +31,11 @@ public:
      static void RunScript(const char* script_file_name);
      static void RunScript(const char* script_file_name, int arg);
 
+     //---------------------------------------------------------------
+     // @brief: Return the name's value inf config.py
+     //---------------------------------------------------------------
+     static float GetValueF(const char* name);
+
      static void Destroy();
 };
 

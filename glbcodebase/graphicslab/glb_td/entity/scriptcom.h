@@ -18,6 +18,7 @@ namespace entity {
 
 class Entity;
 
+typedef void (*ENTITY_UPDATE)(Entity* entity);
 
 //-------------------------------------------------------
 // Type Declaration
@@ -25,6 +26,7 @@ class Entity;
 class ScriptCom : public Component {
 public:
     ScriptCom(Entity* owner, const char* file);
+    ScriptCom(Entity* owner, ENTITY_UPDATE updater);
     virtual ~ScriptCom();
 
 public:
@@ -33,6 +35,7 @@ public:
 protected:
     static const int32_t kScriptFileNameMaxLen = 128;
     char    m_ScriptFile[kScriptFileNameMaxLen];
+    ENTITY_UPDATE m_Updater;
 };
 
 };  // namespace entity

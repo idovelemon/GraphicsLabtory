@@ -26,7 +26,7 @@ void EntityAddRenderCom(int id, const char* name,
                         float rx, float ry, float rz,
                         float sx, float sy, float sz);
 void EntityAddCameraCom(int id, float px, float py, float pz, float tx, float ty, float tz);
-void EntityAddScriptCom(int id, const char* script);
+void EntityAddScriptCom(int id, const char* script); 
 void EntityAddRoleCom(int id, int mt, int st);
 void EntityAddArsenalCom(int id);
 void EntityAddDataCom(int id);

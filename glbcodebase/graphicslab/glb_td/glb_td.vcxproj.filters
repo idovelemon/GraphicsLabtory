@@ -55,6 +55,9 @@
     <Filter Include="源文件\glb\thirdparty\rgbe">
       <UniqueIdentifier>{a33af348-4d77-40bb-a289-3c8b91a6a317}</UniqueIdentifier>
     </Filter>
+    <Filter Include="源文件\entity\updater">
+      <UniqueIdentifier>{e7fe76e8-b456-4073-ab67-f5b24aaf1a9a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\glb\glbapplication.cpp">
@@ -206,6 +209,12 @@
     </ClCompile>
     <ClCompile Include="..\glb\thirdparty\rgbe\rgbe.cpp">
       <Filter>源文件\glb\thirdparty\rgbe</Filter>
+    </ClCompile>
+    <ClCompile Include="entity\updater\coreupdater.cpp">
+      <Filter>源文件\entity\updater</Filter>
+    </ClCompile>
+    <ClCompile Include="entity\updater\emitterupdater.cpp">
+      <Filter>源文件\entity\updater</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -398,6 +407,9 @@
     <ClInclude Include="..\glb\thirdparty\stb_image\std_image.h">
       <Filter>源文件\glb\thirdparty\stb_image</Filter>
     </ClInclude>
+    <ClInclude Include="entity\updater\updater.h">
+      <Filter>源文件\entity\updater</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\glb\math\glbvector.inl">
@@ -405,6 +417,9 @@
     </None>
     <None Include="pyscript\topython.inl">
       <Filter>源文件\pyscript</Filter>
+    </None>
+    <None Include="entity\updater\updater.def">
+      <Filter>源文件\entity\updater</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

@@ -40,12 +40,14 @@ public:
     void LoadScript(const char* script_file_name);
     void RunScript(const char* script_file_name);
     void RunScript(const char* script_file_name, int arg);
+    float GetValueF(const char* name);
     void Destroy();
 
 private:
     void PrintError(const char* script_file_name);
 
 private:
+    PyObject*                        m_ConfigModule;
     std::map<std::string, PyObject*> m_ScriptDatabase;
 };
 
@@ -56,12 +58,14 @@ private:
 //---------------------------------------------------------------------------
 // @brief: PyScriptMgrImp
 //---------------------------------------------------------------------------
-PyScriptMgrImp::PyScriptMgrImp() {
+PyScriptMgrImp::PyScriptMgrImp()
+: m_ConfigModule(NULL) {
     m_ScriptDatabase.clear();
 }
 
 PyScriptMgrImp::~PyScriptMgrImp() {
     m_ScriptDatabase.clear();
+    m_ConfigModule = NULL;
 }
 
 void PyScriptMgrImp::Initialize(const char* script_root_path) {
@@ -78,6 +82,9 @@ void PyScriptMgrImp::Initialize(const char* script_root_path) {
             sprintf_s(add_path_py, "sys.path.append(\"%s\")", script_root_path);
             PyRun_SimpleString("import sys");
             PyRun_SimpleString(add_path_py);
+
+            PyObject* name = PyUnicode_FromString("config");
+            m_ConfigModule = PyImport_Import(name);
 
             is_initialized = true;
 
@@ -177,6 +184,19 @@ void PyScriptMgrImp::RunScript(const char* script_file_name, int arg) {
     }
 }
 
+float PyScriptMgrImp::GetValueF(const char* name) {
+    float v = 0.0f;
+
+    PyObject* value = PyObject_GetAttrString(m_ConfigModule, name);
+    if (value) {
+        PyArg_Parse(value, "f", &v);
+    } else {
+        assert(false);
+    }
+
+    return v;
+}
+
 void PyScriptMgrImp::Destroy() {
     m_ScriptDatabase.clear();
     Py_Finalize();
@@ -265,6 +285,16 @@ void PyScriptMgr::RunScript(const char* script_file_name) {
 void PyScriptMgr::RunScript(const char* script_file_name, int arg) {
     if (s_Imp != NULL) {
         s_Imp->RunScript(script_file_name, arg);
+    } else {
+        assert(false && "Create impelementation first");
+    }
+}
+
+float PyScriptMgr::GetValueF(const char* name) {
+    float result = 0.0f;
+
+    if (s_Imp != NULL) {
+        return s_Imp->GetValueF(name);
     } else {
         assert(false && "Create impelementation first");
     }

@@ -54,7 +54,6 @@ public:
         td::GameTimer::Initialize();
 
         pyscript::PyScriptMgr::LoadScript("level0");
-        pyscript::PyScriptMgr::RunScript("level0");
 
         return true;
     }
@@ -96,8 +95,8 @@ int _stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPreInstance, LPSTR cmdLine,
 
     glb::app::AppConfig config;
     memcpy(config.caption, L"glb_td", sizeof(L"glb_td"));
-    config.screen_width = 800;
-    config.screen_height = 600;
+    config.screen_width = 1024;
+    config.screen_height = 720;
     config.shadow_map_width = 2048;
     config.shadow_map_height = 2048;
     config.icon = IDI_ICON1;

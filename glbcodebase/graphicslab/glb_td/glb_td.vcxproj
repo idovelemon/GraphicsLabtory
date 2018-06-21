@@ -131,6 +131,8 @@
     <ClCompile Include="entity\rolecom.cpp" />
     <ClCompile Include="entity\scriptcom.cpp" />
     <ClCompile Include="entity\transformcom.cpp" />
+    <ClCompile Include="entity\updater\coreupdater.cpp" />
+    <ClCompile Include="entity\updater\emitterupdater.cpp" />
     <ClCompile Include="gametimer.cpp" />
     <ClCompile Include="glb_td.cpp" />
     <ClCompile Include="pyscript\pyscriptmgr.cpp" />
@@ -194,6 +196,7 @@
     <ClInclude Include="entity\rolecom.h" />
     <ClInclude Include="entity\scriptcom.h" />
     <ClInclude Include="entity\transformcom.h" />
+    <ClInclude Include="entity\updater\updater.h" />
     <ClInclude Include="gametimer.h" />
     <ClInclude Include="glb_td.h" />
     <ClInclude Include="pyscript\pyscriptmgr.h" />
@@ -203,6 +206,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\glb\math\glbvector.inl" />
+    <None Include="entity\updater\updater.def" />
     <None Include="pyscript\topython.inl" />
   </ItemGroup>
   <ItemGroup>

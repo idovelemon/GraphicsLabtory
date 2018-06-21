@@ -27,6 +27,8 @@
 #include "../entity/scriptcom.h"
 #include "../entity/transformcom.h"
 
+#include "../entity/updater/updater.h"
+
 //-----------------------------------------------------------------
 // Debug
 void DebugPrint(const char* s) {
@@ -35,6 +37,10 @@ void DebugPrint(const char* s) {
 }
 
 //-----------------------------------------------------------------
+void EntityUpdate(entity::Entity* entity) {
+    printf("test test\n");
+}
+
 // Entity
 int EntityCreate() {
     return entity::EntityMgr::CreateEntity();
@@ -135,8 +141,24 @@ void EntityAddCameraCom(int id, float px, float py, float pz, float tx, float ty
 void EntityAddScriptCom(int id, const char* script) {
     entity::Entity* ent = entity::EntityMgr::GetEntity(id);
     if (ent != NULL) {
-        entity::ScriptCom* com = new entity::ScriptCom(ent, script);
-        ent->AddComponent(com);
+        bool bFound = false;
+        //entity::ScriptCom* com = new entity::ScriptCom(ent, script);  // Discard python script logic now
+        for (int32_t i = 0; i < sizeof(entity::sEntityUpdaterTbl) / sizeof(entity::sEntityUpdaterTbl[0]); i++) {
+            if (!strcmp(script, entity::sEntityUpdaterTbl[i].name)) {
+                entity::ScriptCom* com = new entity::ScriptCom(ent, entity::sEntityUpdaterTbl[i].f);
+                ent->AddComponent(com);
+                bFound = true;
+                break;
+            }
+        }
+
+        if (!bFound) {
+            std::string err;
+            err = err + "[" + script + "]";
+            err = err + " is a invalid updater\n";
+            DebugPrint(err.c_str());
+            assert(false);
+        }
     } else {
         printf("Wrong entity id\n");
         assert(false);

@@ -1,0 +1,3 @@
+UPDATER_DEF(EntityCoreUpdater)
+UPDATER_DEF(EntityCoreRotUpdater)
+UPDATER_DEF(EntityNormalEmitterUpdater)

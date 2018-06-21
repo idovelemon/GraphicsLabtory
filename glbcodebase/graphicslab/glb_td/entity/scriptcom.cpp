@@ -6,6 +6,8 @@
 //------------------------------------------------------------
 #include "scriptcom.h"
 
+#include <assert.h>
+
 #include <memory>
 
 #include "entity.h"
@@ -14,7 +16,8 @@
 namespace entity {
 
 ScriptCom::ScriptCom(Entity* owner, const char* file)
-: Component(CT_SCRIPT, owner) {
+: Component(CT_SCRIPT, owner)
+, m_Updater(NULL) {
     int32_t len = strlen(file);
     len = (len > kScriptFileNameMaxLen - 1) ? (kScriptFileNameMaxLen - 1) : len;
     memcpy(m_ScriptFile, file, len);
@@ -23,11 +26,22 @@ ScriptCom::ScriptCom(Entity* owner, const char* file)
     pyscript::PyScriptMgr::LoadScript(m_ScriptFile);
 }
 
+ScriptCom::ScriptCom(Entity* owner, ENTITY_UPDATE updater)
+: Component(CT_SCRIPT, owner)
+, m_Updater(updater) {
+    m_ScriptFile[0] = '\0';
+}
+
 ScriptCom::~ScriptCom() {
 }
 
 void ScriptCom::Update(float dt) {
-    pyscript::PyScriptMgr::RunScript(m_ScriptFile, m_Entity->GetID());
+    if (m_Updater) {
+        assert(m_Entity != NULL);
+        m_Updater(m_Entity);
+    } else {
+        pyscript::PyScriptMgr::RunScript(m_ScriptFile, m_Entity->GetID());
+    }
 }
 
 };  // namespace entity
