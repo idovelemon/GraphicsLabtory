@@ -19,8 +19,6 @@ namespace glb {
 
 namespace math {
 
-class Vector;
-
 class Matrix {
  public:
     inline Matrix();
