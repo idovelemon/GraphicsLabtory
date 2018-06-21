@@ -195,6 +195,48 @@ static PyObject* EntitySetPos(PyObject* self, PyObject* args) {
 	return Py_BuildValue("");
 }
 
+static PyObject* EntityGetRotX(PyObject* self, PyObject* args) {
+	int id;
+	float ret;
+	if (!PyArg_ParseTuple(args, "i", &id)) {
+		 return NULL;
+	}
+	ret = EntityGetRotX(id);
+	return Py_BuildValue("f", ret);
+}
+
+static PyObject* EntityGetRotY(PyObject* self, PyObject* args) {
+	int id;
+	float ret;
+	if (!PyArg_ParseTuple(args, "i", &id)) {
+		 return NULL;
+	}
+	ret = EntityGetRotY(id);
+	return Py_BuildValue("f", ret);
+}
+
+static PyObject* EntityGetRotZ(PyObject* self, PyObject* args) {
+	int id;
+	float ret;
+	if (!PyArg_ParseTuple(args, "i", &id)) {
+		 return NULL;
+	}
+	ret = EntityGetRotZ(id);
+	return Py_BuildValue("f", ret);
+}
+
+static PyObject* EntitySetRot(PyObject* self, PyObject* args) {
+	int id;
+	float x;
+	float y;
+	float z;
+	if (!PyArg_ParseTuple(args, "ifff", &id, &x, &y, &z)) {
+		 return NULL;
+	}
+	EntitySetRot(id, x, y, z);
+	return Py_BuildValue("");
+}
+
 static PyObject* EntityGetScaleX(PyObject* self, PyObject* args) {
 	int id;
 	float ret;
@@ -611,6 +653,10 @@ static PyMethodDef s_HostAPI_MethodDef[] = {
 	{"EntityGetPosY", EntityGetPosY, METH_VARARGS, NULL},
 	{"EntityGetPosZ", EntityGetPosZ, METH_VARARGS, NULL},
 	{"EntitySetPos", EntitySetPos, METH_VARARGS, NULL},
+	{"EntityGetRotX", EntityGetRotX, METH_VARARGS, NULL},
+	{"EntityGetRotY", EntityGetRotY, METH_VARARGS, NULL},
+	{"EntityGetRotZ", EntityGetRotZ, METH_VARARGS, NULL},
+	{"EntitySetRot", EntitySetRot, METH_VARARGS, NULL},
 	{"EntityGetScaleX", EntityGetScaleX, METH_VARARGS, NULL},
 	{"EntityGetScaleY", EntityGetScaleY, METH_VARARGS, NULL},
 	{"EntityGetScaleZ", EntityGetScaleZ, METH_VARARGS, NULL},

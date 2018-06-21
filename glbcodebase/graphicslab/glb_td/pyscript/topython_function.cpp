@@ -31,6 +31,7 @@
 // Debug
 void DebugPrint(const char* s) {
     printf(s);
+    OutputDebugStringA(s);
 }
 
 //-----------------------------------------------------------------
@@ -243,6 +244,70 @@ void EntitySetPos(int id, float x, float y, float z) {
         entity::TransformCom* com = reinterpret_cast<entity::TransformCom*>(ent->GetComponent(entity::CT_TRANSFORM));
         if (com != NULL) {
             com->SetPos(glb::math::Vector(x, y, z));
+        }
+    } else {
+        printf("Wrong entity id\n");
+        assert(false);
+    }
+}
+
+float EntityGetRotX(int id) {
+    float result = 0.0f;
+
+    entity::Entity* ent = entity::EntityMgr::GetEntity(id);
+    if (ent != NULL) {
+        entity::TransformCom* com = reinterpret_cast<entity::TransformCom*>(ent->GetComponent(entity::CT_TRANSFORM));
+        if (com != NULL) {
+            result = com->GetRotate().x;
+        }
+    } else {
+        printf("Wrong entity id\n");
+        assert(false);
+    }
+
+    return result;
+}
+
+float EntityGetRotY(int id) {
+    float result = 0.0f;
+
+    entity::Entity* ent = entity::EntityMgr::GetEntity(id);
+    if (ent != NULL) {
+        entity::TransformCom* com = reinterpret_cast<entity::TransformCom*>(ent->GetComponent(entity::CT_TRANSFORM));
+        if (com != NULL) {
+            result = com->GetRotate().y;
+        }
+    } else {
+        printf("Wrong entity id\n");
+        assert(false);
+    }
+
+    return result;
+}
+
+float EntityGetRotZ(int id) {
+    float result = 0.0f;
+
+    entity::Entity* ent = entity::EntityMgr::GetEntity(id);
+    if (ent != NULL) {
+        entity::TransformCom* com = reinterpret_cast<entity::TransformCom*>(ent->GetComponent(entity::CT_TRANSFORM));
+        if (com != NULL) {
+            result = com->GetRotate().z;
+        }
+    } else {
+        printf("Wrong entity id\n");
+        assert(false);
+    }
+
+    return result;
+}
+
+void EntitySetRot(int id, float x, float y, float z) {
+    entity::Entity* ent = entity::EntityMgr::GetEntity(id);
+    if (ent != NULL) {
+        entity::TransformCom* com = reinterpret_cast<entity::TransformCom*>(ent->GetComponent(entity::CT_TRANSFORM));
+        if (com != NULL) {
+            com->SetRotate(glb::math::Vector(x, y, z));
         }
     } else {
         printf("Wrong entity id\n");

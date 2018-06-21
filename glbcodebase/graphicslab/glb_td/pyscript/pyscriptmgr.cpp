@@ -192,9 +192,13 @@ void PyScriptMgrImp::PrintError(const char* script_file_name) {
 
     // Print Error Type
     printf("[Script:");
+    OutputDebugStringA("[Script:");
     printf(script_file_name);
+    OutputDebugStringA(script_file_name);
     printf(".py]: ");
+    OutputDebugStringA(".py]: ");
     printf(PyExceptionClass_Name(type));
+    OutputDebugStringA(PyExceptionClass_Name(type));
 
     // Print Error Message
     if (value) {
@@ -205,8 +209,11 @@ void PyScriptMgrImp::PrintError(const char* script_file_name) {
             char *str = new char[num];
             WideCharToMultiByte(0, 0, line_s, -1, str, num, NULL, NULL);
             printf(": ");
+            OutputDebugStringA(": ");
             printf(str);
+            OutputDebugStringA(str);
             printf("\n");
+            OutputDebugStringA("\n");
             delete[] str;
             str = NULL;
             line_s = NULL;
