@@ -1,4 +1,0 @@
-OpenGL Version: 4.5.0 NVIDIA 381.65
-OpenGL Vendor: NVIDIA Corporation
-OpenGL Render: GeForce 610M/PCIe/SSE2
-GLEW Version: 1.5.1

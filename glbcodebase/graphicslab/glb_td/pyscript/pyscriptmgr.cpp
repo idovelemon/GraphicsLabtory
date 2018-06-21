@@ -67,6 +67,9 @@ PyScriptMgrImp::~PyScriptMgrImp() {
 void PyScriptMgrImp::Initialize(const char* script_root_path) {
     bool is_initialized = false;
 
+    // Add host api
+    int ret = PyImport_AppendInittab("host_api", &PyInit_Host_API);
+
     Py_Initialize();
     if (Py_IsInitialized()) {
         do {
@@ -75,9 +78,6 @@ void PyScriptMgrImp::Initialize(const char* script_root_path) {
             sprintf_s(add_path_py, "sys.path.append(\"%s\")", script_root_path);
             PyRun_SimpleString("import sys");
             PyRun_SimpleString(add_path_py);
-
-            // Add host api
-            int ret = PyImport_AppendInittab("host_api", &PyInit_Host_API);
 
             is_initialized = true;
 
@@ -94,7 +94,7 @@ void PyScriptMgrImp::LoadScript(const char* script_file_name) {
     if (script_file_name) {
         bool has_error = false;
         do {
-            PyObject* name = PyUnicodeUCS2_FromString(script_file_name);
+            PyObject* name = PyUnicode_FromString(script_file_name);
             if (name == NULL) {
                 has_error = true;
                 break;

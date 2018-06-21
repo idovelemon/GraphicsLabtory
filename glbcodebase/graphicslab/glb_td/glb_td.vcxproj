@@ -56,13 +56,15 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;GLB_PLATFORM_OPENGL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(PYDIR)\include;$(DXSDK_DIR)\Include;$(SolutionDir)\glb;$(SolutionDir)\..\glew\include;$(SolutionDir)\..\vld;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <ObjectFileName>$(IntDir)/%(RelativeDir)/</ObjectFileName>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)\..\glew\lib;$(DXSDK_DIR)\Lib\x86;$(PYDIR)\libs;$(SolutionDir)\..\vld;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glew32.lib;opengl32.lib;dinput8.lib;dxguid.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)\..\glew\lib\Release\Win32;$(DXSDK_DIR)\Lib\x86;$(SolutionDir)\..\vld;$(PYDIR)\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glew32.lib;opengl32.lib;dinput8.lib;dxguid.lib;python36.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>libcd.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <TargetMachine>MachineX86</TargetMachine>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -83,9 +85,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\glb\comm.cpp" />
     <ClCompile Include="..\glb\glbapplication.cpp" />
-    <ClCompile Include="..\glb\glbeditorcomm.cpp" />
     <ClCompile Include="..\glb\glbinput.cpp" />
     <ClCompile Include="..\glb\math\glbbv.cpp" />
     <ClCompile Include="..\glb\math\glbmath.cpp" />
@@ -112,9 +112,11 @@
     <ClCompile Include="..\glb\scene\glbmodelfile.cpp" />
     <ClCompile Include="..\glb\scene\glbobject.cpp" />
     <ClCompile Include="..\glb\scene\glbscene.cpp" />
+    <ClCompile Include="..\glb\thirdparty\rgbe\rgbe.cpp" />
     <ClCompile Include="..\glb\util\glblog.cpp" />
     <ClCompile Include="..\glb\util\glbprofile.cpp" />
     <ClCompile Include="..\glb\util\glbtexturereader.cpp" />
+    <ClCompile Include="..\glb\util\glbtexturewriter.cpp" />
     <ClCompile Include="..\glb\util\glbutil.cpp" />
     <ClCompile Include="dynamic\dynamicobject.cpp" />
     <ClCompile Include="dynamic\dynamicworld.cpp" />
@@ -135,11 +137,8 @@
     <ClCompile Include="pyscript\topython_function.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\glb\comm.h" />
     <ClInclude Include="..\glb\glb.h" />
     <ClInclude Include="..\glb\glbapplication.h" />
-    <ClInclude Include="..\glb\glbcomm.h" />
-    <ClInclude Include="..\glb\glbeditorcomm.h" />
     <ClInclude Include="..\glb\glbinput.h" />
     <ClInclude Include="..\glb\math\glbbv.h" />
     <ClInclude Include="..\glb\math\glbmath.h" />
@@ -171,10 +170,15 @@
     <ClInclude Include="..\glb\scene\glbmodelfile.h" />
     <ClInclude Include="..\glb\scene\glbobject.h" />
     <ClInclude Include="..\glb\scene\glbscene.h" />
+    <ClInclude Include="..\glb\thirdparty\rgbe\rgbe.h" />
+    <ClInclude Include="..\glb\thirdparty\stb_image\std_image.h" />
+    <ClInclude Include="..\glb\util\glbddsformat.h" />
     <ClInclude Include="..\glb\util\glblog.h" />
     <ClInclude Include="..\glb\util\glbmacro.h" />
     <ClInclude Include="..\glb\util\glbprofile.h" />
+    <ClInclude Include="..\glb\util\glbtextureinfo.h" />
     <ClInclude Include="..\glb\util\glbtexturereader.h" />
+    <ClInclude Include="..\glb\util\glbtexturewriter.h" />
     <ClInclude Include="..\glb\util\glbutil.h" />
     <ClInclude Include="dynamic\dynamicobject.h" />
     <ClInclude Include="dynamic\dynamicworld.h" />
@@ -206,6 +210,9 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\glb.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\glb\thirdparty\rgbe\rgbe.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

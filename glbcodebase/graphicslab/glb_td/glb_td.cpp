@@ -31,21 +31,20 @@ protected:
 public:
     bool Initialize() {
         // Light
-        scene::Light light(scene::PARALLEL_LIGHT);
-        light.ambient = math::Vector(1.0f, 1.0f, 1.0f);
-        light.diffuse = math::Vector(2.0f, 2.0f, 2.0f);
-        light.specular = math::Vector(100.0f, 100.0f, 100.0f);
-        light.dir = math::Vector(-1.0f, -1.0f, -1.0f);
-        light.dir.Normalize();
-        light.pow = 128.0f;
-        glb::scene::Scene::SetLight(light, 0);
+        scene::Light globalAmbientLight(scene::AMBIENT_LIGHT);
+        globalAmbientLight.color = math::Vector(0.1f, 0.1f, 0.1f);
+        scene::Scene::SetLight(globalAmbientLight, 0);
+
+        scene::Light parallelLight(scene::PARALLEL_LIGHT);
+        parallelLight.dir = math::Vector(-1.0f, -1.0f, -1.0f);
+        parallelLight.dir.Normalize();
+        parallelLight.color = math::Vector(1.2f, 1.2f, 1.2f);
+        glb::scene::Scene::SetLight(parallelLight, 1);
 
         // Perspective
         glb::render::Render::SetPerspective(glb::render::Render::PRIMARY_PERS, 69.0f, 800 * 1.0f / 600, 0.1f, 500.0f);
 
         // HDR
-        glb::render::Render::SetExposureLevel(0.3f);
-        glb::render::Render::SetLightAdaption(1.0f);
         glb::render::Render::SetHighLightBase(0.95f);
 
         // Game Manager
@@ -54,9 +53,8 @@ public:
         entity::EntityMgr::Initialize();
         td::GameTimer::Initialize();
 
-        pyscript::PyScriptMgr::LoadScript("testlevel");
-        pyscript::PyScriptMgr::RunScript("testlevel");
-        pyscript::PyScriptMgr::LoadScript("timeline");
+        pyscript::PyScriptMgr::LoadScript("level0");
+        pyscript::PyScriptMgr::RunScript("level0");
 
         return true;
     }
@@ -66,7 +64,7 @@ public:
         time.BeginProfile();
 
         glb::Input::Update();
-        pyscript::PyScriptMgr::RunScript("timeline");
+        pyscript::PyScriptMgr::RunScript("level0");
 
         // Update entity
         dynamic::DynamicWorld::Update();
