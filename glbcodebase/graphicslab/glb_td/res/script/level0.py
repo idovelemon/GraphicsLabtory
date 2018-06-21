@@ -23,6 +23,12 @@ def main():
         EntityAddCameraCom(camera, 0.0, 5.0, 10.0, 0.0, 0.0, 0.0)
 
         # Create Core Entity
+        core = EntityCreate()
+        EntityAddTransformCom(core, 0.0, 1.2, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0)
+        EntityAddRenderCom(core, "res/model/core/core.obj", 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0)
+        EntityAddScriptCom(core, "core")
+
+        # Create Core Rot Entity
         coreRot = EntityCreate()
         EntityAddTransformCom(coreRot, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0)
         EntityAddRenderCom(coreRot, "res/model/core/coreRot.obj", 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0)
