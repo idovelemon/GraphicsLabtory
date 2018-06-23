@@ -1,0 +1,42 @@
+v -50 2.18557e-006 50
+v 50 2.18557e-006 50
+v 50 -2.18557e-006 -50
+vt -10 -10
+vt 10 -10
+vt 10 10
+vn 0 1 -4.37114e-008
+vn 0 1 -4.37114e-008
+vn 0 1 -4.37114e-008
+vtan 1 0 0
+vbi 0 4.37114e-008 1
+vtan 1 0 0
+vbi 0 4.37114e-008 1
+vtan 1 0 0
+vbi 0 4.37114e-008 1
+f 1/1/1/1/1 2/2/2/2/2 3/3/3/3/3
+v -50 2.18557e-006 50
+v 50 -2.18557e-006 -50
+v -50 -2.18557e-006 -50
+vt -10 -10
+vt 10 10
+vt -10 10
+vn 0 1 -4.37114e-008
+vn 0 1 -4.37114e-008
+vn 0 1 -4.37114e-008
+vtan 1 0 0
+vbi 0 4.37114e-008 1
+vtan 1 0 0
+vbi 0 4.37114e-008 1
+vtan 1 0 0
+vbi 0 4.37114e-008 1
+f 4/4/4/4/4 5/5/5/5/5 6/6/6/6/6
+talbedo Material_Base_Color.bmp
+tdiffusepfc diffuse.pfc
+tspecularpfc specular.pfc
+al 1
+as 0
+cs 0
+malbedo 1 1 1
+mroughness 0.75
+mmetallic 0.0
+me 0 0 0

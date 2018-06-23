@@ -19,14 +19,18 @@ def main():
         DebugPrint("TD Level0 Start\n")
 
     if LEVEL_COUNT == 2:
-        # Create Camera Entity
-        camera = EntityCreate()
-        EntityAddCameraCom(camera, 0.0, 5.0, 10.0, 0.0, 0.0, 0.0)
+        # Create Level0 Entity
+        level0 = EntityCreate()
+        EntityAddRenderCom(level0, "res/model/level/level0.obj", 0.0, -1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0)
 
         # Create CoreDummy Entity
         coreDummy = EntityCreate()
         EntityAddTransformCom(coreDummy, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0)
         EntityAddScriptCom(coreDummy, "EntityCoreDummyUpdater")
+
+        # Create Camera Entity
+        camera = EntityCreate()
+        EntityAddCameraCom(camera, 0.0, 10.0, 10.0, 0.0, 0.0, 0.0)
 
         # Create Core Entity
         core = EntityCreate()
