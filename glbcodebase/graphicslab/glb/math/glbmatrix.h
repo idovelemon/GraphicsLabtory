@@ -39,6 +39,16 @@ class Matrix {
     inline void MakeIdentityMatrix();
     inline void MakeRotateAxisMatrix(Vector axis, float rotate_degree);
     inline void MakeRotateMatrix(Vector x_axis, Vector y_axis, Vector z_axis);
+    inline static Matrix CreateScaleMatrix(float sx, float sy, float sz);
+    inline static Matrix CreateTranslateMatrix(float tx, float ty, float tz);
+    inline static Matrix CreateRotateXMatrix(float rotate_degree);
+    inline static Matrix CreateRotateYMatrix(float rotate_degree);
+    inline static Matrix CreateRotateZMatrix(float rotate_degree);
+    inline static Matrix CreateRotateXYZMatrix(float rx, float ry, float rz);
+    inline static Matrix CreateRotateZXYMatrix(float rx, float ry, float rz);
+    inline static Matrix CreateIdentityMatrix();
+    inline static Matrix CreateRotateAxisMatrix(Vector axis, float rotate_degree);
+	inline static Matrix CreateRotateMatrix(Vector x_axis, Vector y_axis, Vector z_axis);
 
     //----------------------------------------------------------------------
     // @brief: Build projection and view matrix
@@ -48,6 +58,11 @@ class Matrix {
     inline void MakeOrthogonalMatrix(float left, float right, float bottom, float top, float near, float far);
     inline void MakeViewMatrix(Vector pos, Vector target);
     inline void MakeViewMatrix(Vector pos, Vector x_axis, Vector y_axis, Vector z_axis);
+    inline static Matrix CreateProjectionMatrix(float aspect, float fov, float near, float far);
+    inline static Matrix CreateProjectionMatrix(float left, float right, float bottom, float top, float near, float far);
+    inline static Matrix CreateOrthogonalMatrix(float left, float right, float bottom, float top, float near, float far);
+    inline static Matrix CreateViewMatrix(Vector pos, Vector target);
+    inline static Matrix CreateViewMatrix(Vector pos, Vector x_axis, Vector y_axis, Vector z_axis);
 
     //----------------------------------------------------------------------
     // @brief: These method will multiply a scale, translate and rotate matrix

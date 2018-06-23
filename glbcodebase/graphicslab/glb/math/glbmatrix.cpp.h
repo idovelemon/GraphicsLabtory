@@ -139,6 +139,66 @@ void Matrix::MakeRotateAxisMatrix(Vector axis, float rotate_degree) {
     m_Matrix.m[3][3] = 1.0f;
 }
 
+Matrix Matrix::CreateScaleMatrix(float sx, float sy, float sz) {
+    Matrix mat;
+    mat.MakeScaleMatrix(sx, sy, sz);
+    return mat;
+}
+
+Matrix Matrix::CreateTranslateMatrix(float tx, float ty, float tz) {
+    Matrix mat;
+    mat.MakeTranslateMatrix(tx, ty, tz);
+    return mat;
+}
+
+Matrix Matrix::CreateRotateXMatrix(float rotate_degree) {
+    Matrix mat;
+    mat.MakeRotateXMatrix(rotate_degree);
+    return mat;
+}
+
+Matrix Matrix::CreateRotateYMatrix(float rotate_degree) {
+    Matrix mat;
+    mat.MakeRotateYMatrix(rotate_degree);
+    return mat;
+}
+
+Matrix Matrix::CreateRotateZMatrix(float rotate_degree) {
+    Matrix mat;
+    mat.MakeRotateZMatrix(rotate_degree);
+    return mat;
+}
+
+Matrix Matrix::CreateRotateXYZMatrix(float rx, float ry, float rz) {
+    Matrix mat;
+    mat.MakeRotateXYZMatrix(rx, ry, rz);
+    return mat;
+}
+
+Matrix Matrix::CreateRotateZXYMatrix(float rx, float ry, float rz) {
+    Matrix mat;
+    mat.MakeRotateZXYMatrix(rx, ry, rz);
+    return mat;
+}
+
+Matrix Matrix::CreateIdentityMatrix() {
+    Matrix mat;
+    mat.MakeIdentityMatrix();
+    return mat;
+}
+
+Matrix Matrix::CreateRotateAxisMatrix(Vector axis, float rotate_degree) {
+    Matrix mat;
+    mat.MakeRotateAxisMatrix(axis, rotate_degree);
+    return mat;
+}
+
+Matrix Matrix::CreateRotateMatrix(Vector x_axis, Vector y_axis, Vector z_axis) {
+    Matrix mat;
+    mat.MakeRotateMatrix(x_axis, y_axis, z_axis);
+    return mat;
+}
+
 void Matrix::MakeRotateMatrix(Vector x_axis, Vector y_axis, Vector z_axis) {
     this->m_Matrix.m[0][0] = x_axis.x;
     this->m_Matrix.m[1][0] = x_axis.y;
@@ -283,6 +343,36 @@ void Matrix::MakeViewMatrix(Vector pos, Vector x_axis, Vector y_axis, Vector z_a
     this->m_Matrix.m[1][3] = - Dot(pos, y_axis);
     this->m_Matrix.m[2][3] = - Dot(pos, z_axis);
     this->m_Matrix.m[3][3] = 1.0f;
+}
+
+Matrix Matrix::CreateProjectionMatrix(float aspect, float fov, float _near, float _far) {
+    Matrix mat;
+    mat.MakeProjectionMatrix(aspect, fov, _near, _far);
+    return mat;
+}
+
+Matrix Matrix::CreateProjectionMatrix(float left, float right, float bottom, float top, float _near, float _far) {
+    Matrix mat;
+    mat.MakeProjectionMatrix(left, right, bottom, top, _near, _far);
+    return mat;
+}
+
+Matrix Matrix::CreateOrthogonalMatrix(float left, float right, float bottom, float top, float _near, float _far) {
+    Matrix mat;
+    mat.MakeOrthogonalMatrix(left, right, bottom, top, _near, _far);
+    return mat;
+}
+
+Matrix Matrix::CreateViewMatrix(Vector pos, Vector target) {
+    Matrix mat;
+    mat.MakeViewMatrix(pos, target);
+    return mat;
+}
+
+Matrix Matrix::CreateViewMatrix(Vector pos, Vector x_axis, Vector y_axis, Vector z_axis) {
+    Matrix mat;
+    mat.MakeViewMatrix(pos, x_axis, y_axis, z_axis);
+    return mat;
 }
 
 void Matrix::Scale(float sx, float sy, float sz) {
