@@ -6,24 +6,63 @@
 //--------------------------------------------------------
 #include "transformcom.h"
 
+#include "math/glbmatrix.h"
+
+#include "entity.h"
+
 namespace entity {
 
 TransformCom::TransformCom(Entity* owner, glb::math::Vector pos, glb::math::Vector rotate, glb::math::Vector scale)
 : Component(CT_TRANSFORM, owner)
 , m_Pos(pos)
 , m_Rotate(rotate)
-, m_Scale(scale) {
+, m_Scale(scale)
+, m_Parent(NULL) {
 }
 
 TransformCom::~TransformCom() {
+    m_Parent = NULL;
 }
 
 glb::math::Vector TransformCom::GetPos() const {
     return m_Pos;
 }
 
+glb::math::Vector TransformCom::GetPosWorld() const {
+    glb::math::Vector pos;
+
+    if (m_Parent) {
+        TransformCom* com = reinterpret_cast<TransformCom*>(m_Parent->GetComponent(CT_TRANSFORM));
+        if (com) {
+            glb::math::Matrix parentToWorld;
+            parentToWorld = com->GetWorldMatrix();
+
+            pos = parentToWorld * m_Pos;
+        }
+    } else {
+        pos = m_Pos;
+    }
+
+    return pos;
+}
+
 glb::math::Vector TransformCom::GetRotate() const {
     return m_Rotate;
+}
+
+glb::math::Vector TransformCom::GetRotateWorld() const {
+    glb::math::Vector rotation;
+
+    if (m_Parent) {
+        TransformCom* com = reinterpret_cast<TransformCom*>(m_Parent->GetComponent(CT_TRANSFORM));
+        if (com) {
+            rotation = com->GetRotate() + m_Rotate;
+        }
+    } else {
+        rotation = m_Rotate;
+    }
+
+    return rotation;
 }
 
 glb::math::Vector TransformCom::GetScale() const {
@@ -40,6 +79,35 @@ void TransformCom::SetRotate(glb::math::Vector rotate) {
 
 void TransformCom::SetScale(glb::math::Vector scale) {
     m_Scale = scale;
+}
+
+glb::math::Matrix TransformCom::GetWorldMatrix() {
+    glb::math::Matrix mat;
+
+    glb::math::Matrix local;
+    local.MakeScaleMatrix(m_Scale.x, m_Scale.y, m_Scale.z);
+    local.RotateXYZ(m_Rotate.x, m_Rotate.y, m_Rotate.z);
+    local.Translate(m_Pos.x, m_Pos.y, m_Pos.z);
+
+    if (m_Parent) {
+        glb::math::Matrix parentToWorld;
+        parentToWorld.MakeIdentityMatrix();
+
+        TransformCom* com = reinterpret_cast<TransformCom*>(m_Parent->GetComponent(CT_TRANSFORM));
+        if (com) {
+            parentToWorld = com->GetWorldMatrix();
+        }
+
+        mat = parentToWorld * local;
+    } else {
+        mat = local;
+    }
+
+    return mat;
+}
+
+void TransformCom::SetParent(Entity* entity) {
+    m_Parent = entity;
 }
 
 };  // namespace entity

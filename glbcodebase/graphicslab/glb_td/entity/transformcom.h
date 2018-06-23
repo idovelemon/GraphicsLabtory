@@ -9,7 +9,7 @@
 
 #include "component.h"
 
-#include "math/glbvector.h"
+#include "math/glbmath.h"
 
 namespace entity {
 
@@ -28,16 +28,21 @@ public:
 
 public:
     glb::math::Vector GetPos() const;
+    glb::math::Vector GetPosWorld() const;
     glb::math::Vector GetRotate() const;
+    glb::math::Vector GetRotateWorld() const;
     glb::math::Vector GetScale() const;
     void SetPos(glb::math::Vector pos);
     void SetRotate(glb::math::Vector rotate);
     void SetScale(glb::math::Vector scale);
+    glb::math::Matrix GetWorldMatrix();
+    void SetParent(Entity* parent);
 
 protected:
     glb::math::Vector   m_Pos;
     glb::math::Vector   m_Rotate;
     glb::math::Vector   m_Scale;
+    Entity*             m_Parent;
 };
 
 };  // namespace entity

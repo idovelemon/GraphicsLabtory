@@ -43,6 +43,7 @@ float EntityGetScaleX(int id);
 float EntityGetScaleY(int id);
 float EntityGetScaleZ(int id);
 void EntitySetScale(int id, float x, float y, float z);
+void EntityTransformSetParent(int id, int parent);
 void EntityAddWeapon(int id, int wt, const char* script);
 void EntityActiveWeapon(int id, int wt);
 int EntityGetWeaponBulletNum(int id);

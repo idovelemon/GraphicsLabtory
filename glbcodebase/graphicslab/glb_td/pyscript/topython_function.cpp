@@ -398,6 +398,20 @@ void EntitySetScale(int id, float x, float y, float z) {
     }
 }
 
+void EntityTransformSetParent(int id, int parent) {
+    entity::Entity* ent = entity::EntityMgr::GetEntity(id);
+    entity::Entity* parentEnt = entity::EntityMgr::GetEntity(parent);
+    if (ent != NULL && parent != NULL) {
+        entity::TransformCom* com = reinterpret_cast<entity::TransformCom*>(ent->GetComponent(entity::CT_TRANSFORM));
+        if (com != NULL) {
+            com->SetParent(parentEnt);
+        }
+    } else {
+        printf("Wrong entity id\n");
+        assert(false);
+    }
+}
+
 void EntityAddWeapon(int id, int wt, const char* script) {
     entity::Entity* ent = entity::EntityMgr::GetEntity(id);
     if (ent != NULL) {

@@ -69,8 +69,8 @@ void RenderCom::Render(TransformCom* transform) {
     if (transform != NULL) {
         glb::scene::Object* obj = glb::scene::Scene::GetObjectById(m_SceneObjID);
         if (obj != NULL) {
-            glb::math::Vector pos = transform->GetPos();
-            glb::math::Vector rotate = transform->GetRotate();
+            glb::math::Vector pos = transform->GetPosWorld();
+            glb::math::Vector rotate = transform->GetRotateWorld();
             glb::math::Vector scale = transform->GetScale();
             obj->SetPos(pos);
             obj->SetRotation(rotate);

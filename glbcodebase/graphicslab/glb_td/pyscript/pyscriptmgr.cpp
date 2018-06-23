@@ -294,10 +294,12 @@ float PyScriptMgr::GetValueF(const char* name) {
     float result = 0.0f;
 
     if (s_Imp != NULL) {
-        return s_Imp->GetValueF(name);
+        result = s_Imp->GetValueF(name);
     } else {
         assert(false && "Create impelementation first");
     }
+
+    return result;
 }
 
 void PyScriptMgr::Destroy() {

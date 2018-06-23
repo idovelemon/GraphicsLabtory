@@ -279,6 +279,16 @@ static PyObject* EntitySetScale(PyObject* self, PyObject* args) {
 	return Py_BuildValue("");
 }
 
+static PyObject* EntityTransformSetParent(PyObject* self, PyObject* args) {
+	int id;
+	int parent;
+	if (!PyArg_ParseTuple(args, "ii", &id, &parent)) {
+		 return NULL;
+	}
+	EntityTransformSetParent(id, parent);
+	return Py_BuildValue("");
+}
+
 static PyObject* EntityAddWeapon(PyObject* self, PyObject* args) {
 	int id;
 	int wt;
@@ -661,6 +671,7 @@ static PyMethodDef s_HostAPI_MethodDef[] = {
 	{"EntityGetScaleY", EntityGetScaleY, METH_VARARGS, NULL},
 	{"EntityGetScaleZ", EntityGetScaleZ, METH_VARARGS, NULL},
 	{"EntitySetScale", EntitySetScale, METH_VARARGS, NULL},
+	{"EntityTransformSetParent", EntityTransformSetParent, METH_VARARGS, NULL},
 	{"EntityAddWeapon", EntityAddWeapon, METH_VARARGS, NULL},
 	{"EntityActiveWeapon", EntityActiveWeapon, METH_VARARGS, NULL},
 	{"EntityGetWeaponBulletNum", EntityGetWeaponBulletNum, METH_VARARGS, NULL},
