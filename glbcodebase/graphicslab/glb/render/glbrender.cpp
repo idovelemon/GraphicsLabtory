@@ -1549,6 +1549,7 @@ void RenderImp::DrawLightLoopCore() {
         }
 
         // Objects
+        int32_t objectTexUnitStart = texUnit;
         for (int32_t j = 0; j < static_cast<int32_t>(objs.size()); j++) {
             scene::Object* obj = objs[j];
 
@@ -1556,6 +1557,9 @@ void RenderImp::DrawLightLoopCore() {
             if (!obj->IsDrawEnable()) {
                 continue;
             }
+
+            // Reset object texture unit index
+            texUnit = objectTexUnitStart;
 
             // Textures
             if (obj->GetModel()->HasAlbedoTexture()) {
