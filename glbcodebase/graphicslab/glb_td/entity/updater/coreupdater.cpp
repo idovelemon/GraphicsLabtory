@@ -18,6 +18,31 @@
 
 namespace entity {
 
+void EntityCoreDummyUpdater(Entity* entity) {
+    TransformCom* transform = reinterpret_cast<TransformCom*>(entity->GetComponent(CT_TRANSFORM));
+    if (transform == NULL) {
+        assert(false);
+        return;
+    }
+
+    float moveSpeed = pyscript::PyScriptMgr::GetValueF("ENTITY_CORE_DUMMY_MOVE_SPEED");
+    glb::math::Vector pos = transform->GetPos();
+
+    if (glb::Input::IsKeyboardButtonPressed(glb::BK_A)) {
+        pos = pos + glb::math::Vector(-1.0f, 0.0f, 0.0f) * moveSpeed * td::GameTimer::GetFrameSpeed();
+    } else if (glb::Input::IsKeyboardButtonPressed(glb::BK_D)) {
+        pos = pos + glb::math::Vector(1.0f, 0.0f, 0.0f) * moveSpeed * td::GameTimer::GetFrameSpeed();
+    }
+
+    if (glb::Input::IsKeyboardButtonPressed(glb::BK_W)) {
+        pos = pos + glb::math::Vector(0.0f, 0.0f, -1.0f) * moveSpeed * td::GameTimer::GetFrameSpeed();
+    } else if (glb::Input::IsKeyboardButtonPressed(glb::BK_S)) {
+        pos = pos + glb::math::Vector(.0f, 0.0f, 1.0f) * moveSpeed * td::GameTimer::GetFrameSpeed();
+    }
+
+    transform->SetPos(pos);
+}
+
 void EntityCoreUpdater(Entity* entity) {
     TransformCom* transform = reinterpret_cast<TransformCom*>(entity->GetComponent(CT_TRANSFORM));
     if (transform == NULL) {

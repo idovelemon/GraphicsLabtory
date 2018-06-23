@@ -1,3 +1,4 @@
+UPDATER_DEF(EntityCoreDummyUpdater)
 UPDATER_DEF(EntityCoreUpdater)
 UPDATER_DEF(EntityCoreRotUpdater)
 UPDATER_DEF(EntityNormalEmitterUpdater)

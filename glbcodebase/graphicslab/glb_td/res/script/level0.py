@@ -23,15 +23,22 @@ def main():
         camera = EntityCreate()
         EntityAddCameraCom(camera, 0.0, 5.0, 10.0, 0.0, 0.0, 0.0)
 
+        # Create CoreDummy Entity
+        coreDummy = EntityCreate()
+        EntityAddTransformCom(coreDummy, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0)
+        EntityAddScriptCom(coreDummy, "EntityCoreDummyUpdater")
+
         # Create Core Entity
         core = EntityCreate()
         EntityAddTransformCom(core, 0.0, 1.2, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0)
+        EntityTransformSetParent(core, coreDummy)
         EntityAddRenderCom(core, "res/model/core/core.obj", 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0)
         EntityAddScriptCom(core, "EntityCoreUpdater")
 
         # Create Core Rot Entity
         coreRot = EntityCreate()
         EntityAddTransformCom(coreRot, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0)
+        EntityTransformSetParent(coreRot, coreDummy)
         EntityAddRenderCom(coreRot, "res/model/core/coreRot.obj", 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0)
         EntityAddScriptCom(coreRot, "EntityCoreRotUpdater")
         EntityAddDataCom(coreRot)
@@ -43,32 +50,24 @@ def main():
         EntityTransformSetParent(backNormalEmitter, coreRot)
         EntityAddRenderCom(backNormalEmitter, "res/model/emitter/normal_Emitter.obj", 0.0, 0.75, 1.8, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0)
         EntityAddScriptCom(backNormalEmitter, "EntityNormalEmitterUpdater")
-        EntityAddDataCom(backNormalEmitter)
-        EntityAddFloatData(backNormalEmitter, "CurRotateSpeed", config.ENTITY_NORMAL_EMITTER_ROTATE_MIN_SPEED)
 
         frontNormalEmitter = EntityCreate()
         EntityAddTransformCom(frontNormalEmitter, 0.0, 0.75, -1.8, 0.0, 180.0, 0.0, 1.0, 1.0, 1.0)
         EntityTransformSetParent(frontNormalEmitter, coreRot)
         EntityAddRenderCom(frontNormalEmitter, "res/model/emitter/normal_Emitter.obj", 0.0, 0.75, -1.8, 0.0, 180.0, 0.0, 1.0, 1.0, 1.0)
         EntityAddScriptCom(frontNormalEmitter, "EntityNormalEmitterUpdater")
-        EntityAddDataCom(frontNormalEmitter)
-        EntityAddFloatData(frontNormalEmitter, "CurRotateSpeed", config.ENTITY_NORMAL_EMITTER_ROTATE_MIN_SPEED)        
 
         leftNormalEmitter = EntityCreate()
         EntityAddTransformCom(leftNormalEmitter, -1.8, 0.75, 0.0, 0.0, -90.0, 0.0, 1.0, 1.0, 1.0)
         EntityTransformSetParent(leftNormalEmitter, coreRot)
         EntityAddRenderCom(leftNormalEmitter, "res/model/emitter/normal_Emitter.obj", -1.8, 0.75, 0.0, 0.0, -90.0, 0.0, 1.0, 1.0, 1.0)
         EntityAddScriptCom(leftNormalEmitter, "EntityNormalEmitterUpdater")
-        EntityAddDataCom(leftNormalEmitter)
-        EntityAddFloatData(leftNormalEmitter, "CurRotateSpeed", config.ENTITY_NORMAL_EMITTER_ROTATE_MIN_SPEED)                
 
         rightNormalEmitter = EntityCreate()
         EntityAddTransformCom(rightNormalEmitter, 1.8, 0.75, 0.0, 0.0, 90.0, 0.0, 1.0, 1.0, 1.0)
         EntityTransformSetParent(rightNormalEmitter, coreRot)
         EntityAddRenderCom(rightNormalEmitter, "res/model/emitter/normal_Emitter.obj", 1.8, 0.75, 0.0, 0.0, 90.0, 0.0, 1.0, 1.0, 1.0)
         EntityAddScriptCom(rightNormalEmitter, "EntityNormalEmitterUpdater")        
-        EntityAddDataCom(rightNormalEmitter)
-        EntityAddFloatData(rightNormalEmitter, "CurRotateSpeed", config.ENTITY_NORMAL_EMITTER_ROTATE_MIN_SPEED)
 
     if LEVEL_COUNT == 20:
         DebugPrint("TD Level0 Finish\n")
