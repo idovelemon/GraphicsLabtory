@@ -46,6 +46,7 @@ public:
 
         // HDR
         glb::render::Render::SetHighLightBase(0.95f);
+        glb::render::Render::SetBloomWeights(0.1f, 0.1f, 0.1f, 0.1f);
 
         // Game Manager
         dynamic::DynamicWorld::Initialize();
