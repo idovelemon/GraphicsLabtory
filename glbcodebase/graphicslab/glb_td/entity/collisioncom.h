@@ -29,7 +29,7 @@ public:
     virtual ~CollisionCom();
 
 public:
-    void Update();
+    virtual void Update();
     void CheckCollision();
     void BeginIterate();
     int Iterate();

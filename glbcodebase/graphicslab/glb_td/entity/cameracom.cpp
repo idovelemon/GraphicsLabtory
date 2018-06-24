@@ -9,6 +9,9 @@
 #include "scene/glbcamera.h"
 #include "scene/glbscene.h"
 
+#include "entity.h"
+#include "transformcom.h"
+
 namespace entity {
 
 CameraCom::CameraCom(Entity* owner, glb::math::Vector pos, glb::math::Vector target)
@@ -30,9 +33,23 @@ CameraCom::~CameraCom() {
     }
 }
 
-void CameraCom::Update(float dt) {
+void CameraCom::Update() {
+    if (m_Entity) {
+        TransformCom* transform = reinterpret_cast<TransformCom*>(m_Entity->GetComponent(CT_TRANSFORM));
+        if (transform && m_Cam) {
+            glb::math::Vector pos = transform->GetPosWorld();
+            glb::math::Vector camPos = m_Cam->GetPos();
+            glb::math::Vector camTgt = m_Cam->GetTarget();
+            glb::math::Vector toTgt = camTgt - camPos;
+            camPos = pos;
+            camTgt = toTgt + camPos;
+            m_Cam->SetPos(camPos);
+            m_Cam->SetTarget(camTgt);
+        }
+    }
+
     if (m_Cam != NULL) {
-        m_Cam->Update(dt);
+        m_Cam->Update(1.0f);
     }
 }
 

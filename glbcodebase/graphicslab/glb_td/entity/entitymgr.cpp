@@ -82,7 +82,7 @@ void EntityMgrImp::Update(float dt) {
         }
     }
 
-    // Update dead entities
+    // Update alive entities
     for (int32_t i = 0; i < kEntityMaxNum; i++) {
         if (m_Entities[i] != NULL && !m_Entities[i]->IsDead()) {
             m_Entities[i]->Update(dt);

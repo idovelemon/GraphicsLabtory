@@ -30,7 +30,7 @@ public:
     virtual ~ScriptCom();
 
 public:
-    virtual void Update(float dt);
+    virtual void Update();
 
 protected:
     static const int32_t kScriptFileNameMaxLen = 128;

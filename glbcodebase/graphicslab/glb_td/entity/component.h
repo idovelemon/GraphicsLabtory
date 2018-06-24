@@ -45,6 +45,8 @@ public:
         m_Entity = NULL;
     }
 
+    virtual void Update() {};
+
 public:
     virtual ComponentType GetType() const { return m_Type; }
     virtual Entity* GetOwner() const { return m_Entity; }

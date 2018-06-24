@@ -31,6 +31,8 @@ def main():
         # Create Camera Entity
         camera = EntityCreate()
         EntityAddCameraCom(camera, 0.0, 10.0, 10.0, 0.0, 0.0, 0.0)
+        EntityAddTransformCom(camera, 0.0, 10.0, 10.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0)
+        EntityTransformSetParent(camera, coreDummy)
 
         # Create Core Entity
         core = EntityCreate()

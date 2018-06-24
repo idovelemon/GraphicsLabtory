@@ -103,12 +103,18 @@ void Entity::RemoveComponent(ComponentType type) {
 }
 
 void Entity::Update(float dt) {
-    ComponentPool::iterator it = m_Components.find(CT_SCRIPT);
-    if (it != m_Components.end()) {
+    //ComponentPool::iterator it = m_Components.find(CT_SCRIPT);
+    //if (it != m_Components.end()) {
+    //    Component* com = it->second;
+    //    if (com != NULL) {
+    //        ScriptCom* script = reinterpret_cast<ScriptCom*>(com);
+    //        script->Update(dt);
+    //    }
+    //}
+    for (ComponentPool::iterator it = m_Components.begin(); it != m_Components.end(); ++it) {
         Component* com = it->second;
         if (com != NULL) {
-            ScriptCom* script = reinterpret_cast<ScriptCom*>(com);
-            script->Update(dt);
+            com->Update();
         }
     }
 }

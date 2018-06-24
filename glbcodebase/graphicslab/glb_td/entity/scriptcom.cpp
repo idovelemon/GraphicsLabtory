@@ -35,7 +35,7 @@ ScriptCom::ScriptCom(Entity* owner, ENTITY_UPDATE updater)
 ScriptCom::~ScriptCom() {
 }
 
-void ScriptCom::Update(float dt) {
+void ScriptCom::Update() {
     if (m_Updater) {
         assert(m_Entity != NULL);
         m_Updater(m_Entity);

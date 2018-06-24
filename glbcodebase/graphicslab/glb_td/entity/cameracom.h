@@ -36,7 +36,7 @@ public:
     virtual ~CameraCom();
 
 public:
-    virtual void Update(float dt);
+    virtual void Update();
 
 protected:
     glb::scene::CameraBase*     m_Cam;
