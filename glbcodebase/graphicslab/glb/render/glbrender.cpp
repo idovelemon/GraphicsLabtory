@@ -143,6 +143,7 @@ public:
 
     void SetHighLightBase(float base);
     float GetHighLightBase();
+    void SetBloomWeights(float w0, float w1, float w2, float w3);
 
     void AddLine(math::Vector start, math::Vector end, math::Vector color);
     void AddBoundBox(math::AABB bv, math::Vector color);
@@ -252,6 +253,14 @@ private:
     int32_t                                 m_Bloom1TexLoc;
     int32_t                                 m_Bloom2TexLoc;
     int32_t                                 m_Bloom3TexLoc;
+    int32_t                                 m_Bloom0WeightLoc;
+    int32_t                                 m_Bloom1WeightLoc;
+    int32_t                                 m_Bloom2WeightLoc;
+    int32_t                                 m_Bloom3WeightLoc;
+    float                                   m_Bloom0Weight;
+    float                                   m_Bloom1Weight;
+    float                                   m_Bloom2Weight;
+    float                                   m_Bloom3Weight;
 
     mesh::ScreenMesh*                       m_ScreenMesh;
     mesh::DebugMesh*                        m_DebugMesh;
@@ -392,6 +401,14 @@ RenderImp::RenderImp()
 , m_Bloom1TexLoc(-1)
 , m_Bloom2TexLoc(-1)
 , m_Bloom3TexLoc(-1)
+, m_Bloom0WeightLoc(-1)
+, m_Bloom1WeightLoc(-1)
+, m_Bloom2WeightLoc(-1)
+, m_Bloom3WeightLoc(-1)
+, m_Bloom0Weight(0.05f)
+, m_Bloom1Weight(0.05f)
+, m_Bloom2Weight(0.05f)
+, m_Bloom3Weight(0.01f)
 
 // Env
 
@@ -615,6 +632,13 @@ void RenderImp::SetHighLightBase(float base) {
 
 float RenderImp::GetHighLightBase() {
     return m_HightLightBase;
+}
+
+void RenderImp::SetBloomWeights(float w0, float w1, float w2, float w3) {
+    m_Bloom0Weight = w0;
+    m_Bloom1Weight = w1;
+    m_Bloom2Weight = w2;
+    m_Bloom3Weight = w3;
 }
 
 void RenderImp::AddLine(math::Vector start, math::Vector end, math::Vector color) {
@@ -854,6 +878,10 @@ void RenderImp::PrepareHDR() {
     m_Bloom1TexLoc = m_TonemapShader->GetUniformLocation("glb_BloomTex[1]");
     m_Bloom2TexLoc = m_TonemapShader->GetUniformLocation("glb_BloomTex[2]");
     m_Bloom3TexLoc = m_TonemapShader->GetUniformLocation("glb_BloomTex[3]");
+    m_Bloom0WeightLoc = m_TonemapShader->GetUniformLocation("glb_BloomWeight[0]");
+    m_Bloom1WeightLoc = m_TonemapShader->GetUniformLocation("glb_BloomWeight[1]");
+    m_Bloom2WeightLoc = m_TonemapShader->GetUniformLocation("glb_BloomWeight[2]");
+    m_Bloom3WeightLoc = m_TonemapShader->GetUniformLocation("glb_BloomWeight[3]");
 
     // Create screen mesh
     m_ScreenMesh = mesh::ScreenMesh::Create();
@@ -1839,6 +1867,10 @@ void RenderImp::Tonemapping() {
     render::Device::SetUniformSampler2D(m_Bloom1TexLoc, 2);
     render::Device::SetUniformSampler2D(m_Bloom2TexLoc, 3);
     render::Device::SetUniformSampler2D(m_Bloom3TexLoc, 4);
+    render::Device::SetUniform1f(m_Bloom0WeightLoc, m_Bloom0Weight);
+    render::Device::SetUniform1f(m_Bloom1WeightLoc, m_Bloom1Weight);
+    render::Device::SetUniform1f(m_Bloom2WeightLoc, m_Bloom2Weight);
+    render::Device::SetUniform1f(m_Bloom3WeightLoc, m_Bloom3Weight);
 
     // Draw
     render::Device::Draw(render::PT_TRIANGLES, 0, m_ScreenMesh->GetVertexNum());
@@ -2184,6 +2216,14 @@ float Render::GetHighLightBase() {
     }
 
     return result;
+}
+
+void Render::SetBloomWeights(float w0, float w1, float w2, float w3) {
+    if (s_RenderImp != NULL) {
+        s_RenderImp->SetBloomWeights(w0, w1, w2, w3);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
 }
 
 void Render::AddLine(math::Vector start, math::Vector end, math::Vector color) {

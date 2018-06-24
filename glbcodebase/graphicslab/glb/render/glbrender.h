@@ -62,6 +62,7 @@ public:
     // HDR
     static void SetHighLightBase(float base);
     static float GetHighLightBase();
+    static void SetBloomWeights(float w0, float w1, float w2, float w3);
 
     // Debug draw
     static void AddLine(math::Vector start, math::Vector end, math::Vector color);
