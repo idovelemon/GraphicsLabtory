@@ -173,6 +173,7 @@ uniform vec3 glb_Material_Emission;
 	uniform samplerCube glb_DiffusePFCTex;
 	uniform samplerCube glb_SpecularPFCTex;
 	uniform sampler2D glb_BRDFPFTTex;
+	uniform float glb_SpecularPFCLOD;
 
 	vec3 calc_fresnel(vec3 n, vec3 v, vec3 F0) {
 		float ndotv = max(dot(n, v), 0.0);
@@ -397,7 +398,7 @@ vec3 calc_ibl_lighting(vec3 n, vec3 v, vec3 albedo, float roughness, float metal
     // Specular part
     float ndotv = max(0.0, dot(n, v));
     vec3 r = 2.0 * ndotv * n - v;
-    vec3 ld = filtering_cube_map_lod(glb_SpecularPFCTex, r, roughness);
+    vec3 ld = filtering_cube_map_lod(glb_SpecularPFCTex, r, roughness * glb_SpecularPFCLOD);
     vec2 dfg = textureLod(glb_BRDFPFTTex, vec2(ndotv, roughness), 0.0).xy;
     vec3 specular = ld * (F0 * dfg.x + dfg.y);
 

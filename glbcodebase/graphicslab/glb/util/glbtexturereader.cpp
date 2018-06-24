@@ -33,6 +33,7 @@ namespace util {
 //--------------------------------------------------------------------------------
 const int32_t kMaxPostfixLen = 8;
 const int32_t kBytesPerPixel = 4;
+const int32_t kBmpXBit = 8;
 const int32_t kBmpRGBBit = 24;
 const int32_t kBmpRGBABit = 32;
 
@@ -153,7 +154,21 @@ int32_t BmpTextureReader::ReadTexture(const char* file_name, int8_t** texture_da
             int8_t* raw_data = new int8_t[info_header.biSizeImage];
             fread(raw_data, sizeof(int8_t), info_header.biSizeImage, file);
 
-            if (info_header.biBitCount == kBmpRGBBit) {
+            if (info_header.biBitCount == kBmpXBit) {
+                // Convert X8 to R8G8B8A8
+                int32_t bpp_in_file = kBmpXBit / 8;
+                for (int32_t i = 0; i < info_header.biHeight; i++) {
+                    for (int32_t j = 0; j < info_header.biWidth; j++) {
+                        int8_t r = 0, g = 0, b = 0;
+                        r = g = b = raw_data[i * info_header.biWidth * bpp_in_file + j * bpp_in_file];
+                        int8_t a = static_cast<int8_t>(0xff);
+                        (*texture_data)[i * info_header.biWidth * kBytesPerPixel + j * kBytesPerPixel] = r;
+                        (*texture_data)[i * info_header.biWidth * kBytesPerPixel + j * kBytesPerPixel + 1] = g;
+                        (*texture_data)[i * info_header.biWidth * kBytesPerPixel + j * kBytesPerPixel + 2] = b;
+                        (*texture_data)[i * info_header.biWidth * kBytesPerPixel + j * kBytesPerPixel + 3] = a;
+                    }
+                }
+            } else if (info_header.biBitCount == kBmpRGBBit) {
                 // Convert B8G8R8 to R8G8B8A8
                 int32_t bpp_in_file = kBmpRGBBit / 8;
                 for (int32_t i = 0; i < info_header.biHeight; i++) {

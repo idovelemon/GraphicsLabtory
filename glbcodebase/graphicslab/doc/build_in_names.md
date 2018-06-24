@@ -30,6 +30,7 @@
 |glb_DiffusePFCTex|samplerCube|Prefilter diffuse cubemap for IBL|
 |glb_SpecularPFCTex|samplerCube|Prefilter specular cubemap for IBL|
 |glb_BRDFPFTTex|sampler2D|Precompute brdf table texture for IBL|
+|glb_SpecularPFCLOD|float|Specular prefilter texture's max lod level value|
 |glb_Light0Tex|sampler2D|Precompute Radiosity Light Map 0|
 |glb_Light1Tex|sampler2D|Precompute Radiosity Light Map 1|
 |glb_Light2Tex|sampler2D|Precompute Radiosity Light Map 2|

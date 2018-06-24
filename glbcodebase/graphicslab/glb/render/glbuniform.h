@@ -50,6 +50,7 @@ enum {
     GLB_DIFFUSEPFCTEX,
     GLB_SPECULARPFCTEX,
     GLB_BRDFPFTTEX,
+    GLB_SPECULARPFCLOD,
     GLB_LIGHT0TEX,
     GLB_LIGHT1TEX,
     GLB_LIGHT2TEX,
@@ -69,6 +70,7 @@ enum {
     GLB_FAR_CLIP,
     GLB_SCREEN_WIDTH,
     GLB_SCREEN_HEIGHT,
+    GLB_MAX,
 };
 
 // Uniform table
@@ -103,6 +105,7 @@ static const struct {
     {"glb_DiffusePFCTex",                   GLB_DIFFUSEPFCTEX,                  0},
     {"glb_SpecularPFCTex",                  GLB_SPECULARPFCTEX,                 0},
     {"glb_BRDFPFTTex",                      GLB_BRDFPFTTEX,                     1},
+    {"glb_SpecularPFCLOD",                  GLB_SPECULARPFCLOD,                 0},
     {"glb_Light0Tex",                       GLB_LIGHT0TEX,                      0},
     {"glb_Light1Tex",                       GLB_LIGHT1TEX,                      0},
     {"glb_Light2Tex",                       GLB_LIGHT2TEX,                      0},
@@ -123,6 +126,8 @@ static const struct {
     {"glb_ScreenWidth",                     GLB_SCREEN_WIDTH,                   1},
     {"glb_ScreenHeight",                    GLB_SCREEN_HEIGHT,                  1},
 };
+
+static_assert(sizeof(kEngineUniforms) / sizeof(kEngineUniforms[0]) == GLB_MAX, "Must match");
 
 // Uniform wrapper
 class Wrapper {
@@ -202,6 +207,7 @@ Wrapper uniform_shadow3_texslot_picker(scene::Object*);           // Pick glb_Sh
 Wrapper uniform_diffuse_pfc_texslot_picker(scene::Object* obj);   // Pick glb_DiffusePFC
 Wrapper uniform_specular_pfc_texslot_picker(scene::Object* obj);  // Pick glb_SpecularPFC
 Wrapper uniform_brdf_pft_texslot_picker(scene::Object* obj);      // Pick glb_BRDFPFT
+Wrapper uniform_specular_pfc_lod_pciker(scene::Object* obj);      // Pick glb_SpecularPFCLOD
 Wrapper uniform_light0_texslot_picker(scene::Object* obj);        // Pick glb_Light0Tex
 Wrapper uniform_light1_texslot_picker(scene::Object* obj);        // Pick glb_Light1Tex
 Wrapper uniform_light2_texslot_picker(scene::Object* obj);        // Pick glb_Light2Tex
@@ -253,6 +259,7 @@ static const struct {
     {uniform_diffuse_pfc_texslot_picker,        GLB_DIFFUSEPFCTEX},
     {uniform_specular_pfc_texslot_picker,       GLB_SPECULARPFCTEX},
     {uniform_brdf_pft_texslot_picker,           GLB_BRDFPFTTEX},
+    {uniform_specular_pfc_lod_pciker,           GLB_SPECULARPFCLOD},
     {uniform_light0_texslot_picker,             GLB_LIGHT0TEX},
     {uniform_light1_texslot_picker,             GLB_LIGHT1TEX},
     {uniform_light2_texslot_picker,             GLB_LIGHT2TEX},
@@ -273,6 +280,7 @@ static const struct {
     {uniform_screen_width_picker,               GLB_SCREEN_WIDTH},
     {uniform_screen_height_picker,              GLB_SCREEN_HEIGHT},
 };
+static_assert(sizeof(kUniformPickers) / sizeof(kUniformPickers[0]) == GLB_MAX, "Must match");
 
 // Uniform entry
 struct UniformEntry {

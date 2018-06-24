@@ -361,6 +361,21 @@ Wrapper uniform_brdf_pft_texslot_picker(scene::Object* obj) {
     return wrapper;
 }
 
+Wrapper uniform_specular_pfc_lod_pciker(scene::Object* obj) {
+    Wrapper wrapper;
+    wrapper.SetFormat(Wrapper::FMT_FLOAT);
+
+    if (obj) {
+        float width = texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(scene::Model::MT_SPECULAR_PFC))->GetWidth();
+        float height = texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(scene::Model::MT_SPECULAR_PFC))->GetHeight();
+        wrapper.SetFloat(log(max(width, height)) / log(2));
+    } else {
+        wrapper.SetFloat(8.0f);
+    }
+
+    return wrapper;
+}
+
 Wrapper uniform_light0_texslot_picker(scene::Object* obj) {
     Wrapper wrapper;
     wrapper.SetFormat(Wrapper::FMT_SAMPLER2D);
