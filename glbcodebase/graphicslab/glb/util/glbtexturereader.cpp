@@ -198,6 +198,9 @@ int32_t BmpTextureReader::ReadTexture(const char* file_name, int8_t** texture_da
                         (*texture_data)[i * info_header.biWidth * kBytesPerPixel + j * kBytesPerPixel + 3] = a;
                     }
                 }
+            } else {
+                // TODO: Un-supported format
+                GLB_SAFE_ASSERT(false);
             }
 
             delete[] raw_data;
