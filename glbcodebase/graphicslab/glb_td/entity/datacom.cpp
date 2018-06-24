@@ -11,9 +11,10 @@
 namespace entity {
 
 //----------------------------------------------------------------
-DataPack::DataPack(int i, float f)
+DataPack::DataPack(int i, float f, const char* str)
 : m_Int(i)
-, m_Float(f) {
+, m_Float(f)
+, m_String(str) {
 }
 
 DataPack::~DataPack() {
@@ -27,12 +28,20 @@ void DataPack::SetFloat(float data) {
     m_Float = data;
 }
 
+void DataPack::SetString(const char* data) {
+    m_String = data;
+}
+
 int DataPack::GetInt() const {
     return m_Int;
 }
 
 float DataPack::GetFloat() const {
     return m_Float;
+}
+
+std::string DataPack::GetString() const {
+    return m_String;
 }
 
 //----------------------------------------------------------------
@@ -56,8 +65,6 @@ DataPack* DataCom::GetData(const char* name) {
         std::map<std::string, DataPack>::iterator it = m_Datas.find(std::string(const_cast<char*>(name)));
         if (it != m_Datas.end()) {
             data = &(it->second);
-        } else {
-            assert(false && "Can not find data pack");
         }
     }
 

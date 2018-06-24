@@ -133,6 +133,7 @@
     <ClCompile Include="entity\transformcom.cpp" />
     <ClCompile Include="entity\updater\coreupdater.cpp" />
     <ClCompile Include="entity\updater\emitterupdater.cpp" />
+    <ClCompile Include="entity\updater\enemyupdater.cpp" />
     <ClCompile Include="gametimer.cpp" />
     <ClCompile Include="glb_td.cpp" />
     <ClCompile Include="pyscript\pyscriptmgr.cpp" />

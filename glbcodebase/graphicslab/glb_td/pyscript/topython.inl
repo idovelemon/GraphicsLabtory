@@ -384,6 +384,17 @@ static PyObject* EntityAddFloatData(PyObject* self, PyObject* args) {
 	return Py_BuildValue("");
 }
 
+static PyObject* EntityAddStringData(PyObject* self, PyObject* args) {
+	int id;
+	const char* name;
+	const char* data;
+	if (!PyArg_ParseTuple(args, "iss", &id, &name, &data)) {
+		 return NULL;
+	}
+	EntityAddStringData(id, name, data);
+	return Py_BuildValue("");
+}
+
 static PyObject* EntityGetIntData(PyObject* self, PyObject* args) {
 	int id;
 	const char* name;
@@ -681,6 +692,7 @@ static PyMethodDef s_HostAPI_MethodDef[] = {
 	{"EntityShoot", EntityShoot, METH_VARARGS, NULL},
 	{"EntityAddIntData", EntityAddIntData, METH_VARARGS, NULL},
 	{"EntityAddFloatData", EntityAddFloatData, METH_VARARGS, NULL},
+	{"EntityAddStringData", EntityAddStringData, METH_VARARGS, NULL},
 	{"EntityGetIntData", EntityGetIntData, METH_VARARGS, NULL},
 	{"EntityGetFloatData", EntityGetFloatData, METH_VARARGS, NULL},
 	{"EntitySetIntData", EntitySetIntData, METH_VARARGS, NULL},

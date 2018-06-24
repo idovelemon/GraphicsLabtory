@@ -527,7 +527,7 @@ void EntityAddIntData(int id, const char* name, int data) {
     if (ent != NULL) {
         entity::DataCom* com = reinterpret_cast<entity::DataCom*>(ent->GetComponent(entity::CT_DATA));
         if (com != NULL) {
-            com->AddData(name, entity::DataPack(data, 0.0f));
+            com->AddData(name, entity::DataPack(data, 0.0f, ""));
         } else {
             assert(false);  // No data component
         }
@@ -542,7 +542,22 @@ void EntityAddFloatData(int id, const char* name, float data) {
     if (ent != NULL) {
         entity::DataCom* com = reinterpret_cast<entity::DataCom*>(ent->GetComponent(entity::CT_DATA));
         if (com != NULL) {
-            com->AddData(name, entity::DataPack(0, data));
+            com->AddData(name, entity::DataPack(0, data, ""));
+        } else {
+            assert(false);  // No data component
+        }
+    } else {
+        printf("Wrong entity id\n");
+        assert(false);
+    }
+}
+
+void EntityAddStringData(int id, const char* name, const char* data) {
+    entity::Entity* ent = entity::EntityMgr::GetEntity(id);
+    if (ent != NULL) {
+        entity::DataCom* com = reinterpret_cast<entity::DataCom*>(ent->GetComponent(entity::CT_DATA));
+        if (com != NULL) {
+            com->AddData(name, entity::DataPack(0, 0.0f, data));
         } else {
             assert(false);  // No data component
         }

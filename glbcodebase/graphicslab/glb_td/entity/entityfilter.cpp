@@ -6,6 +6,7 @@
 //--------------------------------------------------------------------
 #include "entityfilter.h"
 
+#include "datacom.h"
 #include "entity.h"
 #include "rolecom.h"
 #include "transformcom.h"
@@ -59,6 +60,26 @@ std::vector<Entity*> MatchTypeEntityFilter(Entity** entity, int32_t num, std::ve
             RoleCom* role_com = reinterpret_cast<RoleCom*>(entity[i]->GetComponent(CT_ROLETYPE));
             if (role_com == NULL) continue;
             if (role_com->GetMainType() == main_type && role_com->GetSubType() == sub_type) {
+                result.push_back(entity[i]);
+            }
+        }
+    }
+
+    return result;
+}
+
+std::vector<Entity*> TagNameEntityFilter(Entity** entity, int32_t num, std::vector<void*>& args) {
+    std::vector<Entity*> result;
+
+    const char* tag = reinterpret_cast<const char*>(args[0]);
+
+    for (int32_t i = 0; i < num; i++) {
+        if (entity[i] != NULL) {
+            DataCom* data = reinterpret_cast<DataCom*>(entity[i]->GetComponent(CT_DATA));
+            if (data == NULL) continue;
+
+            DataPack* pack = data->GetData("Tag");
+            if (pack && !pack->GetString().compare(tag)) {
                 result.push_back(entity[i]);
             }
         }

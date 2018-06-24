@@ -53,6 +53,7 @@ int EntityFindCloestEnemy(int id);
 void EntityShoot(int id);
 void EntityAddIntData(int id, const char* name, int data);
 void EntityAddFloatData(int id, const char* name, float data);
+void EntityAddStringData(int id, const char* name, const char* data);
 int EntityGetIntData(int id, const char* name);
 float EntityGetFloatData(int id, const char* name);
 void EntitySetIntData(int id, const char* name, int data);

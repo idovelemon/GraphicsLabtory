@@ -20,18 +20,21 @@ namespace entity {
 //----------------------------------------------------------------
 class DataPack {
 public:
-    DataPack(int i, float f);
+    DataPack(int i, float f, const char* str);
     virtual ~DataPack();
 
 public:
     void SetInt(int data);
     void SetFloat(float data);
+    void SetString(const char* data);
     int GetInt() const;
     float GetFloat() const;
+    std::string GetString() const;
 
 protected:
     int m_Int;
     float m_Float;
+    std::string m_String;
 };
 
 

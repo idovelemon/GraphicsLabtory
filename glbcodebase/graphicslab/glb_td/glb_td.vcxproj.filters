@@ -216,6 +216,9 @@
     <ClCompile Include="entity\updater\emitterupdater.cpp">
       <Filter>源文件\entity\updater</Filter>
     </ClCompile>
+    <ClCompile Include="entity\updater\enemyupdater.cpp">
+      <Filter>源文件\entity\updater</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\glb\glb.h">

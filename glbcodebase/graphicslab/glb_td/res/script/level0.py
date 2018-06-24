@@ -27,6 +27,8 @@ def main():
         coreDummy = EntityCreate()
         EntityAddTransformCom(coreDummy, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0)
         EntityAddScriptCom(coreDummy, "EntityCoreDummyUpdater")
+        EntityAddDataCom(coreDummy)
+        EntityAddStringData(coreDummy, "Tag", "Player")
 
         # Create Camera Entity
         camera = EntityCreate()
@@ -84,4 +86,68 @@ def main():
         EntityAddFloatData(rightNormalEmitter, "ShootDelta", 0.0)                  
 
     if LEVEL_COUNT == 20:
+        enemy = EntityCreate()
+        EntityAddTransformCom(enemy, -50.0, 0.0, 50.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0)
+        EntityAddScriptCom(enemy, "EntityEnemy01Updater")
+
+        enemyCockPit = EntityCreate()
+        EntityAddRenderCom(enemyCockPit, "res/model/enemy/enemy_cockpit.obj", 0.0, 0.0, 0.0, 0.0, 0.0, 0., 1.0, 1.0, 1.0)
+        EntityAddTransformCom(enemyCockPit, 0.0, 0.0, 0.0, 0.0, 0.0, 0., 1.0, 1.0, 1.0)
+        EntityTransformSetParent(enemyCockPit, enemy)
+
+        enemyRotate = EntityCreate()
+        EntityAddRenderCom(enemyRotate, "res/model/enemy/enemy_rotate.obj", 0.0, 0.0, 0.0, 0.0, 0.0, 0., 1.0, 1.0, 1.0)
+        EntityAddTransformCom(enemyRotate, 0.0, 0.0, 0.0, 0.0, 0.0, 0., 1.0, 1.0, 1.0)
+        EntityTransformSetParent(enemyRotate, enemy)
+        EntityAddScriptCom(enemyRotate, "EntityEnemy01RotateUpdater")
+
+    if LEVEL_COUNT == 40:
+        enemy = EntityCreate()
+        EntityAddTransformCom(enemy, 50.0, 0.0, 50.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0)
+        EntityAddScriptCom(enemy, "EntityEnemy01Updater")
+
+        enemyCockPit = EntityCreate()
+        EntityAddRenderCom(enemyCockPit, "res/model/enemy/enemy_cockpit.obj", 0.0, 0.0, 0.0, 0.0, 0.0, 0., 1.0, 1.0, 1.0)
+        EntityAddTransformCom(enemyCockPit, 0.0, 0.0, 0.0, 0.0, 0.0, 0., 1.0, 1.0, 1.0)
+        EntityTransformSetParent(enemyCockPit, enemy)
+
+        enemyRotate = EntityCreate()
+        EntityAddRenderCom(enemyRotate, "res/model/enemy/enemy_rotate.obj", 0.0, 0.0, 0.0, 0.0, 0.0, 0., 1.0, 1.0, 1.0)
+        EntityAddTransformCom(enemyRotate, 0.0, 0.0, 0.0, 0.0, 0.0, 0., 1.0, 1.0, 1.0)
+        EntityTransformSetParent(enemyRotate, enemy)
+        EntityAddScriptCom(enemyRotate, "EntityEnemy01RotateUpdater")
+
+    if LEVEL_COUNT == 60:
+        enemy = EntityCreate()
+        EntityAddTransformCom(enemy, 50.0, 0.0, -50.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0)
+        EntityAddScriptCom(enemy, "EntityEnemy01Updater")
+
+        enemyCockPit = EntityCreate()
+        EntityAddRenderCom(enemyCockPit, "res/model/enemy/enemy_cockpit.obj", 0.0, 0.0, 0.0, 0.0, 0.0, 0., 1.0, 1.0, 1.0)
+        EntityAddTransformCom(enemyCockPit, 0.0, 0.0, 0.0, 0.0, 0.0, 0., 1.0, 1.0, 1.0)
+        EntityTransformSetParent(enemyCockPit, enemy)
+
+        enemyRotate = EntityCreate()
+        EntityAddRenderCom(enemyRotate, "res/model/enemy/enemy_rotate.obj", 0.0, 0.0, 0.0, 0.0, 0.0, 0., 1.0, 1.0, 1.0)
+        EntityAddTransformCom(enemyRotate, 0.0, 0.0, 0.0, 0.0, 0.0, 0., 1.0, 1.0, 1.0)
+        EntityTransformSetParent(enemyRotate, enemy)
+        EntityAddScriptCom(enemyRotate, "EntityEnemy01RotateUpdater") 
+
+    if LEVEL_COUNT == 80:
+        enemy = EntityCreate()
+        EntityAddTransformCom(enemy, -50.0, 0.0, -50.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0)
+        EntityAddScriptCom(enemy, "EntityEnemy01Updater")
+
+        enemyCockPit = EntityCreate()
+        EntityAddRenderCom(enemyCockPit, "res/model/enemy/enemy_cockpit.obj", 0.0, 0.0, 0.0, 0.0, 0.0, 0., 1.0, 1.0, 1.0)
+        EntityAddTransformCom(enemyCockPit, 0.0, 0.0, 0.0, 0.0, 0.0, 0., 1.0, 1.0, 1.0)
+        EntityTransformSetParent(enemyCockPit, enemy)
+
+        enemyRotate = EntityCreate()
+        EntityAddRenderCom(enemyRotate, "res/model/enemy/enemy_rotate.obj", 0.0, 0.0, 0.0, 0.0, 0.0, 0., 1.0, 1.0, 1.0)
+        EntityAddTransformCom(enemyRotate, 0.0, 0.0, 0.0, 0.0, 0.0, 0., 1.0, 1.0, 1.0)
+        EntityTransformSetParent(enemyRotate, enemy)
+        EntityAddScriptCom(enemyRotate, "EntityEnemy01RotateUpdater")               
+
+    if LEVEL_COUNT == 30:
         DebugPrint("TD Level0 Finish\n")
