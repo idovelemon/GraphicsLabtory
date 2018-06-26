@@ -491,7 +491,7 @@ void RenderImp::Destroy() {
 
 void RenderImp::Draw() {
     PreDraw();
-    //DrawShadowMap();
+    DrawShadowMap();
     //DrawDepthMap();
     DrawLightLoop();
     //DrawDebug();
@@ -798,7 +798,7 @@ void RenderImp::PrepareShadowMap() {
         GLB_SAFE_ASSERT(m_ShadowRenderTarget[i] != NULL);
 
         // Create shadow map
-        texture::Texture* shadow_map = texture::Texture::CreateFloat32DepthTexture(shadow_map_width, shadow_map_height);
+        texture::Texture* shadow_map = texture::Texture::CreateFloat32DepthTexture(shadow_map_width, shadow_map_height, false);
         if (shadow_map != NULL) {
             m_ShadowMap[i] = texture::Mgr::AddTexture(shadow_map);
         } else {
@@ -942,7 +942,14 @@ void RenderImp::SplitShadowReceivers() {
 }
 
 math::Matrix RenderImp::BuildRefLightSpaceMatrix() {
-    math::Vector light_dir = -scene::Scene::GetLight(0).dir;  // For opengl, +z point out of the screen
+    math::Vector light_dir(0.0f, 0.0f, 0.0f);
+    for (int32_t i = 0; i < scene::kMaxLight; i++) {
+        if (scene::Scene::GetLight(i).type == scene::PARALLEL_LIGHT) {
+            // Assume only one parallel light exsit
+            light_dir = -scene::Scene::GetLight(i).dir;  // For opengl, +z point out of the screen
+            break;
+        }
+    }
     light_dir.w = 0;
 
     // Build light space
@@ -988,14 +995,13 @@ void RenderImp::BuildBasicLightFrustums(math::Matrix light_space_to_world_space)
         m_LightSpaceFrustum[i].Build(points);
 
         //{  // Draw light space frustum
-        //    if (i != 0) continue;
+        //    //if (i != 0) continue;
         //    math::Matrix view = scene::Scene::GetCamera(scene::PRIMIAY_CAM)->GetViewMatrix();
         //    math::Matrix view_to_world = view;
         //    view_to_world.Inverse();
         //    math::Matrix trans;
         //    trans.MakeIdentityMatrix();
-        //    trans.Mul(view_to_world);
-        //    trans.Mul(light_space_to_view_space);
+        //    trans = light_space_to_world_space;
         //    for (int32_t j = 0; j < 8; j++) {
         //        points[j] = trans * points[j];
         //    }
@@ -1130,14 +1136,11 @@ void RenderImp::ShrinkAllLightFrustums(math::Matrix light_space_to_world_space) 
         //}
 
         //{  // Draw light space frustum
-        //    if (i != 0 && i != 1) continue;
+        //    if (i != 0) continue;
         //    m_LightSpaceFrustum[i].GetPoints(points);
-        //    math::Matrix view_to_world = view;
-        //    view_to_world.Inverse();
         //    math::Matrix trans;
         //    trans.MakeIdentityMatrix();
-        //    trans.Mul(view_to_world);
-        //    trans.Mul(light_to_view);
+        //    trans = light_space_to_world_space;
         //    for (int32_t j = 0; j < 8; j++) {
         //        points[j] = trans * points[j];
         //    }
