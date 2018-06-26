@@ -21766,7 +21766,7 @@ tdiffusepfc diffuse.pfc
 tspecularpfc specular.pfc
 al 1
 as 0
-cs 0
+cs 1
 malbedo 1 1 1
 mroughness 0.5
 mmetallic 0.5

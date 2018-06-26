@@ -18,7 +18,6 @@ def main():
     if LEVEL_COUNT == 1:
         DebugPrint("TD Level0 Start\n")
 
-    if LEVEL_COUNT == 2:
         # Create Level0 Entity
         level0 = EntityCreate()
         EntityAddRenderCom(level0, "res/model/level/level0.obj", 0.0, -1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0)
