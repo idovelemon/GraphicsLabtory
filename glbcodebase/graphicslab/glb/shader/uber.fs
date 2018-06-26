@@ -261,7 +261,7 @@ float calc_shadow() {
 	}
 	if (factor < light_space_pos.z) {
 		// In shadow
-		shadow_factor = 0.0;
+		shadow_factor = 0.2;
 	}
 	if (light_space_pos.x < 0.0 || 
 		light_space_pos.x > 1.0 ||
