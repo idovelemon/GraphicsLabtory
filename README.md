@@ -11,6 +11,7 @@ This project is for computer graphics learning.More information in my dev blog [
 - Gamma Correction
 - Bloom
 - Parallel-Split Shadow Map(PSSM)
+- Geometry Instance Rendering
 
 ## Gallery
 ![Image based Lighting for Physical based Shading](https://github.com/idovelemon/GraphicsLabtory/raw/master/glbcodebase/graphicslab/doc/gallery/1.jpg)
