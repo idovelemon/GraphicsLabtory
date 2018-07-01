@@ -19,3 +19,4 @@ This project is for computer graphics learning.More information in my dev blog [
 ![GLB LightStudio](https://github.com/idovelemon/GraphicsLabtory/raw/master/glbcodebase/graphicslab/doc/gallery/4.jpg)
 ![GLB ModelEditor](https://github.com/idovelemon/GraphicsLabtory/raw/master/glbcodebase/graphicslab/doc/gallery/5.jpg)
 ![Parallel-Split Shadow Map](https://github.com/idovelemon/GraphicsLabtory/raw/master/glbcodebase/graphicslab/doc/gallery/6.jpg)
+![Geometry Instance](https://github.com/idovelemon/GraphicsLabtory/raw/master/glbcodebase/graphicslab/doc/gallery/7.jpg)
