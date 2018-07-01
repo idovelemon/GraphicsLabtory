@@ -36,6 +36,7 @@ public:
     void Initialize();
     void Destroy();
     Model* AddModel(const char* file_name);
+    InstanceModel* AddInstanceModel(const char* fileName, int32_t maxInstance);
     void AddModel(Model* model);
     Model* GetModelByName(const char* file_name);
 
@@ -429,6 +430,195 @@ void Model::SetTexWithId(int32_t slot, int32_t tex_id) {
         GLB_SAFE_ASSERT(false);
     }
 }
+
+//-----------------------------------------------------------------------------------
+// InstanceModel DEFINITION
+//-----------------------------------------------------------------------------------
+
+InstanceModel::InstanceModel()
+: m_MaxInstance(0) {
+}
+
+InstanceModel::~InstanceModel() {
+}
+
+InstanceModel* InstanceModel::Create(const char* fileName, int32_t maxInstance) {
+    InstanceModel* model = NULL;
+    if (fileName != NULL) {
+        render::mesh::InstanceTriangleMesh* mesh = NULL;
+        int32_t albedoTex = -1;
+        int32_t roughnessTex = -1;
+        int32_t metallicTex = -1;
+        int32_t alphaTex = -1;
+        int32_t normalTex = -1;
+        int32_t emissionTex = -1;
+        int32_t diffusePFCTex = -1;
+        int32_t specularPFCTex = -1;
+        int32_t light0Tex = -1;
+        int32_t light1Tex = -1;
+        int32_t light2Tex = -1;
+        int32_t material = -1;
+
+        float* vertexBuf = NULL;
+        float* texBuf = NULL;
+        float* lightMapTexBuf = NULL;
+        float* normalBuf = NULL;
+        float* tangentBuf = NULL;
+        float* binormalBuf = NULL;
+        ModelEffectParam effectParam;
+        ModelMaterialParam materialParam;
+        std::string dir = util::path_get_dir(fileName);
+        int32_t num_triangles = ModelFile::ExtractModelData(
+            fileName,
+            effectParam,
+            materialParam,
+            &vertexBuf,
+            &texBuf,
+            &lightMapTexBuf,
+            &normalBuf,
+            &tangentBuf,
+            &binormalBuf
+            );
+        if (num_triangles > 0) {
+            mesh = render::mesh::InstanceTriangleMesh::Create(maxInstance, num_triangles, vertexBuf, texBuf, lightMapTexBuf, normalBuf, tangentBuf, binormalBuf);
+            render::mesh::Mgr::AddMesh(mesh);
+
+            if (effectParam.hasAlbedoTex) {
+                std::string albedoTexPath = dir + materialParam.albedoTexName;
+                albedoTex = render::texture::Mgr::LoadTexture(albedoTexPath.c_str());
+            }
+
+            if (effectParam.hasRoughnessTex) {
+                std::string roughnessTexPath = dir + materialParam.roughnessTexName;
+                roughnessTex = render::texture::Mgr::LoadTexture(roughnessTexPath.c_str());
+            }
+
+            if (effectParam.hasMetallicTex) {
+                std::string metallicTexPath = dir + materialParam.metallicTexName;
+                metallicTex = render::texture::Mgr::LoadTexture(metallicTexPath.c_str());
+            }
+
+            if (effectParam.hasAlphaTex) {
+                std::string alphaTexPath = dir + materialParam.alphaTexName;
+                alphaTex = render::texture::Mgr::LoadTexture(alphaTexPath.c_str());
+            }
+
+            if (effectParam.hasNormalTex) {
+                std::string normalTexPath = dir + materialParam.normalTexName;
+                normalTex = render::texture::Mgr::LoadTexture(normalTexPath.c_str());
+            }
+
+            if (effectParam.hasEmissionTex) {
+                std::string emissionTexPath = dir + materialParam.emissionTexName;
+                emissionTex = render::texture::Mgr::LoadTexture(emissionTexPath.c_str());
+            }
+
+            if (effectParam.hasDiffusePFCTex) {
+                std::string diffusePFCTexPath = dir + materialParam.diffusePFCTexName;
+                diffusePFCTex = render::texture::Mgr::LoadPFCTexture(diffusePFCTexPath.c_str());
+            }
+
+            if (effectParam.hasSpecularPFCTex) {
+                std::string specularPFCTexPath = dir + materialParam.specularPFCTexName;
+                specularPFCTex = render::texture::Mgr::LoadPFCTexture(specularPFCTexPath.c_str());
+            }
+
+            if (effectParam.hasLightTex) {
+                std::string light0TexPath = dir + materialParam.lightTexName[0];
+                light0Tex = render::texture::Mgr::LoadTexture(light0TexPath.c_str());
+
+                std::string light1TexPath = dir + materialParam.lightTexName[1];
+                light1Tex = render::texture::Mgr::LoadTexture(light1TexPath.c_str());
+
+                std::string light2TexPath = dir + materialParam.lightTexName[2];
+                light2Tex = render::texture::Mgr::LoadTexture(light2TexPath.c_str());
+            }
+
+            ModelFile::RelaseBuf(&vertexBuf, &texBuf, &normalBuf, &tangentBuf, &binormalBuf);
+        } else {
+            GLB_SAFE_ASSERT(false);
+        }
+
+        render::material::Material mat;
+        mat.ambient = materialParam.ambient;
+        mat.diffuse = materialParam.diffuse;
+        mat.specular = materialParam.specular;
+        mat.emission = materialParam.emission;
+        mat.specular_pow = materialParam.pow;
+        mat.albedo = materialParam.albedo;
+        mat.roughness = materialParam.roughness;
+        mat.metallic = materialParam.metallic;
+        memcpy(mat.mat_name, fileName, strlen(fileName));
+        mat.mat_name[strlen(fileName)] = '\0';
+        material = render::material::Mgr::AddMaterial(mat);
+
+        model = new InstanceModel;
+        model->m_MaxInstance = maxInstance;
+        model->m_Name = std::string(fileName);
+        model->m_Mesh = mesh->GetId();
+        if (effectParam.hasAlbedoTex) {
+            model->m_Tex[MT_ALBEDO] = albedoTex;
+        }
+        if (effectParam.hasRoughnessTex) {
+            model->m_Tex[MT_ROUGHNESS] = roughnessTex;
+        }
+        if (effectParam.hasMetallicTex) {
+            model->m_Tex[MT_METALLIC] = metallicTex;
+        }
+        if (effectParam.hasAlphaTex) {
+            model->m_Tex[MT_ALPHA] = alphaTex;
+        }
+        if (effectParam.hasNormalTex) {
+            model->m_Tex[MT_NORMAL] = normalTex;
+        }
+        if (effectParam.hasEmissionTex) {
+            model->m_Tex[MT_EMISSION] = emissionTex;
+        }
+        if (effectParam.hasDiffusePFCTex) {
+            model->m_Tex[MT_DIFFUSE_PFC] = diffusePFCTex;
+        }
+        if (effectParam.hasSpecularPFCTex) {
+            model->m_Tex[MT_SPECULAR_PFC] = specularPFCTex;
+        }
+        if (effectParam.hasLightTex) {
+            model->m_Tex[MT_LIGHT0] = light0Tex;
+            model->m_Tex[MT_LIGHT1] = light1Tex;
+            model->m_Tex[MT_LIGHT2] = light2Tex;
+        }
+        model->m_Material = material;
+        model->m_ModelEffectParam = effectParam;
+        model->m_BoundBoxMax = materialParam.boundboxMax;
+        model->m_BoundBoxMin = materialParam.boundboxMin;
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return model;
+}
+
+void InstanceModel::UpdateMatrixAttribute(std::vector<math::Matrix> attributes) {
+    render::mesh::InstanceTriangleMesh* mesh = reinterpret_cast<render::mesh::InstanceTriangleMesh*>(render::mesh::Mgr::GetMeshById(m_Mesh));
+
+    float* buf = new float[m_MaxInstance * 16 * 2];
+
+    for (int32_t i = 0; i < attributes.size(); i++) {
+        // OpenGL store matrix in transpose, so we must transpose the result matrix and upload to opengl server
+        math::Matrix world = attributes[i];
+        world.Transpose();
+        memcpy(buf + i * 16, world.m_Matrix.v, sizeof(world.m_Matrix.v));
+
+        math::Matrix transInvM = attributes[i];
+        transInvM.Inverse();
+
+        memcpy(buf + (m_MaxInstance + i) * 16, transInvM.m_Matrix.v, sizeof(transInvM.m_Matrix.v));
+    }
+
+    mesh->UpdateInstanceBuffer(buf);
+
+    delete[] buf;
+    buf = NULL;
+}
+
 //-----------------------------------------------------------------------------------
 // ModelMgrImp DEFINITION
 //-----------------------------------------------------------------------------------
@@ -455,6 +645,19 @@ Model* ModelMgrImp::AddModel(const char* file_name) {
 
     if (file_name != NULL) {
         model = Model::Create(file_name);
+        m_ModelDataBase.push_back(model);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return model;
+}
+
+InstanceModel* ModelMgrImp::AddInstanceModel(const char* fileName, int32_t maxInstance) {
+    InstanceModel* model = NULL;
+
+    if (fileName != NULL) {
+        model = InstanceModel::Create(fileName, maxInstance);
         m_ModelDataBase.push_back(model);
     } else {
         GLB_SAFE_ASSERT(false);
@@ -516,6 +719,18 @@ Model* ModelMgr::AddModel(const char* file_name) {
 
     if (s_ModelMgrImp != NULL) {
         model = s_ModelMgrImp->AddModel(file_name);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return model;
+}
+
+InstanceModel* ModelMgr::AddInstanceModel(const char* fileName, int32_t maxInstance) {
+    InstanceModel* model = NULL;
+
+    if (s_ModelMgrImp != NULL) {
+        model = s_ModelMgrImp->AddInstanceModel(fileName, maxInstance);
     } else {
         GLB_SAFE_ASSERT(false);
     }

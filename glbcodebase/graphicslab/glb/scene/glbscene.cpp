@@ -48,9 +48,11 @@ public:
     math::Vector GetSceneBoundBoxMin();
 
     // Object
-    int32_t AddObject(const char* object_file);
+    int32_t AddObject(const char* objectFile);
+    int32_t AddInstanceRenderObject(const char* objectFile, int32_t maxInstance);
+    int32_t AddInstanceObject(int32_t instanceRenderObject, math::Vector pos, math::Vector scale, math::Vector rotate);
     int32_t AddObject(scene::Model* model);
-    int32_t AddSkyObject(const char* object_file);
+    int32_t AddSkyObject(const char* objectFile);
     Object* GetObjectById(int32_t id);
     Object* GetSkyObject();
     void GetAllObjects(std::vector<Object*>& objs);
@@ -188,6 +190,55 @@ int32_t SceneImp::AddObject(const char* object_file) {
             id = FindEmptyID();
             if (id != -1) {
                 m_ObjectDataBase[id] = obj;
+                obj->SetObjectId(id);
+            } else {
+                GLB_SAFE_ASSERT(false);
+            }
+        } else {
+            GLB_SAFE_ASSERT(false);
+        }
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return id;
+}
+
+int32_t SceneImp::AddInstanceRenderObject(const char* objectFile, int32_t maxInstance) {
+    int32_t id = -1;
+
+    if (objectFile != NULL) {
+        Object* obj = InstanceRenderObject::Create(objectFile, maxInstance);
+        if (obj != NULL) {
+            id = FindEmptyID();
+            if (id != -1) {
+                m_ObjectDataBase[id] = obj;
+                obj->SetObjectId(id);
+            } else {
+                GLB_SAFE_ASSERT(false);
+            }
+        } else {
+            GLB_SAFE_ASSERT(false);
+        }
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return id;
+}
+
+int32_t SceneImp::AddInstanceObject(int32_t instanceRenderObjectId, math::Vector pos, math::Vector scale, math::Vector rotate) {
+    int32_t id = -1;
+
+    if (0 <= instanceRenderObjectId && instanceRenderObjectId < m_ObjectDataBase.size()) {
+        InstanceRenderObject* instanceRenderObject = reinterpret_cast<InstanceRenderObject*>(m_ObjectDataBase[instanceRenderObjectId]);
+        InstanceObject* obj = InstanceObject::Create(instanceRenderObject, pos, scale, rotate);
+        if (obj != NULL) {
+            id = FindEmptyID();
+            if (id != -1) {
+                m_ObjectDataBase[id] = obj;
+                obj->SetObjectId(id);
+                instanceRenderObject->AddInstanceObject(obj);
             } else {
                 GLB_SAFE_ASSERT(false);
             }
@@ -419,11 +470,35 @@ math::Vector Scene::GetSceneBoundBoxMin() {
     return result;
 }
 
-int32_t Scene::AddObject(const char* object_file) {
+int32_t Scene::AddObject(const char* objectFile) {
     int32_t result = -1;
 
     if (s_SceneImp != NULL) {
-        result = s_SceneImp->AddObject(object_file);
+        result = s_SceneImp->AddObject(objectFile);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return result;
+}
+
+int32_t Scene::AddInstanceRenderObject(const char* objectFile, int32_t maxInstance) {
+    int32_t result = -1;
+
+    if (s_SceneImp != NULL) {
+        result = s_SceneImp->AddInstanceRenderObject(objectFile, maxInstance);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return result;
+}
+
+int32_t Scene::AddInstanceObject(int32_t instanceRenderObject, math::Vector pos, math::Vector scale, math::Vector rotate) {
+    int32_t result = -1;
+
+    if (s_SceneImp != NULL) {
+        result = s_SceneImp->AddInstanceObject(instanceRenderObject, pos, scale, rotate);
     } else {
         GLB_SAFE_ASSERT(false);
     }
@@ -443,11 +518,11 @@ int32_t Scene::AddObject(scene::Model* model) {
     return result;
 }
 
-int32_t Scene::AddSkyObject(const char* object_file) {
+int32_t Scene::AddSkyObject(const char* objectFile) {
     int32_t result = -1;
 
     if (s_SceneImp != NULL) {
-        result = s_SceneImp->AddSkyObject(object_file);
+        result = s_SceneImp->AddSkyObject(objectFile);
     } else {
         GLB_SAFE_ASSERT(false);
     }
@@ -487,9 +562,9 @@ void Scene::GetAllObjects(std::vector<Object*>& objs) {
     }
 }
 
-void Scene::DestroyObject(int32_t object_id) {
+void Scene::DestroyObject(int32_t objectId) {
     if (s_SceneImp != NULL) {
-        s_SceneImp->DestroyObject(object_id);
+        s_SceneImp->DestroyObject(objectId);
     } else {
         GLB_SAFE_ASSERT(false);
     }

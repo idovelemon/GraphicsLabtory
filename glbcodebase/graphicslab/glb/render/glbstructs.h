@@ -17,7 +17,6 @@ namespace render {
 // @Constant
 //------------------------------------------------------
 static const int32_t kMaxVertexAttributeName = 32;
-static const int32_t kMaxVertexLayoutAttributes = 8;
 static const int32_t kMaxUniformName = 64;
 
 //------------------------------------------------------
@@ -31,7 +30,10 @@ enum VertexAttribute {
     VA_NORMAL,
     VA_TANGENT,
     VA_BINORMAL,
+    VA_WORLDMATRIX,
+    VA_TRANSINVWORLDMATRIX,
     VA_COLOR,
+    VA_MAX = VA_COLOR,
 };
 
 struct VertexLayoutAttribute {
@@ -42,7 +44,7 @@ struct VertexLayoutAttribute {
 
 struct VertexLayout {
     int32_t               count;
-    VertexLayoutAttribute layouts[kMaxVertexLayoutAttributes];
+    VertexLayoutAttribute layouts[VA_MAX];
 };
 
 struct ShaderLayoutAttribute {
@@ -53,7 +55,7 @@ struct ShaderLayoutAttribute {
 
 struct ShaderLayout {
     int32_t               count;
-    ShaderLayoutAttribute layouts[kMaxVertexLayoutAttributes];
+    ShaderLayoutAttribute layouts[VA_MAX];
 };
 
 };  // namespace render

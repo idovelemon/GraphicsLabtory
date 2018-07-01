@@ -6,30 +6,35 @@
 // and some sort of that will be implemented in this shader.
 //----------------------------------------------------
 // Input attributes
-in vec3 glb_Pos;
+layout (location = 0) in vec3 glb_Pos;
 
 #ifdef GLB_COLOR_IN_VERTEX
-	in vec3 glb_Color;
+	layout (location = 1) in vec3 glb_Color;
 #endif
 
 #ifdef GLB_NORMAL_IN_VERTEX
-	in vec3 glb_Normal;
+	layout (location = 2) in vec3 glb_Normal;
 #endif
 
 #ifdef GLB_TANGENT_IN_VERTEX
-	in vec3 glb_Tangent;
+	layout (location = 3) in vec3 glb_Tangent;
 #endif
 
 #ifdef GLB_BINORMAL_IN_VERTEX
-	in vec3 glb_Binormal;
+	layout (location = 4) in vec3 glb_Binormal;
 #endif
 
 #ifdef GLB_TEXCOORD_IN_VERTEX
-	in vec2 glb_TexCoord;
+	layout (location = 5) in vec2 glb_TexCoord;
 #endif
 
 #ifdef GLB_LIGHT_TEXCOORD_IN_VERTEX
-	in vec2 glb_LightMapTexCoord;
+	layout (location = 6) in vec2 glb_LightMapTexCoord;
+#endif
+
+#ifdef GLB_ENABLE_INSTANCE_RENDERING
+	layout (location = 7) in mat4 glb_attr_WorldMatrix;
+	layout (location = 11) in mat4 glb_attr_TransInvWorldMatrix;
 #endif
 
 // Output attributes
@@ -61,27 +66,47 @@ out vec3 vs_Vertex;
 
 uniform mat4 glb_ProjM;
 uniform mat4 glb_ViewM;
-uniform mat4 glb_WorldM;
-uniform mat4 glb_Trans_Inv_WorldM;
+
+#ifndef GLB_ENABLE_INSTANCE_RENDERING
+	uniform mat4 glb_WorldM;
+	uniform mat4 glb_Trans_Inv_WorldM;
+#endif
 
 void main() {
+#ifdef GLB_ENABLE_INSTANCE_RENDERING	
+	gl_Position = glb_ProjM * glb_ViewM * glb_attr_WorldMatrix * vec4(glb_Pos, 1.0);
+	vs_Vertex = (glb_attr_WorldMatrix * vec4(glb_Pos, 1.0)).xyz;
+#else
 	gl_Position = glb_ProjM * glb_ViewM * glb_WorldM * vec4(glb_Pos, 1.0);
 	vs_Vertex = (glb_WorldM * vec4(glb_Pos, 1.0)).xyz;
+#endif
 
 #ifdef GLB_COLOR_IN_VERTEX
 	vs_Color = glb_Color;
 #endif
 
 #ifdef GLB_NORMAL_IN_VERTEX
-	vs_Normal = (glb_Trans_Inv_WorldM * vec4(glb_Normal, 0.0)).xyz;
+	#ifdef GLB_ENABLE_INSTANCE_RENDERING
+		vs_Normal = (glb_attr_TransInvWorldMatrix * vec4(glb_Normal, 0.0)).xyz;
+	#else
+		vs_Normal = (glb_Trans_Inv_WorldM * vec4(glb_Normal, 0.0)).xyz;
+	#endif
 #endif
 
 #ifdef GLB_TANGENT_IN_VERTEX
-	vs_Tangent = (glb_Trans_Inv_WorldM * vec4(glb_Tangent, 0.0)).xyz;
+	#ifdef GLB_ENABLE_INSTANCE_RENDERING
+		vs_Tangent = (glb_attr_TransInvWorldMatrix * vec4(glb_Tangent, 0.0)).xyz;
+	#else
+		vs_Tangent = (glb_Trans_Inv_WorldM * vec4(glb_Tangent, 0.0)).xyz;
+	#endif
 #endif
 
 #ifdef GLB_BINORMAL_IN_VERTEX
-	vs_Binormal = (glb_Trans_Inv_WorldM * vec4(glb_Binormal, 0.0)).xyz;
+	#ifdef GLB_ENABLE_INSTANCE_RENDERING
+		vs_Binormal = (glb_attr_TransInvWorldMatrix * vec4(glb_Binormal, 0.0)).xyz;
+	#else
+		vs_Binormal = (glb_Trans_Inv_WorldM * vec4(glb_Binormal, 0.0)).xyz;
+	#endif
 #endif
 
 #ifdef GLB_TEXCOORD_IN_VERTEX

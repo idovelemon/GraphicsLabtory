@@ -176,6 +176,8 @@ protected:
     void ShrinkLightFrustum(math::AABB caster, math::AABB receiver, Frustum& frustum);
     void CalculateFrustumInView(Frustum& frustum);
     void SplitObjIntoFrustum(std::vector<scene::Object*>& objs, Frustum& frustum, math::Matrix trans);
+    void DrawShadowMapNormal();
+    void DrawShadowMapInstance();
 
     // Light Loop
     void PreDrawLightLoop();
@@ -215,6 +217,7 @@ private:
     RenderTarget*                           m_ShadowRenderTarget[kPSSMSplitNum];
     int32_t                                 m_ShadowMap[kPSSMSplitNum];
     int32_t                                 m_ShadowShader;
+    int32_t                                 m_InstanceShadowShader;
     Frustum                                 m_SplitFrustums[kPSSMSplitNum];
     Frustum                                 m_LightSpaceFrustum[kPSSMSplitNum];
     math::Matrix                            m_ShadowMatrix[kPSSMSplitNum];
@@ -372,6 +375,7 @@ RenderImp::RenderImp()
 
 // Shadow
 , m_ShadowShader(-1)
+, m_InstanceShadowShader(-1)
 , m_ShadowMapIndex(-1)
 
 // Depth
@@ -812,6 +816,7 @@ void RenderImp::PrepareShadowMap() {
 
     // Create shadow shader TODO: Use UserShader
     m_ShadowShader = shader::Mgr::AddUberShader("..\\glb\\shader\\shadow.vs", "..\\glb\\shader\\shadow.fs");
+    m_InstanceShadowShader = shader::Mgr::AddUberShader("..\\glb\\shader\\instanceShadow.vs", "..\\glb\\shader\\shadow.fs");
 }
 
 void RenderImp::PrepareDepthMap() {
@@ -1030,7 +1035,7 @@ void RenderImp::SplitShadowCasters(math::Matrix light_space_to_world_space) {
     std::vector<scene::Object*>::iterator it = objs.begin();
     for (; it != objs.end();) {
         scene::Object* obj = *it;
-        if (!obj->GetModel()->IsCastShadow() || !obj->IsDrawEnable()) {
+        if (!obj->GetModel()->IsCastShadow() || !obj->IsDrawEnable() || obj->GetObjectType() == scene::Object::OBJECT_TYPE_INSTANCE_RENDER) {
             it = objs.erase(it);
         } else {
             ++it;
@@ -1077,12 +1082,7 @@ void RenderImp::ShrinkAllLightFrustums(math::Matrix light_space_to_world_space) 
         //    points[Render::FLD] = math::Vector(obj_min.x, obj_min.y, obj_min.z);  // FLD
         //    points[Render::FRU] = math::Vector(obj_max.x, obj_max.y, obj_min.z);  // FRU
         //    points[Render::FRD] = math::Vector(obj_max.x, obj_min.y, obj_min.z);  // FRD
-        //    math::Matrix view_to_world = view;
-        //    view_to_world.Inverse();
-        //    math::Matrix trans;
-        //    trans.MakeIdentityMatrix();
-        //    trans.Mul(view_to_world);
-        //    trans.Mul(light_to_view);
+        //    math::Matrix trans = light_space_to_world_space;
         //    for (int32_t j = 0; j < 8; j++) {
         //        points[j] = trans * points[j];
         //    }
@@ -1112,12 +1112,7 @@ void RenderImp::ShrinkAllLightFrustums(math::Matrix light_space_to_world_space) 
         //    points[Render::FLD] = math::Vector(obj_min.x, obj_min.y, obj_min.z);  // FLD
         //    points[Render::FRU] = math::Vector(obj_max.x, obj_max.y, obj_min.z);  // FRU
         //    points[Render::FRD] = math::Vector(obj_max.x, obj_min.y, obj_min.z);  // FRD
-        //    math::Matrix view_to_world = view;
-        //    view_to_world.Inverse();
-        //    math::Matrix trans;
-        //    trans.MakeIdentityMatrix();
-        //    trans.Mul(view_to_world);
-        //    trans.Mul(light_to_view);
+        //    math::Matrix trans = light_space_to_world_space;
         //    for (int32_t j = 0; j < 8; j++) {
         //        points[j] = trans * points[j];
         //    }
@@ -1213,75 +1208,9 @@ void RenderImp::DrawShadowMapCore() {
         render::Device::SetClearDepth(1.0f);
         render::Device::Clear(CLEAR_DEPTH);
 
-        // Shader
-        shader::UberProgram* program = static_cast<shader::UberProgram*>(shader::Mgr::GetShader(m_ShadowShader));
-        std::vector<uniform::UniformEntry>& uniforms = program->GetUniforms();
-        render::Device::SetShader(program);
-        render::Device::SetShaderLayout(program->GetShaderLayout());
+        DrawShadowMapNormal();
 
-        // Scene uniforms
-        for (int32_t j = 0; j < static_cast<int32_t>(uniforms.size()); j++) {
-            uniform::UniformEntry entry = uniforms[j];
-            if (entry.flag) {
-                // TODO: for now, id is the index of the uniform picker table
-                uniform::Wrapper uniform_wrapper = uniform::kUniformPickers[entry.id].picker(NULL);
-                SetUniform(entry.location, uniform_wrapper);
-            }
-        }
-
-        std::vector<scene::Object*> objs;
-        scene::Object* sky_obj = scene::Scene::GetSkyObject();
-        if (sky_obj != NULL) {
-            objs.push_back(sky_obj);
-        }
-
-        scene::Scene::GetAllObjects(objs);
-
-        // Objects
-        for (int32_t j = 0; j < static_cast<int32_t>(objs.size()); j++) {
-            scene::Object* obj = objs[j];
-
-            // Check if enable draw
-            if (!obj->IsDrawEnable()) {
-                continue;
-            }
-
-            // Check if cast shadow & enable depth
-            if (obj->GetModel()->IsCastShadow() && obj->IsDepthTestEnable()) {
-                // scene::Object Uniform
-                for (int32_t k = 0; k < static_cast<int32_t>(uniforms.size()); k++) {
-                    uniform::UniformEntry entry = uniforms[k];
-                    if (!entry.flag) {
-                        // TODO: for now, id is the index of the uniform picker table
-                        uniform::Wrapper uniform_wrapper = uniform::kUniformPickers[entry.id].picker(obj);
-                        SetUniform(entry.location, uniform_wrapper);
-                    }
-                }
-
-                // Vertex Buffer
-                int32_t mesh_id = obj->GetModel()->GetMeshId();
-                VertexLayout layout = mesh::Mgr::GetMeshById(mesh_id)->GetVertexLayout();
-                int32_t num = mesh::Mgr::GetMeshById(mesh_id)->GetVertexNum();
-                render::Device::SetVertexBuffer(mesh::Mgr::GetMeshById(mesh_id)->GetVertexBuffer());
-                render::Device::SetVertexLayout(layout);
-
-                if (obj->IsCullFaceEnable()) {
-                    render::Device::SetCullFaceEnable(true);
-                    render::Device::SetCullFaceMode(obj->GetCullFaceMode());
-                } else {
-                    render::Device::SetCullFaceEnable(false);
-                }
-
-                if (obj->IsDepthTestEnable()) {
-                    render::Device::SetDepthTestEnable(true);
-                } else {
-                    render::Device::SetDepthTestEnable(false);
-                }
-
-                // Draw
-                render::Device::Draw(render::PT_TRIANGLES, 0, num);
-            }
-        }
+        DrawShadowMapInstance();
 
         // Reset
         render::Device::SetViewport(0, 0, static_cast<int32_t>(m_Width), static_cast<int32_t>(m_Height));
@@ -1296,6 +1225,8 @@ math::AABB RenderImp::CalcAllObjectsBoundBox(math::Matrix trans, Frustum& frustu
 
     int32_t num = objs.size();
     math::AABB bv;
+    bv.m_Max = -math::Vector(FLT_MAX, FLT_MAX, FLT_MAX);
+    bv.m_Min = math::Vector(FLT_MAX, FLT_MAX, FLT_MAX);
 
     for (int32_t i = 0; i < num; i++) {
         math::Vector obj_max = objs[i]->GetBoundBoxMax();
@@ -1450,6 +1381,151 @@ void RenderImp::SplitObjIntoFrustum(std::vector<scene::Object*>& objs, Frustum& 
     }
 }
 
+void RenderImp::DrawShadowMapNormal() {
+    // Shader
+    shader::UberProgram* program = static_cast<shader::UberProgram*>(shader::Mgr::GetShader(m_ShadowShader));
+    std::vector<uniform::UniformEntry>& uniforms = program->GetUniforms();
+    render::Device::SetShader(program);
+    render::Device::SetShaderLayout(program->GetShaderLayout());
+
+    // Scene uniforms
+    for (int32_t j = 0; j < static_cast<int32_t>(uniforms.size()); j++) {
+        uniform::UniformEntry entry = uniforms[j];
+        if (entry.flag) {
+            // TODO: for now, id is the index of the uniform picker table
+            uniform::Wrapper uniform_wrapper = uniform::kUniformPickers[entry.id].picker(NULL);
+            SetUniform(entry.location, uniform_wrapper);
+        }
+    }
+
+    std::vector<scene::Object*> objs;
+    scene::Object* sky_obj = scene::Scene::GetSkyObject();
+    if (sky_obj != NULL) {
+        objs.push_back(sky_obj);
+    }
+
+    scene::Scene::GetAllObjects(objs);
+
+    // Objects
+    for (int32_t j = 0; j < static_cast<int32_t>(objs.size()); j++) {
+        scene::Object* obj = objs[j];
+
+        // Check if enable draw
+        if (!obj->IsDrawEnable() || obj->GetObjectType() != scene::Object::OBJECT_TYPE_NORMAL) {
+            continue;
+        }
+
+        // Check if cast shadow & enable depth
+        if (obj->GetModel()->IsCastShadow() && obj->IsDepthTestEnable()) {
+            // scene::Object Uniform
+            for (int32_t k = 0; k < static_cast<int32_t>(uniforms.size()); k++) {
+                uniform::UniformEntry entry = uniforms[k];
+                if (!entry.flag) {
+                    // TODO: for now, id is the index of the uniform picker table
+                    uniform::Wrapper uniform_wrapper = uniform::kUniformPickers[entry.id].picker(obj);
+                    SetUniform(entry.location, uniform_wrapper);
+                }
+            }
+
+            // Vertex Buffer
+            int32_t mesh_id = obj->GetModel()->GetMeshId();
+            VertexLayout layout = mesh::Mgr::GetMeshById(mesh_id)->GetVertexLayout();
+            int32_t num = mesh::Mgr::GetMeshById(mesh_id)->GetVertexNum();
+            render::Device::SetVertexBuffer(mesh::Mgr::GetMeshById(mesh_id)->GetVertexBuffer());
+            render::Device::SetVertexLayout(layout);
+
+            if (obj->IsCullFaceEnable()) {
+                render::Device::SetCullFaceEnable(true);
+                render::Device::SetCullFaceMode(obj->GetCullFaceMode());
+            } else {
+                render::Device::SetCullFaceEnable(false);
+            }
+
+            if (obj->IsDepthTestEnable()) {
+                render::Device::SetDepthTestEnable(true);
+            } else {
+                render::Device::SetDepthTestEnable(false);
+            }
+
+            // Draw
+            render::Device::Draw(render::PT_TRIANGLES, 0, num);
+        }
+    }
+}
+
+void RenderImp::DrawShadowMapInstance() {
+    // Shader
+    shader::UberProgram* program = static_cast<shader::UberProgram*>(shader::Mgr::GetShader(m_InstanceShadowShader));
+    std::vector<uniform::UniformEntry>& uniforms = program->GetUniforms();
+    render::Device::SetShader(program);
+    render::Device::SetShaderLayout(program->GetShaderLayout());
+
+    // Scene uniforms
+    for (int32_t j = 0; j < static_cast<int32_t>(uniforms.size()); j++) {
+        uniform::UniformEntry entry = uniforms[j];
+        if (entry.flag) {
+            // TODO: for now, id is the index of the uniform picker table
+            uniform::Wrapper uniform_wrapper = uniform::kUniformPickers[entry.id].picker(NULL);
+            SetUniform(entry.location, uniform_wrapper);
+        }
+    }
+
+    std::vector<scene::Object*> objs;
+    scene::Object* sky_obj = scene::Scene::GetSkyObject();
+    if (sky_obj != NULL) {
+        objs.push_back(sky_obj);
+    }
+
+    scene::Scene::GetAllObjects(objs);
+
+    // Objects
+    for (int32_t j = 0; j < static_cast<int32_t>(objs.size()); j++) {
+        scene::Object* obj = objs[j];
+
+        // Check if enable draw
+        if (!obj->IsDrawEnable() || obj->GetObjectType() != scene::Object::OBJECT_TYPE_INSTANCE_RENDER) {
+            continue;
+        }
+
+        // Check if cast shadow & enable depth
+        if (obj->GetModel()->IsCastShadow() && obj->IsDepthTestEnable()) {
+            // scene::Object Uniform
+            for (int32_t k = 0; k < static_cast<int32_t>(uniforms.size()); k++) {
+                uniform::UniformEntry entry = uniforms[k];
+                if (!entry.flag) {
+                    // TODO: for now, id is the index of the uniform picker table
+                    uniform::Wrapper uniform_wrapper = uniform::kUniformPickers[entry.id].picker(obj);
+                    SetUniform(entry.location, uniform_wrapper);
+                }
+            }
+
+            // Vertex Buffer
+            int32_t mesh_id = obj->GetModel()->GetMeshId();
+            VertexLayout layout = mesh::Mgr::GetMeshById(mesh_id)->GetVertexLayout();
+            int32_t num = mesh::Mgr::GetMeshById(mesh_id)->GetVertexNum();
+            render::Device::SetVertexBuffer(mesh::Mgr::GetMeshById(mesh_id)->GetVertexBuffer());
+            render::Device::SetVertexLayout(layout);
+
+            if (obj->IsCullFaceEnable()) {
+                render::Device::SetCullFaceEnable(true);
+                render::Device::SetCullFaceMode(obj->GetCullFaceMode());
+            } else {
+                render::Device::SetCullFaceEnable(false);
+            }
+
+            if (obj->IsDepthTestEnable()) {
+                render::Device::SetDepthTestEnable(true);
+            } else {
+                render::Device::SetDepthTestEnable(false);
+            }
+
+            // Draw
+            int32_t instance = reinterpret_cast<scene::InstanceRenderObject*>(obj)->GetCurInstanceNum();
+            render::Device::DrawInstance(render::PT_TRIANGLES, 0, num, instance);
+        }
+    }
+}
+
 void RenderImp::PreDrawLightLoop() {
     std::vector<scene::Object*> objs;
     m_ShaderGroups.clear();
@@ -1467,6 +1543,8 @@ void RenderImp::PreDrawLightLoop() {
     std::map<std::string, ShaderGroup> opaque_group;
     std::vector<scene::Object*> transparent_objs;
     for (int32_t i = 0; i < static_cast<int32_t>(objs.size()); i++) {
+        if (objs[i]->GetObjectType() == scene::Object::OBJECT_TYPE_INSTANCE) continue;
+
         shader::Descriptor desc = objs[i]->GetShaderDesc();
         bool is_transparent = desc.GetFlag(shader::GLB_ENABLE_ALPHA_TEX);
         if (is_transparent) {
@@ -1585,7 +1663,7 @@ void RenderImp::DrawLightLoopCore() {
             scene::Object* obj = objs[j];
 
             // Check if enable draw
-            if (!obj->IsDrawEnable()) {
+            if (!obj->IsDrawEnable() || obj->GetObjectType() == scene::Object::OBJECT_TYPE_INSTANCE) {
                 continue;
             }
 
@@ -1665,7 +1743,12 @@ void RenderImp::DrawLightLoopCore() {
             }
 
             // Draw
-            render::Device::Draw(render::PT_TRIANGLES, 0, num);
+            if (obj->GetObjectType() == scene::Object::OBJECT_TYPE_NORMAL) {
+                render::Device::Draw(render::PT_TRIANGLES, 0, num);
+            } else if (obj->GetObjectType() == scene::Object::OBJECT_TYPE_INSTANCE_RENDER) {
+                int32_t instanceNum = reinterpret_cast<scene::InstanceRenderObject*>(obj)->GetCurInstanceNum();
+                render::Device::DrawInstance(render::PT_TRIANGLES, 0, num, instanceNum);
+            }
         }
     }
 

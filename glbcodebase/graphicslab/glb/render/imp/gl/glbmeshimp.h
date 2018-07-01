@@ -32,23 +32,27 @@ namespace mesh {
 //-----------------------------------------------------------------------------------
 // VertexBuffer DECLARATION
 //----------------------------------------------------------------------------------
+
 class VertexBuffer {
 public:
-    VertexBuffer();
+    VertexBuffer(bool needInstance = false);
     virtual~ VertexBuffer();
 
 public:
     int32_t GetVAO();
     int32_t GetVBO();
+    int32_t GetIBO();
 
 protected:
     int32_t             m_VAO;
     int32_t             m_VBO;
+    int32_t             m_IBO;  // Instance Buffer Object
 };
 
 //-----------------------------------------------------------------------------------
 // TriangleMesh::Imp DECLARATION
 //----------------------------------------------------------------------------------
+
 class TriangleMesh::Imp {
 public:
     virtual ~Imp();
@@ -80,8 +84,45 @@ protected:
 };
 
 //-----------------------------------------------------------------------------------
+// InstanceTriangleMesh::Imp DECLARATION
+//----------------------------------------------------------------------------------
+
+class InstanceTriangleMesh::Imp {
+public:
+    virtual ~Imp();
+    static InstanceTriangleMesh::Imp* Create(int32_t maxInstance, int32_t triangle_num, float* vertex_buf, float* coord_buf = 0, float* lightMapTexCoordBuf = 0, float* normal_buf = 0, float* tanget_buf = 0, float* binormal_buf = 0);
+
+public:
+    void SetId(int32_t id);
+    int32_t GetId();
+
+    void SetName(std::string name);
+    std::string GetName();
+
+    VertexLayout GetVertexLayout();
+    int32_t GetVertexNum();
+
+    VertexBuffer* GetVertexBuffer();
+    void UpdateInstanceBuffer(void* buf);
+
+protected:
+    Imp();
+
+protected:
+    int32_t         m_ID;
+    std::string     m_Name;
+    int32_t         m_VertexNum;
+    int32_t         m_TriangleNum;
+    int32_t         m_BufSizeInBytes;
+    int32_t         m_InstanceBufSizeInBytes;
+    VertexBuffer*   m_VertexBuffer;
+    VertexLayout    m_VertexLayout;
+};
+
+//-----------------------------------------------------------------------------------
 // DebugMesh::Imp DECLARATION
 //----------------------------------------------------------------------------------
+
 class DebugMesh::Imp {
 public:
     virtual ~Imp();
@@ -110,6 +151,7 @@ private:
 //-----------------------------------------------------------------------------------
 // ScreenMesh::Imp DECLARATION
 //----------------------------------------------------------------------------------
+
 class ScreenMesh::Imp {
 public:
     virtual ~Imp();

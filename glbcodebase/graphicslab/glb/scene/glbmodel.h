@@ -14,6 +14,8 @@ namespace glb {
 
 namespace scene {
 
+//--------------------------------------------------------------------------
+
 class Model {
 public:
     enum {
@@ -72,7 +74,7 @@ public:
 
     void SetTexWithId(int32_t slot, int32_t tex_id);
 
-private:
+protected:
     std::string         m_Name;
     int32_t             m_Mesh;
     int32_t             m_Tex[MT_MAX];
@@ -82,11 +84,31 @@ private:
     ModelEffectParam    m_ModelEffectParam;
 };
 
+//--------------------------------------------------------------------------
+
+class InstanceModel : public Model {
+public:
+    InstanceModel();
+    virtual ~InstanceModel();
+
+public:
+    static InstanceModel* Create(const char* fileName, int32_t maxInstance);
+
+public:
+    void UpdateMatrixAttribute(std::vector<math::Matrix> attributes);
+
+protected:
+    int32_t m_MaxInstance;
+};
+
+//--------------------------------------------------------------------------
+
 class ModelMgr {
 public:
     static void Initialize();
     static void Destroy();
-    static Model* AddModel(const char* file_name);
+    static Model* AddModel(const char* fileName);
+    static InstanceModel* AddInstanceModel(const char* fileName, int32_t maxInstance);
     static void AddModel(Model* model);
     static Model* GetModelByName(const char* file_name);
 };

@@ -322,6 +322,10 @@ VertexAttribute UberProgram::GetVertexAttribute(const char* attribute_name) {
             result = VA_TANGENT;
         } else if (!strcmp("glb_Binormal", attribute_name)) {
             result = VA_BINORMAL;
+        } else if (!strcmp("glb_attr_WorldMatrix", attribute_name)) {
+            result = VA_WORLDMATRIX;
+        } else if (!strcmp("glb_attr_TransInvWorldMatrix", attribute_name)) {
+            result = VA_TRANSINVWORLDMATRIX;
         } else {
             GLB_SAFE_ASSERT(false);
         }

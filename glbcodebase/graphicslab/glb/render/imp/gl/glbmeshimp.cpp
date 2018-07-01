@@ -38,11 +38,15 @@ static const int32_t kScreenMeshBufSize = ((3 + 2)) * 6;
 //--------------------------------------------------------------------------------------
 // VertexBuffer DEFINITION
 //--------------------------------------------------------------------------------------
-VertexBuffer::VertexBuffer()
+VertexBuffer::VertexBuffer(bool needInstance)
 : m_VAO(0)
-, m_VBO(0) {
+, m_VBO(0)
+, m_IBO(0) {
     glGenVertexArrays(1, reinterpret_cast<GLuint*>(&m_VAO));
     glGenBuffers(1, reinterpret_cast<GLuint*>(&m_VBO));
+    if (needInstance) {
+        glGenBuffers(1, reinterpret_cast<GLuint*>(&m_IBO));
+    }
 }
 
 VertexBuffer::~VertexBuffer() {
@@ -57,6 +61,12 @@ VertexBuffer::~VertexBuffer() {
         glDeleteBuffers(1, reinterpret_cast<GLuint*>(&m_VBO));
         m_VBO = 0;
     }
+
+    if (m_IBO != 0) {
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glDeleteBuffers(1, reinterpret_cast<GLuint*>(&m_IBO));
+        m_IBO = 0;
+    }
 }
 
 int32_t VertexBuffer::GetVAO() {
@@ -67,9 +77,14 @@ int32_t VertexBuffer::GetVBO() {
     return m_VBO;
 }
 
+int32_t VertexBuffer::GetIBO() {
+    return m_IBO;
+}
+
 //--------------------------------------------------------------------------------------
 // VertexBuffer DEFINITION
 //--------------------------------------------------------------------------------------
+
 TriangleMesh::Imp::Imp()
 : m_ID(-1)
 , m_Name()
@@ -232,6 +247,211 @@ int32_t TriangleMesh::Imp::GetVertexNum() {
 
 VertexBuffer* TriangleMesh::Imp::GetVertexBuffer() {
     return m_VertexBuffer;
+}
+
+//-----------------------------------------------------------------------------------
+// InstanceTriangleMesh::Imp DEFINITION
+//-----------------------------------------------------------------------------------
+
+InstanceTriangleMesh::Imp::Imp()
+: m_ID(-1)
+, m_Name()
+, m_VertexNum(0)
+, m_TriangleNum(0)
+, m_BufSizeInBytes(0)
+, m_InstanceBufSizeInBytes(0)
+, m_VertexBuffer(NULL)
+, m_VertexLayout()  {
+    memset(&m_VertexLayout, 0, sizeof(m_VertexLayout));
+}
+
+InstanceTriangleMesh::Imp::~Imp() {
+    GLB_SAFE_DELETE(m_VertexBuffer);
+}
+
+InstanceTriangleMesh::Imp* InstanceTriangleMesh::Imp::Create(int32_t maxInstance, int32_t triangle_num, float* vertices, float* tex_coords, float* lightMapTexCoordBuf, float* normals, float* tangets, float* binormals) {
+    InstanceTriangleMesh::Imp* triangle_mesh = NULL;
+
+    if (triangle_num > 0 && vertices != NULL) {
+        // Calculate buffer size in bytes
+        VertexLayout layout;
+        memset(&layout, 0, sizeof(layout));
+
+        // TODO: Instance buffer's layout stored at the same place as vertex buffer's layout.
+        // It should split into two different layout in future.
+
+        // Instance buffer
+        int32_t instanceBufSize = 0;
+        int32_t instanceWorldMatrixBufSize = maxInstance * 16 * sizeof(float);
+        layout.layouts[layout.count].attriType = VA_WORLDMATRIX;
+        layout.layouts[layout.count].size = instanceWorldMatrixBufSize;
+        layout.layouts[layout.count].offset = 0;
+        layout.count++;
+
+        int32_t instanceTransInvWorldMatrixBufSize = maxInstance * 16 * sizeof(float);
+        layout.layouts[layout.count].attriType = VA_TRANSINVWORLDMATRIX;
+        layout.layouts[layout.count].size = instanceTransInvWorldMatrixBufSize;
+        layout.layouts[layout.count].offset = instanceWorldMatrixBufSize;
+        layout.count++;
+
+        instanceBufSize = instanceWorldMatrixBufSize + instanceTransInvWorldMatrixBufSize;
+
+        // Vertex buffer
+        int32_t vertices_buf_size = 3 * triangle_num * 3 * sizeof(float);
+        layout.layouts[layout.count].attriType = VA_POS;
+        layout.layouts[layout.count].size = vertices_buf_size;
+        layout.layouts[layout.count].offset = 0;
+        layout.count++;
+
+        int32_t tex_coords_buf_size = 0;
+        if (tex_coords) {
+            tex_coords_buf_size = 3 * triangle_num * 2 * sizeof(float);
+            layout.layouts[layout.count].attriType = VA_TEXCOORD;
+            layout.layouts[layout.count].size = tex_coords_buf_size;
+            layout.layouts[layout.count].offset = vertices_buf_size;
+            layout.count++;
+        }
+
+        int32_t lightMapTexCoordsBufSize = 0;
+        if (lightMapTexCoordBuf) {
+            lightMapTexCoordsBufSize = 3 * triangle_num * 2 * sizeof(float);
+            layout.layouts[layout.count].attriType = VA_LIGHT_MAP_TEXCOORD;
+            layout.layouts[layout.count].size = lightMapTexCoordsBufSize;
+            layout.layouts[layout.count].offset = tex_coords_buf_size + vertices_buf_size;
+            layout.count++;
+        }
+
+        int32_t normal_buf_size = 0;
+        if (normals) {
+            normal_buf_size = 3 * triangle_num * 3 * sizeof(float);
+            layout.layouts[layout.count].attriType = VA_NORMAL;
+            layout.layouts[layout.count].size = normal_buf_size;
+            layout.layouts[layout.count].offset = vertices_buf_size + tex_coords_buf_size + lightMapTexCoordsBufSize;
+            layout.count++;
+        }
+
+        int32_t tanget_buf_size = 0;
+        if (tangets) {
+            tanget_buf_size = 3 * triangle_num * 3 * sizeof(float);
+            layout.layouts[layout.count].attriType = VA_TANGENT;
+            layout.layouts[layout.count].size = tanget_buf_size;
+            layout.layouts[layout.count].offset = vertices_buf_size + tex_coords_buf_size + lightMapTexCoordsBufSize + normal_buf_size;
+            layout.count++;
+        }
+
+        int32_t binormal_buf_size = 0;
+        if (binormals) {
+            binormal_buf_size = 3 * triangle_num * 3 * sizeof(float);
+            layout.layouts[layout.count].attriType = VA_BINORMAL;
+            layout.layouts[layout.count].size = binormal_buf_size;
+            layout.layouts[layout.count].offset = vertices_buf_size + tex_coords_buf_size + lightMapTexCoordsBufSize + normal_buf_size + tanget_buf_size;
+            layout.count++;
+        }
+
+        int32_t buf_size = vertices_buf_size + tex_coords_buf_size + lightMapTexCoordsBufSize + normal_buf_size + tanget_buf_size + binormal_buf_size;
+
+        // Create vertex array object
+        VertexBuffer* vbuf = new VertexBuffer(true);
+        uint32_t vao = vbuf->GetVAO();
+
+        // Create instance buffer object
+        uint32_t ibo = vbuf->GetIBO();
+        glBindBuffer(GL_ARRAY_BUFFER, ibo);
+        glBufferData(GL_ARRAY_BUFFER, instanceBufSize, NULL, GL_DYNAMIC_DRAW);
+
+        // Create vertex buffer object
+        uint32_t vbo = vbuf->GetVBO();
+        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        glBufferData(GL_ARRAY_BUFFER, buf_size, NULL, GL_STATIC_DRAW);
+
+        // Update vertex data
+        glBufferSubData(GL_ARRAY_BUFFER, 0, vertices_buf_size, vertices);
+
+        // Update texture data
+        if (tex_coords) {
+            glBufferSubData(GL_ARRAY_BUFFER, vertices_buf_size, tex_coords_buf_size, tex_coords);
+        }
+
+        // Update light map texture data
+        if (lightMapTexCoordBuf) {
+            glBufferSubData(GL_ARRAY_BUFFER, vertices_buf_size + tex_coords_buf_size, lightMapTexCoordsBufSize, lightMapTexCoordBuf);
+        }
+
+        // Update normal data
+        if (normals) {
+            glBufferSubData(GL_ARRAY_BUFFER, vertices_buf_size + tex_coords_buf_size + lightMapTexCoordsBufSize, normal_buf_size, normals);
+        }
+
+        // Update tanget data
+        if (tangets) {
+            glBufferSubData(GL_ARRAY_BUFFER, vertices_buf_size + tex_coords_buf_size + lightMapTexCoordsBufSize + normal_buf_size
+                , tanget_buf_size, tangets);
+        }
+
+        // Update binormal data
+        if (binormals) {
+            glBufferSubData(GL_ARRAY_BUFFER, vertices_buf_size + tex_coords_buf_size + lightMapTexCoordsBufSize + normal_buf_size + tanget_buf_size
+                , binormal_buf_size, binormals);
+        }
+
+        // Create TriangleMesh and save value
+        triangle_mesh = new InstanceTriangleMesh::Imp();
+        if (triangle_mesh != NULL) {
+            triangle_mesh->m_TriangleNum = triangle_num;
+            triangle_mesh->m_VertexNum = 3 * triangle_num;
+            triangle_mesh->m_BufSizeInBytes = buf_size;
+            triangle_mesh->m_InstanceBufSizeInBytes = instanceBufSize;
+            triangle_mesh->m_VertexBuffer = vbuf;
+            memcpy(&triangle_mesh->m_VertexLayout, &layout, sizeof(layout));
+        } else {
+            GLB_SAFE_ASSERT(false);
+        }
+
+        // Un-binding
+        glBindVertexArray(0);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return triangle_mesh;
+}
+
+void InstanceTriangleMesh::Imp::SetId(int32_t id) {
+    m_ID = id;
+}
+
+int32_t InstanceTriangleMesh::Imp::GetId() {
+    return m_ID;
+}
+
+void InstanceTriangleMesh::Imp::SetName(std::string name) {
+    m_Name = name;
+}
+
+std::string InstanceTriangleMesh::Imp::GetName() {
+    return m_Name;
+}
+
+VertexLayout InstanceTriangleMesh::Imp::GetVertexLayout() {
+    return m_VertexLayout;
+}
+
+int32_t InstanceTriangleMesh::Imp::GetVertexNum() {
+    return m_VertexNum;
+}
+
+VertexBuffer* InstanceTriangleMesh::Imp::GetVertexBuffer() {
+    return m_VertexBuffer;
+}
+
+void InstanceTriangleMesh::Imp::UpdateInstanceBuffer(void* buf) {
+    glBindVertexArray(m_VertexBuffer->GetVAO());
+    glBindBuffer(GL_ARRAY_BUFFER, m_VertexBuffer->GetIBO());
+
+    glBufferSubData(GL_ARRAY_BUFFER, 0, m_InstanceBufSizeInBytes, buf);
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
 }
 
 //-----------------------------------------------------------------------------------

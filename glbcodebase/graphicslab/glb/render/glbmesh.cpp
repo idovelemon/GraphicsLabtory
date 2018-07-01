@@ -46,12 +46,12 @@ public:
 public:
     void Initialize();
     void Destroy();
-    int32_t AddMesh(TriangleMesh* mesh);
-    TriangleMesh* GetMeshById(int32_t mesh_id);
-    TriangleMesh* GetMeshByName(std::string mesh_name);
+    int32_t AddMesh(MeshBase* mesh);
+    MeshBase* GetMeshById(int32_t mesh_id);
+    MeshBase* GetMeshByName(std::string mesh_name);
 
 private:
-    std::vector<TriangleMesh*> m_MeshDataBase;
+    std::vector<MeshBase*> m_MeshDataBase;
 };  // class MgrImp
 
 //-----------------------------------------------------------------------------------
@@ -62,7 +62,8 @@ private:
 // TriangleMesh DEFINITION
 //-----------------------------------------------------------------------------------
 TriangleMesh::TriangleMesh()
-: m_Imp(NULL) {
+: MeshBase()
+, m_Imp(NULL) {
 }
 
 TriangleMesh::~TriangleMesh() {
@@ -157,6 +158,116 @@ VertexBuffer* TriangleMesh::GetVertexBuffer() {
     }
 
     return buf;
+}
+
+//-----------------------------------------------------------------------------------
+// InstanceTriangleMesh DEFINITION
+//-----------------------------------------------------------------------------------
+InstanceTriangleMesh::InstanceTriangleMesh()
+: MeshBase()
+, m_Imp(NULL) {
+}
+
+InstanceTriangleMesh::~InstanceTriangleMesh() {
+    GLB_SAFE_DELETE(m_Imp);
+}
+
+InstanceTriangleMesh* InstanceTriangleMesh::Create(int32_t maxInstance, int32_t triangle_num, float* vertices, float* tex_coords, float* lightMapTexCoordBuf, float* normals, float* tangets, float* binormals) {
+    InstanceTriangleMesh* triangle_mesh = NULL;
+
+    InstanceTriangleMesh::Imp* imp = InstanceTriangleMesh::Imp::Create(maxInstance, triangle_num, vertices, tex_coords, lightMapTexCoordBuf, normals, tangets, binormals);
+    if (imp != NULL) {
+        triangle_mesh = new InstanceTriangleMesh;
+        triangle_mesh->m_Imp = imp;
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return triangle_mesh;
+}
+
+void InstanceTriangleMesh::SetId(int32_t id) {
+    if (m_Imp != NULL) {
+        m_Imp->SetId(id);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+}
+
+int32_t InstanceTriangleMesh::GetId() {
+    int32_t id = 0;
+
+    if (m_Imp != NULL) {
+        id = m_Imp->GetId();
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return id;
+}
+
+void InstanceTriangleMesh::SetName(std::string name) {
+    if (m_Imp != NULL) {
+        m_Imp->SetName(name);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+}
+
+std::string InstanceTriangleMesh::GetName() {
+    std::string name;
+
+    if (m_Imp != NULL) {
+        name = m_Imp->GetName();
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return name;
+}
+
+VertexLayout InstanceTriangleMesh::GetVertexLayout() {
+    VertexLayout layout;
+
+    if (m_Imp != NULL) {
+        layout = m_Imp->GetVertexLayout();
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return layout;
+}
+
+int32_t InstanceTriangleMesh::GetVertexNum() {
+    int32_t vn = 0;
+
+    if (m_Imp != NULL) {
+        vn = m_Imp->GetVertexNum();
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return vn;
+}
+
+VertexBuffer* InstanceTriangleMesh::GetVertexBuffer() {
+    VertexBuffer* buf = NULL;
+
+    if (m_Imp != NULL) {
+        buf = m_Imp->GetVertexBuffer();
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return buf;
+}
+
+void InstanceTriangleMesh::UpdateInstanceBuffer(void* data) {
+    if (m_Imp != NULL) {
+        m_Imp->UpdateInstanceBuffer(data);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
 }
 
 //-----------------------------------------------------------------------------------
@@ -340,7 +451,7 @@ void MgrImp::Destroy() {
     m_MeshDataBase.clear();
 }
 
-int32_t MgrImp::AddMesh(TriangleMesh* mesh) {
+int32_t MgrImp::AddMesh(MeshBase* mesh) {
     int32_t result = -1;
 
     if (mesh != NULL) {
@@ -354,8 +465,8 @@ int32_t MgrImp::AddMesh(TriangleMesh* mesh) {
     return result;
 }
 
-TriangleMesh* MgrImp::GetMeshById(int32_t id) {
-    TriangleMesh* mesh = NULL;
+MeshBase* MgrImp::GetMeshById(int32_t id) {
+    MeshBase* mesh = NULL;
 
     if (0 <= id && id < static_cast<int32_t>(m_MeshDataBase.size())) {
         mesh = m_MeshDataBase[id];
@@ -366,8 +477,8 @@ TriangleMesh* MgrImp::GetMeshById(int32_t id) {
     return mesh;
 }
 
-TriangleMesh* MgrImp::GetMeshByName(std::string mesh_name) {
-    TriangleMesh* mesh = NULL;
+MeshBase* MgrImp::GetMeshByName(std::string mesh_name) {
+    MeshBase* mesh = NULL;
 
     for (int32_t i = 0; i < static_cast<int32_t>(m_MeshDataBase.size()); i++) {
         if (!strcmp(m_MeshDataBase[i]->GetName().c_str(), mesh_name.c_str())) {
@@ -402,7 +513,7 @@ void Mgr::Destroy() {
     }
 }
 
-int32_t Mgr::AddMesh(TriangleMesh* mesh) {
+int32_t Mgr::AddMesh(MeshBase* mesh) {
     int32_t result = -1;
 
     if (s_MgrImp != NULL) {
@@ -414,8 +525,8 @@ int32_t Mgr::AddMesh(TriangleMesh* mesh) {
     return result;
 }
 
-TriangleMesh* Mgr::GetMeshById(int32_t id) {
-    TriangleMesh* mesh = NULL;
+MeshBase* Mgr::GetMeshById(int32_t id) {
+    MeshBase* mesh = NULL;
 
     if (s_MgrImp != NULL) {
         mesh = s_MgrImp->GetMeshById(id);
@@ -426,8 +537,8 @@ TriangleMesh* Mgr::GetMeshById(int32_t id) {
     return mesh;
 }
 
-TriangleMesh* Mgr::GetMeshByName(std::string mesh_name) {
-    TriangleMesh* mesh = NULL;
+MeshBase* Mgr::GetMeshByName(std::string mesh_name) {
+    MeshBase* mesh = NULL;
     
     if (s_MgrImp != NULL) {
         mesh = s_MgrImp->GetMeshByName(mesh_name);

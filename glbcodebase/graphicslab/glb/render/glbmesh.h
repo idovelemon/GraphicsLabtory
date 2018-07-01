@@ -36,9 +36,30 @@ class VertexBuffer;
 //----------------------------------------------------------------------------------
 
 //-----------------------------------------------------------------------------------
+// MeshBase DECLARATION
+//----------------------------------------------------------------------------------
+class MeshBase {
+public:
+    virtual ~MeshBase() {}
+    MeshBase() {}
+
+public:
+    virtual void SetId(int32_t id) = 0;
+    virtual int32_t GetId() = 0;
+
+    virtual void SetName(std::string name) = 0;
+    virtual std::string GetName() = 0;
+
+    virtual VertexLayout GetVertexLayout() = 0;
+    virtual int32_t GetVertexNum() = 0;
+
+    virtual VertexBuffer* GetVertexBuffer() = 0;
+};
+
+//-----------------------------------------------------------------------------------
 // TriangleMesh DECLARATION
 //----------------------------------------------------------------------------------
-class TriangleMesh {
+class TriangleMesh : public MeshBase {
 public:
     virtual ~TriangleMesh();
 
@@ -65,16 +86,16 @@ public:
     static TriangleMesh* Create(int32_t triangle_num, float* vertex_buf, float* coord_buf = 0, float* lightMapTexCoordBuf = 0, float* normal_buf = 0, float* tanget_buf = 0, float* binormal_buf = 0);
 
 public:
-    void SetId(int32_t id);
-    int32_t GetId();
+    virtual void SetId(int32_t id);
+    virtual int32_t GetId();
 
-    void SetName(std::string name);
-    std::string GetName();
+    virtual void SetName(std::string name);
+    virtual std::string GetName();
 
-    VertexLayout GetVertexLayout();
-    int32_t GetVertexNum();
+    virtual VertexLayout GetVertexLayout();
+    virtual int32_t GetVertexNum();
 
-    VertexBuffer* GetVertexBuffer();
+    virtual VertexBuffer* GetVertexBuffer();
 
 protected:
     TriangleMesh();
@@ -82,6 +103,37 @@ protected:
 private:
     class Imp;
     Imp*         m_Imp;
+};
+
+//-----------------------------------------------------------------------------------
+// InstanceTriangleMesh DECLARATION
+//----------------------------------------------------------------------------------
+
+class InstanceTriangleMesh : public MeshBase {
+public:
+    virtual ~InstanceTriangleMesh();
+    static InstanceTriangleMesh* Create(int32_t maxInstance, int32_t triangle_num, float* vertex_buf, float* coord_buf = 0, float* lightMapTexCoordBuf = 0, float* normal_buf = 0, float* tanget_buf = 0, float* binormal_buf = 0);
+
+protected:
+    InstanceTriangleMesh();
+
+public:
+    virtual void SetId(int32_t id);
+    virtual int32_t GetId();
+
+    virtual void SetName(std::string name);
+    virtual std::string GetName();
+
+    virtual VertexLayout GetVertexLayout();
+    virtual int32_t GetVertexNum();
+
+    virtual VertexBuffer* GetVertexBuffer();
+
+    void UpdateInstanceBuffer(void* data);
+
+private:
+    class Imp;
+    Imp*    m_Imp;
 };
 
 //-----------------------------------------------------------------------------------
@@ -136,9 +188,9 @@ class Mgr {
 public:
     static void Initialize();
     static void Destroy();
-    static int32_t AddMesh(TriangleMesh* mesh);
-    static TriangleMesh* GetMeshById(int32_t mesh_id);
-    static TriangleMesh* GetMeshByName(std::string mesh_name);
+    static int32_t AddMesh(MeshBase* mesh);
+    static MeshBase* GetMeshById(int32_t mesh_id);
+    static MeshBase* GetMeshByName(std::string mesh_name);
 };
 
 };  // namespace mesh

@@ -16,8 +16,12 @@ namespace glb {
 
 namespace scene {
 
+//---------------------------------------------------------------------------------------------
+
 Object::Object()
-: m_IsDead(false)
+: m_ObjectType(OBJECT_TYPE_NORMAL)
+, m_IsDead(false)
+, m_ObjectId(-1)
 , m_Model(NULL)
 , m_Pos(0.0f, 0.0f, 0.0f)
 , m_Scale(0.0f, 0.0f, 0.0f)
@@ -88,6 +92,18 @@ Object* Object::Create(scene::Model* model, math::Vector pos, math::Vector scale
     return obj;
 }
 
+int32_t Object::GetObjectType() const {
+    return m_ObjectType;
+}
+
+void Object::SetObjectId(int32_t id) {
+    m_ObjectId = id;
+}
+
+int32_t Object::GetObjectId() const {
+    return m_ObjectId;
+}
+
 void Object::SetDead(bool dead) {
     m_IsDead = dead;
 }
@@ -122,12 +138,14 @@ math::Vector Object::GetRotation() const {
 
 math::Vector Object::GetBoundBoxMax() {
     math::Vector boundbox_max = m_Model->GetBoundBoxMax();
+    boundbox_max = boundbox_max * m_Scale;
     boundbox_max += m_Pos;
     return boundbox_max;
 }
 
 math::Vector Object::GetBoundBoxMin() {
     math::Vector boundbox_min = m_Model->GetBoundBoxMin();
+    boundbox_min = boundbox_min * m_Scale;
     boundbox_min += m_Pos;
     return boundbox_min;
 }
@@ -350,6 +368,137 @@ render::shader::Descriptor Object::CalculateShaderDesc() {
     }
 
     return desc;
+}
+
+//---------------------------------------------------------------------------------------------
+
+InstanceRenderObject::InstanceRenderObject()
+: m_MaxInstanceNum(0)
+, m_CurInstanceNum(0) {
+    m_ObjectType = OBJECT_TYPE_INSTANCE_RENDER;
+}
+
+InstanceRenderObject::~InstanceRenderObject() {
+}
+
+InstanceRenderObject* InstanceRenderObject::Create(const char* objFileName, int32_t maxInstance) {
+    InstanceRenderObject* obj = NULL;
+
+    if (objFileName != NULL) {
+        obj = new InstanceRenderObject();
+        obj->m_Model = ModelMgr::AddInstanceModel(objFileName, maxInstance);
+        obj->m_ShaderDesc = obj->CalculateShaderDesc();
+        obj->m_ShaderDesc.SetFlag(render::shader::GLB_ENABLE_INSTANCE_RENDERING, true);
+        obj->m_MaxInstanceNum = maxInstance;
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return obj;
+}
+
+void InstanceRenderObject::Update() {
+    InstanceObjectMap::iterator it = m_InstanceObjects.begin();
+
+    std::vector<math::Matrix> matV;
+    for (int32_t i = 0; i < m_CurInstanceNum; i++) {
+        math::Vector pos = it->second->GetPos();
+        math::Vector scale = it->second->GetScale();
+        math::Vector rotate = it->second->GetRotation();
+
+        // Build world transform matrix
+        math::Matrix worldMatrix;
+        worldMatrix.MakeIdentityMatrix();
+
+        // Scale
+        worldMatrix.Scale(scale.x, scale.y, scale.z);
+
+        // Rotate
+        worldMatrix.RotateXYZ(rotate.x, rotate.y, rotate.z);
+
+        // Translate
+        worldMatrix.Translate(pos.x, pos.y, pos.z);
+
+
+        matV.push_back(worldMatrix);
+        it++;
+    }
+
+    // Update world matrix attribute
+    InstanceModel* model = reinterpret_cast<InstanceModel*>(m_Model);
+    model->UpdateMatrixAttribute(matV);
+}
+
+void InstanceRenderObject::AddInstanceObject(InstanceObject* obj) {
+    if (obj != NULL) {
+        m_InstanceObjects.insert(std::pair<int32_t, InstanceObject*>(obj->GetObjectId(), obj));
+        m_CurInstanceNum++;
+    }
+}
+
+int32_t InstanceRenderObject::GetCurInstanceNum() const {
+    return m_CurInstanceNum;
+}
+
+//---------------------------------------------------------------------------------------------
+
+InstanceObject::InstanceObject()
+: m_InstanceRenderObject(NULL) {
+    m_ObjectType = OBJECT_TYPE_INSTANCE;
+}
+
+InstanceObject::~InstanceObject() {
+    m_InstanceRenderObject = NULL;
+}
+
+InstanceObject* InstanceObject::Create(InstanceRenderObject* instanceRenderObject, math::Vector pos, math::Vector scale, math::Vector rotate) {
+    InstanceObject* obj = NULL;
+
+    if (instanceRenderObject != NULL) {
+        obj = new InstanceObject();
+        obj->m_InstanceRenderObject = instanceRenderObject;
+        obj->m_Pos = pos;
+        obj->m_Scale = scale;
+        obj->m_Rotation = rotate;
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return obj;
+}
+
+math::Vector InstanceObject::GetBoundBoxMax() {
+    math::Vector boxMax(0.0f, 0.0f, 0.0f);
+
+    if (m_InstanceRenderObject) {
+        boxMax = m_InstanceRenderObject->GetModel()->GetBoundBoxMax();
+        boxMax = boxMax + m_Pos;
+    }
+
+    return boxMax;
+}
+
+math::Vector InstanceObject::GetBoundBoxMin() {
+    math::Vector boxMin(0.0f, 0.0f, 0.0f);
+
+    if (m_InstanceRenderObject) {
+        boxMin = m_InstanceRenderObject->GetModel()->GetBoundBoxMin();
+        boxMin = boxMin + m_Pos;
+    }
+
+    return boxMin;
+}
+
+Model* InstanceObject::GetModel() {
+    if (m_InstanceRenderObject) {
+        return m_InstanceRenderObject->GetModel();
+    } else {
+        return NULL;
+    }
+}
+
+void InstanceObject::Update() {
+    Object::Update();
 }
 
 };  // namespace scene

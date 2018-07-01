@@ -39,6 +39,7 @@ DeviceImp::DeviceImp()
 , m_OpenGLContext(NULL)
 , m_VertexArrayObject(-1)
 , m_VertexBufferObject(-1)
+, m_InstanceBufferObject(-1)
 , m_VertexLayout()
 , m_ShaderLayout()
 , m_EnableDepthTest(false)
@@ -153,6 +154,7 @@ void DeviceImp::Destroy() {
 void DeviceImp::SetVertexBuffer(mesh::VertexBuffer* buf) {
     m_VertexArrayObject = buf->GetVAO();
     m_VertexBufferObject = buf->GetVBO();
+    m_InstanceBufferObject = buf->GetIBO();
 }
 
 void DeviceImp::SetVertexLayout(VertexLayout layout) {
@@ -360,6 +362,21 @@ void DeviceImp::Draw(PrimitiveType type, int32_t first, int32_t size) {
     SetupRenderState();
 
     glDrawArrays(GetPrimitiveTypeGL(type), first, size);
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+}
+
+void DeviceImp::DrawInstance(PrimitiveType type, int32_t first, int32_t size, int32_t instance) {
+    glBindVertexArray(m_VertexArrayObject);
+    glBindBuffer(GL_ARRAY_BUFFER, m_VertexBufferObject);
+
+    SetupRenderState();
+
+    glBindBuffer(GL_ARRAY_BUFFER, m_InstanceBufferObject);
+    SetupInstanceLayout();
+
+    glDrawArraysInstanced(GetPrimitiveTypeGL(type), first, size, instance);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
@@ -682,6 +699,76 @@ void DeviceImp::SetupVertexLayout() {
                 if (location != -1) {
                     glEnableVertexAttribArray(location);
                     glVertexAttribPointer(location, 3, GL_FLOAT, GL_FALSE, 0, reinterpret_cast<GLvoid*>(m_VertexLayout.layouts[i].offset));
+                }
+            }
+            break;
+
+        case VA_WORLDMATRIX:
+        case VA_TRANSINVWORLDMATRIX:
+            break;
+
+        case VA_UNKNOWN:
+        default:
+            GLB_SAFE_ASSERT(false);
+            break;
+        }
+    }
+}
+
+void DeviceImp::SetupInstanceLayout() {
+    for (int32_t i = 0; i < m_VertexLayout.count; i++) {
+        switch (m_VertexLayout.layouts[i].attriType) {
+        case VA_POS:
+        case VA_COLOR:
+        case VA_TEXCOORD:
+        case VA_LIGHT_MAP_TEXCOORD:
+        case VA_NORMAL:
+        case VA_TANGENT:
+        case VA_BINORMAL:
+            break;
+
+        case VA_WORLDMATRIX:
+            {
+                int32_t location = -1;
+                for (int32_t j = 0; j < m_ShaderLayout.count; j++) {
+                    if (m_ShaderLayout.layouts[j].attriType == VA_WORLDMATRIX) {
+                        location = m_ShaderLayout.layouts[j].location;
+                        break;
+                    }
+                }
+
+                // Must have VA_WORLDMATRIX
+                if (location != -1) {
+                    // When matrix is attributes of vertex, it should be ranged as 4 vectors
+                    for (int32_t j = 0; j < 4; j++) {
+                        glEnableVertexAttribArray(location + j);
+                        glVertexAttribPointer(location + j, 4, GL_FLOAT, GL_FALSE, 16 * sizeof(float), reinterpret_cast<GLvoid*>(m_VertexLayout.layouts[i].offset + j * 4 * sizeof(float)));
+                        glVertexAttribDivisor(location + j, 1);
+                    }
+                } else {
+                    GLB_SAFE_ASSERT(false);
+                }
+            }
+            break;
+
+        case VA_TRANSINVWORLDMATRIX:
+            {
+                int32_t location = -1;
+                for (int32_t j = 0; j < m_ShaderLayout.count; j++) {
+                    if (m_ShaderLayout.layouts[j].attriType == VA_TRANSINVWORLDMATRIX) {
+                        location = m_ShaderLayout.layouts[j].location;
+                        break;
+                    }
+                }
+
+                // VA_WORLDMATRIX is optional
+                if (location != -1) {
+                    // When matrix is attributes of vertex, it should be ranged as 4 vectors
+                    for (int32_t j = 0; j < 4; j++) {
+                        glEnableVertexAttribArray(location + j);
+                        glVertexAttribPointer(location + j, 4, GL_FLOAT, GL_FALSE, 16 * sizeof(float), reinterpret_cast<GLvoid*>(m_VertexLayout.layouts[i].offset + j * 4 * sizeof(float)));
+                        glVertexAttribDivisor(location + j, 1);
+                    }
                 }
             }
             break;

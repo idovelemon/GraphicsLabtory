@@ -94,6 +94,7 @@ public:
     void SetClearDepth(float depth);
     void Clear(int32_t clear_flag);
     void Draw(PrimitiveType type, int32_t first, int32_t size);
+    void DrawInstance(PrimitiveType type, int32_t first, int32_t size, int32_t instance);
     void SetupVSync(bool enable);
     void SwapBuffer();
 
@@ -106,6 +107,7 @@ protected:
     void SetupCullFace();
     void SetupAlphaBlend();
     void SetupVertexLayout();
+    void SetupInstanceLayout();
     void SetupTexture();
 
 private:
@@ -116,6 +118,7 @@ private:
     // Vertex Buffer
     int32_t             m_VertexArrayObject;
     int32_t             m_VertexBufferObject;
+    int32_t             m_InstanceBufferObject;
     VertexLayout        m_VertexLayout;
 
     // Texture

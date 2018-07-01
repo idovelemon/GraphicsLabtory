@@ -271,6 +271,14 @@ void Device::Draw(PrimitiveType type, int32_t first, int32_t count) {
     }
 }
 
+void Device::DrawInstance(PrimitiveType type, int32_t first, int32_t count, int32_t instance) {
+    if (s_DeviceImp != NULL) {
+        s_DeviceImp->DrawInstance(type, first, count, instance);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+}
+
 void Device::SetupVSync(bool enable) {
     if (s_DeviceImp != NULL) {
         s_DeviceImp->SetupVSync(enable);

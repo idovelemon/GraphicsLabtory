@@ -9,6 +9,7 @@
 
 #include <stdint.h>
 
+#include <map>
 #include <vector>
 
 #include "glbmodel.h"
@@ -21,11 +22,21 @@
 
 namespace glb {
 
-class TriangleMesh;
-
 namespace scene {
 
+class InstanceRenderObject;
+class InstanceObject;
+
+//---------------------------------------------------------------------------------------------
+
 class Object {
+public:
+    enum {
+        OBJECT_TYPE_NORMAL = 0,
+        OBJECT_TYPE_INSTANCE,
+        OBJECT_TYPE_INSTANCE_RENDER,
+    };
+
 public:
     Object();
     virtual~ Object();
@@ -44,51 +55,58 @@ public:
         math::Vector scale = math::Vector(1.0f, 1.0f, 1.0f), math::Vector rotation = math::Vector(0.0f, 0.0f, 0.0f));
 
 public:
-    void SetDead(bool dead);
-    bool IsDead() const;
+    virtual int32_t GetObjectType() const;
 
-    void SetPos(math::Vector pos);
-    math::Vector GetPos() const;
+    virtual void SetObjectId(int32_t id);
+    virtual int32_t GetObjectId() const;
 
-    void SetScale(math::Vector scale);
-    math::Vector GetScale() const;
+    virtual void SetDead(bool dead);
+    virtual bool IsDead() const;
 
-    void SetRotation(math::Vector rotation);
-    math::Vector GetRotation() const;
+    virtual void SetPos(math::Vector pos);
+    virtual math::Vector GetPos() const;
 
-    math::Vector GetBoundBoxMax();
-    math::Vector GetBoundBoxMin();
+    virtual void SetScale(math::Vector scale);
+    virtual math::Vector GetScale() const;
 
-    math::Matrix GetWorldMatrix() const;
+    virtual void SetRotation(math::Vector rotation);
+    virtual math::Vector GetRotation() const;
 
-    Model* GetModel();
-    render::shader::Descriptor GetShaderDesc();
+    virtual math::Vector GetBoundBoxMax();
+    virtual math::Vector GetBoundBoxMin();
 
-    void SetDrawEnable(bool enable);
-    bool IsDrawEnable();
+    virtual math::Matrix GetWorldMatrix() const;
 
-    void SetDepthTestEnable(bool enable);
-    bool IsDepthTestEnable();
+    virtual Model* GetModel();
+    virtual render::shader::Descriptor GetShaderDesc();
 
-    void SetAlphaBlendEnable(bool enable);
-    bool IsAlphaBlendEnable();
-    void SetAlphaBlendFunc(render::AlphaBlendFactor factor, render::AlphaBlendFunc func);
-    render::AlphaBlendFunc GetAlphaBlendFunc(render::AlphaBlendFactor factor);
+    virtual void SetDrawEnable(bool enable);
+    virtual bool IsDrawEnable();
 
-    void SetCullFaceEnable(bool enable);
-    bool IsCullFaceEnable();
-    void SetCullFaceMode(render::CullMode mode);
-    render::CullMode GetCullFaceMode();
+    virtual void SetDepthTestEnable(bool enable);
+    virtual bool IsDepthTestEnable();
 
-    void SetTexWithId(int32_t slot, int32_t tex_id);
-    int32_t GetTexId(int32_t slot);
+    virtual void SetAlphaBlendEnable(bool enable);
+    virtual bool IsAlphaBlendEnable();
+    virtual void SetAlphaBlendFunc(render::AlphaBlendFactor factor, render::AlphaBlendFunc func);
+    virtual render::AlphaBlendFunc GetAlphaBlendFunc(render::AlphaBlendFactor factor);
+
+    virtual void SetCullFaceEnable(bool enable);
+    virtual bool IsCullFaceEnable();
+    virtual void SetCullFaceMode(render::CullMode mode);
+    virtual render::CullMode GetCullFaceMode();
+
+    virtual void SetTexWithId(int32_t slot, int32_t tex_id);
+    virtual int32_t GetTexId(int32_t slot);
 
     virtual void Update();
 
-private:
+protected:
     render::shader::Descriptor CalculateShaderDesc();
 
-private:
+protected:
+    int32_t                         m_ObjectType;
+    int32_t                         m_ObjectId;
     bool                            m_IsDead;
     Model*                          m_Model;
     math::Vector                    m_Pos;
@@ -104,6 +122,48 @@ private:
     render::CullMode                m_CullMode;
     render::AlphaBlendFunc          m_SrcBlendFunc;
     render::AlphaBlendFunc          m_DstBlendFunc;
+};
+
+//---------------------------------------------------------------------------------------------
+
+class InstanceRenderObject : public Object {
+public:
+    InstanceRenderObject();
+    virtual ~InstanceRenderObject();
+
+    static InstanceRenderObject* Create(const char* objFileName, int32_t maxInstance = 256);
+
+public:
+    virtual void Update();
+    void AddInstanceObject(InstanceObject* obj);
+    int32_t GetCurInstanceNum() const;
+
+protected:
+    int32_t     m_MaxInstanceNum;
+    int32_t     m_CurInstanceNum;
+    typedef std::map<int32_t, InstanceObject*> InstanceObjectMap;
+    InstanceObjectMap m_InstanceObjects;
+};
+
+//---------------------------------------------------------------------------------------------
+
+class InstanceObject : public Object {
+public:
+    InstanceObject();
+    virtual ~InstanceObject();
+
+    static InstanceObject* Create(InstanceRenderObject* instanceRenderObject, math::Vector pos, math::Vector scale, math::Vector rotate);
+
+public:
+    virtual math::Vector GetBoundBoxMax();
+    virtual math::Vector GetBoundBoxMin();
+
+    virtual Model* GetModel();
+
+    virtual void Update();
+
+private:
+    InstanceRenderObject*       m_InstanceRenderObject;
 };
 
 };  // namespace scene
