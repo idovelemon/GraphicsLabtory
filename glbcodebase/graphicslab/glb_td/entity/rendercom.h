@@ -11,6 +11,8 @@
 
 #include <stdint.h>
 
+#include <map>
+
 #include "math/glbvector.h"
 
 namespace entity {
@@ -26,7 +28,7 @@ class TransformCom;
 
 class RenderCom : public Component {
 public:
-    RenderCom(Entity* owner, const char* name, glb::math::Vector pos, glb::math::Vector rot, glb::math::Vector scale);
+    RenderCom(Entity* owner, const char* name, glb::math::Vector pos, glb::math::Vector rot, glb::math::Vector scale, bool enableInstance, int32_t maxInstanceNum);
     virtual ~RenderCom();
 
 public:
@@ -38,6 +40,9 @@ public:
 
 protected:
     int32_t     m_SceneObjID;
+
+    typedef std::map<std::string, int32_t> InstanceMap;
+    static InstanceMap s_InstanceMap;
 };
 
 };  // namespace entity

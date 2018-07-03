@@ -115,10 +115,11 @@ void EntityAddTransformCom(int id,
 void EntityAddRenderCom(int id, const char* name,
                         float px, float py, float pz,
                         float rx, float ry, float rz,
-                        float sx, float sy, float sz) {
+                        float sx, float sy, float sz,
+                        bool enableInstance, int maxInstanceNum) {
     entity::Entity* ent = entity::EntityMgr::GetEntity(id);
     if (ent != NULL) {
-        entity::RenderCom* com = new entity::RenderCom(ent, name, glb::math::Vector(px, py, pz), glb::math::Vector(rx, ry, rz), glb::math::Vector(sx, sy, sz));
+        entity::RenderCom* com = new entity::RenderCom(ent, name, glb::math::Vector(px, py, pz), glb::math::Vector(rx, ry, rz), glb::math::Vector(sx, sy, sz), enableInstance, maxInstanceNum);
         com->SetDepthTestEnable(true);
         ent->AddComponent(com);
     } else {

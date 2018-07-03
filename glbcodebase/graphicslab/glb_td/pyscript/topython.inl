@@ -83,10 +83,12 @@ static PyObject* EntityAddRenderCom(PyObject* self, PyObject* args) {
 	float sx;
 	float sy;
 	float sz;
-	if (!PyArg_ParseTuple(args, "isfffffffff", &id, &name, &px, &py, &pz, &rx, &ry, &rz, &sx, &sy, &sz)) {
+	bool enableInstance;
+	int maxInstanceNum;
+	if (!PyArg_ParseTuple(args, "isfffffffffbi", &id, &name, &px, &py, &pz, &rx, &ry, &rz, &sx, &sy, &sz, &enableInstance, &maxInstanceNum)) {
 		 return NULL;
 	}
-	EntityAddRenderCom(id, name, px, py, pz, rx, ry, rz, sx, sy, sz);
+	EntityAddRenderCom(id, name, px, py, pz, rx, ry, rz, sx, sy, sz, enableInstance, maxInstanceNum);
 	return Py_BuildValue("");
 }
 

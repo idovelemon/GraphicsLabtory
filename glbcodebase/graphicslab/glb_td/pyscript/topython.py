@@ -19,7 +19,7 @@ TOKEN_DELIMITER = 4
 
 DELIMITERS = [' ', '(', ')', ';', ',']
 
-KEYWORDS = ['float','int', 'void', "const", "char*"]
+KEYWORDS = ['float','int', 'void', "const", "char*", "bool"]
 
 class CParameterDesc:
     def __init__(self):
@@ -160,6 +160,8 @@ def write_python_function(c_function_desc, python_header_file):
                 header += 'i'
             elif param.param_type == "const char*":
                 header += 's'
+            elif param.param_type == "bool":
+                header += 'b'
             else:
                 # Not implementation yet
                 pass
@@ -199,7 +201,7 @@ def write_python_function(c_function_desc, python_header_file):
                 header += ", "
                 param_index += 1
         header += ");\n"                   
-    header += "\treturn Py_BuildValue(";
+    header += "\treturn Py_BuildValue("
     if c_function_desc.return_type == "void":
          header += '"");'
     elif c_function_desc.return_type == "int":

@@ -13,16 +13,38 @@
 
 namespace entity {
 
-RenderCom::RenderCom(Entity* owner, const char* name, glb::math::Vector pos, glb::math::Vector rot, glb::math::Vector scale)
+RenderCom::InstanceMap RenderCom::s_InstanceMap;
+
+RenderCom::RenderCom(Entity* owner, const char* name, glb::math::Vector pos, glb::math::Vector rot, glb::math::Vector scale, bool enableInstance, int32_t maxInstanceNum)
 : Component(CT_RENDER, owner)
 , m_SceneObjID(-1) {
-    m_SceneObjID = glb::scene::Scene::AddObject(name);
+    if (enableInstance) {
+        InstanceMap::iterator it = s_InstanceMap.find(name);
+        if (it != s_InstanceMap.end()) {
+            m_SceneObjID = glb::scene::Scene::AddInstanceObject(it->second);
+        } else {
+            int32_t instanceRenderID = glb::scene::Scene::AddInstanceRenderObject(name, maxInstanceNum);
+            m_SceneObjID = glb::scene::Scene::AddInstanceObject(instanceRenderID);
+            s_InstanceMap.insert(std::pair<std::string, int32_t>(name, instanceRenderID));
+
+            glb::scene::Scene::GetObjectById(instanceRenderID)->SetCullFaceEnable(true);
+            glb::scene::Scene::GetObjectById(instanceRenderID)->SetCullFaceMode(glb::render::CULL_BACK);
+            glb::scene::Scene::GetObjectById(instanceRenderID)->SetDepthTestEnable(true);
+        }
+    } else {
+        m_SceneObjID = glb::scene::Scene::AddObject(name);
+    }
+
     glb::scene::Object* obj = glb::scene::Scene::GetObjectById(m_SceneObjID);
     if (obj != NULL) {
         obj->SetPos(pos);
         obj->SetRotation(rot);
         obj->SetScale(scale);
         obj->Update();
+
+        obj->SetCullFaceEnable(true);
+        obj->SetCullFaceMode(glb::render::CULL_BACK);
+        obj->SetDepthTestEnable(true);
     }
 }
 

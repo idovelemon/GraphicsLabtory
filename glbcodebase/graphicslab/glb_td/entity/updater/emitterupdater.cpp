@@ -47,10 +47,11 @@ void EntityNormalEmitterUpdater(Entity* entity) {
         // Create normal bullet
         int bullet = EntityCreate();
         EntityAddTransformCom(bullet, pos.x, pos.y, pos.z, rot.x, rot.y, rot.z, 1.0f, 1.0f, 1.0f);
-        EntityAddRenderCom(bullet, "res/model/emitter/normal_bullet.obj", pos.x, pos.y, pos.z, rot.x, rot.y, rot.z, 1.0f, 1.0f, 1.0f);
+        EntityAddRenderCom(bullet, "res/model/emitter/normal_bullet.obj", pos.x, pos.y, pos.z, rot.x, rot.y, rot.z, 1.0f, 1.0f, 1.0f, true, 512);
         EntityAddScriptCom(bullet, "EntityNormalBulletUpdater");
         EntityAddDataCom(bullet);
         EntityAddFloatData(bullet, "Life", 3.0f * 60.0f);
+        //EntityAddCollisionCom(bullet);
     }
 
     pack->SetFloat(curDelta);

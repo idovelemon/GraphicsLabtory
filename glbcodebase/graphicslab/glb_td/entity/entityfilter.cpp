@@ -79,7 +79,7 @@ std::vector<Entity*> TagNameEntityFilter(Entity** entity, int32_t num, std::vect
             if (data == NULL) continue;
 
             DataPack* pack = data->GetData("Tag");
-            if (pack && !pack->GetString().compare(tag)) {
+            if (pack != NULL && !pack->GetString().compare(tag)) {
                 result.push_back(entity[i]);
             }
         }
