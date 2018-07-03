@@ -9,10 +9,10 @@
 in vec2 vs_texcoord;
 out vec4 color;
 
-uniform sampler2D glb_HDRSceneTex;
+uniform sampler2D glb_unif_HDRSceneTex;
 
 void main() {
-	vec3 hdr_color = textureLod(glb_HDRSceneTex, vs_texcoord, 1).xyz;
+	vec3 hdr_color = textureLod(glb_unif_HDRSceneTex, vs_texcoord, 1).xyz;
 	float lum = hdr_color.x * 0.27 + hdr_color.y * 0.67 + hdr_color.z * 0.06;
 	float log_lum = log(lum + 0.0001);
 	color = vec4(log_lum, log_lum, log_lum, 1.0);

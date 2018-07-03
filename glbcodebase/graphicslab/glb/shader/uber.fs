@@ -45,24 +45,24 @@ out vec4 oColor;
 #ifdef GLB_TEXCOORD_IN_VERTEX
 
 	#ifdef GLB_ENABLE_ALBEDO_TEX
-		uniform sampler2D glb_AlbedoTex;
+		uniform sampler2D glb_unif_AlbedoTex;
 	#endif
 
 	#ifdef GLB_ENABLE_ROUGHNESS_TEX
-		uniform sampler2D glb_RoughnessTex;
+		uniform sampler2D glb_unif_RoughnessTex;
 	#endif
 
 	#ifdef GLB_ENABLE_METALLIC_TEX
-		uniform sampler2D glb_MetallicTex;
+		uniform sampler2D glb_unif_MetallicTex;
 	#endif
 
 	#ifdef GLB_ENABLE_ALPHA_TEX
-		uniform sampler2D glb_AlphaTex;
+		uniform sampler2D glb_unif_AlphaTex;
 	#endif
 
 	#ifdef GLB_ENABLE_NORMAL_TEX
 
-		uniform sampler2D glb_NormalTex;
+		uniform sampler2D glb_unif_NormalTex;
 
 		#ifdef GLB_TANGENT_IN_VERTEX
 		#ifdef GLB_BINORMAL_IN_VERTEX
@@ -75,11 +75,11 @@ out vec4 oColor;
 	#endif
 
 	#ifdef GLB_ENABLE_EMISSION_TEX
-		uniform sampler2D glb_EmissionTex;
+		uniform sampler2D glb_unif_EmissionTex;
 	#endif
 
 	#ifdef GLB_ENABLE_REFLECT_TEX
-		uniform samplerCube glb_ReflectTex;
+		uniform samplerCube glb_unif_ReflectTex;
 	#endif
 
 #endif  // GLB_TEXCOORD_IN_VERTEX
@@ -87,9 +87,9 @@ out vec4 oColor;
 #ifdef GLB_LIGHT_TEXCOORD_IN_VERTEX
 	#ifdef GLB_ENABLE_LIGHT_TEX
 
-		uniform sampler2D glb_Light0Tex;
-		uniform sampler2D glb_Light1Tex;
-		uniform sampler2D glb_Light2Tex;
+		uniform sampler2D glb_unif_Light0Tex;
+		uniform sampler2D glb_unif_Light1Tex;
+		uniform sampler2D glb_unif_Light2Tex;
 
 		#ifdef GLB_ENABLE_NORMAL_MAPPING
 			#define GLB_ENABLE_RADIOSITY_NORMAL_MAPPING
@@ -100,17 +100,17 @@ out vec4 oColor;
 
 #ifdef GLB_ENABLE_SHADOW
 
-	uniform sampler2D glb_ShadowTex0;
-	uniform sampler2D glb_ShadowTex1;
-	uniform sampler2D glb_ShadowTex2;
-	uniform sampler2D glb_ShadowTex3;
-	uniform mat4 glb_ShadowM0;
-	uniform mat4 glb_ShadowM1;
-	uniform mat4 glb_ShadowM2;
-	uniform mat4 glb_ShadowM3;
-	uniform float glb_ShadowSplit0;
-	uniform float glb_ShadowSplit1;
-	uniform float glb_ShadowSplit2;
+	uniform sampler2D glb_unif_ShadowTex0;
+	uniform sampler2D glb_unif_ShadowTex1;
+	uniform sampler2D glb_unif_ShadowTex2;
+	uniform sampler2D glb_unif_ShadowTex3;
+	uniform mat4 glb_unif_ShadowM0;
+	uniform mat4 glb_unif_ShadowM1;
+	uniform mat4 glb_unif_ShadowM2;
+	uniform mat4 glb_unif_ShadowM3;
+	uniform float glb_unif_ShadowSplit0;
+	uniform float glb_unif_ShadowSplit1;
+	uniform float glb_unif_ShadowSplit2;
 
 	int calc_current_shadow_index(vec3 vtx, vec3 eye_pos, vec3 look_at, float sp0, float sp1, float sp2) {
 		int index = -1;
@@ -132,9 +132,9 @@ out vec4 oColor;
 #endif  // GLB_ENABLE_SHADOW
 
 #ifdef GLB_ENABLE_AO
-	uniform float glb_ScreenWidth;
-	uniform float glb_ScreenHeight;
-	uniform sampler2D glb_AOMap;
+	uniform float glb_unif_ScreenWidth;
+	uniform float glb_unif_ScreenHeight;
+	uniform sampler2D glb_unif_AOMap;
 #endif
 
 #ifdef GLB_ENABLE_LIGHTING
@@ -146,34 +146,34 @@ out vec4 oColor;
 #endif
 
 #ifdef GLB_ENABLE_EYE_POS
-	uniform vec3 glb_EyePos;
-	uniform vec3 glb_LookAt;
+	uniform vec3 glb_unif_EyePos;
+	uniform vec3 glb_unif_LookAt;
 #endif
 
-uniform vec3 glb_Material_Emission;
+uniform vec3 glb_unif_Material_Emission;
 
 #ifdef GLB_ENABLE_LIGHTING
-	uniform vec3 glb_Material_Ambient;
-	uniform vec3 glb_Material_Diffuse;
-	uniform vec3 glb_Material_Specular;
-	uniform float glb_Material_Pow;
-	uniform vec3 glb_Material_Albedo;
-	uniform float glb_Material_Roughness;
-	uniform float glb_Material_Metallic;
+	uniform vec3 glb_unif_Material_Ambient;
+	uniform vec3 glb_unif_Material_Diffuse;
+	uniform vec3 glb_unif_Material_Specular;
+	uniform float glb_unif_Material_Pow;
+	uniform vec3 glb_unif_Material_Albedo;
+	uniform float glb_unif_Material_Roughness;
+	uniform float glb_unif_Material_Metallic;
 
-	uniform vec3 glb_GlobalLight_Ambient;
+	uniform vec3 glb_unif_GlobalLight_Ambient;
 
 	#ifdef GLB_USE_PARALLEL_LIGHT
-		uniform vec3 glb_ParallelLight_Dir;
-		uniform vec3 glb_ParallelLight;
+		uniform vec3 glb_unif_ParallelLight_Dir;
+		uniform vec3 glb_unif_ParallelLight;
 	#else
 		#error No light source specified
 	#endif
 
-	uniform samplerCube glb_DiffusePFCTex;
-	uniform samplerCube glb_SpecularPFCTex;
-	uniform sampler2D glb_BRDFPFTTex;
-	uniform float glb_SpecularPFCLOD;
+	uniform samplerCube glb_unif_DiffusePFCTex;
+	uniform samplerCube glb_unif_SpecularPFCTex;
+	uniform sampler2D glb_unif_BRDFPFTTex;
+	uniform float glb_unif_SpecularPFCLOD;
 
 	vec3 calc_fresnel(vec3 n, vec3 v, vec3 F0) {
 		float ndotv = max(dot(n, v), 0.0);
@@ -231,33 +231,33 @@ float calc_shadow() {
 
 #ifdef GLB_ENABLE_SHADOW
 	vec2 shadow_coord;
-	int index = calc_current_shadow_index(vs_Vertex, glb_EyePos, glb_LookAt, glb_ShadowSplit0, glb_ShadowSplit1, glb_ShadowSplit2);
+	int index = calc_current_shadow_index(vs_Vertex, glb_unif_EyePos, glb_unif_LookAt, glb_unif_ShadowSplit0, glb_unif_ShadowSplit1, glb_unif_ShadowSplit2);
 	vec4 light_space_pos;
 	float factor;
 	if (index == 0) {
-		light_space_pos = glb_ShadowM0 * vec4(vs_Vertex, 1.0);
+		light_space_pos = glb_unif_ShadowM0 * vec4(vs_Vertex, 1.0);
 		light_space_pos.xyz /= 2.0f;
 		light_space_pos.xyz += 0.5f;
 		light_space_pos.xyz /= light_space_pos.w;
-		factor = texture2D(glb_ShadowTex0, light_space_pos.xy).z;
+		factor = texture2D(glb_unif_ShadowTex0, light_space_pos.xy).z;
 	} else if (index == 1) {
-		light_space_pos = glb_ShadowM1 * vec4(vs_Vertex, 1.0);
+		light_space_pos = glb_unif_ShadowM1 * vec4(vs_Vertex, 1.0);
 		light_space_pos.xyz /= 2.0f;
 		light_space_pos.xyz += 0.5f;
 		light_space_pos.xyz /= light_space_pos.w;	
-		factor = texture2D(glb_ShadowTex1, light_space_pos.xy).z;
+		factor = texture2D(glb_unif_ShadowTex1, light_space_pos.xy).z;
 	} else if (index == 2) {
-		light_space_pos = glb_ShadowM2 * vec4(vs_Vertex, 1.0);
+		light_space_pos = glb_unif_ShadowM2 * vec4(vs_Vertex, 1.0);
 		light_space_pos.xyz /= 2.0f;
 		light_space_pos.xyz += 0.5f;
 		light_space_pos.xyz /= light_space_pos.w;				
-		factor = texture2D(glb_ShadowTex2, light_space_pos.xy).z;
+		factor = texture2D(glb_unif_ShadowTex2, light_space_pos.xy).z;
 	} else {
-		light_space_pos = glb_ShadowM3 * vec4(vs_Vertex, 1.0);
+		light_space_pos = glb_unif_ShadowM3 * vec4(vs_Vertex, 1.0);
 		light_space_pos.xyz /= 2.0f;
 		light_space_pos.xyz += 0.5f;
 		light_space_pos.xyz /= light_space_pos.w;
-		factor = texture2D(glb_ShadowTex3, light_space_pos.xy).z;
+		factor = texture2D(glb_unif_ShadowTex3, light_space_pos.xy).z;
 	}
 	if (factor < light_space_pos.z) {
 		// In shadow
@@ -282,7 +282,7 @@ void calc_normal(out vec3 nw, out vec3 nt) {
 #endif
 
 #ifdef GLB_ENABLE_NORMAL_MAPPING
-	nw = texture2D(glb_NormalTex, vs_TexCoord).xyz;
+	nw = texture2D(glb_unif_NormalTex, vs_TexCoord).xyz;
 	nw -= vec3(0.5, 0.5, 0.5);
 	nw *= 2.0;
 	nw = normalize(nw);
@@ -298,7 +298,7 @@ vec3 calc_view() {
 	vec3 view = vec3(0.0, 0.0, 0.0);
 
 #ifdef GLB_ENABLE_EYE_POS
-	view = normalize(glb_EyePos - vs_Vertex);
+	view = normalize(glb_unif_EyePos - vs_Vertex);
 #endif	
 
 	return view;
@@ -307,7 +307,7 @@ vec3 calc_view() {
 vec3 calc_light_dir() {
 	vec3 light_dir = vec3(0.0, 0.0, 0.0);
 #ifdef GLB_USE_PARALLEL_LIGHT
-	light_dir = -glb_ParallelLight_Dir;
+	light_dir = -glb_unif_ParallelLight_Dir;
 #endif
 	return light_dir;
 }
@@ -316,27 +316,27 @@ void calc_material(out vec3 albedo, out float roughness, out float metallic, out
 #ifdef GLB_ENABLE_LIGHTING
 
 #ifdef GLB_ENABLE_ALBEDO_TEX
-	albedo = texture(glb_AlbedoTex, vs_TexCoord).xyz;
+	albedo = texture(glb_unif_AlbedoTex, vs_TexCoord).xyz;
 #else
-	albedo = glb_Material_Albedo;
+	albedo = glb_unif_Material_Albedo;
 #endif
 
 #ifdef GLB_ENABLE_ROUGHNESS_TEX
-	roughness = texture(glb_RoughnessTex, vs_TexCoord).x;
+	roughness = texture(glb_unif_RoughnessTex, vs_TexCoord).x;
 #else
-	roughness = glb_Material_Roughness;
+	roughness = glb_unif_Material_Roughness;
 #endif
 
 #ifdef GLB_ENABLE_METALLIC_TEX
-	metallic = texture(glb_MetallicTex, vs_TexCoord).x;
+	metallic = texture(glb_unif_MetallicTex, vs_TexCoord).x;
 #else
-	metallic = glb_Material_Metallic;
+	metallic = glb_unif_Material_Metallic;
 #endif
 
 #ifdef GLB_ENABLE_EMISSION_TEX
-	emission = texture(glb_EmissionTex, vs_TexCoord).xyz * glb_Material_Emission;
+	emission = texture(glb_unif_EmissionTex, vs_TexCoord).xyz * glb_unif_Material_Emission;
 #else
-	emission = glb_Material_Emission;
+	emission = glb_unif_Material_Emission;
 #endif
 
 #endif
@@ -346,10 +346,10 @@ vec3 calc_direct_light_color() {
 	vec3 light = vec3(0.0, 0.0, 0.0);
 
 #ifdef GLB_ENABLE_LIGHTING
-	light = light + glb_GlobalLight_Ambient;
+	light = light + glb_unif_GlobalLight_Ambient;
 
 #ifdef GLB_USE_PARALLEL_LIGHT
-	light = light + glb_ParallelLight;
+	light = light + glb_unif_ParallelLight;
 #endif
 
 #endif
@@ -392,14 +392,14 @@ vec3 calc_ibl_lighting(vec3 n, vec3 v, vec3 albedo, float roughness, float metal
     vec3 T = vec3(1.0, 1.0, 1.0) - F;
     vec3 kD = T * (1.0 - metalic);
 
-    vec3 irradiance = filtering_cube_map(glb_DiffusePFCTex, n);
+    vec3 irradiance = filtering_cube_map(glb_unif_DiffusePFCTex, n);
     vec3 diffuse = kD * albedo * irradiance;
 
     // Specular part
     float ndotv = max(0.0, dot(n, v));
     vec3 r = 2.0 * ndotv * n - v;
-    vec3 ld = filtering_cube_map_lod(glb_SpecularPFCTex, r, roughness * glb_SpecularPFCLOD);
-    vec2 dfg = textureLod(glb_BRDFPFTTex, vec2(ndotv, roughness), 0.0).xy;
+    vec3 ld = filtering_cube_map_lod(glb_unif_SpecularPFCTex, r, roughness * glb_unif_SpecularPFCLOD);
+    vec2 dfg = textureLod(glb_unif_BRDFPFTTex, vec2(ndotv, roughness), 0.0).xy;
     vec3 specular = ld * (F0 * dfg.x + dfg.y);
 
     result = diffuse + specular;
@@ -436,7 +436,7 @@ float calc_alpha() {
 
 #ifdef GLB_TEXCOORD_IN_VERTEX
 	#ifdef GLB_ENABLE_ALPHA_TEX
-		alpha = texture2D(glb_AlphaTex, vs_TexCoord).w;
+		alpha = texture2D(glb_unif_AlphaTex, vs_TexCoord).w;
 	#endif
 #endif
 
@@ -479,7 +479,7 @@ void main() {
     vec3 refl = reflect(-view, normalInWorld);
     refl = normalize(refl);
     refl.yz = -refl.yz;
-    oColor.xyz = textureCube(glb_ReflectTex, refl).xyz;
+    oColor.xyz = textureCube(glb_unif_ReflectTex, refl).xyz;
 #endif
 
 	float alpha = calc_alpha();

@@ -308,19 +308,19 @@ VertexAttribute UberProgram::GetVertexAttribute(const char* attribute_name) {
     VertexAttribute result = VA_UNKNOWN;
 
     if (attribute_name != NULL) {
-        if (!strcmp("glb_Pos", attribute_name)) {
+        if (!strcmp("glb_attr_Pos", attribute_name)) {
             result = VA_POS;
-        } else if (!strcmp("glb_Color", attribute_name)) {
+        } else if (!strcmp("glb_attr_Color", attribute_name)) {
             result = VA_COLOR;
-        } else if (!strcmp("glb_TexCoord", attribute_name)) {
+        } else if (!strcmp("glb_attr_TexCoord", attribute_name)) {
             result = VA_TEXCOORD;
-        } else if (!strcmp("glb_LightMapTexCoord", attribute_name)) {
+        } else if (!strcmp("glb_attr_LightMapTexCoord", attribute_name)) {
             result = VA_LIGHT_MAP_TEXCOORD;
-        } else if (!strcmp("glb_Normal", attribute_name)) {
+        } else if (!strcmp("glb_attr_Normal", attribute_name)) {
             result = VA_NORMAL;
-        } else if (!strcmp("glb_Tangent", attribute_name)) {
+        } else if (!strcmp("glb_attr_Tangent", attribute_name)) {
             result = VA_TANGENT;
-        } else if (!strcmp("glb_Binormal", attribute_name)) {
+        } else if (!strcmp("glb_attr_Binormal", attribute_name)) {
             result = VA_BINORMAL;
         } else if (!strcmp("glb_attr_WorldMatrix", attribute_name)) {
             result = VA_WORLDMATRIX;
@@ -431,20 +431,24 @@ VertexAttribute UserProgram::GetVertexAttribute(const char* attribute_name) {
     VertexAttribute result = VA_UNKNOWN;
 
     if (attribute_name != NULL) {
-        if (!strcmp("glb_Pos", attribute_name)) {
+        if (!strcmp("glb_attr_Pos", attribute_name)) {
             result = VA_POS;
-        } else if (!strcmp("glb_Color", attribute_name)) {
+        } else if (!strcmp("glb_attr_Color", attribute_name)) {
             result = VA_COLOR;
-        } else if (!strcmp("glb_TexCoord", attribute_name)) {
+        } else if (!strcmp("glb_attr_TexCoord", attribute_name)) {
             result = VA_TEXCOORD;
-        } else if (!strcmp("glb_LightMapTexCoord", attribute_name)) {
+        } else if (!strcmp("glb_attr_LightMapTexCoord", attribute_name)) {
             result = VA_LIGHT_MAP_TEXCOORD;
-        } else if (!strcmp("glb_Normal", attribute_name)) {
+        } else if (!strcmp("glb_attr_Normal", attribute_name)) {
             result = VA_NORMAL;
-        } else if (!strcmp("glb_Tangent", attribute_name)) {
+        } else if (!strcmp("glb_attr_Tangent", attribute_name)) {
             result = VA_TANGENT;
-        } else if (!strcmp("glb_Binormal", attribute_name)) {
+        } else if (!strcmp("glb_attr_Binormal", attribute_name)) {
             result = VA_BINORMAL;
+        } else if (!strcmp("glb_attr_WorldMatrix", attribute_name)) {
+            result = VA_WORLDMATRIX;
+        } else if (!strcmp("glb_attr_TransInvWorldMatrix", attribute_name)) {
+            result = VA_TRANSINVWORLDMATRIX;
         } else {
             GLB_SAFE_ASSERT(false);
         }

@@ -345,6 +345,7 @@ public:
 
                 // Setup uniform
                 render::Device::SetUniformSamplerCube(m_SpecularLDProgram_CubeMapLoc, 0);
+                GLB_CHECK_GL_ERROR;
                 render::Device::SetUniform1i(m_SpecularLDProgram_FaceIndexLoc, i);
                 render::Device::SetUniform1f(m_SpecularLDProgram_RoughnessLoc, j * roughnessStep);
 

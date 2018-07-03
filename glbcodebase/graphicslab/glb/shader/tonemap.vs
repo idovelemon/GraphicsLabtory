@@ -6,11 +6,11 @@
 //-----------------------------------------------------------
 #version 330
 
-in vec2 glb_Pos;
-in vec2 glb_TexCoord;
+in vec2 glb_attr_Pos;
+in vec2 glb_attr_TexCoord;
 out vec2 vs_texcoord;
 
 void main() {
-	gl_Position = vec4(glb_Pos, 0.0, 1.0);
-	vs_texcoord = glb_TexCoord;
+	gl_Position = vec4(glb_attr_Pos, 0.0, 1.0);
+	vs_texcoord = glb_attr_TexCoord;
 }

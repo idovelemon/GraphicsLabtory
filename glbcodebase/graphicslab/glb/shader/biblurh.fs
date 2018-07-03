@@ -10,10 +10,10 @@
 in vec2 vs_texcoord;
 out vec3 color;
 
-uniform sampler2D glb_DepthMap;
-uniform sampler2D glb_AOMap;
-uniform float glb_ScreenWidth;
-uniform float glb_FarClip;
+uniform sampler2D glb_unif_DepthMap;
+uniform sampler2D glb_unif_AOMap;
+uniform float glb_unif_ScreenWidth;
+uniform float glb_unif_FarClip;
 
 // const float kGaussNum[2] = {
 // 0.36166444368093026,
@@ -26,23 +26,23 @@ float kGaussNum[2] = float[]
 );
 
 void main() {
-    float cur_pixel_depth = texture2D(glb_DepthMap, vs_texcoord).r * glb_FarClip;
-    color = texture2D(glb_AOMap, vs_texcoord).xyz * kGaussNum[0] * 1.0;
-    float step = 1.0 / glb_ScreenWidth;
+    float cur_pixel_depth = texture2D(glb_unif_DepthMap, vs_texcoord).r * glb_FarClip;
+    color = texture2D(glb_unif_AOMap, vs_texcoord).xyz * kGaussNum[0] * 1.0;
+    float step = 1.0 / glb_unif_ScreenWidth;
 
     for (int i = 1; i < 2; i++) {
         if (vs_texcoord.x - i * step >= 0.0) {
-            float temp_depth = texture2D(glb_DepthMap, vec2(vs_texcoord.x - i * step, vs_texcoord.y)).r * glb_FarClip;
+            float temp_depth = texture2D(glb_unif_DepthMap, vec2(vs_texcoord.x - i * step, vs_texcoord.y)).r * glb_unif_FarClip;
             float cof = 1.0 / (0.01 + abs(cur_pixel_depth - temp_depth));
             //color += texture2D(glb_AOMap, vec2(vs_texcoord.x - i * step, vs_texcoord.y)).xyz * kGaussNum[i] * cof;
-            color += texture2D(glb_AOMap, vec2(vs_texcoord.x - i * step, vs_texcoord.y)).xyz * kGaussNum[i];
+            color += texture2D(glb_unif_AOMap, vec2(vs_texcoord.x - i * step, vs_texcoord.y)).xyz * kGaussNum[i];
         }
 
         if (vs_texcoord.x + i * step <= 1.0) {
-            float temp_depth = texture2D(glb_DepthMap, vec2(vs_texcoord.x + i * step, vs_texcoord.y)).r * glb_FarClip;
+            float temp_depth = texture2D(glb_unif_DepthMap, vec2(vs_texcoord.x + i * step, vs_texcoord.y)).r * glb_unif_FarClip;
             float cof = 1.0 / (0.01 + abs(cur_pixel_depth - temp_depth));        
             //color += texture2D(glb_AOMap, vec2(vs_texcoord.x + i * step, vs_texcoord.y)).xyz * kGaussNum[i] * cof;
-            color += texture2D(glb_AOMap, vec2(vs_texcoord.x + i * step, vs_texcoord.y)).xyz * kGaussNum[i];
+            color += texture2D(glb_unif_AOMap, vec2(vs_texcoord.x + i * step, vs_texcoord.y)).xyz * kGaussNum[i];
         }
     }
 }

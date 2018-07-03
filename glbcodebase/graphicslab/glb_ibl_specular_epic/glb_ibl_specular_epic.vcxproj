@@ -82,9 +82,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\glb\comm.cpp" />
     <ClCompile Include="..\glb\glbapplication.cpp" />
-    <ClCompile Include="..\glb\glbeditorcomm.cpp" />
     <ClCompile Include="..\glb\glbinput.cpp" />
     <ClCompile Include="..\glb\math\glbbv.cpp" />
     <ClCompile Include="..\glb\math\glbmath.cpp" />
@@ -111,6 +109,7 @@
     <ClCompile Include="..\glb\scene\glbmodelfile.cpp" />
     <ClCompile Include="..\glb\scene\glbobject.cpp" />
     <ClCompile Include="..\glb\scene\glbscene.cpp" />
+    <ClCompile Include="..\glb\thirdparty\rgbe\rgbe.cpp" />
     <ClCompile Include="..\glb\util\glblog.cpp" />
     <ClCompile Include="..\glb\util\glbprofile.cpp" />
     <ClCompile Include="..\glb\util\glbtexturereader.cpp" />
@@ -119,11 +118,8 @@
     <ClCompile Include="glb_ibl_specular_epic.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\glb\comm.h" />
     <ClInclude Include="..\glb\glb.h" />
     <ClInclude Include="..\glb\glbapplication.h" />
-    <ClInclude Include="..\glb\glbcomm.h" />
-    <ClInclude Include="..\glb\glbeditorcomm.h" />
     <ClInclude Include="..\glb\glbinput.h" />
     <ClInclude Include="..\glb\math\glbbv.h" />
     <ClInclude Include="..\glb\math\glbmath.h" />
@@ -155,6 +151,7 @@
     <ClInclude Include="..\glb\scene\glbmodelfile.h" />
     <ClInclude Include="..\glb\scene\glbobject.h" />
     <ClInclude Include="..\glb\scene\glbscene.h" />
+    <ClInclude Include="..\glb\thirdparty\rgbe\rgbe.h" />
     <ClInclude Include="..\glb\thirdparty\stb_image\std_image.h" />
     <ClInclude Include="..\glb\util\glbddsformat.h" />
     <ClInclude Include="..\glb\util\glblog.h" />
@@ -175,6 +172,9 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\glb.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\glb\thirdparty\rgbe\rgbe.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

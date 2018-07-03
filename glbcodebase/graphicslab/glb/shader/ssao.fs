@@ -10,11 +10,11 @@
 in vec2 vs_TexCoord;
 
 // uniform
-uniform sampler2D glb_RandRotateMap;
-uniform sampler2D glb_DepthMap;
-uniform float glb_ScreenWidth;
-uniform float glb_ScreenHeight;
-uniform float glb_FarClip;
+uniform sampler2D glb_unif_RandRotateMap;
+uniform sampler2D glb_unif_DepthMap;
+uniform float glb_unif_ScreenWidth;
+uniform float glb_unif_ScreenHeight;
+uniform float glb_unif_FarClip;
 
 // Output
 out vec3 oColor;
@@ -33,8 +33,8 @@ out vec3 oColor;
 
 void main() {
     // Calculate rotate matrix
-    vec2 rotate_tex_coord = vs_TexCoord * vec2(glb_ScreenWidth, glb_ScreenHeight) / 4.0;
-    vec2 rotate = texture2D(glb_RandRotateMap, rotate_tex_coord).rg;
+    vec2 rotate_tex_coord = vs_TexCoord * vec2(glb_unif_ScreenWidth, glb_unif_ScreenHeight) / 4.0;
+    vec2 rotate = texture2D(glb_unif_RandRotateMap, rotate_tex_coord).rg;
     mat4 rot_z;
     rot_z[0][0] = rotate.y;rot_z[0][1] = -rotate.x;rot_z[0][2] = 0.0;rot_z[0][3] = 0.0;
     rot_z[1][0] = rotate.x;rot_z[1][1] = rotate.y;rot_z[1][2] = 0.0;rot_z[1][3] = 0.0;
@@ -56,7 +56,7 @@ void main() {
     mat4 rot_zxy = rot_y * rot_x * rot_z;
     
     // Get current pixel's depth value in view space
-    float depth = texture2D(glb_DepthMap, vs_TexCoord).r * glb_FarClip;
+    float depth = texture2D(glb_unif_DepthMap, vs_TexCoord).r * glb_unif_FarClip;
     
     // Accumulate the accessibility
     float offset = 0.01f;
@@ -83,7 +83,7 @@ void main() {
             sampler_v *= offset;
             offset *= offset_scale;
             sampler_v.xy += vs_TexCoord;
-            float sampler_depth = texture2D(glb_DepthMap, sampler_v.xy).r * glb_FarClip;
+            float sampler_depth = texture2D(glb_unif_DepthMap, sampler_v.xy).r * glb_unif_FarClip;
             if (sampler_v.z * glb_FarClip + depth > sampler_depth) {  // Invalid
                 continue;
             }

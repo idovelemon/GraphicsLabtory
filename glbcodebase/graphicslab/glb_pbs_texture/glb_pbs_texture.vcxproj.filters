@@ -43,6 +43,9 @@
     <Filter Include="源文件\glb\render\imp\dx11">
       <UniqueIdentifier>{021ac783-9968-4e98-a127-1c2bd70b02aa}</UniqueIdentifier>
     </Filter>
+    <Filter Include="源文件\glb\thirdparty\rgbe">
+      <UniqueIdentifier>{f0180c0a-c4c3-4e4c-b867-ce109981e0f3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\glb\glbapplication.cpp">
@@ -143,6 +146,9 @@
     </ClCompile>
     <ClCompile Include="glb_pbs_texture.cpp">
       <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\thirdparty\rgbe\rgbe.cpp">
+      <Filter>源文件\glb\thirdparty\rgbe</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -275,10 +281,18 @@
     <ClInclude Include="glb_pbs_texture.h">
       <Filter>源文件</Filter>
     </ClInclude>
+    <ClInclude Include="..\glb\thirdparty\rgbe\rgbe.h">
+      <Filter>源文件\glb\thirdparty\rgbe</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\glb\math\glbvector.inl">
       <Filter>源文件\glb\math</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\glb\thirdparty\rgbe\rgbe.txt">
+      <Filter>源文件\glb\thirdparty\rgbe</Filter>
+    </Text>
   </ItemGroup>
 </Project>

@@ -9,10 +9,10 @@
 // Input attributes
 in float vs_DepthInViewSpace;
 
-uniform float glb_FarClip;
+uniform float glb_unif_FarClip;
 
 void main() {
 	// Note: In opengl, camera look at -z axis
 	// so the depth value in view space is negative value
-	gl_FragDepth = -vs_DepthInViewSpace / glb_FarClip;
+	gl_FragDepth = -vs_DepthInViewSpace / glb_unif_FarClip;
 }

@@ -864,29 +864,29 @@ void RenderImp::PrepareHDR() {
 
     // Create Shader
     m_FilterBrightnessShader = shader::UserProgram::Create("..\\glb\\shader\\brightfilter.vs", "..\\glb\\shader\\brightfilter.fs");
-    m_FBTexLoc = m_FilterBrightnessShader->GetUniformLocation("glb_HDRSceneTex");
-    m_FBHighBaseLoc = m_FilterBrightnessShader->GetUniformLocation("glb_HighLightBase");
+    m_FBTexLoc = m_FilterBrightnessShader->GetUniformLocation("glb_unif_HDRSceneTex");
+    m_FBHighBaseLoc = m_FilterBrightnessShader->GetUniformLocation("glb_unif_HighLightBase");
 
     m_DownsamplerShader = shader::UserProgram::Create("..\\glb\\shader\\downsample.vs", "..\\glb\\shader\\downsample.fs");
-    m_DSTexLoc = m_DownsamplerShader->GetUniformLocation("glb_Tex");
+    m_DSTexLoc = m_DownsamplerShader->GetUniformLocation("glb_unif_Tex");
 
     m_BlurHShader = shader::UserProgram::Create("..\\glb\\shader\\bloom.vs", "..\\glb\\shader\\bloomh.fs");
     m_BlurVShader = shader::UserProgram::Create("..\\glb\\shader\\bloom.vs", "..\\glb\\shader\\bloomv.fs");
-    m_BlurHTexLoc = m_BlurHShader->GetUniformLocation("glb_BloomTex");
-    m_BlurVTexLoc = m_BlurVShader->GetUniformLocation("glb_BloomTex");
-    m_BlurWidthLoc = m_BlurHShader->GetUniformLocation("glb_BloomTexWidth");
-    m_BlurHeightLoc = m_BlurVShader->GetUniformLocation("glb_BloomTexHeight");
+    m_BlurHTexLoc = m_BlurHShader->GetUniformLocation("glb_unif_BloomTex");
+    m_BlurVTexLoc = m_BlurVShader->GetUniformLocation("glb_unif_BloomTex");
+    m_BlurWidthLoc = m_BlurHShader->GetUniformLocation("glb_unif_BloomTexWidth");
+    m_BlurHeightLoc = m_BlurVShader->GetUniformLocation("glb_unif_BloomTexHeight");
 
     m_TonemapShader = shader::UserProgram::Create("..\\glb\\shader\\tonemap.vs", "..\\glb\\shader\\tonemap.fs");
-    m_TonemapTexLoc = m_TonemapShader->GetUniformLocation("glb_Tex");
-    m_Bloom0TexLoc = m_TonemapShader->GetUniformLocation("glb_BloomTex[0]");
-    m_Bloom1TexLoc = m_TonemapShader->GetUniformLocation("glb_BloomTex[1]");
-    m_Bloom2TexLoc = m_TonemapShader->GetUniformLocation("glb_BloomTex[2]");
-    m_Bloom3TexLoc = m_TonemapShader->GetUniformLocation("glb_BloomTex[3]");
-    m_Bloom0WeightLoc = m_TonemapShader->GetUniformLocation("glb_BloomWeight[0]");
-    m_Bloom1WeightLoc = m_TonemapShader->GetUniformLocation("glb_BloomWeight[1]");
-    m_Bloom2WeightLoc = m_TonemapShader->GetUniformLocation("glb_BloomWeight[2]");
-    m_Bloom3WeightLoc = m_TonemapShader->GetUniformLocation("glb_BloomWeight[3]");
+    m_TonemapTexLoc = m_TonemapShader->GetUniformLocation("glb_unif_Tex");
+    m_Bloom0TexLoc = m_TonemapShader->GetUniformLocation("glb_unif_BloomTex[0]");
+    m_Bloom1TexLoc = m_TonemapShader->GetUniformLocation("glb_unif_BloomTex[1]");
+    m_Bloom2TexLoc = m_TonemapShader->GetUniformLocation("glb_unif_BloomTex[2]");
+    m_Bloom3TexLoc = m_TonemapShader->GetUniformLocation("glb_unif_BloomTex[3]");
+    m_Bloom0WeightLoc = m_TonemapShader->GetUniformLocation("glb_unif_BloomWeight[0]");
+    m_Bloom1WeightLoc = m_TonemapShader->GetUniformLocation("glb_unif_BloomWeight[1]");
+    m_Bloom2WeightLoc = m_TonemapShader->GetUniformLocation("glb_unif_BloomWeight[2]");
+    m_Bloom3WeightLoc = m_TonemapShader->GetUniformLocation("glb_unif_BloomWeight[3]");
 
     // Create screen mesh
     m_ScreenMesh = mesh::ScreenMesh::Create();

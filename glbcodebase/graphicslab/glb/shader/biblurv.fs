@@ -10,8 +10,8 @@
 in vec2 vs_texcoord;
 out vec3 color;
 
-uniform sampler2D glb_BiBlurMap;
-uniform float glb_ScreenHeight;
+uniform sampler2D glb_unif_BiBlurMap;
+uniform float glb_unif_ScreenHeight;
 
 // const float kGaussNum[2] = {
 // 0.36166444368093026,
@@ -24,16 +24,16 @@ float kGaussNum[2] = float[]
 );
 
 void main() {
-    color = texture2D(glb_BiBlurMap, vs_texcoord).xyz * kGaussNum[0];
-    float step = 1.0 / glb_ScreenHeight;
+    color = texture2D(glb_unif_BiBlurMap, vs_texcoord).xyz * kGaussNum[0];
+    float step = 1.0 / glb_unif_ScreenHeight;
 
     for (int i = 1; i < 2; i++) {
         if (vs_texcoord.y - i * step >= 0.0) {
-            color += texture2D(glb_BiBlurMap, vec2(vs_texcoord.x, vs_texcoord.y - i * step)).xyz * kGaussNum[i];
+            color += texture2D(glb_unif_BiBlurMap, vec2(vs_texcoord.x, vs_texcoord.y - i * step)).xyz * kGaussNum[i];
         }
 
         if (vs_texcoord.y + i * step <= 1.0) {
-            color += texture2D(glb_BiBlurMap, vec2(vs_texcoord.x, vs_texcoord.y + i * step)).xyz * kGaussNum[i];
+            color += texture2D(glb_unif_BiBlurMap, vec2(vs_texcoord.x, vs_texcoord.y + i * step)).xyz * kGaussNum[i];
         }
     }
 }

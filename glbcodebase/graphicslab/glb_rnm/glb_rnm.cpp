@@ -96,10 +96,11 @@ public:
         scene::ModelMaterialParam materialParam;
         float* vertexBuf = NULL;
         float* texBuf = NULL;
+        float* lightMapTexBuf = NULL;
         float* normalBuf = NULL;
         float* tangentBuf = NULL;
         float* binormalBuf = NULL;
-        int32_t faceNum = scene::ModelFile::ExtractModelData(kSceneModelFile, effectParam, materialParam, &vertexBuf, &texBuf, &normalBuf, &tangentBuf, &binormalBuf);
+        int32_t faceNum = scene::ModelFile::ExtractModelData(kSceneModelFile, effectParam, materialParam, &vertexBuf, &texBuf, &lightMapTexBuf, &normalBuf, &tangentBuf, &binormalBuf);
 
         int32_t vertexOffset = 0, uvOffset = 0, normalOffset = 0, tangentOffset = 0, binormalOffset = 0;
         for (int32_t i = 0; i < faceNum; i++) {

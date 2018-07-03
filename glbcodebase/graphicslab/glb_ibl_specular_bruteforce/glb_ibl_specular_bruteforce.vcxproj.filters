@@ -2,13 +2,7 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="glb_ibl_specular_bruteforce.cpp" />
-    <ClCompile Include="..\glb\comm.cpp">
-      <Filter>glb</Filter>
-    </ClCompile>
     <ClCompile Include="..\glb\glbapplication.cpp">
-      <Filter>glb</Filter>
-    </ClCompile>
-    <ClCompile Include="..\glb\glbeditorcomm.cpp">
       <Filter>glb</Filter>
     </ClCompile>
     <ClCompile Include="..\glb\glbinput.cpp">
@@ -104,22 +98,16 @@
     <ClCompile Include="..\glb\render\imp\dx11\glbtextureimp.cpp">
       <Filter>glb\render\imp\dx11</Filter>
     </ClCompile>
+    <ClCompile Include="..\glb\thirdparty\rgbe\rgbe.cpp">
+      <Filter>glb\thirdparty\rgbe</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="glb_ibl_specular_bruteforce.h" />
-    <ClInclude Include="..\glb\comm.h">
-      <Filter>glb</Filter>
-    </ClInclude>
     <ClInclude Include="..\glb\glb.h">
       <Filter>glb</Filter>
     </ClInclude>
     <ClInclude Include="..\glb\glbapplication.h">
-      <Filter>glb</Filter>
-    </ClInclude>
-    <ClInclude Include="..\glb\glbcomm.h">
-      <Filter>glb</Filter>
-    </ClInclude>
-    <ClInclude Include="..\glb\glbeditorcomm.h">
       <Filter>glb</Filter>
     </ClInclude>
     <ClInclude Include="..\glb\glbinput.h">
@@ -243,6 +231,9 @@
       <Filter>glb\thirdparty\stb_image</Filter>
     </ClInclude>
     <ClInclude Include="resource.h" />
+    <ClInclude Include="..\glb\thirdparty\rgbe\rgbe.h">
+      <Filter>glb\thirdparty\rgbe</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="glb">
@@ -275,6 +266,9 @@
     <Filter Include="glb\thirdparty\stb_image">
       <UniqueIdentifier>{198af20c-a547-408d-bd34-01b3dc382063}</UniqueIdentifier>
     </Filter>
+    <Filter Include="glb\thirdparty\rgbe">
+      <UniqueIdentifier>{fa711438-ab0a-46ac-af6c-fbacbb7b1660}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\glb\math\glbvector.inl">
@@ -283,5 +277,10 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="glb_ibl_specular_bruteforce.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\glb\thirdparty\rgbe\rgbe.txt">
+      <Filter>glb\thirdparty\rgbe</Filter>
+    </Text>
   </ItemGroup>
 </Project>

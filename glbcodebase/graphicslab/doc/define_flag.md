@@ -18,5 +18,6 @@
 |GLB_ENABLE_ALPHA_TEX|Model hold a alpha texture|
 |GLB_ENABLE_EMISSION_TEX|Model hold a emission texture|
 |GLB_ENABLE_LIGHT_TEX|Enable using light map for object|
+|GLB_ENABLE_INSTANCE_RENDERING|Enable Geomtry Instance Rendering|
 |GLB_ENABLE_REFLECT_TEX|Discard|
             

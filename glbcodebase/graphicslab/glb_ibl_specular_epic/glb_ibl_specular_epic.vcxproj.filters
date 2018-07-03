@@ -43,15 +43,12 @@
     <Filter Include="源文件\glb\render\imp\dx11">
       <UniqueIdentifier>{04aac992-22ea-4ba5-a72c-ed9cb9c6baf2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="源文件\glb\thirdparty\rgbe">
+      <UniqueIdentifier>{43d7269d-82e7-4cde-a04d-4c4f8b72a4ad}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\glb\comm.cpp">
-      <Filter>源文件\glb</Filter>
-    </ClCompile>
     <ClCompile Include="..\glb\glbapplication.cpp">
-      <Filter>源文件\glb</Filter>
-    </ClCompile>
-    <ClCompile Include="..\glb\glbeditorcomm.cpp">
       <Filter>源文件\glb</Filter>
     </ClCompile>
     <ClCompile Include="..\glb\glbinput.cpp">
@@ -150,21 +147,15 @@
     <ClCompile Include="glb_ibl_specular_epic.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="..\glb\thirdparty\rgbe\rgbe.cpp">
+      <Filter>源文件\glb\thirdparty\rgbe</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\glb\comm.h">
-      <Filter>源文件\glb</Filter>
-    </ClInclude>
     <ClInclude Include="..\glb\glb.h">
       <Filter>源文件\glb</Filter>
     </ClInclude>
     <ClInclude Include="..\glb\glbapplication.h">
-      <Filter>源文件\glb</Filter>
-    </ClInclude>
-    <ClInclude Include="..\glb\glbcomm.h">
-      <Filter>源文件\glb</Filter>
-    </ClInclude>
-    <ClInclude Include="..\glb\glbeditorcomm.h">
       <Filter>源文件\glb</Filter>
     </ClInclude>
     <ClInclude Include="..\glb\glbinput.h">
@@ -293,6 +284,9 @@
     <ClInclude Include="resource.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="..\glb\thirdparty\rgbe\rgbe.h">
+      <Filter>源文件\glb\thirdparty\rgbe</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\glb\math\glbvector.inl">
@@ -308,5 +302,10 @@
     <Image Include="res\glb.ico">
       <Filter>资源文件</Filter>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\glb\thirdparty\rgbe\rgbe.txt">
+      <Filter>源文件\glb\thirdparty\rgbe</Filter>
+    </Text>
   </ItemGroup>
 </Project>
