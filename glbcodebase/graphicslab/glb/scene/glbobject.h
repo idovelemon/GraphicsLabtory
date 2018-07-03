@@ -136,6 +136,8 @@ public:
 public:
     virtual void Update();
     void AddInstanceObject(InstanceObject* obj);
+    void RemoveInstanceObject(InstanceObject* obj);
+    void RemoveAllInstanceObject();
     int32_t GetCurInstanceNum() const;
 
 protected:
@@ -161,6 +163,7 @@ public:
     virtual Model* GetModel();
 
     virtual void Update();
+    virtual void ClearInstanceRenderObject();
 
 private:
     InstanceRenderObject*       m_InstanceRenderObject;

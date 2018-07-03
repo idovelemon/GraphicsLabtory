@@ -436,10 +436,12 @@ void Model::SetTexWithId(int32_t slot, int32_t tex_id) {
 //-----------------------------------------------------------------------------------
 
 InstanceModel::InstanceModel()
-: m_MaxInstance(0) {
+: m_MaxInstance(0)
+, m_MatrixBuf(NULL) {
 }
 
 InstanceModel::~InstanceModel() {
+    GLB_SAFE_DELETE_ARRAY(m_MatrixBuf)
 }
 
 InstanceModel* InstanceModel::Create(const char* fileName, int32_t maxInstance) {
@@ -589,6 +591,7 @@ InstanceModel* InstanceModel::Create(const char* fileName, int32_t maxInstance) 
         model->m_ModelEffectParam = effectParam;
         model->m_BoundBoxMax = materialParam.boundboxMax;
         model->m_BoundBoxMin = materialParam.boundboxMin;
+        model->m_MatrixBuf = new float[maxInstance * 16 * 2];
     } else {
         GLB_SAFE_ASSERT(false);
     }
@@ -599,24 +602,19 @@ InstanceModel* InstanceModel::Create(const char* fileName, int32_t maxInstance) 
 void InstanceModel::UpdateMatrixAttribute(std::vector<math::Matrix> attributes) {
     render::mesh::InstanceTriangleMesh* mesh = reinterpret_cast<render::mesh::InstanceTriangleMesh*>(render::mesh::Mgr::GetMeshById(m_Mesh));
 
-    float* buf = new float[m_MaxInstance * 16 * 2];
-
     for (int32_t i = 0; i < attributes.size(); i++) {
         // OpenGL store matrix in transpose, so we must transpose the result matrix and upload to opengl server
         math::Matrix world = attributes[i];
         world.Transpose();
-        memcpy(buf + i * 16, world.m_Matrix.v, sizeof(world.m_Matrix.v));
+        memcpy(m_MatrixBuf + i * 16, world.m_Matrix.v, sizeof(world.m_Matrix.v));
 
         math::Matrix transInvM = attributes[i];
         transInvM.Inverse();
 
-        memcpy(buf + (m_MaxInstance + i) * 16, transInvM.m_Matrix.v, sizeof(transInvM.m_Matrix.v));
+        memcpy(m_MatrixBuf + (m_MaxInstance + i) * 16, transInvM.m_Matrix.v, sizeof(transInvM.m_Matrix.v));
     }
 
-    mesh->UpdateInstanceBuffer(buf);
-
-    delete[] buf;
-    buf = NULL;
+    mesh->UpdateInstanceBuffer(m_MatrixBuf);
 }
 
 //-----------------------------------------------------------------------------------

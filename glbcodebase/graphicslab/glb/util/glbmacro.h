@@ -61,7 +61,7 @@
             char buffer[128];\
             sprintf(buffer, "ERR:%d Desc:%s", err, reinterpret_cast<LPCSTR>(const_cast<GLubyte*>(err_str)));\
             OutputDebugStringA(buffer);\
-            MessageBoxA(NULL, buffer, "GL-Error", MB_OK);\
+            MessageBoxA(NULL, buffer, "GL-Error", MB_OKCANCEL);\
         }\
     }
 

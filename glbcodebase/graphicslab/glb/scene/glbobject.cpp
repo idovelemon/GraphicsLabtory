@@ -379,6 +379,7 @@ InstanceRenderObject::InstanceRenderObject()
 }
 
 InstanceRenderObject::~InstanceRenderObject() {
+    RemoveAllInstanceObject();
 }
 
 InstanceRenderObject* InstanceRenderObject::Create(const char* objFileName, int32_t maxInstance) {
@@ -431,9 +432,40 @@ void InstanceRenderObject::Update() {
 
 void InstanceRenderObject::AddInstanceObject(InstanceObject* obj) {
     if (obj != NULL) {
-        m_InstanceObjects.insert(std::pair<int32_t, InstanceObject*>(obj->GetObjectId(), obj));
-        m_CurInstanceNum++;
+        if (m_CurInstanceNum < m_MaxInstanceNum) {
+            m_InstanceObjects.insert(std::pair<int32_t, InstanceObject*>(obj->GetObjectId(), obj));
+            m_CurInstanceNum++;
+        } else {
+            GLB_SAFE_ASSERT(false);  // Too much geometry instance, try to increase the max instance number
+        }
     }
+}
+
+void InstanceRenderObject::RemoveInstanceObject(InstanceObject* obj) {
+    if (obj != NULL) {
+        InstanceObjectMap::iterator it = m_InstanceObjects.find(obj->GetObjectId());
+        if (it != m_InstanceObjects.end()) {
+            obj->ClearInstanceRenderObject();
+            m_InstanceObjects.erase(it);
+            m_CurInstanceNum--;
+        } else {
+            GLB_SAFE_ASSERT(false);
+        }
+    }
+}
+
+void InstanceRenderObject::RemoveAllInstanceObject() {
+    InstanceObjectMap::iterator it = m_InstanceObjects.begin();
+
+    for (; it != m_InstanceObjects.end(); ++it) {
+        if (it->second != NULL) {
+            it->second->ClearInstanceRenderObject();
+            it->second = NULL;
+        }
+    }
+
+    m_InstanceObjects.clear();
+    m_CurInstanceNum = 0;
 }
 
 int32_t InstanceRenderObject::GetCurInstanceNum() const {
@@ -448,6 +480,9 @@ InstanceObject::InstanceObject()
 }
 
 InstanceObject::~InstanceObject() {
+    if (m_InstanceRenderObject) {
+        m_InstanceRenderObject->RemoveInstanceObject(this);
+    }
     m_InstanceRenderObject = NULL;
 }
 
@@ -499,6 +534,10 @@ Model* InstanceObject::GetModel() {
 
 void InstanceObject::Update() {
     Object::Update();
+}
+
+void InstanceObject::ClearInstanceRenderObject() {
+    m_InstanceRenderObject = NULL;
 }
 
 };  // namespace scene

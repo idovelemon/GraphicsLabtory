@@ -99,6 +99,7 @@ public:
 
 protected:
     int32_t m_MaxInstance;
+    float* m_MatrixBuf;
 };
 
 //--------------------------------------------------------------------------
