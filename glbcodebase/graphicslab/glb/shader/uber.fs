@@ -339,6 +339,10 @@ void calc_material(out vec3 albedo, out float roughness, out float metallic, out
 	emission = glb_unif_Material_Emission;
 #endif
 
+#ifdef GLB_COLOR_IN_VERTEX
+	emission = emission + vs_Color;
+#endif
+
 #endif
 }
 

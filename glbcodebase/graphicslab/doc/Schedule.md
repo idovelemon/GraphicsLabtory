@@ -8,11 +8,16 @@ GLB(GraphicsLabtory) library is a light-weight 3D rendering library.
 |Task|Begin Time|Fnish Time|Status|
 |-|-|-|-|
 |Resource System problem:When destroy an object, how to deal with the mesh and texture resource associated with it? |2018-06-09 10:10||<font color="Blue">New</font>|
-|Model Editor|2018-06-10 22:40||<font color="Blue">New</font>|
+|Model Editor|2018-06-10 22:40|2018-07-01 17:25|<font color="Green">Finish</font>|
+|Rename build-in attribute and uniform with glb_attr_xxx and glb_uni_xxx|2018-07-01 17:25||<font color="Blue">New</font>|
+|Using fixed layout (location = n) for uber shader|2018-07-01 17:25||<font color="Blue">New</font>|
+|Font rendering|2018-07-01 17:25||<font color="Blue">New</font>|
+|Build-in debug menu|2018-07-01 17:25||<font color="Blue">New</font>|
 
 |Bug|Begin Time|Fnish Time|Status|
 |-|-|-|-|
-|Missing shader type when create shader|2018-06-11 15:20||<font color="Blue">New</font>|
+|Missing shader type when create shader|2018-06-11 15:20|2018-06-07-01|<font color="Green">Finish</font>|
+|Calculate boundbox with rotation|2018-07-01 17:25||<font color="Blue">New</font>|
 
 ## GLB LightStudio
 Light studio is used for baking Lightmap with Radiosity Normal Mapping(RNM) and precompute LightProbe for image based lighting
@@ -89,6 +94,7 @@ GLB ModelEditor is used for convert DCC tool's export file format to GLB library
 |Support for light map texture|2018-06-11 22:35|2018-06-15 07:50|<font color="Green">Finish</font>|
 |Copy texture when export model|2018-06-11 23:10|2018-06-12 11:15|<font color="Green">Finish</font>|
 |Clear texture in editor mode|2018-06-12 12:35||<font color="Blue">New</font>|
+|Edit emission intensity at editor mode|2018-06-21 20:00||<font color="Blue">New</font>|
 
 |Bug|Begin Time|Fnish Time|Status|
 |-|-|-|-|
@@ -98,3 +104,4 @@ GLB ModelEditor is used for convert DCC tool's export file format to GLB library
 |Do not enable texture file browser button after preview a model|2018-06-12 11:05|2018-06-12 11:55|<font color="Green">Finish</font>|
 |Display default environment cube map|2018-06-12 11:15|2018-06-12 12:20|<font color="Green">Finish</font>|
 |Import a model again : GLB init failed|2018-06-20 8:00||<font color="Blue">New</font>|
+|Check if has texcoord when set albedo/roughness/metallic/normal/alpha/emission texture|2018-06-23 18:15||<font color="Blue">New</font>|

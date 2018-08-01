@@ -158,7 +158,7 @@ protected:
     void AfterDraw();
 
     void PrepareShadowMap();
-    void PrepareDepthMap();
+    void PrepareDebug();
     void PrepareAOMap();
     void PrepareHDR();
     void PrepareEnvMap();
@@ -191,13 +191,6 @@ protected:
     void BloomVTex();
     void Tonemapping();
 
-    // SSAO
-    void DrawDepthMap();
-    void GenRandRotateMap();
-    void DrawAO();
-    void BiBlurH();
-    void BiBlurV();
-
     void SetUniform(int32_t location, uniform::Wrapper& wrapper);
     inline float ZValueFromCamera(scene::Object* obj);
 
@@ -224,14 +217,10 @@ private:
     int32_t                                 m_ShadowMapIndex;
     float                                   m_ShadowSplitValue[kPSSMSplitNum - 1];
 
-    // Depth
-    RenderTarget*                           m_DepthTarget;
-    int32_t                                 m_DepthShader;
-    int32_t                                 m_DepthMap;
-
     // HDR
     float                                   m_HightLightBase;
     RenderTarget*                           m_HDRRenderTarget;
+    int32_t                                 m_DepthMap;
     int32_t                                 m_HDRTex;
     RenderTarget*                           m_FilterBrightnessRT;
     int32_t                                 m_FilterBrightnessTex;
@@ -264,6 +253,9 @@ private:
     float                                   m_Bloom1Weight;
     float                                   m_Bloom2Weight;
     float                                   m_Bloom3Weight;
+
+    // Debug
+    shader::UserProgram*                    m_DebugLineShader;
 
     mesh::ScreenMesh*                       m_ScreenMesh;
     mesh::DebugMesh*                        m_DebugMesh;
@@ -378,15 +370,11 @@ RenderImp::RenderImp()
 , m_InstanceShadowShader(-1)
 , m_ShadowMapIndex(-1)
 
-// Depth
-, m_DepthTarget(NULL)
-, m_DepthMap(-1)
-, m_DepthShader(-1)
-
 // HDR
 , m_HightLightBase(1.0f)
 , m_HDRRenderTarget(NULL)
 , m_HDRTex(-1)
+, m_DepthMap(-1)
 , m_FilterBrightnessRT(NULL)
 , m_FilterBrightnessTex(-1)
 , m_FilterBrightnessShader(NULL)
@@ -413,6 +401,9 @@ RenderImp::RenderImp()
 , m_Bloom1Weight(0.05f)
 , m_Bloom2Weight(0.05f)
 , m_Bloom3Weight(0.01f)
+
+// Debug
+, m_DebugLineShader(NULL)
 
 // Env
 
@@ -442,7 +433,7 @@ void RenderImp::Initialize(int32_t width, int32_t height) {
     m_Height = height;
 
     PrepareShadowMap();
-    PrepareDepthMap();
+    PrepareDebug();
     PrepareHDR();
     PrepareEnvMap();
 
@@ -469,9 +460,7 @@ void RenderImp::Destroy() {
     m_ShadowShader = -1;
 
     // Depth
-    GLB_SAFE_DELETE(m_DepthTarget);
     m_DepthMap = -1;
-    m_DepthShader = -1;
 
     // HDR
     GLB_SAFE_DELETE(m_FilterBrightnessRT);
@@ -489,6 +478,9 @@ void RenderImp::Destroy() {
     GLB_SAFE_DELETE(m_BlurHShader);
     GLB_SAFE_DELETE(m_BlurVShader);
 
+    // Debug
+    GLB_SAFE_DELETE(m_DebugLineShader);
+
     GLB_SAFE_DELETE(m_DebugMesh);
     GLB_SAFE_DELETE(m_ScreenMesh);
 }
@@ -498,8 +490,8 @@ void RenderImp::Draw() {
     DrawShadowMap();
     //DrawDepthMap();
     DrawLightLoop();
-    //DrawDebug();
     DrawHDR();
+    DrawDebug();
     AfterDraw();
 
 #ifdef GLB_PLATFORM_OPENGL
@@ -729,47 +721,36 @@ void RenderImp::DrawLightLoop() {
 
 void RenderImp::DrawDebug() {
     // Render Target
-    render::Device::SetRenderTarget(m_HDRRenderTarget);
+    render::Device::SetRenderTarget(render::RenderTarget::DefaultRenderTarget());
 
     // Draw Buffer
-    render::Device::SetDrawColorBuffer(render::COLORBUF_COLOR_ATTACHMENT0);
+    render::Device::SetDrawColorBuffer(render::COLORBUF_BACK);
+
+    // Clear
+    render::Device::SetClearDepth(1.0f);
+    render::Device::Clear(render::CLEAR_DEPTH);
 
     // Shader
-    int32_t shader_id = shader::Mgr::GetUberShaderID(m_DebugMesh->GetShaderDesc());
-    shader::UberProgram* program = static_cast<shader::UberProgram*>(shader::Mgr::GetShader(shader_id));
-    render::Device::SetShader(program);
-    render::Device::SetShaderLayout(program->GetShaderLayout());
+    render::Device::SetShader(m_DebugLineShader);
+    render::Device::SetShaderLayout(m_DebugLineShader->GetShaderLayout());
 
-    // Scene uniforms
-    std::vector<uniform::UniformEntry> uniforms = program->GetUniforms();
-    for (int32_t j = 0; j < static_cast<int32_t>(uniforms.size()); j++) {
-        uniform::UniformEntry entry = uniforms[j];
-        if (entry.flag) {
-            // TODO: for now, id is the index of the uniform picker table
-            uniform::Wrapper uniform_wrapper = uniform::kUniformPickers[entry.id].picker(NULL);
-            SetUniform(entry.location, uniform_wrapper);
-        }
-    }
+    // Texture
+    render::Device::ClearTexture();
+    render::Device::SetTexture(0, texture::Mgr::GetTextureById(m_DepthMap), 0);
 
-    // Scene Object Uniform
-    for (int32_t k = 0; k < static_cast<int32_t>(uniforms.size()); k++) {
-        uniform::UniformEntry entry = uniforms[k];
-        if (entry.id == uniform::GLB_WORLDM) {
-            math::Matrix identity;
-            identity.MakeIdentityMatrix();
-            render::Device::SetUniformMatrix(entry.location, identity);
-            break;
-        }
-    }
+    // Uniforms
+    math::Matrix proj = render::Render::GetPerspective(render::Render::GetCurPerspectiveType());
+    scene::CameraBase* cam = scene::Scene::GetCamera(scene::Scene::GetCurCameraType());
+    math::Matrix view = cam->GetViewMatrix();
+
+    render::Device::SetUniformMatrix(m_DebugLineShader->GetUniformLocation("glb_unif_WVP"), proj * view);
+    render::Device::SetUniformSampler2D(m_DebugLineShader->GetUniformLocation("glb_unif_DepthMap"), 0);
 
     // Vertex Buffer
     VertexLayout layout = m_DebugMesh->GetVertexLayout();
     int32_t num = m_DebugMesh->GetVertexNum();
     render::Device::SetVertexBuffer(m_DebugMesh->GetVertexBuffer());
     render::Device::SetVertexLayout(layout);
-
-    // Render State
-    render::Device::SetDepthTestEnable(true);
 
     // Draw
     render::Device::Draw(render::PT_LINES, 0, num);
@@ -819,25 +800,17 @@ void RenderImp::PrepareShadowMap() {
     m_InstanceShadowShader = shader::Mgr::AddUberShader("..\\glb\\shader\\instanceShadow.vs", "..\\glb\\shader\\shadow.fs");
 }
 
-void RenderImp::PrepareDepthMap() {
+void RenderImp::PrepareDebug() {
     // Create depth map
-    texture::Texture* depth_map = texture::Texture::CreateFloat32DepthTexture(static_cast<int32_t>(m_Width), static_cast<int32_t>(m_Height));
+    texture::Texture* depth_map = texture::Texture::CreateFloat32DepthTexture(static_cast<int32_t>(m_Width), static_cast<int32_t>(m_Height), false);
     if (depth_map != NULL) {
         m_DepthMap = texture::Mgr::AddTexture(depth_map);
     } else {
         GLB_SAFE_ASSERT(false);
     }
 
-    // Create render target
-    m_DepthTarget = RenderTarget::Create(static_cast<int32_t>(m_Width), static_cast<int32_t>(m_Height));
-    if (m_DepthTarget != NULL) {
-        m_DepthTarget->AttachDepthTexture(depth_map);
-    } else {
-        GLB_SAFE_ASSERT(false);
-    }
-
-    // Create shader TODO: Use UserShader
-    m_DepthShader = shader::Mgr::AddUberShader("..\\glb\\shader\\depth.vs", "..\\glb\\shader\\depth.fs");
+    // Create Shader
+    m_DebugLineShader = render::shader::UserProgram::Create("..\\glb\\shader\\debugline.vs", "..\\glb\\shader\\debugline.fs");
 }
 
 void RenderImp::PrepareHDR() {
@@ -845,6 +818,7 @@ void RenderImp::PrepareHDR() {
     m_HDRRenderTarget = RenderTarget::Create(m_Width, m_Height);
     m_HDRTex = texture::Mgr::AddTexture(texture::Texture::CreateFloat32Texture(m_Width, m_Height, false));
     m_HDRRenderTarget->AttachColorTexture(render::COLORBUF_COLOR_ATTACHMENT0, texture::Mgr::GetTextureById(m_HDRTex));
+    m_HDRRenderTarget->AttachDepthTexture(texture::Mgr::GetTextureById(m_DepthMap));
 
     m_FilterBrightnessRT = RenderTarget::Create(m_Width, m_Height);
     m_FilterBrightnessTex = texture::Mgr::AddTexture(texture::Texture::CreateFloat32Texture(m_Width, m_Height, false));
@@ -1192,7 +1166,6 @@ void RenderImp::BuildShadowMatrixs(math::Matrix light_space_to_world_space) {
 
 void RenderImp::DrawShadowMapCore() {
     for (int32_t i = 0; i < kPSSMSplitNum; i++) {
-        //if ( i != 0) continue;
         m_ShadowMapIndex = i;
 
         // Render Target
@@ -1963,91 +1936,6 @@ void RenderImp::Tonemapping() {
 
     render::Device::SetRenderTarget(render::RenderTarget::DefaultRenderTarget());
     render::Device::SetViewport(0, 0, m_Width, m_Height);
-}
-
-void RenderImp::DrawDepthMap() {
-    // Render Target
-    render::Device::SetRenderTarget(m_DepthTarget);
-
-    // Draw Buffer
-    render::Device::SetDrawColorBuffer(render::COLORBUF_NONE);
-
-    // Clear
-    render::Device::SetClearDepth(1.0f);
-    render::Device::Clear(CLEAR_DEPTH);
-
-    // Shader
-    shader::UberProgram* program = static_cast<shader::UberProgram*>(shader::Mgr::GetShader(m_DepthShader));
-    std::vector<uniform::UniformEntry>& uniforms = program->GetUniforms();
-    render::Device::SetShader(program);
-    render::Device::SetShaderLayout(program->GetShaderLayout());
-
-    // Scene uniforms
-    for (int32_t j = 0; j < static_cast<int32_t>(uniforms.size()); j++) {
-        uniform::UniformEntry entry = uniforms[j];
-        if (entry.flag) {
-            // TODO: for now, id is the index of the uniform picker table
-            uniform::Wrapper uniform_wrapper = uniform::kUniformPickers[entry.id].picker(NULL);
-            SetUniform(entry.location, uniform_wrapper);
-        }
-    }
-
-    std::vector<scene::Object*> objs;
-    scene::Object* sky_obj = scene::Scene::GetSkyObject();
-    if (sky_obj != NULL) {
-        objs.push_back(sky_obj);
-    }
-
-    scene::Scene::GetAllObjects(objs);
-
-    // scene::Objects
-    for (int32_t j = 0; j < static_cast<int32_t>(objs.size()); j++) {
-        scene::Object* obj = objs[j];
-
-        // Check enable draw
-        if (!obj->IsDrawEnable()) {
-            continue;
-        }
-
-        // Check if cast shadow & enable depth
-        if (obj->GetModel()->IsCastShadow() && obj->IsDepthTestEnable()) {
-            // scene::Object Uniform
-            for (int32_t k = 0; k < static_cast<int32_t>(uniforms.size()); k++) {
-                uniform::UniformEntry entry = uniforms[k];
-                if (!entry.flag) {
-                    // TODO: for now, id is the index of the uniform picker table
-                    uniform::Wrapper uniform_wrapper = uniform::kUniformPickers[entry.id].picker(obj);
-                    SetUniform(entry.location, uniform_wrapper);
-                }
-            }
-
-            // Vertex Buffer
-            int32_t mesh_id = obj->GetModel()->GetMeshId();
-            VertexLayout layout = mesh::Mgr::GetMeshById(mesh_id)->GetVertexLayout();
-            int32_t num = mesh::Mgr::GetMeshById(mesh_id)->GetVertexNum();
-            render::Device::SetVertexBuffer(mesh::Mgr::GetMeshById(mesh_id)->GetVertexBuffer());
-            render::Device::SetVertexLayout(layout);
-
-            if (obj->IsCullFaceEnable()) {
-                render::Device::SetCullFaceEnable(true);
-                render::Device::SetCullFaceMode(obj->GetCullFaceMode());
-            } else {
-                render::Device::SetCullFaceEnable(false);
-            }
-
-            if (obj->IsDepthTestEnable()) {
-                render::Device::SetDepthTestEnable(true);
-            } else {
-                render::Device::SetDepthTestEnable(false);
-            }
-
-            // Draw
-            render::Device::Draw(render::PT_TRIANGLES, 0, num);
-        }
-    }
-
-    // Reset render target
-    render::Device::SetRenderTarget(0);
 }
 
 void RenderImp::SetUniform(int32_t location, uniform::Wrapper& wrapper) {
