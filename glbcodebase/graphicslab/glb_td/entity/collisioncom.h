@@ -13,6 +13,8 @@
 #include "component.h"
 #include "math/glbvector.h"
 
+#include "../dynamic/dynamicobject.h"
+
 namespace entity {
 
 //-----------------------------------------------------------
@@ -25,24 +27,16 @@ class Entity;
 
 class CollisionCom : public Component {
 public:
-    CollisionCom(Entity* owner);
+    CollisionCom(Entity* owner, float width, float height, float depth, glb::math::Vector pos);
     virtual ~CollisionCom();
 
 public:
     virtual void Update();
-    void CheckCollision();
-    void BeginIterate();
-    int Iterate();
-    void EndIterate();
-    float GetWidth();
-    float GetLength();
+
+    void SetCollisionHandle(dynamic::DynamicObject::CollisionEventHandle handle);
 
 protected:
     int32_t                     m_DynamicObjectID;
-    std::vector<int32_t>        m_CollIDs;
-    int32_t                     m_Iterate;
-    glb::math::Vector           m_OriMax;
-    glb::math::Vector           m_OriMin;
 };
 
 };  // namespace entity

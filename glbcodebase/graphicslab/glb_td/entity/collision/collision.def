@@ -1,0 +1,2 @@
+COLLISION_HANDLE_DEF(EntityNormalBulletCollisionHandle)
+COLLISION_HANDLE_DEF(EntityEnemyCollisionHandle)

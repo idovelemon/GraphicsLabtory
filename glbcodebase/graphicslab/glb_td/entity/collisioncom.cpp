@@ -16,23 +16,14 @@
 
 namespace entity {
 
-CollisionCom::CollisionCom(Entity* owner)
+CollisionCom::CollisionCom(Entity* owner, float width, float height, float depth, glb::math::Vector pos)
 : Component(CT_COLLISION, owner)
-, m_DynamicObjectID(-1)
-, m_Iterate(-1)
-, m_OriMax(0.0f, 0.0f, 0.0f)
-, m_OriMin(0.0f, 0.0f, 0.0f) {
-    dynamic::DTAabb* object = new dynamic::DTAabb(glb::math::Vector(0.0f, 0.0f, 0.0f), glb::math::Vector(0.0f, 0.0f, 0.0f), glb::math::Vector(0.0f, 0.0f, 0.0f));
-    m_DynamicObjectID = dynamic::DynamicWorld::AddDynamicObject(object);
-    object->SetUserData(reinterpret_cast<void*>(m_Entity->GetID()));
+, m_DynamicObjectID(-1) {
+    dynamic::DTAabb* aabb = new dynamic::DTAabb(glb::math::Vector(width / 2.0f, height / 2.0f, depth / 2.0f)
+        , glb::math::Vector(-width / 2.0f, -height / 2.0f, -depth / 2.0f)
+        , pos);
 
-    RenderCom* com = reinterpret_cast<RenderCom*>(m_Entity->GetComponent(CT_RENDER));
-    if (com != NULL) {
-        m_OriMax = com->GetBoundBoxMax();
-        m_OriMin = com->GetBoundBoxMin();
-    } else {
-        assert(false && "Must have render component");
-    }
+    m_DynamicObjectID = dynamic::DynamicWorld::AddDynamicObject(aabb);
 }
 
 CollisionCom::~CollisionCom() {
@@ -41,65 +32,14 @@ CollisionCom::~CollisionCom() {
 }
 
 void CollisionCom::Update() {
-    TransformCom* com = reinterpret_cast<TransformCom*>(m_Entity->GetComponent(CT_TRANSFORM));
-    if (com != NULL) {
-        glb::math::Vector cur_pos = com->GetPos();
-        glb::math::Vector cur_scale = com->GetScale();
-        glb::math::Vector center = (m_OriMax + m_OriMin) * 0.5f;
-        center = center + cur_pos;
-        glb::math::Vector max = m_OriMax * cur_scale + cur_pos;
-        glb::math::Vector min = m_OriMin * cur_scale + cur_pos;
-        dynamic::DTAabb* aabb = reinterpret_cast<dynamic::DTAabb*>(dynamic::DynamicWorld::GetDynamicObject(m_DynamicObjectID));
-        if (aabb != NULL) {
-            aabb->Update(max - center, min - center, center);
-        }
-    } else {
-        assert(false && "Must have render component");
+    entity::TransformCom* com = reinterpret_cast<entity::TransformCom*>(m_Entity->GetComponent(entity::CT_TRANSFORM));
+    if (com) {
+        reinterpret_cast<dynamic::DTAabb*>(dynamic::DynamicWorld::GetDynamicObject(m_DynamicObjectID))->Update(com->GetPos());
     }
 }
 
-void CollisionCom::CheckCollision() {
-    dynamic::DynamicWorld::CheckCollision(m_DynamicObjectID, m_CollIDs);
-}
-
-void CollisionCom::BeginIterate() {
-    m_Iterate = 0;
-}
-
-int CollisionCom::Iterate() {
-    int result = -1;
-    int size = m_CollIDs.size();
-    if (m_Iterate < size) {
-        result = m_CollIDs[m_Iterate];
-        m_Iterate++;
-    }
-    return result;
-}
-
-void CollisionCom::EndIterate() {
-    m_Iterate = 0;
-}
-
-float CollisionCom::GetWidth() {
-    float result = 0.0f;
-
-    dynamic::DynamicObject* object = dynamic::DynamicWorld::GetDynamicObject(m_DynamicObjectID);
-    if (object != NULL) {
-        result = object->GetWidth();
-    }
-
-    return result;
-}
-
-float CollisionCom::GetLength() {
-    float result = 0.0f;
-
-    dynamic::DynamicObject* object = dynamic::DynamicWorld::GetDynamicObject(m_DynamicObjectID);
-    if (object != NULL) {
-        result = object->GetLength();
-    }
-
-    return result;
+void CollisionCom::SetCollisionHandle(dynamic::DynamicObject::CollisionEventHandle handle) {
+    dynamic::DynamicWorld::GetDynamicObject(m_DynamicObjectID)->SetCollisionHandle(handle);
 }
 
 };  // namespace entity

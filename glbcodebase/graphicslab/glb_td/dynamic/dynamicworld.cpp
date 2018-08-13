@@ -9,6 +9,7 @@
 #include <assert.h>
 #include <memory.h>
 
+#include "btBulletDynamicsCommon.h"
 #include "dynamicobject.h"
 
 namespace dynamic {
@@ -42,6 +43,7 @@ protected:
     int32_t FindEmptyId();
 
 protected:
+    btDiscreteDynamicsWorld*    m_DynamicsWorld;
     DynamicObject*      m_DynamicObjects[kMaxDynamicObject];
 };
 
@@ -49,7 +51,8 @@ protected:
 // Type Definition
 
 //---------------------------------------------------------------------
-DynamicWorldImp::DynamicWorldImp() {
+DynamicWorldImp::DynamicWorldImp()
+: m_DynamicsWorld(NULL) {
     memset(m_DynamicObjects, 0, sizeof(m_DynamicObjects));
 }
 
@@ -58,12 +61,69 @@ DynamicWorldImp::~DynamicWorldImp() {
 }
 
 void DynamicWorldImp::Initialize() {
+	///collision configuration contains default setup for memory, collision setup. Advanced users can create their own configuration.
+	btDefaultCollisionConfiguration* collisionConfiguration = new btDefaultCollisionConfiguration();
+
+	///use the default collision dispatcher. For parallel processing you can use a diffent dispatcher (see Extras/BulletMultiThreaded)
+	btCollisionDispatcher* dispatcher = new	btCollisionDispatcher(collisionConfiguration);
+
+	///btDbvtBroadphase is a good general purpose broadphase. You can also try out btAxis3Sweep.
+	btBroadphaseInterface* overlappingPairCache = new btDbvtBroadphase();
+
+	///the default constraint solver. For parallel processing you can use a different solver (see Extras/BulletMultiThreaded)
+	btSequentialImpulseConstraintSolver* solver = new btSequentialImpulseConstraintSolver;
+
+	btDiscreteDynamicsWorld* dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher,overlappingPairCache,solver,collisionConfiguration);
+	dynamicsWorld->setGravity(btVector3(0,-10,0));
+    m_DynamicsWorld = dynamicsWorld;
 }
 
 void DynamicWorldImp::Update() {
+    if (m_DynamicsWorld) {
+        m_DynamicsWorld->stepSimulation(1.0f / 60.0f, 10);
+
+        // Define ContactResultCallback
+        class DynamicWorldContactResultCallback : public btCollisionWorld::ContactResultCallback {
+        public:
+            DynamicWorldContactResultCallback(std::vector<btCollisionObject*>& collObjs)
+            : m_CollObjs(collObjs) {
+            }
+
+            virtual	btScalar	addSingleResult(btManifoldPoint& cp,	const btCollisionObjectWrapper* colObj0Wrap,int partId0,int index0,const btCollisionObjectWrapper* colObj1Wrap,int partId1,int index1) {
+                m_CollObjs.push_back(const_cast<btCollisionObject*>(colObj1Wrap->getCollisionObject()));
+                return 0.0f;
+            }
+
+        protected:
+            std::vector<btCollisionObject*>&    m_CollObjs;
+        };
+
+        // Do collision detection
+        for (int32_t i = 0; i < kMaxDynamicObject; i++) {
+            std::vector<btCollisionObject*> collObjs;
+            DynamicWorldContactResultCallback contactCallback(collObjs);
+            if (m_DynamicObjects[i]) {
+                m_DynamicsWorld->contactTest(m_DynamicObjects[i]->GetBtCollision(), contactCallback);
+
+                for (int32_t j = 0; j < collObjs.size(); j++) {
+                    int32_t id = reinterpret_cast<int32_t>(collObjs[j]->getUserPointer());
+                    if (m_DynamicObjects[i]->GetCollisionHandle()) {
+                        m_DynamicObjects[i]->GetCollisionHandle()(m_DynamicObjects[i], m_DynamicObjects[id]);
+                    } else {
+                        // Must set a collision handler
+                        assert(false);
+                    }
+                }
+            }
+        }
+    }
 }
 
 void DynamicWorldImp::Destroy() {
+    if (m_DynamicsWorld) {
+        delete m_DynamicsWorld;
+        m_DynamicsWorld = NULL;
+    }
 }
 
 int32_t DynamicWorldImp::AddDynamicObject(DynamicObject* object) {
@@ -71,6 +131,7 @@ int32_t DynamicWorldImp::AddDynamicObject(DynamicObject* object) {
     id = FindEmptyId();
     if (id != -1) {
         m_DynamicObjects[id] = object;
+        m_DynamicsWorld->addCollisionObject(object->GetBtCollision());
     } else {
         assert(false && "No empty id for dynamic object");
     }
@@ -80,6 +141,7 @@ int32_t DynamicWorldImp::AddDynamicObject(DynamicObject* object) {
 void DynamicWorldImp::RemoveDynamicObject(int32_t id) {
     if (0 <= id && id < kMaxDynamicObject) {
         if (m_DynamicObjects[id] != nullptr) {
+            m_DynamicsWorld->removeCollisionObject(m_DynamicObjects[id]->GetBtCollision());
             delete m_DynamicObjects[id];
             m_DynamicObjects[id] = nullptr;
         }
@@ -98,17 +160,6 @@ DynamicObject* DynamicWorldImp::GetDynamicObject(int32_t id) {
 
 void DynamicWorldImp::CheckCollision(int32_t id, std::vector<int32_t>& coll_ids) {
     coll_ids.clear();
-
-    DynamicObject* a = m_DynamicObjects[id];
-    for (int32_t i = 0; i < kMaxDynamicObject; i++) {
-        DynamicObject* b = m_DynamicObjects[i];
-        if (i != id && b != nullptr) {
-            if (a->IsIntersection(b)) {
-                int32_t entityid = reinterpret_cast<int32_t>(b->GetUserData());
-                coll_ids.push_back(entityid);
-            }
-        }
-    }
 }
 
 int32_t DynamicWorldImp::FindEmptyId() {

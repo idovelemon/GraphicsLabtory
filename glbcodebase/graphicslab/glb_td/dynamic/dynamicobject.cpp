@@ -8,70 +8,54 @@
 
 #include <assert.h>
 
+#include "math/glbmatrix.h"
+
+#include "BulletCollision/CollisionShapes/btBoxShape.h"
+
 namespace dynamic {
 
 //-----------------------------------------------------------------
 DTAabb::DTAabb(glb::math::Vector max, glb::math::Vector min, glb::math::Vector pos)
 : DynamicObject(DOT_AABB)
-, m_Max(max)
-, m_Min(min)
-, m_Pos(pos) {
+, m_OriMax(max)
+, m_OriMin(min) {
+    glb::math::Vector half = max - min;
+    half = half * 0.5f;
+
+    btVector3 halfExt(half.x, half.y, half.z);
+
+    m_btCollisionShape = new btBoxShape(halfExt);
+    m_btCollision = new btCollisionObject();
+    m_btCollision->setCollisionShape(m_btCollisionShape);
+
+    glb::math::Matrix mat;
+    mat.MakeIdentityMatrix();
+    mat.Translate(pos.x, pos.y, pos.z);
+    btTransform transform;
+    transform.setFromOpenGLMatrix(mat.m_Matrix.v);
+    m_btCollision->setWorldTransform(transform);
 }
 
 DTAabb::~DTAabb() {
-}
-
-bool DTAabb::IsIntersection(DynamicObject* object) {
-    bool result = false;
-
-    if (object == nullptr) return result;
-
-    switch (object->GetType()) {
-    case DOT_AABB:
-        result = IsIntersectionWithAABB(reinterpret_cast<DTAabb*>(object));
-        break;
-
-    default:
-        assert(false && "Unsupport dynamic object type");
+    if (m_btCollision) {
+        delete m_btCollision;
+        m_btCollision = nullptr;
     }
 
-    return result;
+    if (m_btCollisionShape) {
+        delete m_btCollisionShape;
+        m_btCollisionShape = nullptr;
+    }
 }
 
-void DTAabb::Update(glb::math::Vector max, glb::math::Vector min, glb::math::Vector center) {
-    m_Max = max;
-    m_Min = min;
-    m_Pos = center;
-}
-
-float DTAabb::GetWidth() {
-    return (m_Max.x - m_Min.x);
-}
-
-float DTAabb::GetLength() {
-    return (m_Max.z - m_Min.z);
-}
-
-bool DTAabb::IsIntersectionWithAABB(DTAabb* object) {
-    if (object == nullptr) return false;
-
-    glb::math::Vector center0 = (m_Max + m_Min) * 0.5f;
-    glb::math::Vector diff0 = m_Pos - center0;
-    glb::math::Vector max0 = m_Max + diff0;
-    glb::math::Vector min0 = m_Min + diff0;
-    glb::math::Vector center1 = (object->m_Max + object->m_Min) * 0.5f;
-    glb::math::Vector diff1 = object->m_Pos - center1;
-    glb::math::Vector max1 = object->m_Max + diff1;
-    glb::math::Vector min1 = object->m_Min + diff1;
-
-    if (max0.x < min1.x) return false;
-    if (max0.y < min1.y) return false;
-    if (max0.z < min1.z) return false;
-    if (min0.x > max1.x) return false;
-    if (min0.y > max1.y) return false;
-    if (min0.z > max1.z) return false;
-
-    return true;
+void DTAabb::Update(glb::math::Vector pos, glb::math::Vector rot, glb::math::Vector scale) {
+    glb::math::Matrix mat;
+    mat.MakeIdentityMatrix();
+    mat.Scale(scale.x, scale.y, scale.z);
+    mat.Translate(pos.x, pos.y, pos.z);
+    btTransform transform;
+    transform.setFromOpenGLMatrix(mat.m_Matrix.v);
+    m_btCollision->setWorldTransform(transform);
 }
 
 };  // namespace dynamic

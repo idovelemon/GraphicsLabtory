@@ -54,15 +54,16 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;GLB_PLATFORM_OPENGL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(PYDIR)\include;$(DXSDK_DIR)\Include;$(SolutionDir)\glb;$(SolutionDir)\..\glew\include;$(SolutionDir)\..\vld;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(PYDIR)\include;$(DXSDK_DIR)\Include;$(SolutionDir)\glb;$(SolutionDir)\..\glew\include;$(SolutionDir)\..\vld;$(SolutionDir)$(ProjectName)\bullet\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <ObjectFileName>$(IntDir)/%(RelativeDir)/</ObjectFileName>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)\..\glew\lib\Release\Win32;$(DXSDK_DIR)\Lib\x86;$(SolutionDir)\..\vld;$(PYDIR)\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glew32.lib;opengl32.lib;dinput8.lib;dxguid.lib;python36.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)\..\glew\lib\Release\Win32;$(DXSDK_DIR)\Lib\x86;$(SolutionDir)\..\vld;$(PYDIR)\libs;$(SolutionDir)$(ProjectName)\bullet\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glew32.lib;opengl32.lib;dinput8.lib;dxguid.lib;python36.lib;BulletDynamics_vs2010_debug.lib;BulletCollision_vs2010_debug.lib;LinearMath_vs2010_debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>libcd.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
@@ -123,6 +124,7 @@
     <ClCompile Include="entity\arsenalcom.cpp" />
     <ClCompile Include="entity\cameracom.cpp" />
     <ClCompile Include="entity\collisioncom.cpp" />
+    <ClCompile Include="entity\collision\bulletcollisionhandle.cpp" />
     <ClCompile Include="entity\datacom.cpp" />
     <ClCompile Include="entity\entity.cpp" />
     <ClCompile Include="entity\entityfilter.cpp" />
@@ -188,6 +190,7 @@
     <ClInclude Include="entity\arsenalcom.h" />
     <ClInclude Include="entity\cameracom.h" />
     <ClInclude Include="entity\collisioncom.h" />
+    <ClInclude Include="entity\collision\collision.h" />
     <ClInclude Include="entity\component.h" />
     <ClInclude Include="entity\datacom.h" />
     <ClInclude Include="entity\entity.h" />
@@ -207,6 +210,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\glb\math\glbvector.inl" />
+    <None Include="entity\collision\collision.def" />
     <None Include="entity\updater\updater.def" />
     <None Include="pyscript\topython.inl" />
   </ItemGroup>

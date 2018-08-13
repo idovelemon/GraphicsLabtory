@@ -148,10 +148,16 @@ static PyObject* EntityAddDataCom(PyObject* self, PyObject* args) {
 
 static PyObject* EntityAddCollisionCom(PyObject* self, PyObject* args) {
 	int id;
-	if (!PyArg_ParseTuple(args, "i", &id)) {
+	float x;
+	float y;
+	float z;
+	float width;
+	float height;
+	float depth;
+	if (!PyArg_ParseTuple(args, "iffffff", &id, &x, &y, &z, &width, &height, &depth)) {
 		 return NULL;
 	}
-	EntityAddCollisionCom(id);
+	EntityAddCollisionCom(id, x, y, z, width, height, depth);
 	return Py_BuildValue("");
 }
 
@@ -278,6 +284,16 @@ static PyObject* EntitySetScale(PyObject* self, PyObject* args) {
 		 return NULL;
 	}
 	EntitySetScale(id, x, y, z);
+	return Py_BuildValue("");
+}
+
+static PyObject* EntitySetCollisionHandle(PyObject* self, PyObject* args) {
+	int id;
+	const char* handleName;
+	if (!PyArg_ParseTuple(args, "is", &id, &handleName)) {
+		 return NULL;
+	}
+	EntitySetCollisionHandle(id, handleName);
 	return Py_BuildValue("");
 }
 
@@ -524,72 +540,6 @@ static PyObject* EntityIsSubType(PyObject* self, PyObject* args) {
 	return Py_BuildValue("i", ret);
 }
 
-static PyObject* EntityUpdateCollision(PyObject* self, PyObject* args) {
-	int id;
-	if (!PyArg_ParseTuple(args, "i", &id)) {
-		 return NULL;
-	}
-	EntityUpdateCollision(id);
-	return Py_BuildValue("");
-}
-
-static PyObject* EntityCheckCollision(PyObject* self, PyObject* args) {
-	int id;
-	if (!PyArg_ParseTuple(args, "i", &id)) {
-		 return NULL;
-	}
-	EntityCheckCollision(id);
-	return Py_BuildValue("");
-}
-
-static PyObject* EntityCollisionBeginIterate(PyObject* self, PyObject* args) {
-	int id;
-	if (!PyArg_ParseTuple(args, "i", &id)) {
-		 return NULL;
-	}
-	EntityCollisionBeginIterate(id);
-	return Py_BuildValue("");
-}
-
-static PyObject* EntityCollisionIterate(PyObject* self, PyObject* args) {
-	int id;
-	int ret;
-	if (!PyArg_ParseTuple(args, "i", &id)) {
-		 return NULL;
-	}
-	ret = EntityCollisionIterate(id);
-	return Py_BuildValue("i", ret);
-}
-
-static PyObject* EntityCollisionEndIterate(PyObject* self, PyObject* args) {
-	int id;
-	if (!PyArg_ParseTuple(args, "i", &id)) {
-		 return NULL;
-	}
-	EntityCollisionEndIterate(id);
-	return Py_BuildValue("");
-}
-
-static PyObject* EntityGetCollisionWidth(PyObject* self, PyObject* args) {
-	int id;
-	float ret;
-	if (!PyArg_ParseTuple(args, "i", &id)) {
-		 return NULL;
-	}
-	ret = EntityGetCollisionWidth(id);
-	return Py_BuildValue("f", ret);
-}
-
-static PyObject* EntityGetCollisionLength(PyObject* self, PyObject* args) {
-	int id;
-	float ret;
-	if (!PyArg_ParseTuple(args, "i", &id)) {
-		 return NULL;
-	}
-	ret = EntityGetCollisionLength(id);
-	return Py_BuildValue("f", ret);
-}
-
 static PyObject* EntityFindEntity(PyObject* self, PyObject* args) {
 	int main;
 	int sub;
@@ -684,6 +634,7 @@ static PyMethodDef s_HostAPI_MethodDef[] = {
 	{"EntityGetScaleY", EntityGetScaleY, METH_VARARGS, NULL},
 	{"EntityGetScaleZ", EntityGetScaleZ, METH_VARARGS, NULL},
 	{"EntitySetScale", EntitySetScale, METH_VARARGS, NULL},
+	{"EntitySetCollisionHandle", EntitySetCollisionHandle, METH_VARARGS, NULL},
 	{"EntityTransformSetParent", EntityTransformSetParent, METH_VARARGS, NULL},
 	{"EntityAddWeapon", EntityAddWeapon, METH_VARARGS, NULL},
 	{"EntityActiveWeapon", EntityActiveWeapon, METH_VARARGS, NULL},
@@ -708,13 +659,6 @@ static PyMethodDef s_HostAPI_MethodDef[] = {
 	{"EntityEndIterate", EntityEndIterate, METH_VARARGS, NULL},
 	{"EntityIsMainType", EntityIsMainType, METH_VARARGS, NULL},
 	{"EntityIsSubType", EntityIsSubType, METH_VARARGS, NULL},
-	{"EntityUpdateCollision", EntityUpdateCollision, METH_VARARGS, NULL},
-	{"EntityCheckCollision", EntityCheckCollision, METH_VARARGS, NULL},
-	{"EntityCollisionBeginIterate", EntityCollisionBeginIterate, METH_VARARGS, NULL},
-	{"EntityCollisionIterate", EntityCollisionIterate, METH_VARARGS, NULL},
-	{"EntityCollisionEndIterate", EntityCollisionEndIterate, METH_VARARGS, NULL},
-	{"EntityGetCollisionWidth", EntityGetCollisionWidth, METH_VARARGS, NULL},
-	{"EntityGetCollisionLength", EntityGetCollisionLength, METH_VARARGS, NULL},
 	{"EntityFindEntity", EntityFindEntity, METH_VARARGS, NULL},
 	{"TimeGetPrevGameTime", TimeGetPrevGameTime, METH_VARARGS, NULL},
 	{"TimeGetCurGameTime", TimeGetCurGameTime, METH_VARARGS, NULL},

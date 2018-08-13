@@ -58,6 +58,9 @@
     <Filter Include="源文件\entity\updater">
       <UniqueIdentifier>{e7fe76e8-b456-4073-ab67-f5b24aaf1a9a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="源文件\entity\collision">
+      <UniqueIdentifier>{ee8936bb-7216-491f-b25a-b178e7b1d26a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\glb\glbapplication.cpp">
@@ -218,6 +221,9 @@
     </ClCompile>
     <ClCompile Include="entity\updater\enemyupdater.cpp">
       <Filter>源文件\entity\updater</Filter>
+    </ClCompile>
+    <ClCompile Include="entity\collision\bulletcollisionhandle.cpp">
+      <Filter>源文件\entity\collision</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -413,6 +419,9 @@
     <ClInclude Include="entity\updater\updater.h">
       <Filter>源文件\entity\updater</Filter>
     </ClInclude>
+    <ClInclude Include="entity\collision\collision.h">
+      <Filter>源文件\entity\collision</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\glb\math\glbvector.inl">
@@ -423,6 +432,9 @@
     </None>
     <None Include="entity\updater\updater.def">
       <Filter>源文件\entity\updater</Filter>
+    </None>
+    <None Include="entity\collision\collision.def">
+      <Filter>源文件\entity\collision</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

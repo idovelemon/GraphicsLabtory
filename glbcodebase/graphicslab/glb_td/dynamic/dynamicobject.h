@@ -9,6 +9,9 @@
 
 #include "math/glbvector.h"
 
+#include "BulletCollision/CollisionDispatch/btCollisionObject.h"
+#include "BulletCollision/CollisionShapes/btBoxShape.h"
+
 namespace dynamic {
 
 //---------------------------------------------------------
@@ -23,24 +26,34 @@ enum DynamicObjectType {
 //---------------------------------------------------------
 class DynamicObject {
 public:
+    typedef void (*CollisionEventHandle)(DynamicObject* self, DynamicObject* other);
+
+public:
     DynamicObject(DynamicObjectType type)
     : m_Type(type)
-    , m_UserData(nullptr) {
+    , m_btCollisionShape(nullptr)
+    , m_btCollision(nullptr)
+    , m_UserData(nullptr)
+    , m_CollisionHandle(nullptr) {
     }
     virtual ~DynamicObject() {
     }
 
 public:
     virtual DynamicObjectType GetType() const { return m_Type; }
-    virtual bool IsIntersection(DynamicObject* object) = 0;
-    virtual float GetWidth() = 0;
-    virtual float GetLength() = 0;
+    virtual void Update(glb::math::Vector pos, glb::math::Vector rot, glb::math::Vector scale) = 0;
+    virtual btCollisionObject* GetBtCollision() { return m_btCollision; }
     virtual void SetUserData(void* data) { m_UserData = data; }
-    virtual void* GetUserData() { return m_UserData; }
+    virtual void* GetUserData() const { return m_UserData; }
+    virtual void SetCollisionHandle(CollisionEventHandle handle) { m_CollisionHandle = handle; }
+    virtual CollisionEventHandle GetCollisionHandle() const { return m_CollisionHandle; }
 
 protected:
-    DynamicObjectType   m_Type;
-    void*               m_UserData;
+    DynamicObjectType       m_Type;
+    btCollisionShape*       m_btCollisionShape;
+    btCollisionObject*      m_btCollision;
+    void*                   m_UserData;
+    CollisionEventHandle    m_CollisionHandle;
 };
 
 //---------------------------------------------------------
@@ -50,18 +63,11 @@ public:
     virtual ~DTAabb();
 
 public:
-    virtual bool IsIntersection(DynamicObject* object);
-    virtual void Update(glb::math::Vector max, glb::math::Vector min, glb::math::Vector center);
-    virtual float GetWidth();
-    virtual float GetLength();
+    virtual void Update(glb::math::Vector pos, glb::math::Vector rot = glb::math::Vector(0.0f, 0.0f, 0.0f), glb::math::Vector scale = glb::math::Vector(1.0f, 1.0f, 1.0f)) override;
 
 protected:
-    bool IsIntersectionWithAABB(DTAabb* aabb);
-
-protected:
-    glb::math::Vector       m_Max;
-    glb::math::Vector       m_Min;
-    glb::math::Vector       m_Pos;
+    glb::math::Vector       m_OriMax;
+    glb::math::Vector       m_OriMin;
 };
 
 };  // namespace dynamic

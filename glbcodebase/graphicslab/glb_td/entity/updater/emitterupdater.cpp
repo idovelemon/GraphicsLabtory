@@ -13,6 +13,7 @@
 #include "../../pyscript/topython_function.h"
 #include "../datacom.h"
 #include "../transformcom.h"
+#include "../collision/collision.h"
 #include "updater.h"
 
 #include "glb.h"
@@ -51,7 +52,8 @@ void EntityNormalEmitterUpdater(Entity* entity) {
         EntityAddScriptCom(bullet, "EntityNormalBulletUpdater");
         EntityAddDataCom(bullet);
         EntityAddFloatData(bullet, "Life", 3.0f * 60.0f);
-        //EntityAddCollisionCom(bullet);
+        EntityAddCollisionCom(bullet, pos.x, pos.y, pos.z, 1.0f, 1.0f, 1.0f);
+        EntitySetCollisionHandle(bullet, "EntityNormalBulletCollisionHandle");
     }
 
     pack->SetFloat(curDelta);

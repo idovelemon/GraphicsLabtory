@@ -104,6 +104,8 @@ def main():
         enemy = EntityCreate()
         EntityAddTransformCom(enemy, 50.0, 0.0, 50.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0)
         EntityAddScriptCom(enemy, "EntityEnemy01Updater")
+        EntityAddCollisionCom(enemy, 50.0, 0.0, 50.0, 1.0, 1.0, 1.0)
+        EntitySetCollisionHandle(enemy, "EntityEnemyCollisionHandle")        
 
         enemyCockPit = EntityCreate()
         EntityAddRenderCom(enemyCockPit, "res/model/enemy/enemy_cockpit.obj", 0.0, 0.0, 0.0, 0.0, 0.0, 0., 1.0, 1.0, 1.0, True, 10)
@@ -115,7 +117,6 @@ def main():
         EntityAddTransformCom(enemyRotate, 0.0, 0.0, 0.0, 0.0, 0.0, 0., 1.0, 1.0, 1.0)
         EntityTransformSetParent(enemyRotate, enemy)
         EntityAddScriptCom(enemyRotate, "EntityEnemy01RotateUpdater")
-        EntityAddCollisionCom(enemyRotate)
 
     if LEVEL_COUNT == 60:
         enemy = EntityCreate()
@@ -132,7 +133,7 @@ def main():
         EntityAddTransformCom(enemyRotate, 0.0, 0.0, 0.0, 0.0, 0.0, 0., 1.0, 1.0, 1.0)
         EntityTransformSetParent(enemyRotate, enemy)
         EntityAddScriptCom(enemyRotate, "EntityEnemy01RotateUpdater") 
-        EntityAddCollisionCom(enemyRotate)
+        #EntityAddCollisionCom(enemyRotate)
 
     if LEVEL_COUNT == 80:
         enemy = EntityCreate()
@@ -149,7 +150,7 @@ def main():
         EntityAddTransformCom(enemyRotate, 0.0, 0.0, 0.0, 0.0, 0.0, 0., 1.0, 1.0, 1.0)
         EntityTransformSetParent(enemyRotate, enemy)
         EntityAddScriptCom(enemyRotate, "EntityEnemy01RotateUpdater")               
-        EntityAddCollisionCom(enemyRotate)
+        #EntityAddCollisionCom(enemyRotate)
 
     if LEVEL_COUNT == 30:
         DebugPrint("TD Level0 Finish\n")

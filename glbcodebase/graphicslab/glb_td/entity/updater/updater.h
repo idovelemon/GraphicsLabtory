@@ -28,10 +28,10 @@ class Entity;
 
 #define UPDATER_DEF(_name_) {#_name_, _name_},
 
-typedef void (*func__)(Entity*);
+typedef void (*update_func__)(Entity*);
 static const struct {
     char name[128];
-    func__ f;
+    update_func__ f;
 } sEntityUpdaterTbl[] = {
 #include "updater.def"
 };
