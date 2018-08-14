@@ -11,6 +11,8 @@
 
 #include "btBulletDynamicsCommon.h"
 #include "dynamicobject.h"
+#include "dynamicdrawer.h"
+#include "../version.h"
 
 namespace dynamic {
 
@@ -76,6 +78,10 @@ void DynamicWorldImp::Initialize() {
 	btDiscreteDynamicsWorld* dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher,overlappingPairCache,solver,collisionConfiguration);
 	dynamicsWorld->setGravity(btVector3(0,-10,0));
     m_DynamicsWorld = dynamicsWorld;
+
+#if ENABLE_DYNAMIC_DRAW
+    m_DynamicsWorld->setDebugDrawer(new DynamicDebugDrawer());
+#endif
 }
 
 void DynamicWorldImp::Update() {
@@ -117,6 +123,12 @@ void DynamicWorldImp::Update() {
             }
         }
     }
+
+#if ENABLE_DYNAMIC_DRAW
+    if (m_DynamicsWorld) {
+        m_DynamicsWorld->debugDrawWorld();
+    }
+#endif
 }
 
 void DynamicWorldImp::Destroy() {

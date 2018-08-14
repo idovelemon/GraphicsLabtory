@@ -225,6 +225,9 @@
     <ClCompile Include="entity\collision\bulletcollisionhandle.cpp">
       <Filter>源文件\entity\collision</Filter>
     </ClCompile>
+    <ClCompile Include="dynamic\dynamicdrawer.cpp">
+      <Filter>源文件\dynamic</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\glb\glb.h">
@@ -421,6 +424,12 @@
     </ClInclude>
     <ClInclude Include="entity\collision\collision.h">
       <Filter>源文件\entity\collision</Filter>
+    </ClInclude>
+    <ClInclude Include="dynamic\dynamicdrawer.h">
+      <Filter>源文件\dynamic</Filter>
+    </ClInclude>
+    <ClInclude Include="version.h">
+      <Filter>源文件</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -53,6 +53,7 @@ void DTAabb::Update(glb::math::Vector pos, glb::math::Vector rot, glb::math::Vec
     mat.MakeIdentityMatrix();
     mat.Scale(scale.x, scale.y, scale.z);
     mat.Translate(pos.x, pos.y, pos.z);
+    mat.Transpose();
     btTransform transform;
     transform.setFromOpenGLMatrix(mat.m_Matrix.v);
     m_btCollision->setWorldTransform(transform);
