@@ -11,6 +11,7 @@
 #include "../../gametimer.h"
 #include "../../pyscript/pyscriptmgr.h"
 #include "../../pyscript/topython_function.h"
+#include "../collisioncom.h"
 #include "../datacom.h"
 #include "../transformcom.h"
 #include "../collision/collision.h"
@@ -52,8 +53,9 @@ void EntityNormalEmitterUpdater(Entity* entity) {
         EntityAddScriptCom(bullet, "EntityNormalBulletUpdater");
         EntityAddDataCom(bullet);
         EntityAddFloatData(bullet, "Life", 3.0f * 60.0f);
-        EntityAddCollisionCom(bullet, pos.x, pos.y, pos.z, 1.0f, 1.0f, 1.0f);
+        EntityAddCollisionCom(bullet, pos.x, pos.y, pos.z, 0.8f, 0.8f, 0.8f);
         EntitySetCollisionHandle(bullet, "EntityNormalBulletCollisionHandle");
+        EntitySetCollisionFilter(bullet, CollisionCom::PlayerFilter, CollisionCom::EnemyFilter);
     }
 
     pack->SetFloat(curDelta);

@@ -228,6 +228,9 @@
     <ClCompile Include="dynamic\dynamicdrawer.cpp">
       <Filter>源文件\dynamic</Filter>
     </ClCompile>
+    <ClCompile Include="log.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\glb\glb.h">
@@ -429,6 +432,9 @@
       <Filter>源文件\dynamic</Filter>
     </ClInclude>
     <ClInclude Include="version.h">
+      <Filter>源文件</Filter>
+    </ClInclude>
+    <ClInclude Include="log.h">
       <Filter>源文件</Filter>
     </ClInclude>
   </ItemGroup>

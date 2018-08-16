@@ -297,6 +297,17 @@ static PyObject* EntitySetCollisionHandle(PyObject* self, PyObject* args) {
 	return Py_BuildValue("");
 }
 
+static PyObject* EntitySetCollisionFilter(PyObject* self, PyObject* args) {
+	int id;
+	int groupFilter;
+	int maskFilter;
+	if (!PyArg_ParseTuple(args, "iii", &id, &groupFilter, &maskFilter)) {
+		 return NULL;
+	}
+	EntitySetCollisionFilter(id, groupFilter, maskFilter);
+	return Py_BuildValue("");
+}
+
 static PyObject* EntityTransformSetParent(PyObject* self, PyObject* args) {
 	int id;
 	int parent;
@@ -635,6 +646,7 @@ static PyMethodDef s_HostAPI_MethodDef[] = {
 	{"EntityGetScaleZ", EntityGetScaleZ, METH_VARARGS, NULL},
 	{"EntitySetScale", EntitySetScale, METH_VARARGS, NULL},
 	{"EntitySetCollisionHandle", EntitySetCollisionHandle, METH_VARARGS, NULL},
+	{"EntitySetCollisionFilter", EntitySetCollisionFilter, METH_VARARGS, NULL},
 	{"EntityTransformSetParent", EntityTransformSetParent, METH_VARARGS, NULL},
 	{"EntityAddWeapon", EntityAddWeapon, METH_VARARGS, NULL},
 	{"EntityActiveWeapon", EntityActiveWeapon, METH_VARARGS, NULL},

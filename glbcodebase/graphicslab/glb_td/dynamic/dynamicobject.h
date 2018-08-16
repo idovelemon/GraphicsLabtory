@@ -7,6 +7,8 @@
 #ifndef DYNAMIC_DYNAMICOBJECT_H_
 #define DYNAMIC_DYNAMICOBJECT_H_
 
+#include <stdint.h>
+
 #include "math/glbvector.h"
 
 #include "BulletCollision/CollisionDispatch/btCollisionObject.h"
@@ -34,7 +36,9 @@ public:
     , m_btCollisionShape(nullptr)
     , m_btCollision(nullptr)
     , m_UserData(nullptr)
-    , m_CollisionHandle(nullptr) {
+    , m_CollisionHandle(nullptr)
+    , m_CollisionFilterGroup(-1)
+    , m_CollisionFilterMask(-1) {
     }
     virtual ~DynamicObject() {
     }
@@ -47,6 +51,16 @@ public:
     virtual void* GetUserData() const { return m_UserData; }
     virtual void SetCollisionHandle(CollisionEventHandle handle) { m_CollisionHandle = handle; }
     virtual CollisionEventHandle GetCollisionHandle() const { return m_CollisionHandle; }
+    virtual void SetCollisionFilter(int32_t group, int32_t mask) {
+        m_CollisionFilterGroup = group;
+        m_CollisionFilterMask = mask;
+        if (m_btCollision) {
+            m_btCollision->getBroadphaseHandle()->m_collisionFilterGroup = group;
+            m_btCollision->getBroadphaseHandle()->m_collisionFilterMask = mask;
+        }
+    }
+    virtual int32_t GetCollisionFilterGroup() const { return m_CollisionFilterGroup; }
+    virtual int32_t GetCollisionFilterMask() const { return m_CollisionFilterMask; }
 
 protected:
     DynamicObjectType       m_Type;
@@ -54,6 +68,8 @@ protected:
     btCollisionObject*      m_btCollision;
     void*                   m_UserData;
     CollisionEventHandle    m_CollisionHandle;
+    int32_t                 m_CollisionFilterGroup;
+    int32_t                 m_CollisionFilterMask;
 };
 
 //---------------------------------------------------------

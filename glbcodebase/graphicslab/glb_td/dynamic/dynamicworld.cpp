@@ -106,9 +106,13 @@ void DynamicWorldImp::Update() {
 
         // Do collision detection
         for (int32_t i = 0; i < kMaxDynamicObject; i++) {
-            std::vector<btCollisionObject*> collObjs;
-            DynamicWorldContactResultCallback contactCallback(collObjs);
             if (m_DynamicObjects[i]) {
+                std::vector<btCollisionObject*> collObjs;
+                DynamicWorldContactResultCallback contactCallback(collObjs);
+
+                contactCallback.m_collisionFilterGroup = m_DynamicObjects[i]->GetCollisionFilterGroup();
+                contactCallback.m_collisionFilterMask = m_DynamicObjects[i]->GetCollisionFilterMask();
+
                 m_DynamicsWorld->contactTest(m_DynamicObjects[i]->GetBtCollision(), contactCallback);
 
                 for (int32_t j = 0; j < collObjs.size(); j++) {
@@ -143,7 +147,7 @@ int32_t DynamicWorldImp::AddDynamicObject(DynamicObject* object) {
     id = FindEmptyId();
     if (id != -1) {
         m_DynamicObjects[id] = object;
-        m_DynamicsWorld->addCollisionObject(object->GetBtCollision());
+        m_DynamicsWorld->addCollisionObject(object->GetBtCollision(), object->GetCollisionFilterGroup(), object->GetCollisionFilterMask());
     } else {
         assert(false && "No empty id for dynamic object");
     }

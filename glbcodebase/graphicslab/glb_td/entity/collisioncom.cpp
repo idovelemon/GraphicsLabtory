@@ -22,7 +22,7 @@ CollisionCom::CollisionCom(Entity* owner, float width, float height, float depth
     dynamic::DTAabb* aabb = new dynamic::DTAabb(glb::math::Vector(width / 2.0f, height / 2.0f, depth / 2.0f)
         , glb::math::Vector(-width / 2.0f, -height / 2.0f, -depth / 2.0f)
         , pos);
-
+    aabb->SetUserData(reinterpret_cast<void*>(owner->GetID()));
     m_DynamicObjectID = dynamic::DynamicWorld::AddDynamicObject(aabb);
 }
 
@@ -40,6 +40,10 @@ void CollisionCom::Update() {
 
 void CollisionCom::SetCollisionHandle(dynamic::DynamicObject::CollisionEventHandle handle) {
     dynamic::DynamicWorld::GetDynamicObject(m_DynamicObjectID)->SetCollisionHandle(handle);
+}
+
+void CollisionCom::SetCollisionFilter(int32_t groupFilter, int32_t maskFilter) {
+    dynamic::DynamicWorld::GetDynamicObject(m_DynamicObjectID)->SetCollisionFilter(groupFilter, maskFilter);
 }
 
 };  // namespace entity

@@ -27,6 +27,12 @@ class Entity;
 
 class CollisionCom : public Component {
 public:
+    enum {
+        PlayerFilter = 1 << 7,
+        EnemyFilter = 1 << 8,
+    };
+
+public:
     CollisionCom(Entity* owner, float width, float height, float depth, glb::math::Vector pos);
     virtual ~CollisionCom();
 
@@ -34,6 +40,7 @@ public:
     virtual void Update();
 
     void SetCollisionHandle(dynamic::DynamicObject::CollisionEventHandle handle);
+    void SetCollisionFilter(int32_t groupFilter, int32_t maskFilter);
 
 protected:
     int32_t                     m_DynamicObjectID;

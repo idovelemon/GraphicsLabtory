@@ -45,6 +45,7 @@ float EntityGetScaleY(int id);
 float EntityGetScaleZ(int id);
 void EntitySetScale(int id, float x, float y, float z);
 void EntitySetCollisionHandle(int id, const char* handleName);
+void EntitySetCollisionFilter(int id, int groupFilter, int maskFilter);
 void EntityTransformSetParent(int id, int parent);
 void EntityAddWeapon(int id, int wt, const char* script);
 void EntityActiveWeapon(int id, int wt);

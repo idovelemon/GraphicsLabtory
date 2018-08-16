@@ -139,6 +139,7 @@
     <ClCompile Include="entity\updater\enemyupdater.cpp" />
     <ClCompile Include="gametimer.cpp" />
     <ClCompile Include="glb_td.cpp" />
+    <ClCompile Include="log.cpp" />
     <ClCompile Include="pyscript\pyscriptmgr.cpp" />
     <ClCompile Include="pyscript\topython_function.cpp" />
   </ItemGroup>
@@ -205,6 +206,7 @@
     <ClInclude Include="entity\updater\updater.h" />
     <ClInclude Include="gametimer.h" />
     <ClInclude Include="glb_td.h" />
+    <ClInclude Include="log.h" />
     <ClInclude Include="pyscript\pyscriptmgr.h" />
     <ClInclude Include="pyscript\topython.h" />
     <ClInclude Include="pyscript\topython_function.h" />

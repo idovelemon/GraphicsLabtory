@@ -430,6 +430,20 @@ void EntitySetCollisionHandle(int id, const char* handleName) {
     }
 }
 
+void EntitySetCollisionFilter(int id, int groupFilter, int maskFilter) {
+    entity::Entity* ent = entity::EntityMgr::GetEntity(id);
+
+    if (ent != NULL) {
+        entity::CollisionCom* com = reinterpret_cast<entity::CollisionCom*>(ent->GetComponent(entity::CT_COLLISION));
+        if (com != nullptr) {
+            com->SetCollisionFilter(groupFilter, maskFilter);
+        }
+    } else {
+        printf("Wrong entity id\n");
+        assert(false);
+    }
+}
+
 void EntityTransformSetParent(int id, int parent) {
     entity::Entity* ent = entity::EntityMgr::GetEntity(id);
     entity::Entity* parentEnt = entity::EntityMgr::GetEntity(parent);
