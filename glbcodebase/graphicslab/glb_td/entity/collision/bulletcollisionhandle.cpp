@@ -11,6 +11,7 @@
 #include "../../gametimer.h"
 #include "../../log.h"
 #include "../../pyscript/pyscriptmgr.h"
+#include "../../pyscript/topython_function.h"
 #include "../datacom.h"
 #include "../transformcom.h"
 #include "collision.h"
@@ -23,6 +24,8 @@ void EntityNormalBulletCollisionHandle(dynamic::DynamicObject* self, dynamic::Dy
     int32_t selfEntityID = reinterpret_cast<int32_t>(self->GetUserData());
     int32_t otherEntityID = reinterpret_cast<int32_t>(other->GetUserData());
     tdlog::Print("EntityNormalBulletCollisionHandle: SelfID:%d OtherID:%d\n", selfEntityID, otherEntityID);
+
+    EntitySetDead(selfEntityID, true);
 }
 
 void EntityEnemyCollisionHandle(dynamic::DynamicObject* self, dynamic::DynamicObject* other) {
