@@ -95,8 +95,12 @@ void DynamicWorldImp::Update() {
             : m_CollObjs(collObjs) {
             }
 
-            virtual	btScalar	addSingleResult(btManifoldPoint& cp,	const btCollisionObjectWrapper* colObj0Wrap,int partId0,int index0,const btCollisionObjectWrapper* colObj1Wrap,int partId1,int index1) {
-                m_CollObjs.push_back(const_cast<btCollisionObject*>(colObj1Wrap->getCollisionObject()));
+            virtual	btScalar addSingleResult(btManifoldPoint& cp, const btCollisionObjectWrapper* colObj0Wrap,int partId0,int index0,const btCollisionObjectWrapper* colObj1Wrap,int partId1,int index1) {
+                // Note: addSingleResult is called for every contact point result
+                std::vector<btCollisionObject*>::iterator it = std::find(m_CollObjs.begin(), m_CollObjs.end(), colObj1Wrap->getCollisionObject());
+                if (it == m_CollObjs.end()) {
+                    m_CollObjs.push_back(const_cast<btCollisionObject*>(colObj1Wrap->getCollisionObject()));
+                }
                 return 0.0f;
             }
 
