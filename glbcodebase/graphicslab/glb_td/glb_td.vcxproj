@@ -126,6 +126,7 @@
     <ClCompile Include="entity\cameracom.cpp" />
     <ClCompile Include="entity\collisioncom.cpp" />
     <ClCompile Include="entity\collision\bulletcollisionhandle.cpp" />
+    <ClCompile Include="entity\collision\enemycollisionhandle.cpp" />
     <ClCompile Include="entity\datacom.cpp" />
     <ClCompile Include="entity\entity.cpp" />
     <ClCompile Include="entity\entityfilter.cpp" />

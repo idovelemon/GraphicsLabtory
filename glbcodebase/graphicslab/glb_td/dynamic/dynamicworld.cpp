@@ -148,6 +148,7 @@ int32_t DynamicWorldImp::AddDynamicObject(DynamicObject* object) {
     if (id != -1) {
         m_DynamicObjects[id] = object;
         m_DynamicsWorld->addCollisionObject(object->GetBtCollision(), object->GetCollisionFilterGroup(), object->GetCollisionFilterMask());
+        object->GetBtCollision()->setUserPointer(reinterpret_cast<void*>(id));
     } else {
         assert(false && "No empty id for dynamic object");
     }

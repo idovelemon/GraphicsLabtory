@@ -110,6 +110,8 @@ def main():
         EntityAddCollisionCom(enemy, 50.0, 0.0, 50.0, 1.8, 1.8, 1.8)
         EntitySetCollisionHandle(enemy, "EntityEnemyCollisionHandle")
         EntitySetCollisionFilter(enemy, EnemyFilter, PlayerFilter)
+        EntityAddDataCom(enemy)
+        EntityAddFloatData(enemy, "HP", 5.0)
 
         enemyCockPit = EntityCreate()
         EntityAddRenderCom(enemyCockPit, "res/model/enemy/enemy_cockpit.obj", 0.0, 0.0, 0.0, 0.0, 0.0, 0., 1.0, 1.0, 1.0, True, 10)
@@ -129,6 +131,8 @@ def main():
         EntityAddCollisionCom(enemy, 50.0, 0.0, -50.0, 1.8, 1.8, 1.8)
         EntitySetCollisionHandle(enemy, "EntityEnemyCollisionHandle")
         EntitySetCollisionFilter(enemy, EnemyFilter, PlayerFilter)
+        EntityAddDataCom(enemy)
+        EntityAddFloatData(enemy, "HP", 5.0)        
 
         enemyCockPit = EntityCreate()
         EntityAddRenderCom(enemyCockPit, "res/model/enemy/enemy_cockpit.obj", 0.0, 0.0, 0.0, 0.0, 0.0, 0., 1.0, 1.0, 1.0, True, 10)
@@ -148,6 +152,8 @@ def main():
         EntityAddCollisionCom(enemy, -50.0, 0.0, -50.0, 1.8, 1.8, 1.8)
         EntitySetCollisionHandle(enemy, "EntityEnemyCollisionHandle")
         EntitySetCollisionFilter(enemy, EnemyFilter, PlayerFilter)
+        EntityAddDataCom(enemy)
+        EntityAddFloatData(enemy, "HP", 5.0)        
 
         enemyCockPit = EntityCreate()
         EntityAddRenderCom(enemyCockPit, "res/model/enemy/enemy_cockpit.obj", 0.0, 0.0, 0.0, 0.0, 0.0, 0., 1.0, 1.0, 1.0, True, 10)
