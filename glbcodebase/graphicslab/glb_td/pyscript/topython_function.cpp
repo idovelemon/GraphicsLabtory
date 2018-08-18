@@ -22,6 +22,7 @@
 #include "../entity/datacom.h"
 #include "../entity/entitymgr.h"
 #include "../entity/entityfilter.h"
+#include "../entity/relationshipcom.h"
 #include "../entity/rendercom.h"
 #include "../entity/rolecom.h"
 #include "../entity/scriptcom.h"
@@ -204,6 +205,17 @@ void EntityAddCollisionCom(int id, float x, float y, float z, float width, float
     entity::Entity* ent = entity::EntityMgr::GetEntity(id);
     if (ent != NULL) {
         entity::CollisionCom* com = new entity::CollisionCom(ent, width, height, depth, glb::math::Vector(x, y, z));
+        ent->AddComponent(com);
+    } else {
+        printf("Wrong entity id\n");
+        assert(false);
+    }
+}
+
+void EntityAddRelationshipCom(int id) {
+    entity::Entity* ent = entity::EntityMgr::GetEntity(id);
+    if (ent != NULL) {
+        entity::RelationshipCom* com = new entity::RelationshipCom(ent);
         ent->AddComponent(com);
     } else {
         printf("Wrong entity id\n");
@@ -444,13 +456,44 @@ void EntitySetCollisionFilter(int id, int groupFilter, int maskFilter) {
     }
 }
 
-void EntityTransformSetParent(int id, int parent) {
+void EntitySetParent(int id, int parent) {
     entity::Entity* ent = entity::EntityMgr::GetEntity(id);
-    entity::Entity* parentEnt = entity::EntityMgr::GetEntity(parent);
-    if (ent != NULL && parent != NULL) {
-        entity::TransformCom* com = reinterpret_cast<entity::TransformCom*>(ent->GetComponent(entity::CT_TRANSFORM));
-        if (com != NULL) {
-            com->SetParent(parentEnt);
+
+    if (ent != NULL) {
+        entity::RelationshipCom* com = reinterpret_cast<entity::RelationshipCom*>(ent->GetComponent(entity::CT_RELATIONSHIP));
+        if (com != nullptr) {
+            com->SetParent(parent);
+        }
+    } else {
+        printf("Wrong entity id\n");
+        assert(false);
+    }
+}
+
+void EntityAddChild(int id, int child) {
+    entity::Entity* ent = entity::EntityMgr::GetEntity(id);
+
+    if (ent != NULL) {
+        entity::RelationshipCom* com = reinterpret_cast<entity::RelationshipCom*>(ent->GetComponent(entity::CT_RELATIONSHIP));
+        if (com != nullptr) {
+            com->AddChild(child);
+        }
+    } else {
+        printf("Wrong entity id\n");
+        assert(false);
+    }
+}
+
+void EntityBindRelationship(int parent, int child) {
+    entity::Entity* parentEntity = entity::EntityMgr::GetEntity(parent);
+    entity::Entity* childEntity = entity::EntityMgr::GetEntity(child);
+
+    if (parentEntity != nullptr && childEntity != nullptr) {
+        entity::RelationshipCom* parentRelationshipCom = reinterpret_cast<entity::RelationshipCom*>(parentEntity->GetComponent(entity::CT_RELATIONSHIP));
+        entity::RelationshipCom* childRelationshipCom = reinterpret_cast<entity::RelationshipCom*>(childEntity->GetComponent(entity::CT_RELATIONSHIP));
+        if (parentRelationshipCom != nullptr && childRelationshipCom != nullptr) {
+            parentRelationshipCom->AddChild(child);
+            childRelationshipCom->SetParent(parent);
         }
     } else {
         printf("Wrong entity id\n");

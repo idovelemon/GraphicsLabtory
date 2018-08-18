@@ -30,6 +30,7 @@ enum ComponentType {
     CT_ARSENAL,
     CT_DATA,
     CT_COLLISION,
+    CT_RELATIONSHIP,
     CT_MAX,
 };
 

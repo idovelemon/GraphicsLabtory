@@ -28,24 +28,28 @@ def main():
         EntityAddScriptCom(coreDummy, "EntityCoreDummyUpdater")
         EntityAddDataCom(coreDummy)
         EntityAddStringData(coreDummy, "Tag", "Player")
+        EntityAddRelationshipCom(coreDummy)
 
         # Create Camera Entity
         camera = EntityCreate()
         EntityAddCameraCom(camera, 0.0, 10.0, 10.0, 0.0, 0.0, 0.0)
         EntityAddTransformCom(camera, 0.0, 10.0, 10.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0)
-        EntityTransformSetParent(camera, coreDummy)
+        EntityAddRelationshipCom(camera)
+        EntityBindRelationship(coreDummy, camera)
 
         # Create Core Entity
         core = EntityCreate()
         EntityAddTransformCom(core, 0.0, 1.2, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0)
-        EntityTransformSetParent(core, coreDummy)
+        EntityAddRelationshipCom(core)
+        EntityBindRelationship(coreDummy, core)
         EntityAddRenderCom(core, "res/model/core/core.obj", 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, False, 0)
         EntityAddScriptCom(core, "EntityCoreUpdater")
 
         # Create Core Rot Entity
         coreRot = EntityCreate()
         EntityAddTransformCom(coreRot, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0)
-        EntityTransformSetParent(coreRot, coreDummy)
+        EntityAddRelationshipCom(coreRot)
+        EntityBindRelationship(coreDummy, coreRot)
         EntityAddRenderCom(coreRot, "res/model/core/coreRot.obj", 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, False, 0)
         EntityAddScriptCom(coreRot, "EntityCoreRotUpdater")
         EntityAddDataCom(coreRot)
@@ -54,7 +58,8 @@ def main():
         # Create Four Normal Emitter
         backNormalEmitter = EntityCreate()
         EntityAddTransformCom(backNormalEmitter, 0.0, 0.75, 1.8, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0)
-        EntityTransformSetParent(backNormalEmitter, coreRot)
+        EntityAddRelationshipCom(backNormalEmitter)
+        EntityBindRelationship(coreRot, backNormalEmitter)        
         EntityAddRenderCom(backNormalEmitter, "res/model/emitter/normal_Emitter.obj", 0.0, 0.75, 1.8, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, True, 4)
         EntityAddScriptCom(backNormalEmitter, "EntityNormalEmitterUpdater")
         EntityAddDataCom(backNormalEmitter)
@@ -62,7 +67,8 @@ def main():
 
         frontNormalEmitter = EntityCreate()
         EntityAddTransformCom(frontNormalEmitter, 0.0, 0.75, -1.8, 0.0, 180.0, 0.0, 1.0, 1.0, 1.0)
-        EntityTransformSetParent(frontNormalEmitter, coreRot)
+        EntityAddRelationshipCom(frontNormalEmitter)
+        EntityBindRelationship(coreRot, frontNormalEmitter)        
         EntityAddRenderCom(frontNormalEmitter, "res/model/emitter/normal_Emitter.obj", 0.0, 0.75, -1.8, 0.0, 180.0, 0.0, 1.0, 1.0, 1.0, True, 4)
         EntityAddScriptCom(frontNormalEmitter, "EntityNormalEmitterUpdater")
         EntityAddDataCom(frontNormalEmitter)
@@ -70,7 +76,8 @@ def main():
 
         leftNormalEmitter = EntityCreate()
         EntityAddTransformCom(leftNormalEmitter, -1.8, 0.75, 0.0, 0.0, -90.0, 0.0, 1.0, 1.0, 1.0)
-        EntityTransformSetParent(leftNormalEmitter, coreRot)
+        EntityAddRelationshipCom(leftNormalEmitter)
+        EntityBindRelationship(coreRot, leftNormalEmitter)                
         EntityAddRenderCom(leftNormalEmitter, "res/model/emitter/normal_Emitter.obj", -1.8, 0.75, 0.0, 0.0, -90.0, 0.0, 1.0, 1.0, 1.0, True, 4)
         EntityAddScriptCom(leftNormalEmitter, "EntityNormalEmitterUpdater")
         EntityAddDataCom(leftNormalEmitter)
@@ -78,7 +85,8 @@ def main():
 
         rightNormalEmitter = EntityCreate()
         EntityAddTransformCom(rightNormalEmitter, 1.8, 0.75, 0.0, 0.0, 90.0, 0.0, 1.0, 1.0, 1.0)
-        EntityTransformSetParent(rightNormalEmitter, coreRot)
+        EntityAddRelationshipCom(rightNormalEmitter)
+        EntityBindRelationship(coreRot, rightNormalEmitter)
         EntityAddRenderCom(rightNormalEmitter, "res/model/emitter/normal_Emitter.obj", 1.8, 0.75, 0.0, 0.0, 90.0, 0.0, 1.0, 1.0, 1.0, True, 4)
         EntityAddScriptCom(rightNormalEmitter, "EntityNormalEmitterUpdater")
         EntityAddDataCom(rightNormalEmitter)
@@ -91,16 +99,21 @@ def main():
         EntityAddCollisionCom(enemy, -50.0, 0.0, 50.0, 1.8, 1.8, 1.8)
         EntitySetCollisionHandle(enemy, "EntityEnemyCollisionHandle")        
         EntitySetCollisionFilter(enemy, EnemyFilter, PlayerFilter)
+        EntityAddDataCom(enemy)
+        EntityAddFloatData(enemy, "HP", 5.0)        
+        EntityAddRelationshipCom(enemy)
 
         enemyCockPit = EntityCreate()
         EntityAddRenderCom(enemyCockPit, "res/model/enemy/enemy_cockpit.obj", 0.0, 0.0, 0.0, 0.0, 0.0, 0., 1.0, 1.0, 1.0, True, 10)
         EntityAddTransformCom(enemyCockPit, 0.0, 0.0, 0.0, 0.0, 0.0, 0., 1.0, 1.0, 1.0)
-        EntityTransformSetParent(enemyCockPit, enemy)
+        EntityAddRelationshipCom(enemyCockPit)
+        EntityBindRelationship(enemy, enemyCockPit)
 
         enemyRotate = EntityCreate()
         EntityAddRenderCom(enemyRotate, "res/model/enemy/enemy_rotate.obj", 0.0, 0.0, 0.0, 0.0, 0.0, 0., 1.0, 1.0, 1.0, True, 10)
         EntityAddTransformCom(enemyRotate, 0.0, 0.0, 0.0, 0.0, 0.0, 0., 1.0, 1.0, 1.0)
-        EntityTransformSetParent(enemyRotate, enemy)
+        EntityAddRelationshipCom(enemyRotate)
+        EntityBindRelationship(enemy, enemyRotate)        
         EntityAddScriptCom(enemyRotate, "EntityEnemy01RotateUpdater")
 
     if LEVEL_COUNT == 40:
@@ -112,16 +125,19 @@ def main():
         EntitySetCollisionFilter(enemy, EnemyFilter, PlayerFilter)
         EntityAddDataCom(enemy)
         EntityAddFloatData(enemy, "HP", 5.0)
+        EntityAddRelationshipCom(enemy)
 
         enemyCockPit = EntityCreate()
         EntityAddRenderCom(enemyCockPit, "res/model/enemy/enemy_cockpit.obj", 0.0, 0.0, 0.0, 0.0, 0.0, 0., 1.0, 1.0, 1.0, True, 10)
         EntityAddTransformCom(enemyCockPit, 0.0, 0.0, 0.0, 0.0, 0.0, 0., 1.0, 1.0, 1.0)
-        EntityTransformSetParent(enemyCockPit, enemy)
+        EntityAddRelationshipCom(enemyCockPit)
+        EntityBindRelationship(enemy, enemyCockPit)
 
         enemyRotate = EntityCreate()
         EntityAddRenderCom(enemyRotate, "res/model/enemy/enemy_rotate.obj", 0.0, 0.0, 0.0, 0.0, 0.0, 0., 1.0, 1.0, 1.0, True, 10)
         EntityAddTransformCom(enemyRotate, 0.0, 0.0, 0.0, 0.0, 0.0, 0., 1.0, 1.0, 1.0)
-        EntityTransformSetParent(enemyRotate, enemy)
+        EntityAddRelationshipCom(enemyRotate)
+        EntityBindRelationship(enemy, enemyRotate)
         EntityAddScriptCom(enemyRotate, "EntityEnemy01RotateUpdater")
 
     if LEVEL_COUNT == 60:
@@ -133,16 +149,19 @@ def main():
         EntitySetCollisionFilter(enemy, EnemyFilter, PlayerFilter)
         EntityAddDataCom(enemy)
         EntityAddFloatData(enemy, "HP", 5.0)        
+        EntityAddRelationshipCom(enemy)
 
         enemyCockPit = EntityCreate()
         EntityAddRenderCom(enemyCockPit, "res/model/enemy/enemy_cockpit.obj", 0.0, 0.0, 0.0, 0.0, 0.0, 0., 1.0, 1.0, 1.0, True, 10)
         EntityAddTransformCom(enemyCockPit, 0.0, 0.0, 0.0, 0.0, 0.0, 0., 1.0, 1.0, 1.0)
-        EntityTransformSetParent(enemyCockPit, enemy)
+        EntityAddRelationshipCom(enemyCockPit)
+        EntityBindRelationship(enemy, enemyCockPit)
 
         enemyRotate = EntityCreate()
         EntityAddRenderCom(enemyRotate, "res/model/enemy/enemy_rotate.obj", 0.0, 0.0, 0.0, 0.0, 0.0, 0., 1.0, 1.0, 1.0, True, 10)
         EntityAddTransformCom(enemyRotate, 0.0, 0.0, 0.0, 0.0, 0.0, 0., 1.0, 1.0, 1.0)
-        EntityTransformSetParent(enemyRotate, enemy)
+        EntityAddRelationshipCom(enemyRotate)
+        EntityBindRelationship(enemy, enemyRotate)
         EntityAddScriptCom(enemyRotate, "EntityEnemy01RotateUpdater") 
 
     if LEVEL_COUNT == 80:
@@ -153,17 +172,20 @@ def main():
         EntitySetCollisionHandle(enemy, "EntityEnemyCollisionHandle")
         EntitySetCollisionFilter(enemy, EnemyFilter, PlayerFilter)
         EntityAddDataCom(enemy)
-        EntityAddFloatData(enemy, "HP", 5.0)        
+        EntityAddFloatData(enemy, "HP", 5.0)
+        EntityAddRelationshipCom(enemy)
 
         enemyCockPit = EntityCreate()
         EntityAddRenderCom(enemyCockPit, "res/model/enemy/enemy_cockpit.obj", 0.0, 0.0, 0.0, 0.0, 0.0, 0., 1.0, 1.0, 1.0, True, 10)
         EntityAddTransformCom(enemyCockPit, 0.0, 0.0, 0.0, 0.0, 0.0, 0., 1.0, 1.0, 1.0)
-        EntityTransformSetParent(enemyCockPit, enemy)
+        EntityAddRelationshipCom(enemyCockPit)
+        EntityBindRelationship(enemy, enemyCockPit)
 
         enemyRotate = EntityCreate()
         EntityAddRenderCom(enemyRotate, "res/model/enemy/enemy_rotate.obj", 0.0, 0.0, 0.0, 0.0, 0.0, 0., 1.0, 1.0, 1.0, True, 10)
         EntityAddTransformCom(enemyRotate, 0.0, 0.0, 0.0, 0.0, 0.0, 0., 1.0, 1.0, 1.0)
-        EntityTransformSetParent(enemyRotate, enemy)
+        EntityAddRelationshipCom(enemyRotate)
+        EntityBindRelationship(enemy, enemyRotate)
         EntityAddScriptCom(enemyRotate, "EntityEnemy01RotateUpdater")
 
     if LEVEL_COUNT == 30:

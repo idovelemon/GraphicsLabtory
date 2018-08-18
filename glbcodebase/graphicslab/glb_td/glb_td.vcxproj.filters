@@ -234,6 +234,9 @@
     <ClCompile Include="entity\collision\enemycollisionhandle.cpp">
       <Filter>源文件\entity\collision</Filter>
     </ClCompile>
+    <ClCompile Include="entity\relationshipcom.cpp">
+      <Filter>源文件\entity</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\glb\glb.h">
@@ -439,6 +442,9 @@
     </ClInclude>
     <ClInclude Include="log.h">
       <Filter>源文件</Filter>
+    </ClInclude>
+    <ClInclude Include="entity\relationshipcom.h">
+      <Filter>源文件\entity</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

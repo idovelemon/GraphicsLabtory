@@ -161,6 +161,15 @@ static PyObject* EntityAddCollisionCom(PyObject* self, PyObject* args) {
 	return Py_BuildValue("");
 }
 
+static PyObject* EntityAddRelationshipCom(PyObject* self, PyObject* args) {
+	int id;
+	if (!PyArg_ParseTuple(args, "i", &id)) {
+		 return NULL;
+	}
+	EntityAddRelationshipCom(id);
+	return Py_BuildValue("");
+}
+
 static PyObject* EntityGetPosX(PyObject* self, PyObject* args) {
 	int id;
 	float ret;
@@ -308,13 +317,33 @@ static PyObject* EntitySetCollisionFilter(PyObject* self, PyObject* args) {
 	return Py_BuildValue("");
 }
 
-static PyObject* EntityTransformSetParent(PyObject* self, PyObject* args) {
+static PyObject* EntitySetParent(PyObject* self, PyObject* args) {
 	int id;
 	int parent;
 	if (!PyArg_ParseTuple(args, "ii", &id, &parent)) {
 		 return NULL;
 	}
-	EntityTransformSetParent(id, parent);
+	EntitySetParent(id, parent);
+	return Py_BuildValue("");
+}
+
+static PyObject* EntityAddChild(PyObject* self, PyObject* args) {
+	int id;
+	int child;
+	if (!PyArg_ParseTuple(args, "ii", &id, &child)) {
+		 return NULL;
+	}
+	EntityAddChild(id, child);
+	return Py_BuildValue("");
+}
+
+static PyObject* EntityBindRelationship(PyObject* self, PyObject* args) {
+	int parent;
+	int child;
+	if (!PyArg_ParseTuple(args, "ii", &parent, &child)) {
+		 return NULL;
+	}
+	EntityBindRelationship(parent, child);
 	return Py_BuildValue("");
 }
 
@@ -633,6 +662,7 @@ static PyMethodDef s_HostAPI_MethodDef[] = {
 	{"EntityAddArsenalCom", EntityAddArsenalCom, METH_VARARGS, NULL},
 	{"EntityAddDataCom", EntityAddDataCom, METH_VARARGS, NULL},
 	{"EntityAddCollisionCom", EntityAddCollisionCom, METH_VARARGS, NULL},
+	{"EntityAddRelationshipCom", EntityAddRelationshipCom, METH_VARARGS, NULL},
 	{"EntityGetPosX", EntityGetPosX, METH_VARARGS, NULL},
 	{"EntityGetPosY", EntityGetPosY, METH_VARARGS, NULL},
 	{"EntityGetPosZ", EntityGetPosZ, METH_VARARGS, NULL},
@@ -647,7 +677,9 @@ static PyMethodDef s_HostAPI_MethodDef[] = {
 	{"EntitySetScale", EntitySetScale, METH_VARARGS, NULL},
 	{"EntitySetCollisionHandle", EntitySetCollisionHandle, METH_VARARGS, NULL},
 	{"EntitySetCollisionFilter", EntitySetCollisionFilter, METH_VARARGS, NULL},
-	{"EntityTransformSetParent", EntityTransformSetParent, METH_VARARGS, NULL},
+	{"EntitySetParent", EntitySetParent, METH_VARARGS, NULL},
+	{"EntityAddChild", EntityAddChild, METH_VARARGS, NULL},
+	{"EntityBindRelationship", EntityBindRelationship, METH_VARARGS, NULL},
 	{"EntityAddWeapon", EntityAddWeapon, METH_VARARGS, NULL},
 	{"EntityActiveWeapon", EntityActiveWeapon, METH_VARARGS, NULL},
 	{"EntityGetWeaponBulletNum", EntityGetWeaponBulletNum, METH_VARARGS, NULL},

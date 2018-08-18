@@ -36,13 +36,11 @@ public:
     void SetRotate(glb::math::Vector rotate);
     void SetScale(glb::math::Vector scale);
     glb::math::Matrix GetWorldMatrix();
-    void SetParent(Entity* parent);
 
 protected:
     glb::math::Vector   m_Pos;
     glb::math::Vector   m_Rotate;
     glb::math::Vector   m_Scale;
-    Entity*             m_Parent;
 };
 
 };  // namespace entity

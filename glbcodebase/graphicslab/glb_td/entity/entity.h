@@ -19,11 +19,17 @@ namespace entity {
 // Class declaration
 class Entity {
 public:
+    enum {
+        KILL_ONLY_ME = 0,
+        KILL_ALL,
+    };
+
+public:
     Entity();
     virtual ~Entity();
 
 public:
-    virtual void SetDead(bool dead);
+    virtual void SetDead(bool dead, int32_t killType = KILL_ALL);
     virtual bool IsDead();
     virtual void SetID(int32_t id);
     virtual int32_t GetID() const;

@@ -9,6 +9,8 @@
 #include "math/glbmatrix.h"
 
 #include "entity.h"
+#include "entitymgr.h"
+#include "relationshipcom.h"
 
 namespace entity {
 
@@ -16,12 +18,10 @@ TransformCom::TransformCom(Entity* owner, glb::math::Vector pos, glb::math::Vect
 : Component(CT_TRANSFORM, owner)
 , m_Pos(pos)
 , m_Rotate(rotate)
-, m_Scale(scale)
-, m_Parent(NULL) {
+, m_Scale(scale) {
 }
 
 TransformCom::~TransformCom() {
-    m_Parent = NULL;
 }
 
 glb::math::Vector TransformCom::GetPos() const {
@@ -31,16 +31,19 @@ glb::math::Vector TransformCom::GetPos() const {
 glb::math::Vector TransformCom::GetPosWorld() const {
     glb::math::Vector pos;
 
-    if (m_Parent) {
-        TransformCom* com = reinterpret_cast<TransformCom*>(m_Parent->GetComponent(CT_TRANSFORM));
-        if (com) {
+    if (m_Entity) {
+        RelationshipCom* relationshipCom = reinterpret_cast<RelationshipCom*>(m_Entity->GetComponent(CT_RELATIONSHIP));
+        if (relationshipCom && relationshipCom->GetParent() != -1) {
+            TransformCom* transformCom = reinterpret_cast<TransformCom*>(EntityMgr::GetEntity(relationshipCom->GetParent())->GetComponent(CT_TRANSFORM));
+            assert(transformCom != nullptr);
+
             glb::math::Matrix parentToWorld;
-            parentToWorld = com->GetWorldMatrix();
+            parentToWorld = transformCom->GetWorldMatrix();
 
             pos = parentToWorld * m_Pos;
+        } else {
+            pos = m_Pos;
         }
-    } else {
-        pos = m_Pos;
     }
 
     return pos;
@@ -53,13 +56,16 @@ glb::math::Vector TransformCom::GetRotate() const {
 glb::math::Vector TransformCom::GetRotateWorld() const {
     glb::math::Vector rotation;
 
-    if (m_Parent) {
-        TransformCom* com = reinterpret_cast<TransformCom*>(m_Parent->GetComponent(CT_TRANSFORM));
-        if (com) {
-            rotation = com->GetRotate() + m_Rotate;
+    if (m_Entity) {
+        RelationshipCom* relationshipCom = reinterpret_cast<RelationshipCom*>(m_Entity->GetComponent(CT_RELATIONSHIP));
+        if (relationshipCom && relationshipCom->GetParent() != -1) {
+            TransformCom* transformCom = reinterpret_cast<TransformCom*>(EntityMgr::GetEntity(relationshipCom->GetParent())->GetComponent(CT_TRANSFORM));
+            assert(transformCom != nullptr);
+
+            rotation = transformCom->GetRotate() + m_Rotate;
+        } else {
+            rotation = m_Rotate;
         }
-    } else {
-        rotation = m_Rotate;
     }
 
     return rotation;
@@ -89,25 +95,23 @@ glb::math::Matrix TransformCom::GetWorldMatrix() {
     local.RotateXYZ(m_Rotate.x, m_Rotate.y, m_Rotate.z);
     local.Translate(m_Pos.x, m_Pos.y, m_Pos.z);
 
-    if (m_Parent) {
+    if (m_Entity) {
         glb::math::Matrix parentToWorld;
         parentToWorld.MakeIdentityMatrix();
 
-        TransformCom* com = reinterpret_cast<TransformCom*>(m_Parent->GetComponent(CT_TRANSFORM));
-        if (com) {
-            parentToWorld = com->GetWorldMatrix();
-        }
+        RelationshipCom* relationshipCom = reinterpret_cast<RelationshipCom*>(m_Entity->GetComponent(CT_RELATIONSHIP));
+        if (relationshipCom && relationshipCom->GetParent() != -1) {
+            TransformCom* transformCom = reinterpret_cast<TransformCom*>(EntityMgr::GetEntity(relationshipCom->GetParent())->GetComponent(CT_TRANSFORM));
+            assert(transformCom != nullptr);
 
-        mat = parentToWorld * local;
-    } else {
-        mat = local;
+            parentToWorld = transformCom->GetWorldMatrix();
+            mat = parentToWorld * local;
+        } else {
+            mat = local;
+        }
     }
 
     return mat;
-}
-
-void TransformCom::SetParent(Entity* entity) {
-    m_Parent = entity;
 }
 
 };  // namespace entity

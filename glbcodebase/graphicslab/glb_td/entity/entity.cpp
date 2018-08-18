@@ -8,6 +8,8 @@
 
 #include <assert.h>
 
+#include "entitymgr.h"
+#include "relationshipcom.h"
 #include "rendercom.h"
 #include "scriptcom.h"
 #include "transformcom.h"
@@ -33,8 +35,38 @@ Entity::~Entity() {
     m_Components.clear();
 }
 
-void Entity::SetDead(bool dead) {
+void Entity::SetDead(bool dead, int32_t killType) {
     m_IsDead = dead;
+
+    // Find relationship component
+    RelationshipCom* relationShip = reinterpret_cast<RelationshipCom*>(GetComponent(CT_RELATIONSHIP));
+    if (relationShip) {
+        // Remove from parent
+        int32_t parentID = relationShip->GetParent();
+        if (parentID != -1) {
+            relationShip->SetParent(-1);
+
+            Entity* parentEntity = EntityMgr::GetEntity(parentID);
+            if (parentEntity) {
+                RelationshipCom* parentRelationShip = reinterpret_cast<RelationshipCom*>(GetComponent(CT_RELATIONSHIP));
+                parentRelationShip->RemoveChild(m_ID);
+            }
+        }
+
+        // If need kill all childrens
+        if (killType == KILL_ALL) {
+            const std::vector<int32_t>& childrenID = relationShip->GetChildren();
+
+            for (auto childID : childrenID) {
+                Entity* childEntity = EntityMgr::GetEntity(childID);
+                if (childEntity) {
+                    childEntity->SetDead(dead, KILL_ALL);
+                }
+            }
+
+            relationShip->RemoveAllChildren();
+        }
+    }
 }
 
 bool Entity::IsDead() {

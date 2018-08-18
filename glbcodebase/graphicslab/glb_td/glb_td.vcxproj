@@ -131,6 +131,7 @@
     <ClCompile Include="entity\entity.cpp" />
     <ClCompile Include="entity\entityfilter.cpp" />
     <ClCompile Include="entity\entitymgr.cpp" />
+    <ClCompile Include="entity\relationshipcom.cpp" />
     <ClCompile Include="entity\rendercom.cpp" />
     <ClCompile Include="entity\rolecom.cpp" />
     <ClCompile Include="entity\scriptcom.cpp" />
@@ -200,6 +201,7 @@
     <ClInclude Include="entity\entity.h" />
     <ClInclude Include="entity\entityfilter.h" />
     <ClInclude Include="entity\entitymgr.h" />
+    <ClInclude Include="entity\relationshipcom.h" />
     <ClInclude Include="entity\rendercom.h" />
     <ClInclude Include="entity\rolecom.h" />
     <ClInclude Include="entity\scriptcom.h" />
