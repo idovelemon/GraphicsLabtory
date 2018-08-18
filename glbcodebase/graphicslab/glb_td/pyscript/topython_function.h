@@ -28,7 +28,6 @@ void EntityAddRenderCom(int id, const char* name,
                         bool enableInstance, int maxInstanceNum);
 void EntityAddCameraCom(int id, float px, float py, float pz, float tx, float ty, float tz);
 void EntityAddScriptCom(int id, const char* script); 
-void EntityAddRoleCom(int id, int mt, int st);
 void EntityAddArsenalCom(int id);
 void EntityAddDataCom(int id);
 void EntityAddCollisionCom(int id, float x, float y, float z, float width, float height, float depth);
@@ -55,7 +54,6 @@ void EntityActiveWeapon(int id, int wt);
 int EntityGetWeaponBulletNum(int id);
 void EntitySetWeaponBulletNum(int id, int num);
 void EntityMoveToTarget(int id, float speed, float tx, float ty, float tz);
-int EntityFindCloestEnemy(int id);
 void EntityShoot(int id);
 void EntityAddIntData(int id, const char* name, int data);
 void EntityAddFloatData(int id, const char* name, float data);
@@ -71,9 +69,6 @@ void EntitySetDrawEnable(int id, int display);
 void EntityBeginIterate();
 int EntityIterate();
 void EntityEndIterate();
-int EntityIsMainType(int id, int main_type);
-int EntityIsSubType(int id, int sub_type);
-int EntityFindEntity(int main, int sub);
 
 // Time
 float TimeGetPrevGameTime();

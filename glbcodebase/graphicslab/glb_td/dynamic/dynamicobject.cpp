@@ -31,6 +31,7 @@ DTAabb::DTAabb(glb::math::Vector max, glb::math::Vector min, glb::math::Vector p
     glb::math::Matrix mat;
     mat.MakeIdentityMatrix();
     mat.Translate(pos.x, pos.y, pos.z);
+    mat.Transpose();
     btTransform transform;
     transform.setFromOpenGLMatrix(mat.m_Matrix.v);
     m_btCollision->setWorldTransform(transform);

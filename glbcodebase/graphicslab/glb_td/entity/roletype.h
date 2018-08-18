@@ -16,13 +16,14 @@ namespace entity {
 
 //------------------------------------------------------------
 
-enum RoleMainType {
-    RMT_NONE = -1,
-    RMT_PLAYER,
-    RMT_ENEMY,
-    RMT_OPERATOR,
-    RMT_ITEM,
-    RMT_MAX
+namespace RoleType {
+    enum Type {
+        NONE = -1,
+        PLAYER,
+        PLAYERBULLET,
+        ENEMY,
+        MAX
+    };
 };
 
 enum RoleSubType {
@@ -49,21 +50,6 @@ enum RoleSubType {
     // Item Begin
     RST_ITEM_BOMB,
     RST_ITEM_END = 400,
-};
-
-//-------------------------------------------------------------
-class RoleCom : public Component {
-public:
-    RoleCom(Entity* entity, RoleMainType mt, RoleSubType st);
-    virtual ~RoleCom();
-
-public:
-    RoleMainType GetMainType() const;
-    RoleSubType GetSubType() const;
-
-protected:
-    RoleMainType        m_MainType;
-    RoleSubType         m_SubType;
 };
 
 };  // namespace entity

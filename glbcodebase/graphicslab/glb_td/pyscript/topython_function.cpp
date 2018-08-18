@@ -24,7 +24,6 @@
 #include "../entity/entityfilter.h"
 #include "../entity/relationshipcom.h"
 #include "../entity/rendercom.h"
-#include "../entity/rolecom.h"
 #include "../entity/scriptcom.h"
 #include "../entity/transformcom.h"
 
@@ -162,17 +161,6 @@ void EntityAddScriptCom(int id, const char* script) {
             DebugPrint(err.c_str());
             assert(false);
         }
-    } else {
-        printf("Wrong entity id\n");
-        assert(false);
-    }
-}
-
-void EntityAddRoleCom(int id, int mt, int st) {
-    entity::Entity* ent = entity::EntityMgr::GetEntity(id);
-    if (ent != NULL) {
-        entity::RoleCom* com = new entity::RoleCom(ent, static_cast<entity::RoleMainType>(mt), static_cast<entity::RoleSubType>(st));
-        ent->AddComponent(com);
     } else {
         printf("Wrong entity id\n");
         assert(false);
@@ -576,25 +564,6 @@ void EntityMoveToTarget(int id, float speed, float tx, float ty, float tz) {
     }
 }
 
-int EntityFindCloestEnemy(int id) {
-    int result = -1;
-
-    entity::Entity* ent = entity::EntityMgr::GetEntity(id);
-    if (ent != NULL) {
-        std::vector<void*> args;
-        args.push_back(ent);
-        std::vector<entity::Entity*> ents = entity::EntityMgr::FindEntities(entity::ClosestEnemyFilter, args);
-        if (ents[0] != NULL) {
-            result = ents[0]->GetID();
-        }
-    } else {
-        printf("Wrong entity id\n");
-        assert(false);
-    }
-
-    return result;
-}
-
 void EntityShoot(int id) {
     entity::Entity* player = entity::EntityMgr::GetEntity(id);
     if (player != NULL) {
@@ -826,64 +795,6 @@ void EntityEndIterate() {
     entity::EntityMgr::EndIterate();
 }
 
-int EntityIsMainType(int id, int main_type) {
-    int result = 0;
-
-    entity::Entity* ent = entity::EntityMgr::GetEntity(id);
-    if (ent != NULL) {
-        entity::RoleCom* com = reinterpret_cast<entity::RoleCom*>(ent->GetComponent(entity::CT_ROLETYPE));
-        if (com != NULL) {
-            if (com->GetMainType() == main_type) {
-                result = 1;
-            }
-        } // else {
-        //    assert(false);  // No role type component
-        //}
-        // TODO: Some entities do not have role type now
-    } else {
-        printf("Wrong entity id\n");
-        assert(false);
-    }
-
-    return result;
-}
-
-int EntityIsSubType(int id, int sub_type) {
-    int result = 0;
-
-    entity::Entity* ent = entity::EntityMgr::GetEntity(id);
-    if (ent != NULL) {
-        entity::RoleCom* com = reinterpret_cast<entity::RoleCom*>(ent->GetComponent(entity::CT_ROLETYPE));
-        if (com != NULL) {
-            if (com->GetSubType() == sub_type) {
-                result = 1;
-            }
-        } // else {
-        //    assert(false);  // No role type component
-        //}
-        // TODO: Some entities do not have role type now
-    } else {
-        printf("Wrong entity id\n");
-        assert(false);
-    }
-
-    return result;
-}
-
-int EntityFindEntity(int main, int sub) {
-    int result = -1;
-
-    std::vector<void*> args;
-    args.push_back(reinterpret_cast<void*>(main));
-    args.push_back(reinterpret_cast<void*>(sub));
-    std::vector<entity::Entity*> entities = entity::EntityMgr::FindEntities(entity::MatchTypeEntityFilter, args);
-    if (entities.size() > 0) {
-        result = entities[0]->GetID();
-    }
-
-    return result;
-}
-
 //-----------------------------------------------------------------
 // Time
 float TimeGetPrevGameTime() {
@@ -905,11 +816,11 @@ int InputGetPointAtEntity() {
 }
 
 float InputGetCursorPosX() {
-    return glb::Input::GetMousePosX();
+    return static_cast<float>(glb::Input::GetMousePosX());
 }
 
 float InputGetCursorPosY() {
-    return glb::Input::GetMousePosY();
+    return static_cast<float>(glb::Input::GetMousePosY());
 }
 
 int InputHasKeyPressed(int key) {

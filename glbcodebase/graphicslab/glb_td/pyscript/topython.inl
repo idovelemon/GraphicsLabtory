@@ -117,17 +117,6 @@ static PyObject* EntityAddScriptCom(PyObject* self, PyObject* args) {
 	return Py_BuildValue("");
 }
 
-static PyObject* EntityAddRoleCom(PyObject* self, PyObject* args) {
-	int id;
-	int mt;
-	int st;
-	if (!PyArg_ParseTuple(args, "iii", &id, &mt, &st)) {
-		 return NULL;
-	}
-	EntityAddRoleCom(id, mt, st);
-	return Py_BuildValue("");
-}
-
 static PyObject* EntityAddArsenalCom(PyObject* self, PyObject* args) {
 	int id;
 	if (!PyArg_ParseTuple(args, "i", &id)) {
@@ -401,16 +390,6 @@ static PyObject* EntityMoveToTarget(PyObject* self, PyObject* args) {
 	return Py_BuildValue("");
 }
 
-static PyObject* EntityFindCloestEnemy(PyObject* self, PyObject* args) {
-	int id;
-	int ret;
-	if (!PyArg_ParseTuple(args, "i", &id)) {
-		 return NULL;
-	}
-	ret = EntityFindCloestEnemy(id);
-	return Py_BuildValue("i", ret);
-}
-
 static PyObject* EntityShoot(PyObject* self, PyObject* args) {
 	int id;
 	if (!PyArg_ParseTuple(args, "i", &id)) {
@@ -558,39 +537,6 @@ static PyObject* EntityEndIterate(PyObject* self, PyObject* args) {
 	return Py_BuildValue("");
 }
 
-static PyObject* EntityIsMainType(PyObject* self, PyObject* args) {
-	int id;
-	int main_type;
-	int ret;
-	if (!PyArg_ParseTuple(args, "ii", &id, &main_type)) {
-		 return NULL;
-	}
-	ret = EntityIsMainType(id, main_type);
-	return Py_BuildValue("i", ret);
-}
-
-static PyObject* EntityIsSubType(PyObject* self, PyObject* args) {
-	int id;
-	int sub_type;
-	int ret;
-	if (!PyArg_ParseTuple(args, "ii", &id, &sub_type)) {
-		 return NULL;
-	}
-	ret = EntityIsSubType(id, sub_type);
-	return Py_BuildValue("i", ret);
-}
-
-static PyObject* EntityFindEntity(PyObject* self, PyObject* args) {
-	int main;
-	int sub;
-	int ret;
-	if (!PyArg_ParseTuple(args, "ii", &main, &sub)) {
-		 return NULL;
-	}
-	ret = EntityFindEntity(main, sub);
-	return Py_BuildValue("i", ret);
-}
-
 static PyObject* TimeGetPrevGameTime(PyObject* self, PyObject* args) {
 	float ret;
 	ret = TimeGetPrevGameTime();
@@ -658,7 +604,6 @@ static PyMethodDef s_HostAPI_MethodDef[] = {
 	{"EntityAddRenderCom", EntityAddRenderCom, METH_VARARGS, NULL},
 	{"EntityAddCameraCom", EntityAddCameraCom, METH_VARARGS, NULL},
 	{"EntityAddScriptCom", EntityAddScriptCom, METH_VARARGS, NULL},
-	{"EntityAddRoleCom", EntityAddRoleCom, METH_VARARGS, NULL},
 	{"EntityAddArsenalCom", EntityAddArsenalCom, METH_VARARGS, NULL},
 	{"EntityAddDataCom", EntityAddDataCom, METH_VARARGS, NULL},
 	{"EntityAddCollisionCom", EntityAddCollisionCom, METH_VARARGS, NULL},
@@ -685,7 +630,6 @@ static PyMethodDef s_HostAPI_MethodDef[] = {
 	{"EntityGetWeaponBulletNum", EntityGetWeaponBulletNum, METH_VARARGS, NULL},
 	{"EntitySetWeaponBulletNum", EntitySetWeaponBulletNum, METH_VARARGS, NULL},
 	{"EntityMoveToTarget", EntityMoveToTarget, METH_VARARGS, NULL},
-	{"EntityFindCloestEnemy", EntityFindCloestEnemy, METH_VARARGS, NULL},
 	{"EntityShoot", EntityShoot, METH_VARARGS, NULL},
 	{"EntityAddIntData", EntityAddIntData, METH_VARARGS, NULL},
 	{"EntityAddFloatData", EntityAddFloatData, METH_VARARGS, NULL},
@@ -701,9 +645,6 @@ static PyMethodDef s_HostAPI_MethodDef[] = {
 	{"EntityBeginIterate", EntityBeginIterate, METH_VARARGS, NULL},
 	{"EntityIterate", EntityIterate, METH_VARARGS, NULL},
 	{"EntityEndIterate", EntityEndIterate, METH_VARARGS, NULL},
-	{"EntityIsMainType", EntityIsMainType, METH_VARARGS, NULL},
-	{"EntityIsSubType", EntityIsSubType, METH_VARARGS, NULL},
-	{"EntityFindEntity", EntityFindEntity, METH_VARARGS, NULL},
 	{"TimeGetPrevGameTime", TimeGetPrevGameTime, METH_VARARGS, NULL},
 	{"TimeGetCurGameTime", TimeGetCurGameTime, METH_VARARGS, NULL},
 	{"TimeGetGameFrameSpeed", TimeGetGameFrameSpeed, METH_VARARGS, NULL},

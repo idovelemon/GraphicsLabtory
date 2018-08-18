@@ -2,7 +2,7 @@
 // Declaration: Copyright (c), by i_dovelemon, 2018. All right reserved.
 // Author: i_dovelemon[1322600812@qq.com]
 // Date: 2018/08/13
-// Brief: Bullet's collision handle
+// Brief: Enemy's collision handle
 //-------------------------------------------------------------
 #include "../entity.h"
 
@@ -14,6 +14,7 @@
 #include "../../pyscript/topython_function.h"
 #include "../datacom.h"
 #include "../entitymgr.h"
+#include "../roletype.h"
 #include "../transformcom.h"
 #include "collision.h"
 
@@ -21,7 +22,7 @@
 
 namespace entity {
 
-void EntityEnemyCollisionHandle(dynamic::DynamicObject* self, dynamic::DynamicObject* other) {
+void EntityEnemy01CollisionHandle(dynamic::DynamicObject* self, dynamic::DynamicObject* other) {
     int32_t selfEntityID = reinterpret_cast<int32_t>(self->GetUserData());
     int32_t otherEntityID = reinterpret_cast<int32_t>(other->GetUserData());
 
@@ -35,18 +36,28 @@ void EntityEnemyCollisionHandle(dynamic::DynamicObject* self, dynamic::DynamicOb
 
     if (!selfData || !otherData) return;
 
-    entity::DataPack* selfHP = selfData->GetData("HP");
-    entity::DataPack* otherDamage = otherData->GetData("Damage");
+    entity::DataPack* otherRoleType = otherData->GetData("Tag");
+    if (!otherRoleType) return;
 
-    if (!selfHP || !otherDamage) return;
-
-    float hp = selfHP->GetFloat();
-    hp = hp - otherDamage->GetFloat();
-    selfHP->SetFloat(hp);
-
-    if (hp < 0.0f) {
+    if (!otherRoleType->GetString().compare("Player")) {
         selfEntity->SetDead(true);
-        tdlog::Print("EntityEnemyCollisionHandle: SelfID:%d killed by OtherID:%d\n", selfEntityID, otherEntityID);
+        tdlog::Print("EntityEnemyCollisionHandle: SelfID:%d hit player\n", selfEntityID, otherEntityID);
+    } else if (!otherRoleType->GetString().compare("PlayerBullet")) {
+        entity::DataPack* selfHP = selfData->GetData("HP");
+        entity::DataPack* otherDamage = otherData->GetData("Damage");
+
+        if (!selfHP || !otherDamage) return;
+
+        float hp = selfHP->GetFloat();
+        hp = hp - otherDamage->GetFloat();
+        selfHP->SetFloat(hp);
+
+        if (hp < 0.0f) {
+            selfEntity->SetDead(true);
+            tdlog::Print("EntityEnemyCollisionHandle: SelfID:%d killed by OtherID:%d\n", selfEntityID, otherEntityID);
+        }
+    } else {
+        tdlog::Print("EntityEnemyCollisionHandle: OtherID: %d Unknown role type %d\n", otherEntityID, otherRoleType->GetInt());
     }
 }
 

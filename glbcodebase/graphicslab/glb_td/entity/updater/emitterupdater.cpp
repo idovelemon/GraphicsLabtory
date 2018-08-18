@@ -54,6 +54,7 @@ void EntityNormalEmitterUpdater(Entity* entity) {
         EntityAddDataCom(bullet);
         EntityAddFloatData(bullet, "Life", 3.0f * 60.0f);
         EntityAddFloatData(bullet, "Damage", 1.0f);
+        EntityAddStringData(bullet, "Tag", "PlayerBullet");
         EntityAddCollisionCom(bullet, pos.x, pos.y, pos.z, 0.8f, 0.8f, 0.8f);
         EntitySetCollisionHandle(bullet, "EntityNormalBulletCollisionHandle");
         EntitySetCollisionFilter(bullet, CollisionCom::PlayerFilter, CollisionCom::EnemyFilter);

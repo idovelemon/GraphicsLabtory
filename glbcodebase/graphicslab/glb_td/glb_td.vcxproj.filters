@@ -177,9 +177,6 @@
     <ClCompile Include="entity\entityfilter.cpp">
       <Filter>源文件\entity</Filter>
     </ClCompile>
-    <ClCompile Include="entity\rolecom.cpp">
-      <Filter>源文件\entity</Filter>
-    </ClCompile>
     <ClCompile Include="entity\arsenalcom.cpp">
       <Filter>源文件\entity</Filter>
     </ClCompile>
@@ -236,6 +233,9 @@
     </ClCompile>
     <ClCompile Include="entity\relationshipcom.cpp">
       <Filter>源文件\entity</Filter>
+    </ClCompile>
+    <ClCompile Include="entity\collision\playercollisionhandle.cpp">
+      <Filter>源文件\entity\collision</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -380,9 +380,6 @@
     <ClInclude Include="entity\entityfilter.h">
       <Filter>源文件\entity</Filter>
     </ClInclude>
-    <ClInclude Include="entity\rolecom.h">
-      <Filter>源文件\entity</Filter>
-    </ClInclude>
     <ClInclude Include="entity\arsenalcom.h">
       <Filter>源文件\entity</Filter>
     </ClInclude>
@@ -444,6 +441,9 @@
       <Filter>源文件</Filter>
     </ClInclude>
     <ClInclude Include="entity\relationshipcom.h">
+      <Filter>源文件\entity</Filter>
+    </ClInclude>
+    <ClInclude Include="entity\roletype.h">
       <Filter>源文件\entity</Filter>
     </ClInclude>
   </ItemGroup>

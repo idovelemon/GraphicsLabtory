@@ -17,6 +17,7 @@ static struct{
     char name[128];
     int value;
 } s_IntConstant_Tbl[] = {
+    // Collision Filter
     {"PlayerFilter", 1 << 7},
     {"EnemyFilter", 1 << 8},
 };

@@ -127,13 +127,13 @@
     <ClCompile Include="entity\collisioncom.cpp" />
     <ClCompile Include="entity\collision\bulletcollisionhandle.cpp" />
     <ClCompile Include="entity\collision\enemycollisionhandle.cpp" />
+    <ClCompile Include="entity\collision\playercollisionhandle.cpp" />
     <ClCompile Include="entity\datacom.cpp" />
     <ClCompile Include="entity\entity.cpp" />
     <ClCompile Include="entity\entityfilter.cpp" />
     <ClCompile Include="entity\entitymgr.cpp" />
     <ClCompile Include="entity\relationshipcom.cpp" />
     <ClCompile Include="entity\rendercom.cpp" />
-    <ClCompile Include="entity\rolecom.cpp" />
     <ClCompile Include="entity\scriptcom.cpp" />
     <ClCompile Include="entity\transformcom.cpp" />
     <ClCompile Include="entity\updater\coreupdater.cpp" />
@@ -203,7 +203,7 @@
     <ClInclude Include="entity\entitymgr.h" />
     <ClInclude Include="entity\relationshipcom.h" />
     <ClInclude Include="entity\rendercom.h" />
-    <ClInclude Include="entity\rolecom.h" />
+    <ClInclude Include="entity\roletype.h" />
     <ClInclude Include="entity\scriptcom.h" />
     <ClInclude Include="entity\transformcom.h" />
     <ClInclude Include="entity\updater\updater.h" />
