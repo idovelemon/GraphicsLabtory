@@ -53,11 +53,12 @@ void EntityNormalEmitterUpdater(Entity* entity) {
         EntityAddScriptCom(bullet, "EntityNormalBulletUpdater");
         EntityAddDataCom(bullet);
         EntityAddFloatData(bullet, "Life", 3.0f * 60.0f);
+        EntityAddFloatData(bullet, "Speed", pyscript::PyScriptMgr::GetValueF("ENTITY_NORMAL_BULLET_MOVE_SPEED"));
         EntityAddFloatData(bullet, "Damage", 1.0f);
         EntityAddStringData(bullet, "Tag", "PlayerBullet");
         EntityAddCollisionCom(bullet, pos.x, pos.y, pos.z, 0.8f, 0.8f, 0.8f);
         EntitySetCollisionHandle(bullet, "EntityNormalBulletCollisionHandle");
-        EntitySetCollisionFilter(bullet, CollisionCom::PlayerFilter, CollisionCom::EnemyFilter);
+        EntitySetCollisionFilter(bullet, CollisionCom::PlayerBulletFilter, CollisionCom::EnemyFilter);
     }
 
     pack->SetFloat(curDelta);
@@ -77,11 +78,12 @@ void EntityNormalBulletUpdater(Entity* entity) {
     }
 
     DataPack* pack = data->GetData("Life");
+    DataPack* speedPack = data->GetData("Speed");
     float life = pack->GetFloat();
     life = life - td::GameTimer::GetFrameSpeed();
     pack->SetFloat(life);
 
-    float moveSpeed = pyscript::PyScriptMgr::GetValueF("ENTITY_NORMAL_BULLET_MOVE_SPEED");
+    float moveSpeed = speedPack->GetFloat();
     glb::math::Vector pos = transform->GetPos();
     glb::math::Vector rot = transform->GetRotate();
     glb::math::Vector dir = glb::math::Vector(0.0f, 0.0f, 1.0f);

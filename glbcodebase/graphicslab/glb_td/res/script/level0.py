@@ -17,7 +17,7 @@ def EnemyCreateE01(x, y, z):
         EntityAddScriptCom(enemy, "EntityEnemy01Updater")
         EntityAddCollisionCom(enemy, x, y, z, 1.8, 1.8, 1.8)
         EntitySetCollisionHandle(enemy, "EntityEnemy01CollisionHandle")
-        EntitySetCollisionFilter(enemy, EnemyFilter, PlayerFilter)
+        EntitySetCollisionFilter(enemy, EnemyFilter, PlayerFilter | PlayerBulletFilter)
         EntityAddDataCom(enemy)
         EntityAddFloatData(enemy, "HP", 5.0)
         EntityAddStringData(enemy, "Tag", "Enemy")
@@ -42,7 +42,7 @@ def EnemyCreateE02(x, y, z):
         EntityAddScriptCom(enemy, "EntityEnemy02Updater")
         EntityAddCollisionCom(enemy, x, y, z, 1.8, 1.8, 1.8)
         EntitySetCollisionHandle(enemy, "EntityEnemy01CollisionHandle")
-        EntitySetCollisionFilter(enemy, EnemyFilter, PlayerFilter)
+        EntitySetCollisionFilter(enemy, EnemyFilter, PlayerFilter | PlayerBulletFilter)
         EntityAddDataCom(enemy)
         EntityAddFloatData(enemy, "HP", 10.0)
         EntityAddStringData(enemy, "Tag", "Enemy")
@@ -66,6 +66,36 @@ def EnemyCreateE02(x, y, z):
         EntityBindRelationship(enemy, enemyRotate)
         EntityAddScriptCom(enemyRotate, "EntityEnemy01RotateUpdater")    
 
+def EnemyCreateE03(x, y, z):
+        enemy = EntityCreate()
+        EntityAddTransformCom(enemy, x, y, z, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0)
+        EntityAddScriptCom(enemy, "EntityEnemy03Updater")
+        EntityAddCollisionCom(enemy, x, y, z, 1.8, 1.8, 1.8)
+        EntitySetCollisionHandle(enemy, "EntityEnemy01CollisionHandle")
+        EntitySetCollisionFilter(enemy, EnemyFilter, PlayerFilter | PlayerBulletFilter)
+        EntityAddDataCom(enemy)
+        EntityAddFloatData(enemy, "HP", 10.0)
+        EntityAddStringData(enemy, "Tag", "Enemy")
+        EntityAddStringData(enemy, "State", "FindPlayer")
+        EntityAddFloatData(enemy, "StateTimer", 0.0)
+        EntityAddFloatData(enemy, "MoveDirX", 0.0)
+        EntityAddFloatData(enemy, "MoveDirY", 0.0)
+        EntityAddFloatData(enemy, "MoveDirZ", 0.0)
+        EntityAddRelationshipCom(enemy)
+
+        enemyCockPit = EntityCreate()
+        EntityAddRenderCom(enemyCockPit, "res/model/enemy/enemy_cockpit.obj", 0.0, 0.0, 0.0, 0.0, 0.0, 0., 1.0, 1.0, 1.0, True, 10)
+        EntityAddTransformCom(enemyCockPit, 0.0, 0.0, 0.0, 0.0, 0.0, 0., 1.0, 1.0, 1.0)
+        EntityAddRelationshipCom(enemyCockPit)
+        EntityBindRelationship(enemy, enemyCockPit)
+
+        enemyRotate = EntityCreate()
+        EntityAddRenderCom(enemyRotate, "res/model/enemy/enemy_rotate.obj", 0.0, 0.0, 0.0, 0.0, 0.0, 0., 1.0, 1.0, 1.0, True, 10)
+        EntityAddTransformCom(enemyRotate, 0.0, 0.0, 0.0, 0.0, 0.0, 0., 1.0, 1.0, 1.0)
+        EntityAddRelationshipCom(enemyRotate)
+        EntityBindRelationship(enemy, enemyRotate)
+        EntityAddScriptCom(enemyRotate, "EntityEnemy01RotateUpdater")
+
 def main():
     global LEVEL_COUNT
     LEVEL_COUNT = LEVEL_COUNT + 1
@@ -86,7 +116,7 @@ def main():
         EntityAddRelationshipCom(coreDummy)
         EntityAddCollisionCom(coreDummy, 0.0, 0.0, 0.0, 1.8, 1.8, 1.8)
         EntitySetCollisionHandle(coreDummy, "EntityPlayerCollisionHandle")
-        EntitySetCollisionFilter(coreDummy, PlayerFilter, EnemyFilter)
+        EntitySetCollisionFilter(coreDummy, PlayerFilter, EnemyFilter | EnemyBulletFilter)
 
         # Create Camera Entity
         camera = EntityCreate()
@@ -174,7 +204,20 @@ def main():
         EnemyCreateE02(50.0, 0.0, -50.0)
 
     if LEVEL_COUNT == 480:
-        EnemyCreateE02(-50.0, 0.0, -50.0)        
+        EnemyCreateE02(-50.0, 0.0, -50.0)
+
+    # Wave 3
+    if LEVEL_COUNT == 600:
+        EnemyCreateE03(-50.0, 0.0, 50.0)
+
+    if LEVEL_COUNT == 630:
+        EnemyCreateE03(50.0, 0.0, 50.0)
+
+    if LEVEL_COUNT == 660:
+        EnemyCreateE03(50.0, 0.0, -50.0)
+
+    if LEVEL_COUNT == 690:
+        EnemyCreateE03(-50.0, 0.0, -50.0)
 
     if LEVEL_COUNT == 3000:
         DebugPrint("TD Level0 Finish\n")

@@ -30,6 +30,8 @@ public:
     enum {
         PlayerFilter = 1 << 7,
         EnemyFilter = 1 << 8,
+        PlayerBulletFilter = 1 << 9,
+        EnemyBulletFilter = 1 << 10,
     };
 
 public:
