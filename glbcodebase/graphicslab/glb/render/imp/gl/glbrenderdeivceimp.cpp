@@ -52,6 +52,7 @@ DeviceImp::DeviceImp()
 , m_ClearR(0.0f)
 , m_ClearG(0.0f)
 , m_ClearB(0.0f)
+, m_ClearA(0.0f)
 , m_ClearDepth(0.0f) {
     for (int32_t i = 0; i < TS_MAX; i++) {
         m_Texture[i].tex_obj = -1;
@@ -329,10 +330,11 @@ void DeviceImp::SetDrawMultiColorBuffer(DrawColorBuffer* buffer, int32_t num) {
     glDrawBuffers(num, draw_bufs);
 }
 
-void DeviceImp::SetClearColor(float r, float g, float b) {
+void DeviceImp::SetClearColor(float r, float g, float b, float a) {
     m_ClearR = r;
     m_ClearG = g;
     m_ClearB = b;
+    m_ClearA = a;
 }
 
 void DeviceImp::SetClearDepth(float depth) {
@@ -344,7 +346,7 @@ void DeviceImp::Clear(int32_t flag) {
 
     if (flag & CLEAR_COLOR) {
         clear_flag_gl |= GL_COLOR_BUFFER_BIT;
-        glClearColor(m_ClearR, m_ClearG, m_ClearB, 1.0f);
+        glClearColor(m_ClearR, m_ClearG, m_ClearB, m_ClearA);
     }
 
     if (flag & CLEAR_DEPTH) {

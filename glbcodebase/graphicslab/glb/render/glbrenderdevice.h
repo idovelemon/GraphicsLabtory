@@ -147,7 +147,7 @@ public:
     // Draw
     static void SetDrawColorBuffer(DrawColorBuffer buffer);
     static void SetDrawMultiColorBuffer(DrawColorBuffer* buffers, int32_t num);
-    static void SetClearColor(float r, float g, float b);
+    static void SetClearColor(float r, float g, float b, float alpha = 1.0f);
     static void SetClearDepth(float depth);
     static void Clear(int32_t clear_flag);
     static void Draw(PrimitiveType type, int32_t first, int32_t size);

@@ -90,7 +90,7 @@ public:
     // Draw
     void SetDrawColorBuffer(DrawColorBuffer buffer);
     void SetDrawMultiColorBuffer(DrawColorBuffer* buffers, int32_t num);
-    void SetClearColor(float r, float g, float b);
+    void SetClearColor(float r, float g, float b, float a);
     void SetClearDepth(float depth);
     void Clear(int32_t clear_flag);
     void Draw(PrimitiveType type, int32_t first, int32_t size);
@@ -140,6 +140,7 @@ private:
     float               m_ClearR;
     float               m_ClearG;
     float               m_ClearB;
+    float               m_ClearA;
     float               m_ClearDepth;
 };
 

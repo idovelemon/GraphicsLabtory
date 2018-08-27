@@ -239,9 +239,9 @@ void Device::SetDrawMultiColorBuffer(DrawColorBuffer* buffers, int32_t num) {
     }
 }
 
-void Device::SetClearColor(float r, float g, float b) {
+void Device::SetClearColor(float r, float g, float b, float alpha) {
     if (s_DeviceImp != NULL) {
-        s_DeviceImp->SetClearColor(r, g, b);
+        s_DeviceImp->SetClearColor(r, g, b, alpha);
     } else {
         GLB_SAFE_ASSERT(false);
     }
