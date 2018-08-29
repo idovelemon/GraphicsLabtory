@@ -64,3 +64,6 @@
 |glb_unif_AOMap|sampler2D|Ambient Occlusion map|
 |glb_unif_BiBlurMap|sampler2D|Blur Map for SSAO|
 |glb_unif_HighLightBase|float|Base light strength value for brightness filter|
+|glb_unif_DecalViewM|mat4|Decal view matrix|
+|glb_unif_DecalProjM|mat4|Decal projection matrix|
+|glb_unif_DecalTex|sampler2D|Decal map|

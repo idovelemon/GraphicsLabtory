@@ -10,6 +10,7 @@
 |GLB_LIGHT_TEXCOORD_IN_VERTEX|Vertex data hold light map texture coordinate information|
 |GLB_ENABLE_LIGHTING|When rendering this model, it need lighting calculation|
 |GLB_ENABLE_SHADOW|When rendering this model, it need shadow calculation|
+|GLB_ENABLE_DECAL|When rendering this model, it can accept decal|
 |GLB_ENABLE_AO|Discard|
 |GLB_USE_PARALLEL_LIGHT|When do lighting calculation, it accept parallel light|
 |GLB_ENABLE_ALBEDO_TEX|Model hold a albedo texture|
