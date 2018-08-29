@@ -34,6 +34,7 @@ talbedo Material_Base_Color.bmp
 tdiffusepfc diffuse.pfc
 tspecularpfc specular.pfc
 al 1
+ad 1
 as 1
 cs 0
 malbedo 1 1 1

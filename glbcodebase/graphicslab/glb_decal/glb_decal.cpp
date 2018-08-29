@@ -310,6 +310,120 @@ protected:
     int32_t                         m_DecalShaderWVPLoc;
 };
 
+//-----------------------------------------------------------------------------------------------------------------
+
+class ApplicationDecalGLB : public glb::app::ApplicationBase {
+public:
+    ApplicationDecalGLB() {
+    }
+    virtual~ApplicationDecalGLB() {}
+
+public:
+    static glb::app::ApplicationBase* Create() {
+        return new ApplicationDecalGLB;
+    }
+
+public:
+    bool Initialize() {
+        // Setup Camera
+        scene::FreeCamera* camera = scene::FreeCamera::Create(math::Vector(0.0f, 10.0f, -10.0f), math::Vector(0.0f, 0.0f, 0.0f));
+        scene::Scene::SetCamera(scene::PRIMIAY_CAM, camera);
+
+        // Setup Light
+        scene::Light ambientLight;
+        ambientLight.type = scene::AMBIENT_LIGHT;
+        ambientLight.color = math::Vector(0.2f, 0.2f, 0.2f);
+        scene::Scene::SetLight(ambientLight, 0);
+
+        scene::Light parallelLight;
+        parallelLight.type = scene::PARALLEL_LIGHT;
+        parallelLight.color = math::Vector(2.8f, 2.8f, 2.8f);
+        parallelLight.dir = math::Vector(1.0f, -1.0f, 1.0f);
+        parallelLight.dir.Normalize();
+        scene::Scene::SetLight(parallelLight, 1);
+
+        // Setup Perspective
+        render::Render::SetPerspective(glb::render::Render::PRIMARY_PERS, 69.0f, 800 * 1.0f / 600, 0.1f, 500.0f);
+
+        // Setup HDR
+        glb::render::Render::SetHighLightBase(1.5f);
+
+        // Setup world
+        int32_t floor = scene::Scene::AddObject("res/floor.obj");
+        scene::Scene::GetObjectById(floor)->SetCullFaceEnable(true);
+        scene::Scene::GetObjectById(floor)->SetCullFaceMode(glb::render::CULL_BACK);
+        scene::Scene::GetObjectById(floor)->SetDepthTestEnable(true);
+        scene::Scene::GetObjectById(floor)->SetPos(math::Vector(0.0, 0.0, 0.0));
+
+        auto RandRange = [](int min, int max) {
+            return min + rand() % (max - min);
+        };
+
+        for (int32_t i = 0; i < 5; i++) {
+            int32_t decal = scene::Scene::AddDecalObject("res/decal.obj");
+            scene::Scene::GetObjectById(decal)->SetCullFaceEnable(false);
+            scene::Scene::GetObjectById(decal)->SetCullFaceMode(glb::render::CULL_FRONT);
+            scene::Scene::GetObjectById(decal)->SetDepthTestEnable(true);
+            scene::Scene::GetObjectById(decal)->SetPos(math::Vector(1.0f * RandRange(-20, 20), 2.1f, 1.0f * RandRange(-20, 20)));
+        }
+
+        return true;
+    }
+
+    void Update(float dt) {
+        util::ProfileTime time;
+        time.BeginProfile();
+
+        static float sRotX = 0.0f, sRotY = 0.0f;
+        static float sPosX = 0.0f, sPosY = 20.0f, sPosZ = 0.0f;
+        math::Matrix cameraOffset;
+        cameraOffset.MakeIdentityMatrix();
+        float mouseMoveX = Input::GetMouseMoveX();
+        float mouseMoveY = Input::GetMouseMoveY();
+        sRotX = sRotX + mouseMoveX * 0.1f;
+        sRotY = sRotY + mouseMoveY * 0.1f;
+        cameraOffset.RotateY(sRotX);
+        cameraOffset.RotateX(sRotY);
+        math::Vector lookAt(0.0f, 0.0f, 1.0f);
+        lookAt = cameraOffset * lookAt;
+
+        if (Input::IsKeyboardButtonPressed(BK_A)) {
+            sPosX = sPosX + 0.1f;
+        } else if (Input::IsKeyboardButtonPressed(BK_D)) {
+            sPosX = sPosX - 0.1f;
+        }
+
+        if (Input::IsKeyboardButtonPressed(BK_Q)) {
+            sPosY = sPosY + 0.1f;
+        } else if (Input::IsKeyboardButtonPressed(BK_E)) {
+            sPosY = sPosY - 0.1f;
+        }
+
+        if (Input::IsKeyboardButtonPressed(BK_W)) {
+            sPosZ = sPosZ + 0.1f;
+        } else if (Input::IsKeyboardButtonPressed(BK_S)) {
+            sPosZ = sPosZ - 0.1f;
+        }
+
+        scene::Scene::GetCurCamera()->SetPos(math::Vector(sPosX, sPosY, sPosZ));
+        scene::Scene::GetCurCamera()->SetTarget(math::Vector(sPosX, sPosY, sPosZ) + lookAt);
+        scene::Scene::GetCurCamera()->Update(1.0f);
+
+        Input::Update();
+        scene::Scene::Update();
+        render::Render::Draw();
+
+        time.EndProfile();
+        printf("%f\n", time.GetProfileTimeInMs());
+    }
+
+    void Destroy() {
+    }
+
+protected:
+
+};
+
 int _stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPreInstance, LPSTR cmdLine, int nShowCmd) {
     glb::app::AppConfig config;
     memcpy(config.caption, L"glb_decal", sizeof(L"glb_decal"));
@@ -317,8 +431,10 @@ int _stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPreInstance, LPSTR cmdLine,
     config.screen_height = 600;
     config.shadow_map_width = 1024;
     config.shadow_map_height = 1024;
+    config.decalMapWidth = 2048;
+    config.decalMapHeight = 2048;
     config.icon = IDI_ICON1;
-    if (!glb::app::Application::Initialize(ApplicationDecal::Create, hInstance, config)) {
+    if (!glb::app::Application::Initialize(ApplicationDecalGLB::Create, hInstance, config)) {
         return 0;
     }
 
