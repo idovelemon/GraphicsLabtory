@@ -57,6 +57,8 @@ public:
     int32_t GetWindowHeight();
     int32_t GetShadowMapWidth();
     int32_t GetShadowMapHeight();
+    int32_t GetDecalMapWidth();
+    int32_t GetDecalMapHeight();
 
 protected:
     bool CreateWnd(HINSTANCE hInstance, HWND hWnd, int32_t width, int32_t height, const wchar_t* caption, int32_t icon);
@@ -209,6 +211,14 @@ int32_t ApplicationImp::GetShadowMapWidth() {
 
 int32_t ApplicationImp::GetShadowMapHeight() {
     return m_Config.shadow_map_height;
+}
+
+int32_t ApplicationImp::GetDecalMapWidth() {
+    return m_Config.decalMapWidth;
+}
+
+int32_t ApplicationImp::GetDecalMapHeight() {
+    return m_Config.decalMapHeight;
 }
 
 bool ApplicationImp::CreateWnd(HINSTANCE hInstance, HWND hWnd, int32_t width, int32_t height, const wchar_t* caption, int32_t icon) {
@@ -373,6 +383,30 @@ int32_t Application::GetShadowMapHeight() {
     int32_t result = 0;
     if (s_ApplicationImp != NULL) {
         result = s_ApplicationImp->GetShadowMapHeight();
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return result;
+}
+
+int32_t Application::GetDecalMapWidth() {
+    int32_t result = 0;
+
+    if (s_ApplicationImp != NULL) {
+        result = s_ApplicationImp->GetDecalMapWidth();
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return result;
+}
+
+int32_t Application::GetDecalMapHeight() {
+    int32_t result = 0;
+
+    if (s_ApplicationImp != NULL) {
+        result = s_ApplicationImp->GetDecalMapHeight();
     } else {
         GLB_SAFE_ASSERT(false);
     }

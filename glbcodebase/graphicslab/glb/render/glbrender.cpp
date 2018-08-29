@@ -141,6 +141,9 @@ public:
     int32_t GetCurShadowMapIndex();
     float GetShadowSplitValue(int32_t index);
 
+    math::Matrix GetDecalViewMatrix();
+    math::Matrix GetDecalProjMatrix();
+
     void SetHighLightBase(float base);
     float GetHighLightBase();
     void SetBloomWeights(float w0, float w1, float w2, float w3);
@@ -151,6 +154,7 @@ public:
 protected:
     void PreDraw();
     void DrawShadowMap();
+    void DrawDecalMap();
     void DrawAOMap();
     void DrawLightLoop();
     void DrawDebug();
@@ -158,6 +162,7 @@ protected:
     void AfterDraw();
 
     void PrepareShadowMap();
+    void PrepareDecalMap();
     void PrepareDebug();
     void PrepareAOMap();
     void PrepareHDR();
@@ -178,6 +183,11 @@ protected:
     void SplitObjIntoFrustum(std::vector<scene::Object*>& objs, Frustum& frustum, math::Matrix trans);
     void DrawShadowMapNormal();
     void DrawShadowMapInstance();
+
+    // Decal
+    void PreDrawDecalMap();
+    void BuildDecalViewProjectionMatrix();
+    void DrawDecalMapCore();
 
     // Light Loop
     void PreDrawLightLoop();
@@ -216,6 +226,12 @@ private:
     math::Matrix                            m_ShadowMatrix[kPSSMSplitNum];
     int32_t                                 m_ShadowMapIndex;
     float                                   m_ShadowSplitValue[kPSSMSplitNum - 1];
+
+    // Decal
+    RenderTarget*                           m_DecalRenderTarget;
+    int32_t                                 m_DecalMap;
+    math::Matrix                            m_DecalViewMatrix;
+    math::Matrix                            m_DecalProjMatrix;
 
     // HDR
     float                                   m_HightLightBase;
@@ -370,6 +386,10 @@ RenderImp::RenderImp()
 , m_InstanceShadowShader(-1)
 , m_ShadowMapIndex(-1)
 
+// Decal
+, m_DecalRenderTarget(NULL)
+, m_DecalMap(-1)
+
 // HDR
 , m_HightLightBase(1.0f)
 , m_HDRRenderTarget(NULL)
@@ -433,6 +453,7 @@ void RenderImp::Initialize(int32_t width, int32_t height) {
     m_Height = height;
 
     PrepareShadowMap();
+    PrepareDecalMap();
     PrepareDebug();
     PrepareHDR();
     PrepareEnvMap();
@@ -458,6 +479,10 @@ void RenderImp::Destroy() {
         m_ShadowMap[i] = -1;
     }
     m_ShadowShader = -1;
+
+    // Decal
+    GLB_SAFE_DELETE(m_DecalRenderTarget);
+    m_DecalMap = -1;
 
     // Depth
     m_DepthMap = -1;
@@ -488,6 +513,7 @@ void RenderImp::Destroy() {
 void RenderImp::Draw() {
     PreDraw();
     DrawShadowMap();
+    DrawDecalMap();
     //DrawDepthMap();
     DrawLightLoop();
     DrawHDR();
@@ -622,6 +648,14 @@ float RenderImp::GetShadowSplitValue(int32_t index) {
     return m_ShadowSplitValue[index];
 }
 
+math::Matrix RenderImp::GetDecalViewMatrix() {
+    return m_DecalViewMatrix;
+}
+
+math::Matrix RenderImp::GetDecalProjMatrix() {
+    return m_DecalProjMatrix;
+}
+
 void RenderImp::SetHighLightBase(float base) {
     m_HightLightBase = base;
 }
@@ -714,6 +748,13 @@ void RenderImp::DrawShadowMap() {
     DrawShadowMapCore();
 }
 
+void RenderImp::DrawDecalMap() {
+    PreDrawDecalMap();
+    BuildDecalViewProjectionMatrix();
+    DrawDecalMapCore();
+    texture::Mgr::GetTextureById(m_DecalMap)->GenerateMipmap();
+}
+
 void RenderImp::DrawLightLoop() {
     PreDrawLightLoop();
     DrawLightLoopCore();
@@ -798,6 +839,28 @@ void RenderImp::PrepareShadowMap() {
     // Create shadow shader TODO: Use UserShader
     m_ShadowShader = shader::Mgr::AddUberShader("..\\glb\\shader\\shadow.vs", "..\\glb\\shader\\shadow.fs");
     m_InstanceShadowShader = shader::Mgr::AddUberShader("..\\glb\\shader\\instanceShadow.vs", "..\\glb\\shader\\shadow.fs");
+}
+
+void RenderImp::PrepareDecalMap() {
+    int32_t decalMapWidth = app::Application::GetDecalMapWidth();
+    int32_t decalMapHeight = app::Application::GetDecalMapHeight();
+
+    // Create decal render target
+    m_DecalRenderTarget = RenderTarget::Create(decalMapWidth, decalMapHeight);
+    GLB_SAFE_ASSERT(m_DecalRenderTarget != NULL);
+
+    // Create decal map
+    texture::Texture* decalMap = texture::Texture::CreateFloat32Texture(decalMapWidth, decalMapHeight, true);
+    if (decalMap != NULL) {
+        m_DecalMap = texture::Mgr::AddTexture(decalMap);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    // Bind texture
+    if (m_DecalRenderTarget != NULL) {
+        m_DecalRenderTarget->AttachColorTexture(COLORBUF_COLOR_ATTACHMENT0, decalMap);
+    }
 }
 
 void RenderImp::PrepareDebug() {
@@ -1499,6 +1562,277 @@ void RenderImp::DrawShadowMapInstance() {
     }
 }
 
+void RenderImp::PreDrawDecalMap() {
+    std::vector<scene::Object*> objs;
+    m_ShaderGroups.clear();
+
+    // Add normal object
+    glb::scene::Scene::GetAllObjects(objs);
+
+    // Sort object by shader
+    std::map<std::string, ShaderGroup> opaque_group;
+    std::vector<scene::Object*> transparent_objs;
+    for (int32_t i = 0; i < static_cast<int32_t>(objs.size()); i++) {
+        if (objs[i]->GetObjectType() != scene::Object::OBJECT_TYPE_DECAL) continue;
+
+        shader::Descriptor desc = objs[i]->GetShaderDesc();
+        bool is_transparent = desc.GetFlag(shader::GLB_ENABLE_ALPHA_TEX);
+        if (is_transparent) {
+            transparent_objs.push_back(objs[i]);
+        } else {
+            std::map<std::string, ShaderGroup>::iterator it = opaque_group.find(desc.GetString());
+            if (it != opaque_group.end()) {
+                it->second.AddObject(objs[i]);
+            } else {
+                shader::Descriptor desc = objs[i]->GetShaderDesc();
+                shader::Program* program = shader::Mgr::GetShader(shader::Mgr::GetUberShaderID(desc));
+                ShaderGroup new_group(desc, program);
+                new_group.AddObject(objs[i]);
+                opaque_group.insert(std::pair<std::string, ShaderGroup>(new_group.GetShaderDesc().GetString(), new_group));
+            }
+        }
+    }
+
+    // Transparent objects
+    std::vector<ShaderGroup> transparent_group;
+    {
+        // Sort transparent group from far to near
+        std::vector<float> obj_zvalues;
+        for (int32_t i = 0; i < static_cast<int32_t>(transparent_objs.size()); i++) {
+            obj_zvalues.push_back(ZValueFromCamera(transparent_objs[i]));
+        }
+
+        for (int32_t i = static_cast<int32_t>(transparent_objs.size()); i >= 0 ; i--) {
+            for (int32_t j = 0; j < i - 1; j++) {
+                float obj1_zvalue = obj_zvalues[j];
+                float obj2_zvalue = obj_zvalues[j + 1];
+                if (obj1_zvalue < obj2_zvalue) {
+                    scene::Object* temp = transparent_objs[j];
+                    transparent_objs[j] = transparent_objs[j + 1];
+                    transparent_objs[j + 1] = temp;
+
+                    obj_zvalues[j] = obj2_zvalue;
+                    obj_zvalues[j + 1] = obj1_zvalue;
+                }
+            }
+        }
+
+        // Split into groups
+        for (int32_t i = 0; i < static_cast<int32_t>(transparent_objs.size()); i++) {
+            if (transparent_group.size() == 0) {
+                shader::Descriptor desc = transparent_objs[i]->GetShaderDesc();
+                ShaderGroup new_group(desc, shader::Mgr::GetShader(shader::Mgr::GetUberShaderID(desc)));
+                new_group.AddObject(transparent_objs[i]);
+                transparent_group.push_back(new_group);
+            } else {
+                shader::Descriptor desc = transparent_objs[i]->GetShaderDesc();
+                if (transparent_group[transparent_group.size() - 1].GetShaderDesc().Equal(desc)) {
+                    transparent_group[transparent_group.size() - 1].AddObject(transparent_objs[i]);
+                } else {
+                    shader::Descriptor desc = transparent_objs[i]->GetShaderDesc();
+                    ShaderGroup new_group(desc, shader::Mgr::GetShader(shader::Mgr::GetUberShaderID(desc)));
+                    new_group.AddObject(transparent_objs[i]);
+                    transparent_group.push_back(new_group);
+                }
+            }
+        }
+    }
+
+    // Merge two groups, make sure transparent group is after opaque group
+    for (std::map<std::string, ShaderGroup>::iterator it = opaque_group.begin(); it != opaque_group.end(); ++it) {
+        m_ShaderGroups.push_back(it->second);
+    }
+    for (int32_t i = 0; i < static_cast<int32_t>(transparent_group.size()); i++) {
+        m_ShaderGroups.push_back(transparent_group[i]);
+    }
+}
+
+void RenderImp::BuildDecalViewProjectionMatrix() {
+    math::Vector maxPos(-FLT_MAX, -FLT_MAX, -FLT_MAX);
+    math::Vector minPos(FLT_MAX, FLT_MAX, FLT_MAX);
+
+    for (ShaderGroup& shaderGroup : m_ShaderGroups) {
+        for (scene::Object* object : shaderGroup.GetObjects()) {
+            if (object) {
+                math::Vector boundMax = object->GetBoundBoxMax();
+                math::Vector boundMin = object->GetBoundBoxMin();
+
+                if (maxPos.x < boundMax.x) maxPos.x = boundMax.x;
+                if (maxPos.y < boundMax.y) maxPos.y = boundMax.y;
+                if (maxPos.z < boundMax.z) maxPos.z = boundMax.z;
+                if (minPos.x > boundMin.x) minPos.x = boundMin.x;
+                if (minPos.y > boundMin.y) minPos.y = boundMin.y;
+                if (minPos.z > boundMin.z) minPos.z = boundMin.z;
+            }
+        }
+    }
+
+    float width = maxPos.x - minPos.x;
+    float height = maxPos.z - minPos.z;
+    width = height = max(width, height);
+    float depth = 10.0f + maxPos.y - minPos.y;
+
+    math::Vector cameraPos = (maxPos + minPos) * 0.5f;
+    math::Vector lookAt = math::Vector(0.0f, 1.0f, 0.01f);
+    lookAt.w = 0.0f;
+    math::Vector target = cameraPos + lookAt;
+
+    m_DecalViewMatrix.MakeViewMatrix(cameraPos, target);
+    m_DecalProjMatrix.MakeOrthogonalMatrix(-width / 2.0f, width / 2.0f, - height / 2.0f, height / 2.0f, - depth / 2.0f, depth / 2.0f);
+}
+
+void RenderImp::DrawDecalMapCore() {
+    // Render Target
+    render::Device::SetRenderTarget(m_DecalRenderTarget);
+
+    // Draw Buffer
+    render::Device::SetDrawColorBuffer(render::COLORBUF_COLOR_ATTACHMENT0);
+
+    // Viewport
+    render::Device::SetViewport(0, 0, app::Application::GetDecalMapWidth(), app::Application::GetDecalMapHeight());
+
+    // Clear
+    render::Device::SetClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    render::Device::SetClearDepth(1.0f);
+    render::Device::Clear(CLEAR_COLOR | CLEAR_DEPTH);
+
+    for (int32_t i = 0; i < static_cast<int32_t>(m_ShaderGroups.size()); i++) {
+        std::vector<scene::Object*> objs = m_ShaderGroups[i].GetObjects();
+        shader::Descriptor desc = m_ShaderGroups[i].GetShaderDesc();
+        shader::UberProgram* program = static_cast<shader::UberProgram*>(m_ShaderGroups[i].GetShaderProgram());
+        std::vector<uniform::UniformEntry>& uniforms = program->GetUniforms();
+
+        // Shader
+        render::Device::SetShader(program);
+        render::Device::SetShaderLayout(program->GetShaderLayout());
+
+        // Common Texture
+        int32_t texUnit = 0;
+        render::Device::SetTexture(render::TS_SHADOW0, texture::Mgr::GetTextureById(m_ShadowMap[0]), texUnit++);
+        render::Device::SetTexture(render::TS_SHADOW1, texture::Mgr::GetTextureById(m_ShadowMap[1]), texUnit++);
+        render::Device::SetTexture(render::TS_SHADOW2, texture::Mgr::GetTextureById(m_ShadowMap[2]), texUnit++);
+        render::Device::SetTexture(render::TS_SHADOW3, texture::Mgr::GetTextureById(m_ShadowMap[3]), texUnit++);
+        render::Device::SetTexture(render::TS_BRDF_PFT, texture::Mgr::GetTextureById(m_BRDFPFTMap), texUnit++);
+
+        // Scene uniforms
+        for (int32_t j = 0; j < static_cast<int32_t>(uniforms.size()); j++) {
+            uniform::UniformEntry entry = uniforms[j];
+            if (entry.flag) {
+                // TODO: for now, id is the index of the uniform picker table
+                if (entry.id == uniform::GLB_VIEWM) {
+                    uniform::Wrapper uniformWrapper;
+                    uniformWrapper.SetFormat(uniform::Wrapper::FMT_MATRIX);
+                    uniformWrapper.SetMatrix(m_DecalViewMatrix);
+                    SetUniform(entry.location, uniformWrapper);
+                } else if (entry.id == uniform::GLB_PROJM) {
+                    uniform::Wrapper uniformWrapper;
+                    uniformWrapper.SetFormat(uniform::Wrapper::FMT_MATRIX);
+                    uniformWrapper.SetMatrix(m_DecalProjMatrix);
+                    SetUniform(entry.location, uniformWrapper);
+                } else {
+                    uniform::Wrapper uniform_wrapper = uniform::kUniformPickers[entry.id].picker(NULL);
+                    SetUniform(entry.location, uniform_wrapper);
+                }
+            }
+        }
+
+        // Objects
+        int32_t objectTexUnitStart = texUnit;
+        for (int32_t j = 0; j < static_cast<int32_t>(objs.size()); j++) {
+            scene::Object* obj = objs[j];
+
+            // Check if enable draw
+            if (!obj->IsDrawEnable() || obj->GetObjectType() != scene::Object::OBJECT_TYPE_DECAL) {
+                continue;
+            }
+
+            // Reset object texture unit index
+            texUnit = objectTexUnitStart;
+
+            // Textures
+            if (obj->GetModel()->HasAlbedoTexture()) {
+                render::Device::SetTexture(render::TS_ALBEDO, texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(scene::Model::MT_ALBEDO)), texUnit++);
+            }
+            if (obj->GetModel()->HasRoughnessTexture()) {
+                render::Device::SetTexture(render::TS_ROUGHNESS, texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(scene::Model::MT_ROUGHNESS)), texUnit++);
+            }
+            if (obj->GetModel()->HasMettalicTexture()) {
+                render::Device::SetTexture(render::TS_METALLIC, texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(scene::Model::MT_METALLIC)), texUnit++);
+            }
+            if (obj->GetModel()->HasAlphaTexture()) {
+                render::Device::SetTexture(render::TS_ALPHA, texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(scene::Model::MT_ALPHA)), texUnit++);
+            }
+            if (obj->GetModel()->HasNormalTexture()) {
+                render::Device::SetTexture(render::TS_NORMAL, texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(scene::Model::MT_NORMAL)), texUnit++);
+            }
+            if (obj->GetModel()->HasEmissionTexture()) {
+                render::Device::SetTexture(render::TS_EMISSION, texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(scene::Model::MT_EMISSION)), texUnit++);
+            }
+            if (obj->GetModel()->HasReflectTexture()) {
+                render::Device::SetTexture(render::TS_REFLECT, texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(scene::Model::MT_REFLECT)), texUnit++);
+            }
+            if (obj->GetModel()->HasDiffusePFCTexture()) {
+                render::Device::SetTexture(render::TS_DIFFUSE_PFC, texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(scene::Model::MT_DIFFUSE_PFC)), texUnit++);
+            }
+            if (obj->GetModel()->HasSpecularPFCTexture()) {
+                render::Device::SetTexture(render::TS_SPECULAR_PFC, texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(scene::Model::MT_SPECULAR_PFC)), texUnit++);
+            }
+            if (obj->GetModel()->HasLightTexture()) {
+                render::Device::SetTexture(render::TS_LIGHT0, texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(scene::Model::MT_LIGHT0)), texUnit++);
+                render::Device::SetTexture(render::TS_LIGHT1, texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(scene::Model::MT_LIGHT1)), texUnit++);
+                render::Device::SetTexture(render::TS_LIGHT2, texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(scene::Model::MT_LIGHT2)), texUnit++);
+            }
+
+            // Object Uniform
+            for (int32_t k = 0; k < static_cast<int32_t>(uniforms.size()); k++) {
+                uniform::UniformEntry entry = uniforms[k];
+                if (!entry.flag) {
+                    // TODO: for now, id is the index of the uniform picker table
+                    uniform::Wrapper uniform_wrapper = uniform::kUniformPickers[entry.id].picker(obj);
+                    SetUniform(entry.location, uniform_wrapper);
+                }
+            }
+
+            // Vertex Buffer
+            int32_t mesh_id = obj->GetModel()->GetMeshId();
+            VertexLayout layout = mesh::Mgr::GetMeshById(mesh_id)->GetVertexLayout();
+            int32_t num = mesh::Mgr::GetMeshById(mesh_id)->GetVertexNum();
+            render::Device::SetVertexBuffer(mesh::Mgr::GetMeshById(mesh_id)->GetVertexBuffer());
+            render::Device::SetVertexLayout(layout);
+
+            if (obj->IsCullFaceEnable()) {
+                render::Device::SetCullFaceEnable(true);
+                render::Device::SetCullFaceMode(obj->GetCullFaceMode());
+            } else {
+                render::Device::SetCullFaceEnable(false);
+            }
+
+            if (obj->IsDepthTestEnable()) {
+                render::Device::SetDepthTestEnable(true);
+            } else {
+                render::Device::SetDepthTestEnable(false);
+            }
+
+            if (obj->IsAlphaBlendEnable()) {
+                render::Device::SetAlphaBlendEnable(true);
+                render::Device::SetAlphaBlendFunc(render::FACTOR_SRC, obj->GetAlphaBlendFunc(render::FACTOR_SRC));
+                render::Device::SetAlphaBlendFunc(render::FACTOR_DST, obj->GetAlphaBlendFunc(render::FACTOR_DST));
+            } else {
+                render::Device::SetAlphaBlendEnable(false);
+            }
+
+            // Draw
+            render::Device::Draw(render::PT_TRIANGLES, 0, num);
+        }
+    }
+
+    // Viewport
+    render::Device::SetViewport(0, 0, app::Application::GetWindowWidth(), app::Application::GetWindowHeight());
+
+    // Reset render target
+    render::Device::SetRenderTarget(0);
+}
+
 void RenderImp::PreDrawLightLoop() {
     std::vector<scene::Object*> objs;
     m_ShaderGroups.clear();
@@ -1517,6 +1851,7 @@ void RenderImp::PreDrawLightLoop() {
     std::vector<scene::Object*> transparent_objs;
     for (int32_t i = 0; i < static_cast<int32_t>(objs.size()); i++) {
         if (objs[i]->GetObjectType() == scene::Object::OBJECT_TYPE_INSTANCE) continue;
+        if (objs[i]->GetObjectType() == scene::Object::OBJECT_TYPE_DECAL) continue;
 
         shader::Descriptor desc = objs[i]->GetShaderDesc();
         bool is_transparent = desc.GetFlag(shader::GLB_ENABLE_ALPHA_TEX);
@@ -1619,6 +1954,7 @@ void RenderImp::DrawLightLoopCore() {
         render::Device::SetTexture(render::TS_SHADOW2, texture::Mgr::GetTextureById(m_ShadowMap[2]), texUnit++);
         render::Device::SetTexture(render::TS_SHADOW3, texture::Mgr::GetTextureById(m_ShadowMap[3]), texUnit++);
         render::Device::SetTexture(render::TS_BRDF_PFT, texture::Mgr::GetTextureById(m_BRDFPFTMap), texUnit++);
+        render::Device::SetTexture(render::TS_DECAL, texture::Mgr::GetTextureById(m_DecalMap), texUnit++);
 
         // Scene uniforms
         for (int32_t j = 0; j < static_cast<int32_t>(uniforms.size()); j++) {
@@ -1636,7 +1972,8 @@ void RenderImp::DrawLightLoopCore() {
             scene::Object* obj = objs[j];
 
             // Check if enable draw
-            if (!obj->IsDrawEnable() || obj->GetObjectType() == scene::Object::OBJECT_TYPE_INSTANCE) {
+            if (!obj->IsDrawEnable() || obj->GetObjectType() == scene::Object::OBJECT_TYPE_INSTANCE
+                || obj->GetObjectType() == scene::Object::OBJECT_TYPE_DECAL) {
                 continue;
             }
 
@@ -2165,6 +2502,30 @@ float Render::GetShadowSplitValue(int32_t index) {
 
     if (s_RenderImp != NULL) {
         result = s_RenderImp->GetShadowSplitValue(index);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return result;
+}
+
+math::Matrix Render::GetDecalViewMatrix() {
+    math::Matrix result;
+
+    if (s_RenderImp != NULL) {
+        result = s_RenderImp->GetDecalViewMatrix();
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return result;
+}
+
+math::Matrix Render::GetDecalProjMatrix() {
+    math::Matrix result;
+
+    if (s_RenderImp != NULL) {
+        result = s_RenderImp->GetDecalProjMatrix();
     } else {
         GLB_SAFE_ASSERT(false);
     }

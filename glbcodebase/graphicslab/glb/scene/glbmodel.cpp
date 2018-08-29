@@ -388,6 +388,10 @@ bool Model::IsUseAO() const {
     return m_ModelEffectParam.useAO;
 }
 
+bool Model::IsAcceptDecal() const {
+    return m_ModelEffectParam.acceptDecal;
+}
+
 void Model::SetTexWithId(int32_t slot, int32_t tex_id) {
     if (0 <= slot && slot < MT_MAX) {
         m_Tex[slot] = tex_id;

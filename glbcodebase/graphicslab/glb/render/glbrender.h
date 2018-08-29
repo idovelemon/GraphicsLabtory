@@ -59,6 +59,10 @@ public:
     static int GetCurShadowMapIndex();
     static float GetShadowSplitValue(int32_t index);
 
+    // Decal
+    static math::Matrix GetDecalViewMatrix();
+    static math::Matrix GetDecalProjMatrix();
+
     // HDR
     static void SetHighLightBase(float base);
     static float GetHighLightBase();

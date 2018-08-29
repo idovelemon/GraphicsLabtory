@@ -34,6 +34,8 @@ struct AppConfig {
     int32_t screen_height;
     int32_t shadow_map_width;
     int32_t shadow_map_height;
+    int32_t decalMapWidth;
+    int32_t decalMapHeight;
     int32_t platform_api;
     int32_t icon;
     wchar_t caption[128];
@@ -44,6 +46,8 @@ struct AppConfig {
     , screen_height(0)
     , shadow_map_width(0)
     , shadow_map_height(0)
+    , decalMapWidth(0)
+    , decalMapHeight(0)
     , platform_api(0)
     , icon(0)
     , wnd(NULL) {
@@ -64,6 +68,8 @@ public:
     static int32_t GetWindowHeight();
     static int32_t GetShadowMapWidth();
     static int32_t GetShadowMapHeight();
+    static int32_t GetDecalMapWidth();
+    static int32_t GetDecalMapHeight();
 };
 
 class ApplicationBase {

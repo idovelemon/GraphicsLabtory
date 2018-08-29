@@ -367,7 +367,51 @@ render::shader::Descriptor Object::CalculateShaderDesc() {
         desc.SetFlag(render::shader::GLB_ENABLE_AO, true);
     }
 
+    if (m_Model->IsAcceptDecal()) {
+        desc.SetFlag(render::shader::GLB_ENABLE_DECAL, true);
+    }
+
     return desc;
+}
+
+//---------------------------------------------------------------------------------------------
+
+DecalObject::DecalObject() {
+    m_ObjectType = OBJECT_TYPE_DECAL;
+}
+
+DecalObject::~DecalObject() {
+}
+
+DecalObject* DecalObject::Create(const char* decalObjectFile, math::Vector pos, math::Vector scale, math::Vector rotation) {
+    DecalObject* obj = NULL;
+    
+    if (decalObjectFile) {
+        Model* model = ModelMgr::GetModelByName(decalObjectFile);
+        if (model == NULL) {
+            model = ModelMgr::AddModel(decalObjectFile);
+        }
+
+        if (model) {
+            obj = new DecalObject();
+            if (obj) {
+                obj->m_Model = model;
+                obj->m_Pos = pos;
+                obj->m_Scale = scale;
+                obj->m_Rotation = rotation;
+                obj->m_WorldMatrix.MakeIdentityMatrix();
+                obj->m_ShaderDesc = obj->CalculateShaderDesc();
+            } else {
+                GLB_SAFE_ASSERT(false);
+            }
+        } else {
+            GLB_SAFE_ASSERT(false);
+        }
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return obj;
 }
 
 //---------------------------------------------------------------------------------------------

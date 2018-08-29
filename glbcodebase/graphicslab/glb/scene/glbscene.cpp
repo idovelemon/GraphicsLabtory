@@ -49,6 +49,7 @@ public:
 
     // Object
     int32_t AddObject(const char* objectFile);
+    int32_t AddDecalObject(const char* decalObjectFile);
     int32_t AddInstanceRenderObject(const char* objectFile, int32_t maxInstance);
     int32_t AddInstanceObject(int32_t instanceRenderObject, math::Vector pos, math::Vector scale, math::Vector rotate);
     int32_t AddObject(scene::Model* model);
@@ -186,6 +187,29 @@ int32_t SceneImp::AddObject(const char* object_file) {
 
     if (object_file != NULL) {
         Object* obj = Object::Create(object_file);
+        if (obj != NULL) {
+            id = FindEmptyID();
+            if (id != -1) {
+                m_ObjectDataBase[id] = obj;
+                obj->SetObjectId(id);
+            } else {
+                GLB_SAFE_ASSERT(false);
+            }
+        } else {
+            GLB_SAFE_ASSERT(false);
+        }
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return id;
+}
+
+int32_t SceneImp::AddDecalObject(const char* decalObjectFile) {
+    int32_t id = -1;
+
+    if (decalObjectFile != NULL) {
+        Object* obj = DecalObject::Create(decalObjectFile);
         if (obj != NULL) {
             id = FindEmptyID();
             if (id != -1) {
@@ -499,6 +523,18 @@ int32_t Scene::AddInstanceObject(int32_t instanceRenderObject, math::Vector pos,
 
     if (s_SceneImp != NULL) {
         result = s_SceneImp->AddInstanceObject(instanceRenderObject, pos, scale, rotate);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return result;
+}
+
+int32_t Scene::AddDecalObject(const char* decalObjectFile) {
+    int32_t result = -1;
+
+    if (s_SceneImp != NULL) {
+        result = s_SceneImp->AddDecalObject(decalObjectFile);
     } else {
         GLB_SAFE_ASSERT(false);
     }

@@ -41,7 +41,8 @@ public:
     , acceptLight(false)
     , acceptShadow(false)
     , castShadow(false)
-    , useAO(false) {
+    , useAO(false)
+    , acceptDecal(false) {
     }
 
     virtual ~ModelEffectParam() {
@@ -66,6 +67,7 @@ public:
     bool    acceptShadow;
     bool    castShadow;
     bool    useAO;
+    bool    acceptDecal;
 };
 
 class ModelMaterialParam {

@@ -12,7 +12,7 @@
 const float PI = 3.1415927;
 
 // Input attributes
-in vec3 vs_Vertex;
+in vec4 vs_Vertex;
 
 #ifdef GLB_COLOR_IN_VERTEX
 	in vec3 vs_Color;
@@ -150,6 +150,12 @@ out vec4 oColor;
 	uniform vec3 glb_unif_LookAt;
 #endif
 
+#ifdef GLB_ENABLE_DECAL
+	uniform mat4 glb_unif_DecalViewM;
+	uniform mat4 glb_unif_DecalProjM;
+	uniform sampler2D glb_unif_DecalTex;
+#endif
+
 uniform vec3 glb_unif_Material_Emission;
 
 #ifdef GLB_ENABLE_LIGHTING
@@ -231,29 +237,29 @@ float calc_shadow() {
 
 #ifdef GLB_ENABLE_SHADOW
 	vec2 shadow_coord;
-	int index = calc_current_shadow_index(vs_Vertex, glb_unif_EyePos, glb_unif_LookAt, glb_unif_ShadowSplit0, glb_unif_ShadowSplit1, glb_unif_ShadowSplit2);
+	int index = calc_current_shadow_index(vs_Vertex.xyz, glb_unif_EyePos, glb_unif_LookAt, glb_unif_ShadowSplit0, glb_unif_ShadowSplit1, glb_unif_ShadowSplit2);
 	vec4 light_space_pos;
 	float factor;
 	if (index == 0) {
-		light_space_pos = glb_unif_ShadowM0 * vec4(vs_Vertex, 1.0);
+		light_space_pos = glb_unif_ShadowM0 * vec4(vs_Vertex.xyz, 1.0);
 		light_space_pos.xyz /= 2.0f;
 		light_space_pos.xyz += 0.5f;
 		light_space_pos.xyz /= light_space_pos.w;
 		factor = texture2D(glb_unif_ShadowTex0, light_space_pos.xy).z;
 	} else if (index == 1) {
-		light_space_pos = glb_unif_ShadowM1 * vec4(vs_Vertex, 1.0);
+		light_space_pos = glb_unif_ShadowM1 * vec4(vs_Vertex.xyz, 1.0);
 		light_space_pos.xyz /= 2.0f;
 		light_space_pos.xyz += 0.5f;
 		light_space_pos.xyz /= light_space_pos.w;	
 		factor = texture2D(glb_unif_ShadowTex1, light_space_pos.xy).z;
 	} else if (index == 2) {
-		light_space_pos = glb_unif_ShadowM2 * vec4(vs_Vertex, 1.0);
+		light_space_pos = glb_unif_ShadowM2 * vec4(vs_Vertex.xyz, 1.0);
 		light_space_pos.xyz /= 2.0f;
 		light_space_pos.xyz += 0.5f;
 		light_space_pos.xyz /= light_space_pos.w;				
 		factor = texture2D(glb_unif_ShadowTex2, light_space_pos.xy).z;
 	} else {
-		light_space_pos = glb_unif_ShadowM3 * vec4(vs_Vertex, 1.0);
+		light_space_pos = glb_unif_ShadowM3 * vec4(vs_Vertex.xyz, 1.0);
 		light_space_pos.xyz /= 2.0f;
 		light_space_pos.xyz += 0.5f;
 		light_space_pos.xyz /= light_space_pos.w;
@@ -298,7 +304,7 @@ vec3 calc_view() {
 	vec3 view = vec3(0.0, 0.0, 0.0);
 
 #ifdef GLB_ENABLE_EYE_POS
-	view = normalize(glb_unif_EyePos - vs_Vertex);
+	view = normalize(glb_unif_EyePos - vs_Vertex.xyz);
 #endif	
 
 	return view;
@@ -435,6 +441,23 @@ vec3 calc_light_mapping_lighting(vec3 n) {
 	return result;
 }
 
+vec3 calc_decal(vec3 color) {
+	vec3 result = color;
+
+#ifdef GLB_ENABLE_DECAL
+  	vec4 decalTexcoord = glb_unif_DecalProjM * glb_unif_DecalViewM * vs_Vertex;
+    decalTexcoord.xyz /= 2.0;
+    decalTexcoord.xyz += 0.5;
+    decalTexcoord.xyz /= decalTexcoord.w;
+
+    vec4 decal = texture(glb_unif_DecalTex, decalTexcoord.xy);
+
+    result = color * (1.0 - decal.w) + decal.xyz * decal.w;	
+#endif
+
+	return result;
+}
+
 float calc_alpha() {
 	float alpha = 1.0;
 
@@ -458,7 +481,7 @@ void main() {
 
 	vec3 view = calc_view();
 
-	vec3 light = calc_light_dir();	
+	vec3 light = calc_light_dir();
 
 	vec3 h = normalize(view + light);
 
@@ -477,6 +500,8 @@ void main() {
 	vec3 light_mapping_color = calc_light_mapping_lighting(normalInTangent);
 
 	oColor.xyz = (direct_color + ibl_color + light_mapping_color) * shadow_factor + emission;
+
+	oColor.xyz = calc_decal(oColor.xyz);
 
 	// TEST code
 #ifdef GLB_ENABLE_REFLECT_TEX

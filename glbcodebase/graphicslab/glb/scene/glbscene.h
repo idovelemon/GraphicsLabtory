@@ -56,6 +56,7 @@ public:
     static int32_t AddObject(const char* objectFile);
     static int32_t AddInstanceRenderObject(const char* objectFile, int32_t maxInstance = 256);
     static int32_t AddInstanceObject(int32_t instanceRenderObject, math::Vector pos = math::Vector(0.0f, 0.0f, 0.0f), math::Vector scale = math::Vector(1.0f, 1.0f, 1.0f), math::Vector rotate = math::Vector(0.0f, 0.0f, 0.0f));
+    static int32_t AddDecalObject(const char* decalObjectFile);
     static int32_t AddObject(Model* model);
     static int32_t AddSkyObject(const char* objectFile);
     static Object* GetObjectById(int32_t objectId);

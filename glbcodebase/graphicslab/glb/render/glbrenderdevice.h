@@ -72,6 +72,7 @@ enum TextureSlot {
     TS_LIGHT0,
     TS_LIGHT1,
     TS_LIGHT2,
+    TS_DECAL,
     TS_MAX,
 };
 

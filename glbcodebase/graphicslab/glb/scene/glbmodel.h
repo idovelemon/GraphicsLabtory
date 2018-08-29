@@ -71,6 +71,7 @@ public:
     bool IsCastShadow() const;
     void SetCastShadow(bool cast);
     bool IsUseAO() const;
+    bool IsAcceptDecal() const;
 
     void SetTexWithId(int32_t slot, int32_t tex_id);
 

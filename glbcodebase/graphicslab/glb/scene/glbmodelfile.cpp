@@ -362,6 +362,15 @@ int32_t ObjModelFile::ExtractModelData(
                     } else {
                         effectParam.useAO = false;
                     }
+                } else if (!strcmp(prefix, "ad")) {
+                    // Accept decal
+                    int32_t temp = 0;
+                    input >> temp;
+                    if (temp != 0) {
+                        effectParam.acceptDecal = true;
+                    } else {
+                        effectParam.acceptDecal = false;
+                    }
                 } else if (!strcmp(prefix, "cs")) {
                     // Cast shadow
                     int32_t temp = 0;

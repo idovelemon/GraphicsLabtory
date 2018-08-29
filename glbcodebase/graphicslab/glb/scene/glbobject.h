@@ -33,6 +33,7 @@ class Object {
 public:
     enum {
         OBJECT_TYPE_NORMAL = 0,
+        OBJECT_TYPE_DECAL,
         OBJECT_TYPE_INSTANCE,
         OBJECT_TYPE_INSTANCE_RENDER,
     };
@@ -122,6 +123,17 @@ protected:
     render::CullMode                m_CullMode;
     render::AlphaBlendFunc          m_SrcBlendFunc;
     render::AlphaBlendFunc          m_DstBlendFunc;
+};
+
+//---------------------------------------------------------------------------------------------
+
+class DecalObject : public Object {
+public:
+    DecalObject();
+    virtual ~DecalObject();
+
+    static DecalObject* Create(const char* decalObjectFile, math::Vector pos = math::Vector(0.0f, 0.0f, 0.0f),
+        math::Vector scale = math::Vector(1.0f, 1.0f, 1.0f), math::Vector rotation = math::Vector(0.0f, 0.0f, 0.0f));
 };
 
 //---------------------------------------------------------------------------------------------

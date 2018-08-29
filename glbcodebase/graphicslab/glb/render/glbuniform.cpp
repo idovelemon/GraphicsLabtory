@@ -221,6 +221,20 @@ Wrapper uniform_trans_inv_worldm_picker(scene::Object* obj) {
     return wrapper;
 }
 
+Wrapper uniform_decal_viewm_picker(scene::Object*) {
+    Wrapper wrapper;
+    wrapper.SetFormat(Wrapper::FMT_MATRIX);
+    wrapper.SetMatrix(render::Render::GetDecalViewMatrix());
+    return wrapper;
+}
+
+Wrapper uniform_decal_projm_picker(scene::Object*) {
+    Wrapper wrapper;
+    wrapper.SetFormat(Wrapper::FMT_MATRIX);
+    wrapper.SetMatrix(render::Render::GetDecalProjMatrix());
+    return wrapper;
+}
+
 Wrapper uniform_albedo_texslot_picker(scene::Object* obj) {
     Wrapper wrapper;
     wrapper.SetFormat(Wrapper::FMT_SAMPLER2D);
@@ -394,6 +408,13 @@ Wrapper uniform_light2_texslot_picker(scene::Object* obj) {
     Wrapper wrapper;
     wrapper.SetFormat(Wrapper::FMT_SAMPLER2D);
     wrapper.SetSampler2D(render::TS_LIGHT2);
+    return wrapper;
+}
+
+Wrapper uniform_decal_texslot_picker(scene::Object* obj) {
+    Wrapper wrapper;
+    wrapper.SetFormat(Wrapper::FMT_SAMPLER2D);
+    wrapper.SetSampler2D(render::TS_DECAL);
     return wrapper;
 }
 

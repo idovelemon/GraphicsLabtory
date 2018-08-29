@@ -38,7 +38,7 @@ layout (location = 0) in vec3 glb_attr_Pos;
 #endif
 
 // Output attributes
-out vec3 vs_Vertex;
+out vec4 vs_Vertex;
 
 #ifdef GLB_COLOR_IN_VERTEX
 	out vec3 vs_Color;
@@ -75,10 +75,10 @@ uniform mat4 glb_unif_ViewM;
 void main() {
 #ifdef GLB_ENABLE_INSTANCE_RENDERING	
 	gl_Position = glb_unif_ProjM * glb_unif_ViewM * glb_attr_WorldMatrix * vec4(glb_attr_Pos, 1.0);
-	vs_Vertex = (glb_attr_WorldMatrix * vec4(glb_attr_Pos, 1.0)).xyz;
+	vs_Vertex = (glb_attr_WorldMatrix * vec4(glb_attr_Pos, 1.0));
 #else
 	gl_Position = glb_unif_ProjM * glb_unif_ViewM * glb_unif_WorldM * vec4(glb_attr_Pos, 1.0);
-	vs_Vertex = (glb_unif_WorldM * vec4(glb_attr_Pos, 1.0)).xyz;
+	vs_Vertex = (glb_unif_WorldM * vec4(glb_attr_Pos, 1.0));
 #endif
 
 #ifdef GLB_COLOR_IN_VERTEX
