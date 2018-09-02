@@ -34,7 +34,7 @@ CollisionCom::~CollisionCom() {
 void CollisionCom::Update() {
     entity::TransformCom* com = reinterpret_cast<entity::TransformCom*>(m_Entity->GetComponent(entity::CT_TRANSFORM));
     if (com) {
-        reinterpret_cast<dynamic::DTAabb*>(dynamic::DynamicWorld::GetDynamicObject(m_DynamicObjectID))->Update(com->GetPos(), com->GetRotate());
+        reinterpret_cast<dynamic::DTAabb*>(dynamic::DynamicWorld::GetDynamicObject(m_DynamicObjectID))->Update(com->GetPos(), com->GetRotate(), com->GetScale());
     }
 }
 
@@ -44,6 +44,14 @@ void CollisionCom::SetCollisionHandle(dynamic::DynamicObject::CollisionEventHand
 
 void CollisionCom::SetCollisionFilter(int32_t groupFilter, int32_t maskFilter) {
     dynamic::DynamicWorld::GetDynamicObject(m_DynamicObjectID)->SetCollisionFilter(groupFilter, maskFilter);
+}
+
+void CollisionCom::GetBoundBox(float& outWidth, float& outHeight, float& outDepth) {
+    glb::math::Vector maxPos, minPos;
+    reinterpret_cast<dynamic::DTAabb*>(dynamic::DynamicWorld::GetDynamicObject(m_DynamicObjectID))->GetBoundBox(maxPos, minPos);
+    outWidth = maxPos.x - minPos.x;
+    outHeight = maxPos.y - minPos.y;
+    outDepth = maxPos.z - minPos.z;
 }
 
 };  // namespace entity

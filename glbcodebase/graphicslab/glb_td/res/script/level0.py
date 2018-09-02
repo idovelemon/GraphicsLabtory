@@ -96,6 +96,15 @@ def EnemyCreateE03(x, y, z):
     EntityBindRelationship(enemy, enemyRotate)
     EntityAddScriptCom(enemyRotate, "EntityEnemy01RotateUpdater")
 
+def ObstacleCreateWall(x, y, z, rx, ry, rz, width, height, depth):
+    obstacle = EntityCreate()
+    EntityAddRenderCom(obstacle, "res/model/obstacle/wall.obj", 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, True, 10)
+    EntityAddTransformCom(obstacle, x, y, z, rx, ry, rz, width / 2.0, height / 2.0, depth / 2.0)
+    EntityAddCollisionCom(obstacle, x, y, z, 2.0, 2.0, 2.0)
+    EntitySetCollisionFilter(obstacle, ObstacleFilter, PlayerFilter)
+    EntityAddDataCom(obstacle)
+    EntityAddStringData(obstacle, "Tag", "Wall")   
+
 def ObstacleCreateSpike(x, y, z):
     obstacle = EntityCreate()
     EntityAddRenderCom(obstacle, "res/model/obstacle/spike.obj", 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, True, 10)
@@ -162,8 +171,8 @@ def main():
 
         # Create Camera Entity
         camera = EntityCreate()
-        EntityAddCameraCom(camera, 0.0, 10.0, 10.0, 0.0, 0.0, 0.0)
-        EntityAddTransformCom(camera, 0.0, 10.0, 10.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0)
+        EntityAddCameraCom(camera, 0.0, 20.0, 20.0, 0.0, 0.0, 0.0)
+        EntityAddTransformCom(camera, 0.0, 20.0, 20.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0)
         EntityAddRelationshipCom(camera)
         EntityBindRelationship(coreDummy, camera)
 
@@ -207,6 +216,12 @@ def main():
 
     if LEVEL_COUNT == 4:
         ObstacleCreateRotateRock(-15.0, 0.0, 0.0)
+
+    if LEVEL_COUNT == 5:
+        ObstacleCreateWall(-50.0, 0.0, 0.0, 0.0, 0.0, 0.0, 2.0, 2.0, 100.0)
+        ObstacleCreateWall(50.0, 0.0, 0.0, 0.0, 0.0, 0.0, 2.0, 2.0, 100.0)
+        ObstacleCreateWall(0.0, 0.0, -50.0, 0.0, 0.0, 0.0, 100.0, 2.0, 2.0)
+        ObstacleCreateWall(0.0, 0.0, 50.0, 0.0, 0.0, 0.0, 100.0, 2.0, 2.0)
 
     if LEVEL_COUNT == 3000:
         DebugPrint("TD Level0 Finish\n")

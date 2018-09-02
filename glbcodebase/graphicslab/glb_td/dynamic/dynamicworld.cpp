@@ -12,6 +12,7 @@
 #include "btBulletDynamicsCommon.h"
 #include "dynamicobject.h"
 #include "dynamicdrawer.h"
+#include "../log.h"
 #include "../version.h"
 
 namespace dynamic {
@@ -125,7 +126,7 @@ void DynamicWorldImp::Update() {
                         m_DynamicObjects[i]->GetCollisionHandle()(m_DynamicObjects[i], m_DynamicObjects[id]);
                     } else {
                         // Must set a collision handler
-                        assert(false);
+                        tdlog::Print("Warning: Dynamic object has no collision handler");
                     }
                 }
             }

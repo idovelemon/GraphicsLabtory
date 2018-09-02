@@ -45,6 +45,8 @@ public:
     void SetCollisionHandle(dynamic::DynamicObject::CollisionEventHandle handle);
     void SetCollisionFilter(int32_t groupFilter, int32_t maskFilter);
 
+    void GetBoundBox(float& outWidth, float& outHeight, float& outDepth);
+
 protected:
     int32_t                     m_DynamicObjectID;
 };

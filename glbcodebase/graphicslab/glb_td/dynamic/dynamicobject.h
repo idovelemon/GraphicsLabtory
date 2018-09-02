@@ -80,6 +80,7 @@ public:
 
 public:
     virtual void Update(glb::math::Vector pos, glb::math::Vector rot = glb::math::Vector(0.0f, 0.0f, 0.0f), glb::math::Vector scale = glb::math::Vector(1.0f, 1.0f, 1.0f)) override;
+    void GetBoundBox(glb::math::Vector& outMax, glb::math::Vector& outMin);
 
 protected:
     glb::math::Vector       m_OriMax;

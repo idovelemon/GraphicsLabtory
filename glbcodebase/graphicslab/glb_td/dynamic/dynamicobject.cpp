@@ -52,13 +52,21 @@ DTAabb::~DTAabb() {
 void DTAabb::Update(glb::math::Vector pos, glb::math::Vector rot, glb::math::Vector scale) {
     glb::math::Matrix mat;
     mat.MakeIdentityMatrix();
-    mat.Scale(scale.x, scale.y, scale.z);
+    //mat.Scale(scale.x, scale.y, scale.z);  // Can not set bullet collision object's scaling
     mat.RotateXYZ(rot.x, rot.y, rot.z);
     mat.Translate(pos.x, pos.y, pos.z);
     mat.Transpose();
     btTransform transform;
     transform.setFromOpenGLMatrix(mat.m_Matrix.v);
     m_btCollision->setWorldTransform(transform);
+    m_btCollisionShape->setLocalScaling(btVector3(scale.x, scale.y, scale.z));  // Must set collision shape's scaling
+}
+
+void DTAabb::GetBoundBox(glb::math::Vector& outMax, glb::math::Vector& outMin) {
+    btVector3 localScaling = m_btCollisionShape->getLocalScaling();
+    glb::math::Vector scaling = glb::math::Vector(localScaling.getX(), localScaling.getY(), localScaling.getZ());
+    outMax = m_OriMax * scaling;
+    outMin = m_OriMin * scaling;
 }
 
 };  // namespace dynamic
