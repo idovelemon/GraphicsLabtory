@@ -64,7 +64,7 @@ void EntityPlayerCollisionHandle(dynamic::DynamicObject* self, dynamic::DynamicO
     }
 
     DataCom* data = reinterpret_cast<DataCom*>(otherEntity->GetComponent(entity::CT_DATA));
-    if (data && !data->GetDataString("Tag").compare("Wall")) {
+    if (data && data->GetData("Tag") && !data->GetDataString("Tag").compare("Wall")) {
         EntityPlayerOnCollisionWithWall(selfEntity, otherEntity);
         return;
     }

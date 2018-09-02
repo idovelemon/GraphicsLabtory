@@ -124,9 +124,6 @@ void DynamicWorldImp::Update() {
                     int32_t id = reinterpret_cast<int32_t>(collObjs[j]->getUserPointer());
                     if (m_DynamicObjects[i]->GetCollisionHandle()) {
                         m_DynamicObjects[i]->GetCollisionHandle()(m_DynamicObjects[i], m_DynamicObjects[id]);
-                    } else {
-                        // Must set a collision handler
-                        tdlog::Print("Warning: Dynamic object has no collision handler");
                     }
                 }
             }
