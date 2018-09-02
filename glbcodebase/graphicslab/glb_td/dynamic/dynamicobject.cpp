@@ -53,6 +53,7 @@ void DTAabb::Update(glb::math::Vector pos, glb::math::Vector rot, glb::math::Vec
     glb::math::Matrix mat;
     mat.MakeIdentityMatrix();
     mat.Scale(scale.x, scale.y, scale.z);
+    mat.RotateXYZ(rot.x, rot.y, rot.z);
     mat.Translate(pos.x, pos.y, pos.z);
     mat.Transpose();
     btTransform transform;

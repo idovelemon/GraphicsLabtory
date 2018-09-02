@@ -1,8 +1,8 @@
 //-------------------------------------------------------------
 // Declaration: Copyright (c), by i_dovelemon, 2018. All right reserved.
 // Author: i_dovelemon[1322600812@qq.com]
-// Date: 2018/08/18
-// Brief: Player's collision handle
+// Date: 2018/08/30
+// Brief: Obstacle's collision handle
 //-------------------------------------------------------------
 #include "../entity.h"
 
@@ -13,6 +13,8 @@
 #include "../../pyscript/pyscriptmgr.h"
 #include "../../pyscript/topython_function.h"
 #include "../datacom.h"
+#include "../entitymgr.h"
+#include "../roletype.h"
 #include "../transformcom.h"
 #include "collision.h"
 
@@ -20,15 +22,13 @@
 
 namespace entity {
 
-void EntityPlayerCollisionHandle(dynamic::DynamicObject* self, dynamic::DynamicObject* other) {
-    int32_t selfEntityID = reinterpret_cast<int32_t>(self->GetUserData());
-    int32_t otherEntityID = reinterpret_cast<int32_t>(other->GetUserData());
+void EntityObstacleSpikeCollisionHandle(dynamic::DynamicObject* self, dynamic::DynamicObject* other) {
+}
 
-    tdlog::Print("Hit player\n");
+void EntityObstaclePushRockCollisionHandle(dynamic::DynamicObject* self, dynamic::DynamicObject* other) {
+}
 
-    // TEST
-    MessageBoxA(NULL, "GameOver", "Try Again", MB_OK);
-    exit(0);
+void EntityObstacleRotateRockCollisionHandle(dynamic::DynamicObject* self, dynamic::DynamicObject* other) {
 }
 
 };  // namespace entity

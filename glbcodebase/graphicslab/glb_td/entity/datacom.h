@@ -17,6 +17,7 @@ namespace entity {
 //----------------------------------------------------------------
 // Type Declaration
 
+
 //----------------------------------------------------------------
 class DataPack {
 public:
@@ -48,6 +49,13 @@ public:
 public:
     void AddData(const char* name, DataPack data);
     DataPack* GetData(const char* name);
+
+    void SetDataFloat(const char* name, float value);
+    float GetDataFloat(const char* name);
+    void SetDataInt(const char* name, int value);
+    int GetDataInt(const char* name);
+    void SetDataString(const char* name, const char* value);
+    std::string GetDataString(const char* name);
 
 protected:
     std::map<std::string, DataPack>        m_Datas;

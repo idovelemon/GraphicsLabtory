@@ -1,3 +1,6 @@
 COLLISION_HANDLE_DEF(EntityPlayerCollisionHandle)
 COLLISION_HANDLE_DEF(EntityNormalBulletCollisionHandle)
 COLLISION_HANDLE_DEF(EntityEnemy01CollisionHandle)
+COLLISION_HANDLE_DEF(EntityObstacleSpikeCollisionHandle)
+COLLISION_HANDLE_DEF(EntityObstaclePushRockCollisionHandle)
+COLLISION_HANDLE_DEF(EntityObstacleRotateRockCollisionHandle)

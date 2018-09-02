@@ -32,6 +32,7 @@ public:
         EnemyFilter = 1 << 8,
         PlayerBulletFilter = 1 << 9,
         EnemyBulletFilter = 1 << 10,
+        ObstacleFilter = 1 << 11,
     };
 
 public:

@@ -34,7 +34,7 @@ CollisionCom::~CollisionCom() {
 void CollisionCom::Update() {
     entity::TransformCom* com = reinterpret_cast<entity::TransformCom*>(m_Entity->GetComponent(entity::CT_TRANSFORM));
     if (com) {
-        reinterpret_cast<dynamic::DTAabb*>(dynamic::DynamicWorld::GetDynamicObject(m_DynamicObjectID))->Update(com->GetPos());
+        reinterpret_cast<dynamic::DTAabb*>(dynamic::DynamicWorld::GetDynamicObject(m_DynamicObjectID))->Update(com->GetPos(), com->GetRotate());
     }
 }
 

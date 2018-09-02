@@ -127,6 +127,7 @@
     <ClCompile Include="entity\collisioncom.cpp" />
     <ClCompile Include="entity\collision\bulletcollisionhandle.cpp" />
     <ClCompile Include="entity\collision\enemycollisionhandle.cpp" />
+    <ClCompile Include="entity\collision\obstaclecollisionhandle.cpp" />
     <ClCompile Include="entity\collision\playercollisionhandle.cpp" />
     <ClCompile Include="entity\datacom.cpp" />
     <ClCompile Include="entity\entity.cpp" />
@@ -139,6 +140,7 @@
     <ClCompile Include="entity\updater\coreupdater.cpp" />
     <ClCompile Include="entity\updater\emitterupdater.cpp" />
     <ClCompile Include="entity\updater\enemyupdater.cpp" />
+    <ClCompile Include="entity\updater\obstacleupdater.cpp" />
     <ClCompile Include="gametimer.cpp" />
     <ClCompile Include="glb_td.cpp" />
     <ClCompile Include="log.cpp" />

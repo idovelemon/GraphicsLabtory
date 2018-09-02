@@ -71,4 +71,70 @@ DataPack* DataCom::GetData(const char* name) {
     return data;
 }
 
+void DataCom::SetDataFloat(const char* name, float value) {
+    DataPack* pack = GetData(name);
+    if (pack) {
+        pack->SetFloat(value);
+    } else {
+        assert(false);  // Invalid data
+    }
+}
+
+void DataCom::SetDataInt(const char* name, int value) {
+    DataPack* pack = GetData(name);
+    if (pack) {
+        pack->SetInt(value);
+    } else {
+        assert(false);  // Invalid data
+    }
+}
+
+void DataCom::SetDataString(const char* name, const char* value) {
+    DataPack* pack = GetData(name);
+    if (pack) {
+        pack->SetString(value);
+    } else {
+        assert(false);  // Invalid data
+    }
+}
+
+float DataCom::GetDataFloat(const char* name) {
+    float result = 0.0f;
+
+    DataPack* pack = GetData(name);
+    if (pack) {
+        result = pack->GetFloat();
+    } else {
+        assert(false);  // Invalid data
+    }
+
+    return result;
+}
+
+int DataCom::GetDataInt(const char* name) {
+    int result = 0;
+
+    DataPack* pack = GetData(name);
+    if (pack) {
+        result = pack->GetInt();
+    } else {
+        assert(false);  // Invalid data
+    }
+
+    return result;
+}
+
+std::string DataCom::GetDataString(const char* name) {
+    std::string result = "";
+
+    DataPack* pack = GetData(name);
+    if (pack) {
+        result = pack->GetString();
+    } else {
+        assert(false);  // Invalid data
+    }
+
+    return result;
+}
+
 };  // namespace entity

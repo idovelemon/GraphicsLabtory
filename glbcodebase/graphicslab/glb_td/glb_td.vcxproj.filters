@@ -237,6 +237,12 @@
     <ClCompile Include="entity\collision\playercollisionhandle.cpp">
       <Filter>源文件\entity\collision</Filter>
     </ClCompile>
+    <ClCompile Include="entity\updater\obstacleupdater.cpp">
+      <Filter>源文件\entity\updater</Filter>
+    </ClCompile>
+    <ClCompile Include="entity\collision\obstaclecollisionhandle.cpp">
+      <Filter>源文件\entity\collision</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\glb\glb.h">
