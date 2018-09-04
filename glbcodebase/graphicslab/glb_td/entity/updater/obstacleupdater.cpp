@@ -36,6 +36,8 @@ void EntityObstacleSpikeUpdater(Entity* entity) {
     float curTime = data->GetDataFloat("CurTime");
     float startPosY = data->GetDataFloat("StartY");
     float endPosY = data->GetDataFloat("EndY");
+    float extraSpeed = data->GetDataFloat("ExtraSpeed");
+    float extraSpeedTimer = data->GetDataFloat("ExtraSpeedTimer");
 
     glb::math::Vector pos = transform->GetPos();
 
@@ -43,7 +45,12 @@ void EntityObstacleSpikeUpdater(Entity* entity) {
         return a + (b - a) * sin(3.14159f / 2.0f * ratio);
     };
 
-    curTime = curTime + td::GameTimer::GetFrameSpeed();
+    curTime = curTime + td::GameTimer::GetFrameSpeed() * extraSpeed;
+    extraSpeedTimer = extraSpeedTimer - td::GameTimer::GetFrameSpeed();
+    if (extraSpeedTimer <= 0.0f) {
+        extraSpeedTimer = 0.0f;
+        extraSpeed = 1.0f;
+    }
 
     if (!state.compare("up")) {
         // In up stage
@@ -64,7 +71,10 @@ void EntityObstacleSpikeUpdater(Entity* entity) {
     } else {
         assert(false);  // Unknown state
     }
+
     data->SetDataFloat("CurTime", curTime);
+    data->SetDataFloat("ExtraSpeed", extraSpeed);
+    data->SetDataFloat("ExtraSpeedTimer", extraSpeedTimer);
 
     transform->SetPos(pos);
 }
@@ -88,6 +98,8 @@ void EntityObstaclePushRockUpdater(Entity* entity) {
     float curTime = data->GetDataFloat("CurTime");
     float startPosZ = data->GetDataFloat("StartZ");
     float endPosZ = data->GetDataFloat("EndZ");
+    float extraSpeed = data->GetDataFloat("ExtraSpeed");
+    float extraSpeedTimer = data->GetDataFloat("ExtraSpeedTimer");
     oriPos.x = data->GetDataFloat("OriX");
     oriPos.y = data->GetDataFloat("OriY");
     oriPos.z = data->GetDataFloat("OriZ");
@@ -101,7 +113,12 @@ void EntityObstaclePushRockUpdater(Entity* entity) {
         return a + (b - a) * sin(3.14159f / 2.0f * ratio);
     };
 
-    curTime = curTime + td::GameTimer::GetFrameSpeed();
+    curTime = curTime + td::GameTimer::GetFrameSpeed() * extraSpeed;
+    extraSpeedTimer = extraSpeedTimer - td::GameTimer::GetFrameSpeed();
+    if (extraSpeedTimer <= 0.0f) {
+        extraSpeedTimer = 0.0f;
+        extraSpeed = 1.0f;
+    }
 
     if (!state.compare("push")) {
         // In up stage
@@ -122,7 +139,10 @@ void EntityObstaclePushRockUpdater(Entity* entity) {
     } else {
         assert(false);  // Unknown state
     }
+
     data->SetDataFloat("CurTime", curTime);
+    data->SetDataFloat("ExtraSpeed", extraSpeed);
+    data->SetDataFloat("ExtraSpeedTimer", extraSpeedTimer);
 
     transform->SetPos(pos);
 }
@@ -134,9 +154,27 @@ void EntityObstacleRotateRockUpdater(Entity* entity) {
         return;
     }
 
+    DataCom* data = reinterpret_cast<DataCom*>(entity->GetComponent(CT_DATA));
+    if (!data) {
+        assert(false);
+        return;
+    }
+
+    float extraSpeed = data->GetDataFloat("ExtraSpeed");
+
     glb::math::Vector rot = transform->GetRotate();
-    rot.y = rot.y + pyscript::PyScriptMgr::GetValueF("ROTATEROCK_ROTATE_SPEED") * td::GameTimer::GetFrameSpeed();
+    rot.y = rot.y + pyscript::PyScriptMgr::GetValueF("ROTATEROCK_ROTATE_SPEED") * td::GameTimer::GetFrameSpeed() * extraSpeed;
     transform->SetRotate(rot);
+
+    float extraSpeedTimer = data->GetDataFloat("ExtraSpeedTimer");
+    extraSpeedTimer = extraSpeedTimer - td::GameTimer::GetFrameSpeed();
+    if (extraSpeedTimer <= 0.0f) {
+        extraSpeedTimer = 0.0f;
+        extraSpeed = 1.0f;
+    }
+
+    data->SetDataFloat("ExtraSpeed", extraSpeed);
+    data->SetDataFloat("ExtraSpeedTimer", extraSpeedTimer);
 }
 
 };  // namespace entity

@@ -9,6 +9,7 @@
 #include <assert.h>
 
 #include "../../gametimer.h"
+#include "../../log.h"
 #include "../../pyscript/pyscriptmgr.h"
 #include "../../pyscript/topython_function.h"
 #include "../collisioncom.h"
@@ -35,18 +36,37 @@ void EntityNormalEmitterUpdater(Entity* entity) {
     }
 
     float shootDelta = pyscript::PyScriptMgr::GetValueF("NORMAL_EMITTER_SHOOT_DELTA");
-    DataPack* pack = data->GetData("ShootDelta");
-    float curDelta = pack->GetFloat();
-    curDelta = curDelta + td::GameTimer::GetFrameSpeed();
+    DataPack* shootAccelerateBulletPack = data->GetData("ShootAccelerateBulletDelta");
+    DataPack* shootDeaccelerateBulletPack = data->GetData("ShootDeaccelerateBulletDelta");
+    float curShootAccelerateBulletDelta = shootAccelerateBulletPack->GetFloat();
+    float curShootDeaccelerateBulletDelta = shootDeaccelerateBulletPack->GetFloat();
 
     glb::math::Vector pos = transform->GetPosWorld();
     glb::math::Vector rot = transform->GetRotateWorld();
 
-    if (glb::Input::IsMouseButtonPressed(glb::BM_LEFT) && curDelta > shootDelta) {
-        // Reset shoot delta
-        curDelta = 0.0f;
+    bool canShootAccelerateBullet = false, canShootDeaccelerateBullet = false;
 
+    if (glb::Input::IsMouseButtonPressed(glb::BM_LEFT)) {
+        curShootAccelerateBulletDelta = curShootAccelerateBulletDelta + td::GameTimer::GetFrameSpeed();
+    } else {
+        if (curShootAccelerateBulletDelta > 0.0f) {
+            canShootAccelerateBullet = true;
+        }
+    }
+
+    if (glb::Input::IsMouseButtonPressed(glb::BM_RIGHT)) {
+        curShootDeaccelerateBulletDelta = curShootDeaccelerateBulletDelta + td::GameTimer::GetFrameSpeed();
+    } else {
+        if (curShootDeaccelerateBulletDelta > 0.0f) {
+            canShootDeaccelerateBullet = true;
+        }
+    }
+
+    if (canShootAccelerateBullet) {
         // Create normal bullet
+        float ratio = curShootAccelerateBulletDelta / shootDelta;
+        ratio = max(0.0f, min(ratio, 1.0f));
+
         int bullet = EntityCreate();
         EntityAddTransformCom(bullet, pos.x, pos.y, pos.z, rot.x, rot.y, rot.z, 1.0f, 1.0f, 1.0f);
         EntityAddRenderCom(bullet, "res/model/emitter/normal_bullet.obj", pos.x, pos.y, pos.z, rot.x, rot.y, rot.z, 1.0f, 1.0f, 1.0f, true, 512);
@@ -55,13 +75,41 @@ void EntityNormalEmitterUpdater(Entity* entity) {
         EntityAddFloatData(bullet, "Life", 3.0f * 60.0f);
         EntityAddFloatData(bullet, "Speed", pyscript::PyScriptMgr::GetValueF("ENTITY_NORMAL_BULLET_MOVE_SPEED"));
         EntityAddFloatData(bullet, "Damage", 1.0f);
-        EntityAddStringData(bullet, "Tag", "PlayerBullet");
+        EntityAddStringData(bullet, "Tag", "PlayerAccelerateBullet");
+        EntityAddFloatData(bullet, "ExtraSpeed", 1.0f + 4.0f * ratio);
+        EntityAddFloatData(bullet, "ExtraSpeedTimer", 300.0f);
         EntityAddCollisionCom(bullet, pos.x, pos.y, pos.z, 0.8f, 0.8f, 0.8f);
         EntitySetCollisionHandle(bullet, "EntityNormalBulletCollisionHandle");
-        EntitySetCollisionFilter(bullet, CollisionCom::PlayerBulletFilter, CollisionCom::EnemyFilter);
+        EntitySetCollisionFilter(bullet, CollisionCom::PlayerBulletFilter, CollisionCom::EnemyFilter | CollisionCom::ObstacleFilter);
+
+        curShootAccelerateBulletDelta = 0.0f;
     }
 
-    pack->SetFloat(curDelta);
+    if (canShootDeaccelerateBullet) {
+        // Create normal bullet
+        float ratio = curShootDeaccelerateBulletDelta / shootDelta;
+        ratio = max(0.0f, min(ratio, 1.0f));
+
+        int bullet = EntityCreate();
+        EntityAddTransformCom(bullet, pos.x, pos.y, pos.z, rot.x, rot.y, rot.z, 1.0f, 1.0f, 1.0f);
+        EntityAddRenderCom(bullet, "res/model/emitter/normal_bullet.obj", pos.x, pos.y, pos.z, rot.x, rot.y, rot.z, 1.0f, 1.0f, 1.0f, true, 512);
+        EntityAddScriptCom(bullet, "EntityNormalBulletUpdater");
+        EntityAddDataCom(bullet);
+        EntityAddFloatData(bullet, "Life", 3.0f * 60.0f);
+        EntityAddFloatData(bullet, "Speed", pyscript::PyScriptMgr::GetValueF("ENTITY_NORMAL_BULLET_MOVE_SPEED"));
+        EntityAddFloatData(bullet, "Damage", 1.0f);
+        EntityAddStringData(bullet, "Tag", "PlayerDeaccelerateBullet");
+        EntityAddFloatData(bullet, "ExtraSpeed", 1.0f - 0.99f * ratio);
+        EntityAddFloatData(bullet, "ExtraSpeedTimer", 300.0f);
+        EntityAddCollisionCom(bullet, pos.x, pos.y, pos.z, 0.8f, 0.8f, 0.8f);
+        EntitySetCollisionHandle(bullet, "EntityNormalBulletCollisionHandle");
+        EntitySetCollisionFilter(bullet, CollisionCom::PlayerBulletFilter, CollisionCom::EnemyFilter | CollisionCom::ObstacleFilter);
+
+        curShootDeaccelerateBulletDelta = 0.0f;
+    }
+
+    shootAccelerateBulletPack->SetFloat(curShootAccelerateBulletDelta);
+    shootDeaccelerateBulletPack->SetFloat(curShootDeaccelerateBulletDelta);
 }
 
 void EntityNormalBulletUpdater(Entity* entity) {

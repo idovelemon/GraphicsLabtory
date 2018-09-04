@@ -112,13 +112,15 @@ def ObstacleCreateSpike(x, y, z):
     EntityAddScriptCom(obstacle, "EntityObstacleSpikeUpdater")
     EntityAddCollisionCom(obstacle, x, y, z, 2.0, 2.0, 2.0)
     EntitySetCollisionHandle(obstacle, "EntityObstacleSpikeCollisionHandle")
-    EntitySetCollisionFilter(obstacle, ObstacleFilter, PlayerFilter)
+    EntitySetCollisionFilter(obstacle, ObstacleFilter, PlayerFilter | PlayerBulletFilter)
     EntityAddDataCom(obstacle)
     EntityAddStringData(obstacle, "State", "down")
     EntityAddFloatData(obstacle, "TotalTime", config.SPIKE_DOWN_TIME)
     EntityAddFloatData(obstacle, "CurTime", 0.0)
     EntityAddFloatData(obstacle, "StartY", -3.0)
     EntityAddFloatData(obstacle, "EndY", 0.0)
+    EntityAddFloatData(obstacle, "ExtraSpeed", 1.0)
+    EntityAddFloatData(obstacle, "ExtraSpeedTimer", 0.0)
 
 def ObstacleCreatePushRock(x, y, z, rx, ry, rz):
     obstacle = EntityCreate()
@@ -127,7 +129,7 @@ def ObstacleCreatePushRock(x, y, z, rx, ry, rz):
     EntityAddScriptCom(obstacle, "EntityObstaclePushRockUpdater")
     EntityAddCollisionCom(obstacle, x, y, z, 5.0, 2.0, 8.0)
     EntitySetCollisionHandle(obstacle, "EntityObstaclePushRockCollisionHandle")
-    EntitySetCollisionFilter(obstacle, ObstacleFilter, PlayerFilter)
+    EntitySetCollisionFilter(obstacle, ObstacleFilter, PlayerFilter | PlayerBulletFilter)
     EntityAddDataCom(obstacle)
     EntityAddStringData(obstacle, "State", "back")
     EntityAddFloatData(obstacle, "TotalTime", config.PUSHROCK_PUSH_TIME)
@@ -137,6 +139,8 @@ def ObstacleCreatePushRock(x, y, z, rx, ry, rz):
     EntityAddFloatData(obstacle, "OriX", x)
     EntityAddFloatData(obstacle, "OriY", y)
     EntityAddFloatData(obstacle, "OriZ", z)
+    EntityAddFloatData(obstacle, "ExtraSpeed", 1.0)
+    EntityAddFloatData(obstacle, "ExtraSpeedTimer", 0.0)
 
 def ObstacleCreateRotateRock(x, y, z):
     obstacle = EntityCreate()
@@ -145,7 +149,10 @@ def ObstacleCreateRotateRock(x, y, z):
     EntityAddScriptCom(obstacle, "EntityObstacleRotateRockUpdater")
     EntityAddCollisionCom(obstacle, x, y, z, 2.0, 2.0, 15.0)
     EntitySetCollisionHandle(obstacle, "EntityObstacleRotateRockCollisionHandle")
-    EntitySetCollisionFilter(obstacle, ObstacleFilter, PlayerFilter)
+    EntitySetCollisionFilter(obstacle, ObstacleFilter, PlayerFilter | PlayerBulletFilter)
+    EntityAddDataCom(obstacle)
+    EntityAddFloatData(obstacle, "ExtraSpeed", 1.0)
+    EntityAddFloatData(obstacle, "ExtraSpeedTimer", 0.0)
 
 def main():
     global LEVEL_COUNT
@@ -195,14 +202,15 @@ def main():
         EntityAddFloatData(coreRot, "CurRotateSpeed", config.ENTITY_CORE_ROT_ROTATE_MIN_SPEED)
 
         # Create Normal Emitter
-        # rightNormalEmitter = EntityCreate()
-        # EntityAddTransformCom(rightNormalEmitter, 1.8, 0.75, 0.0, 0.0, 90.0, 0.0, 1.0, 1.0, 1.0)
-        # EntityAddRelationshipCom(rightNormalEmitter)
-        # EntityBindRelationship(coreRot, rightNormalEmitter)
-        # EntityAddRenderCom(rightNormalEmitter, "res/model/emitter/normal_Emitter.obj", 1.8, 0.75, 0.0, 0.0, 90.0, 0.0, 1.0, 1.0, 1.0, True, 4)
-        # EntityAddScriptCom(rightNormalEmitter, "EntityNormalEmitterUpdater")
-        # EntityAddDataCom(rightNormalEmitter)
-        # EntityAddFloatData(rightNormalEmitter, "ShootDelta", 0.0)
+        rightNormalEmitter = EntityCreate()
+        EntityAddTransformCom(rightNormalEmitter, 1.8, 0.75, 0.0, 0.0, 90.0, 0.0, 1.0, 1.0, 1.0)
+        EntityAddRelationshipCom(rightNormalEmitter)
+        EntityBindRelationship(coreRot, rightNormalEmitter)
+        EntityAddRenderCom(rightNormalEmitter, "res/model/emitter/normal_Emitter.obj", 1.8, 0.75, 0.0, 0.0, 90.0, 0.0, 1.0, 1.0, 1.0, True, 4)
+        EntityAddScriptCom(rightNormalEmitter, "EntityNormalEmitterUpdater")
+        EntityAddDataCom(rightNormalEmitter)
+        EntityAddFloatData(rightNormalEmitter, "ShootAccelerateBulletDelta", 0.0)
+        EntityAddFloatData(rightNormalEmitter, "ShootDeaccelerateBulletDelta", 0.0)
 
     if LEVEL_COUNT == 2:
         ObstacleCreateSpike(0.0, 0.0, 0.0)
