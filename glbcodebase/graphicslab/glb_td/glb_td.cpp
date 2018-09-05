@@ -54,7 +54,7 @@ public:
         entity::EntityMgr::Initialize();
         td::GameTimer::Initialize();
 
-        pyscript::PyScriptMgr::LoadScript("level0");
+        pyscript::PyScriptMgr::LoadScript("level1");
 
         return true;
     }
@@ -64,7 +64,7 @@ public:
         time.BeginProfile();
 
         glb::Input::Update();
-        pyscript::PyScriptMgr::RunScript("level0");
+        pyscript::PyScriptMgr::RunScript("level1");
 
         // Update entity
         dynamic::DynamicWorld::Update();
