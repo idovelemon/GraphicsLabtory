@@ -90,6 +90,7 @@ class Matrix {
     // @brief: Inverse the matrix and save result
     //----------------------------------------------------------------------
     inline void Inverse();
+    inline static Matrix Inverse(const Matrix& m);
 
     //----------------------------------------------------------------------
     // @brief: Override operator

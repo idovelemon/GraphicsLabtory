@@ -12,6 +12,7 @@
 #include <vector>
 
 #include "glblight.h"
+#include "../math/glbmath.h"
 
 namespace glb {
 
@@ -74,6 +75,7 @@ public:
     static void SetCurCamera(int32_t type);
     static int32_t GetCurCameraType();
     static CameraBase* GetCurCamera();
+    static math::Matrix GetViewMatrix(int32_t type);
 
     // Debug Draw
     static void AddBoundBox(math::Vector color);

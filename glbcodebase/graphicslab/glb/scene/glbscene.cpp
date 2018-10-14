@@ -69,6 +69,7 @@ public:
     void SetCurCamera(int32_t type);
     int32_t GetCurCameraType();
     CameraBase* GetCurCamera();
+    math::Matrix GetViewMatrix(int32_t type);
 
     // Debug Draw
     void AddBoundBox(math::Vector color);
@@ -402,6 +403,16 @@ CameraBase* SceneImp::GetCurCamera() {
     return m_Camera[m_CurCameraType];
 }
 
+math::Matrix SceneImp::GetViewMatrix(int32_t type) {
+    math::Matrix mat = math::Matrix::CreateIdentityMatrix();
+
+    if (m_Camera[type]) {
+        mat = m_Camera[type]->GetViewMatrix();
+    }
+
+    return mat;
+}
+
 void SceneImp::AddBoundBox(math::Vector color) {
     math::Vector view_space_points[8];
     view_space_points[render::Render::NLU] = math::Vector(m_BoundBoxMin.x, m_BoundBoxMax.y, m_BoundBoxMax.z);
@@ -676,6 +687,18 @@ CameraBase* Scene::GetCurCamera() {
     }
 
     return cam;
+}
+
+math::Matrix Scene::GetViewMatrix(int32_t type) {
+    math::Matrix mat = math::Matrix::CreateIdentityMatrix();
+
+    if (s_SceneImp != NULL) {
+        mat = s_SceneImp->GetViewMatrix(type);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return mat;
 }
 
 void Scene::AddBoundBox(math::Vector color) {

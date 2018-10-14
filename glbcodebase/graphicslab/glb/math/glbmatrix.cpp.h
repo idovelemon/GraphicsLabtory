@@ -500,6 +500,53 @@ void Matrix::Inverse() {
     m_Matrix.m[0][3] = det30*Invdet;m_Matrix.m[1][3] = det31*Invdet;m_Matrix.m[2][3] = det32*Invdet;m_Matrix.m[3][3] = det33*Invdet;
 }
 
+Matrix Matrix::Inverse(const Matrix& m) {
+    float m00 = m.m_Matrix.m[0][0],m01 = m.m_Matrix.m[0][1],m02 = m.m_Matrix.m[0][2],m03 = m.m_Matrix.m[0][3];
+    float m10 = m.m_Matrix.m[1][0],m11 = m.m_Matrix.m[1][1],m12 = m.m_Matrix.m[1][2],m13 = m.m_Matrix.m[1][3];
+    float m20 = m.m_Matrix.m[2][0],m21 = m.m_Matrix.m[2][1],m22 = m.m_Matrix.m[2][2],m23 = m.m_Matrix.m[2][3];
+    float m30 = m.m_Matrix.m[3][0],m31 = m.m_Matrix.m[3][1],m32 = m.m_Matrix.m[3][2],m33 = m.m_Matrix.m[3][3];
+
+    float det = 0.f;
+    float det00,det01,det02,det03;
+    det00 = m11*(m22*m33-m32*m23)-m12*(m21*m33-m31*m23)+m13*(m21*m32-m31*m22);
+    det01 = m10*(m22*m33-m32*m23)-m12*(m20*m33-m30*m23)+m13*(m20*m32-m30*m22);
+    det02 = m10*(m21*m33-m31*m23)-m11*(m20*m33-m30*m23)+m13*(m20*m31-m30*m21);
+    det03 = m10*(m21*m32-m31*m22)-m11*(m20*m32-m30*m22)+m12*(m20*m31-m30*m21);
+
+    det = m00*det00-m01*det01+m02*det02-m03*det03;
+    float Invdet = 1.f/det;
+    det01*=-1;det03*=-1;
+
+    float det10,det11,det12,det13;
+    det10 = m01*(m22*m33-m32*m23)-m02*(m21*m33-m31*m23)+m03*(m21*m32-m31*m22);
+    det11 = m00*(m22*m33-m32*m23)-m02*(m20*m33-m30*m23)+m03*(m20*m32-m30*m22);
+    det12 = m00*(m21*m33-m31*m23)-m01*(m20*m33-m30*m23)+m03*(m20*m31-m30*m21);
+    det13 = m00*(m21*m32-m31*m22)-m01*(m20*m32-m30*m22)+m02*(m20*m31-m30*m21);
+    det10*=-1;det12*=-1;
+
+    float det20,det21,det22,det23;
+    det20 = m01*(m12*m33-m32*m13)-m02*(m11*m33-m31*m13)+m03*(m11*m32-m31*m12);
+    det21 = m00*(m12*m33-m32*m13)-m02*(m10*m33-m30*m13)+m03*(m10*m32-m30*m12);
+    det22 = m00*(m11*m33-m31*m13)-m01*(m10*m33-m30*m13)+m03*(m10*m31-m30*m11);
+    det23 = m00*(m11*m32-m31*m12)-m01*(m10*m32-m30*m12)+m02*(m10*m31-m30*m11);
+    det21*=-1;det23*=-1;
+
+    float det30,det31,det32,det33;
+    det30 = m01*(m12*m23-m22*m13)-m02*(m11*m23-m21*m13)+m03*(m11*m22-m21*m12);
+    det31 = m00*(m12*m23-m22*m13)-m02*(m10*m23-m20*m13)+m03*(m10*m22-m20*m12);
+    det32 = m00*(m11*m23-m21*m13)-m01*(m10*m23-m20*m13)+m03*(m10*m21-m20*m11);
+    det33 = m00*(m11*m22-m21*m12)-m01*(m10*m22-m20*m12)+m02*(m10*m21-m20*m11);
+    det30*=-1;det32*=-1;
+
+    Matrix result;
+    result.m_Matrix.m[0][0] = det00*Invdet;result.m_Matrix.m[1][0] = det01*Invdet;result.m_Matrix.m[2][0] = det02*Invdet;result.m_Matrix.m[3][0] = det03*Invdet;
+    result.m_Matrix.m[0][1] = det10*Invdet;result.m_Matrix.m[1][1] = det11*Invdet;result.m_Matrix.m[2][1] = det12*Invdet;result.m_Matrix.m[3][1] = det13*Invdet;
+    result.m_Matrix.m[0][2] = det20*Invdet;result.m_Matrix.m[1][2] = det21*Invdet;result.m_Matrix.m[2][2] = det22*Invdet;result.m_Matrix.m[3][2] = det23*Invdet;
+    result.m_Matrix.m[0][3] = det30*Invdet;result.m_Matrix.m[1][3] = det31*Invdet;result.m_Matrix.m[2][3] = det32*Invdet;result.m_Matrix.m[3][3] = det33*Invdet;
+
+    return result;
+}
+
 const Vector Matrix::operator*(const Vector& v) {
     Vector result(0.0f, 0.0f, 0.0f);
     result.x = m_Matrix.m[0][0] * v.x + m_Matrix.m[0][1] * v.y + m_Matrix.m[0][2] * v.z + m_Matrix.m[0][3] * v.w;
