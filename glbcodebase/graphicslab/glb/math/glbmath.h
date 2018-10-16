@@ -15,6 +15,31 @@ namespace glb {
 namespace math {
 
 //--------------------------------------------------------------------------------
+// @brief: Using lerp to smooth value
+// @param: s The start value
+// @param: e The end value
+// @param: r The smooth ratio
+// @return: The value after smooth
+//--------------------------------------------------------------------------------
+template<typename T>
+T LerpSmooth(T s, T e, float r) {
+    return s + (e - s) * r;
+}
+
+//--------------------------------------------------------------------------------
+// @brief: Using sin curve to smooth value
+// @param: s The start value
+// @param: e The end value
+// @param: r The smooth ratio
+// @return: The value after smooth
+//--------------------------------------------------------------------------------
+template<typename T>
+T SinSmooth(T s, T e, float r) {
+    static const float kPI = 3.1415926f;
+    return s + (e - s) * sin(kPI / 2 * r);
+}
+
+//--------------------------------------------------------------------------------
 // @brief: Calculate pick ray from normalized screen position (range from 0.0 to 1.0)
 // @param: x The normalized screen position x
 // @param: y The normalized screen position y
