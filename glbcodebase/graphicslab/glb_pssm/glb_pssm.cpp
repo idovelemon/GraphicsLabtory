@@ -53,7 +53,7 @@ public:
         obj->SetCullFaceEnable(true);
         obj->SetCullFaceMode(render::CULL_BACK);
         obj->SetDepthTestEnable(true);
-        obj->SetPos(math::Vector(0.0f, -1.0f, 0.0f));
+        obj->SetWorldMatrix(math::Matrix::CreateTranslateMatrix(0.0f, -1.0f, 0.0f));
 
         int32_t num = 4;
         for (int32_t i = 0; i < num; i++) {
@@ -64,7 +64,7 @@ public:
                 obj->SetCullFaceEnable(true);
                 obj->SetCullFaceMode(render::CULL_BACK);
                 obj->SetDepthTestEnable(true);
-                obj->SetPos(math::Vector(0.0f - (j - num/2) * 20.0f, 0.0f, 0.0f - (i - num/2) * 20.0f));
+                obj->SetWorldMatrix(math::Matrix::CreateTranslateMatrix(0.0f - (j - num/2) * 20.0f, 0.0f, 0.0f - (i - num/2) * 20.0f));
             }
         }
 
