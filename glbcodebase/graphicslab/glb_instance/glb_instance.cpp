@@ -48,8 +48,13 @@ public:
         glb::scene::Scene::GetObjectById(level)->SetCullFaceEnable(true);
         glb::scene::Scene::GetObjectById(level)->SetCullFaceMode(glb::render::CULL_BACK);
         glb::scene::Scene::GetObjectById(level)->SetDepthTestEnable(true);
-        glb::scene::Scene::GetObjectById(level)->SetPos(math::Vector(0.0f, -80.0f, 0.0f));
-        glb::scene::Scene::GetObjectById(level)->SetScale(math::Vector(100.0f, 100.0f, 100.0f));
+
+        glb::math::Matrix mat;
+        mat.MakeScaleMatrix(100.0f, 100.0f, 100.0f);
+        mat.Translate(0.0f, -80.0f, 0.0f);
+        glb::scene::Scene::GetObjectById(level)->SetWorldMatrix(mat);
+        //glb::scene::Scene::GetObjectById(level)->SetPos(math::Vector(0.0f, -80.0f, 0.0f));
+        //glb::scene::Scene::GetObjectById(level)->SetScale(math::Vector(100.0f, 100.0f, 100.0f));
 
 #if ENABLE_INSTANCE_RENDERING
         {  // Using Geometry Instance Rendering
@@ -61,7 +66,7 @@ public:
             for (int32_t i = 0; i < kInstanceNum; i++) {
                 for (int32_t j = 0; j < kInstanceNum; j++) {
                     int32_t instance = glb::scene::Scene::AddInstanceObject(cube);
-                    glb::scene::Scene::GetObjectById(instance)->SetPos(math::Vector((i - (kInstanceNum - 1)/2) * -180.0f, 0.0f, (j - (kInstanceNum - 1)/2) * -180.0f));
+                    glb::scene::Scene::GetObjectById(instance)->SetWorldMatrix(math::Matrix::CreateTranslateMatrix((i - (kInstanceNum - 1)/2) * -180.0f, 0.0f, (j - (kInstanceNum - 1)/2) * -180.0f));
                     m_Instances.push_back(instance);
                 }
             }
@@ -74,7 +79,7 @@ public:
                     glb::scene::Scene::GetObjectById(cube)->SetCullFaceEnable(true);
                     glb::scene::Scene::GetObjectById(cube)->SetCullFaceMode(glb::render::CULL_BACK);
                     glb::scene::Scene::GetObjectById(cube)->SetDepthTestEnable(true);
-                    glb::scene::Scene::GetObjectById(cube)->SetPos(math::Vector((i - (kInstanceNum - 1)/2) * -180.0f, 0.0f, (j - (kInstanceNum - 1)/2) * -180.0f));
+                    glb::scene::Scene::GetObjectById(instance)->SetWorldMatrix(math::Matrix::CreateTranslateMatrix((i - (kInstanceNum - 1)/2) * -180.0f, 0.0f, (j - (kInstanceNum - 1)/2) * -180.0f));
                     m_Instances.push_back(cube);
                 }
             }
@@ -94,7 +99,13 @@ public:
         static float rotate = 0.0f;
         rotate = rotate + 1.0f;
         for (int32_t i = 0; i < m_Instances.size(); i++) {
-            glb::scene::Scene::GetObjectById(m_Instances[i])->SetRotation(math::Vector(rotate + i * 10.0f, rotate + i * 10.0f, rotate + i * 10.0f));
+            math::Vector pos = glb::scene::Scene::GetObjectById(m_Instances[i])->GetWorldMatrix().GetTranslation();
+            math::Vector scale = glb::scene::Scene::GetObjectById(m_Instances[i])->GetWorldMatrix().GetScale();
+            math::Matrix mat;
+            mat.MakeScaleMatrix(scale.x, scale.y, scale.z);
+            mat.RotateXYZ(rotate + i * 10.0f, rotate + i * 10.0f, rotate + i * 10.0f);
+            mat.Translate(pos.x, pos.y, pos.z);
+            glb::scene::Scene::GetObjectById(m_Instances[i])->SetWorldMatrix(mat);
         }
 
         math::Vector pos = glb::scene::Scene::GetCurCamera()->GetPos();
