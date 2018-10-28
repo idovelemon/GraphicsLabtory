@@ -45,7 +45,7 @@ public:
         scene::Scene::GetObjectById(cube)->SetCullFaceEnable(true);
         scene::Scene::GetObjectById(cube)->SetCullFaceMode(glb::render::CULL_BACK);
         scene::Scene::GetObjectById(cube)->SetDepthTestEnable(true);
-        scene::Scene::GetObjectById(cube)->SetPos(math::Vector(0.0f, 0.0f, 0.0f));
+        scene::Scene::GetObjectById(cube)->SetWorldMatrix(math::Matrix::CreateIdentityMatrix());
         m_Cube = cube;
 
         return true;
@@ -66,9 +66,9 @@ public:
         glb::scene::Scene::SetLight(lit, 1);
 
         // Randomly Rotate the sphere
-        math::Vector rot_v = glb::scene::Scene::GetObjectById(m_Cube)->GetRotation();
-        rot_v += math::Vector(0.5f, 0.5f, 0.5f);
-        glb::scene::Scene::GetObjectById(m_Cube)->SetRotation(rot_v);
+        static float sRot = 0.0f;
+        sRot = sRot + 0.5f;
+        glb::scene::Scene::GetObjectById(m_Cube)->SetWorldMatrix(math::Matrix::CreateRotateXYZMatrix(sRot, sRot, sRot));
 
         glb::scene::Scene::Update();
 
@@ -103,6 +103,8 @@ int _stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPreInstance, LPSTR cmdLine,
     config.screen_height = 600;
     config.shadow_map_width = 1024;
     config.shadow_map_height = 1024;
+    config.decalMapWidth = 1024;
+    config.decalMapHeight = 1024;
     config.icon = IDI_ICON1;
     if (!glb::app::Application::Initialize(ApplicationNormalMap::Create, hInstance, config)) {
         return 0;
