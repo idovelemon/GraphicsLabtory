@@ -353,7 +353,7 @@ public:
         scene::Scene::GetObjectById(floor)->SetCullFaceEnable(true);
         scene::Scene::GetObjectById(floor)->SetCullFaceMode(glb::render::CULL_BACK);
         scene::Scene::GetObjectById(floor)->SetDepthTestEnable(true);
-        scene::Scene::GetObjectById(floor)->SetPos(math::Vector(0.0, 0.0, 0.0));
+        scene::Scene::GetObjectById(floor)->SetWorldMatrix(math::Matrix::CreateIdentityMatrix());
 
         auto RandRange = [](int min, int max) {
             return min + rand() % (max - min);
@@ -364,7 +364,7 @@ public:
             scene::Scene::GetObjectById(decal)->SetCullFaceEnable(false);
             scene::Scene::GetObjectById(decal)->SetCullFaceMode(glb::render::CULL_FRONT);
             scene::Scene::GetObjectById(decal)->SetDepthTestEnable(true);
-            scene::Scene::GetObjectById(decal)->SetPos(math::Vector(1.0f * RandRange(-20, 20), 2.1f, 1.0f * RandRange(-20, 20)));
+            scene::Scene::GetObjectById(decal)->SetWorldMatrix(math::Matrix::CreateTranslateMatrix(1.0f * RandRange(-20, 20), 2.1f, 1.0f * RandRange(-20, 20)));
         }
 
         return true;
