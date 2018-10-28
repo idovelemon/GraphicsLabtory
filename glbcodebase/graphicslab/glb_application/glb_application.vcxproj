@@ -187,6 +187,7 @@
     <ClCompile Include="..\glb\scene\glbmodelfile.cpp" />
     <ClCompile Include="..\glb\scene\glbobject.cpp" />
     <ClCompile Include="..\glb\scene\glbscene.cpp" />
+    <ClCompile Include="..\glb\thirdparty\rgbe\rgbe.cpp" />
     <ClCompile Include="..\glb\util\glblog.cpp" />
     <ClCompile Include="..\glb\util\glbprofile.cpp" />
     <ClCompile Include="..\glb\util\glbtexturereader.cpp" />
@@ -228,6 +229,7 @@
     <ClInclude Include="..\glb\scene\glbmodelfile.h" />
     <ClInclude Include="..\glb\scene\glbobject.h" />
     <ClInclude Include="..\glb\scene\glbscene.h" />
+    <ClInclude Include="..\glb\thirdparty\rgbe\rgbe.h" />
     <ClInclude Include="..\glb\thirdparty\stb_image\std_image.h" />
     <ClInclude Include="..\glb\util\glbddsformat.h" />
     <ClInclude Include="..\glb\util\glblog.h" />
@@ -250,6 +252,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\glb\math\glbvector.inl" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\glb\thirdparty\rgbe\rgbe.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
