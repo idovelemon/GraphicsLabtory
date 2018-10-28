@@ -199,6 +199,12 @@ Matrix Matrix::CreateRotateMatrix(Vector x_axis, Vector y_axis, Vector z_axis) {
     return mat;
 }
 
+Matrix Matrix::CreateRotateMatrix(Vector a, Vector b) {
+    Matrix mat;
+    mat.MakeRotateMatrix(a, b);
+    return mat;
+}
+
 void Matrix::MakeRotateMatrix(Vector x_axis, Vector y_axis, Vector z_axis) {
     this->m_Matrix.m[0][0] = x_axis.x;
     this->m_Matrix.m[1][0] = x_axis.y;
@@ -219,6 +225,19 @@ void Matrix::MakeRotateMatrix(Vector x_axis, Vector y_axis, Vector z_axis) {
     this->m_Matrix.m[1][3] = 0.0f;
     this->m_Matrix.m[2][3] = 0.0f;
     this->m_Matrix.m[3][3] = 1.0f;
+}
+
+void Matrix::MakeRotateMatrix(Vector a, Vector b) {
+    float aDotB = Dot(a, b);
+
+    if (abs(aDotB) >= 1.0f) {
+        MakeIdentityMatrix();
+    } else {
+        Vector c = Cross(a, b);
+        c.Normalize();
+        float degree = -acos(aDotB) / 3.1415926f * 180.0f;
+        MakeRotateAxisMatrix(c, degree);
+    }
 }
 
 void Matrix::MakeProjectionMatrix(float aspect, float fov, float znear, float zfar) {
@@ -422,6 +441,17 @@ void Matrix::RotateAxis(Vector axis, float rotate_degree) {
     rotate_axis.MakeRotateAxisMatrix(axis, rotate_degree);
     rotate_axis.Mul(*this);
     *this = rotate_axis;
+}
+
+Vector Matrix::GetScale() {
+    Vector l0 = Vector(m_Matrix.m[0][0], m_Matrix.m[1][0], m_Matrix.m[2][0]);
+    Vector l1 = Vector(m_Matrix.m[0][1], m_Matrix.m[1][1], m_Matrix.m[2][1]);
+    Vector l2 = Vector(m_Matrix.m[0][2], m_Matrix.m[1][2], m_Matrix.m[2][2]);
+    return Vector(l0.Length(), l1.Length(), l2.Length());
+}
+
+Vector Matrix::GetTranslation() {
+    return Vector(m_Matrix.m[0][3], m_Matrix.m[1][3], m_Matrix.m[2][3]);
 }
 
 void Matrix::Translate(float tx, float ty, float tz) {

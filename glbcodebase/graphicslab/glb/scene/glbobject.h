@@ -64,19 +64,13 @@ public:
     virtual void SetDead(bool dead);
     virtual bool IsDead() const;
 
-    virtual void SetPos(math::Vector pos);
-    virtual math::Vector GetPos() const;
-
-    virtual void SetScale(math::Vector scale);
-    virtual math::Vector GetScale() const;
-
-    virtual void SetRotation(math::Vector rotation);
-    virtual math::Vector GetRotation() const;
-
     virtual math::Vector GetBoundBoxMax();
     virtual math::Vector GetBoundBoxMin();
 
+    virtual math::Vector GetPos();
+    virtual math::Vector GetScale();
     virtual math::Matrix GetWorldMatrix() const;
+    virtual void SetWorldMatrix(math::Matrix worldMatrix);
 
     virtual Model* GetModel();
     virtual render::shader::Descriptor GetShaderDesc();
@@ -110,9 +104,6 @@ protected:
     int32_t                         m_ObjectId;
     bool                            m_IsDead;
     Model*                          m_Model;
-    math::Vector                    m_Pos;
-    math::Vector                    m_Scale;
-    math::Vector                    m_Rotation;
     math::Matrix                    m_WorldMatrix;
     render::shader::Descriptor      m_ShaderDesc;
 

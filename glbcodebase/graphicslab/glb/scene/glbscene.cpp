@@ -132,7 +132,7 @@ void SceneImp::Update() {
     }
 
     if (m_SkyObject != NULL && m_Camera[PRIMIAY_CAM] != NULL) {
-        m_SkyObject->SetPos(m_Camera[PRIMIAY_CAM]->GetPos());
+        //m_SkyObject->SetPos(m_Camera[PRIMIAY_CAM]->GetPos()); // TODO
         m_SkyObject->Update();
     }
 

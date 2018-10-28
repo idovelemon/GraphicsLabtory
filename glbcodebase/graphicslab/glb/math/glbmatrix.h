@@ -39,6 +39,7 @@ class Matrix {
     inline void MakeIdentityMatrix();
     inline void MakeRotateAxisMatrix(Vector axis, float rotate_degree);
     inline void MakeRotateMatrix(Vector x_axis, Vector y_axis, Vector z_axis);
+    inline void MakeRotateMatrix(Vector a, Vector b);
     inline static Matrix CreateScaleMatrix(float sx, float sy, float sz);
     inline static Matrix CreateTranslateMatrix(float tx, float ty, float tz);
     inline static Matrix CreateRotateXMatrix(float rotate_degree);
@@ -49,6 +50,7 @@ class Matrix {
     inline static Matrix CreateIdentityMatrix();
     inline static Matrix CreateRotateAxisMatrix(Vector axis, float rotate_degree);
 	inline static Matrix CreateRotateMatrix(Vector x_axis, Vector y_axis, Vector z_axis);
+    inline static Matrix CreateRotateMatrix(Vector a, Vector b);
 
     //----------------------------------------------------------------------
     // @brief: Build projection and view matrix
@@ -75,6 +77,8 @@ class Matrix {
     inline void RotateXYZ(float rx, float ry, float rz);
     inline void RotateZXY(float rx, float ry, float rz);
     inline void RotateAxis(Vector axis, float rotate_degree);
+    inline Vector GetScale();
+    inline Vector GetTranslation();
 
     //----------------------------------------------------------------------
     // @brief: Multiply a matrix and save result

@@ -23,9 +23,6 @@ Object::Object()
 , m_IsDead(false)
 , m_ObjectId(-1)
 , m_Model(NULL)
-, m_Pos(0.0f, 0.0f, 0.0f)
-, m_Scale(0.0f, 0.0f, 0.0f)
-, m_Rotation(0.0f, 0.0f, 0.0f)
 , m_WorldMatrix()
 , m_EnableDraw(true)
 , m_EnableCullFace(false)
@@ -51,9 +48,6 @@ Object* Object::Create(const char* file_name, math::Vector pos, math::Vector sca
             obj = new Object();
             if (obj) {
                 obj->m_Model = model;
-                obj->m_Pos = pos;
-                obj->m_Scale = scale;
-                obj->m_Rotation = rotation;
                 obj->m_WorldMatrix.MakeIdentityMatrix();
                 obj->m_ShaderDesc = obj->CalculateShaderDesc();
             } else {
@@ -77,9 +71,6 @@ Object* Object::Create(scene::Model* model, math::Vector pos, math::Vector scale
         if (obj) {
             ModelMgr::AddModel(model);
             obj->m_Model = model;
-            obj->m_Pos = pos;
-            obj->m_Scale = scale;
-            obj->m_Rotation = rotation;
             obj->m_WorldMatrix.MakeIdentityMatrix();
             obj->m_ShaderDesc = obj->CalculateShaderDesc();
         } else {
@@ -112,46 +103,34 @@ bool Object::IsDead() const {
     return m_IsDead;
 }
 
-void Object::SetPos(math::Vector pos) {
-    m_Pos = pos;
-}
-
-math::Vector Object::GetPos() const {
-    return m_Pos;
-}
-
-void Object::SetScale(math::Vector scale) {
-    m_Scale = scale;
-}
-
-math::Vector Object::GetScale() const {
-    return m_Scale;
-}
-
-void Object::SetRotation(math::Vector rotation) {
-    m_Rotation = rotation;
-}
-
-math::Vector Object::GetRotation() const {
-    return m_Rotation;
-}
-
 math::Vector Object::GetBoundBoxMax() {
     math::Vector boundbox_max = m_Model->GetBoundBoxMax();
-    boundbox_max = boundbox_max * m_Scale;
-    boundbox_max += m_Pos;
+    boundbox_max = boundbox_max * m_WorldMatrix.GetScale();
+    boundbox_max += m_WorldMatrix.GetTranslation();
     return boundbox_max;
 }
 
 math::Vector Object::GetBoundBoxMin() {
     math::Vector boundbox_min = m_Model->GetBoundBoxMin();
-    boundbox_min = boundbox_min * m_Scale;
-    boundbox_min += m_Pos;
+    boundbox_min = boundbox_min * m_WorldMatrix.GetScale();
+    boundbox_min += m_WorldMatrix.GetTranslation();
     return boundbox_min;
+}
+
+math::Vector Object::GetPos() {
+    return m_WorldMatrix.GetTranslation();
+}
+
+math::Vector Object::GetScale() {
+    return m_WorldMatrix.GetScale();
 }
 
 math::Matrix Object::GetWorldMatrix() const {
     return m_WorldMatrix;
+}
+
+void Object::SetWorldMatrix(math::Matrix worldMatrix) {
+    m_WorldMatrix = worldMatrix;
 }
 
 Model* Object::GetModel() {
@@ -284,14 +263,6 @@ int32_t Object::GetTexId(int32_t slot) {
 }
 
 void Object::Update() {
-    // Build world transform matrix
-    m_WorldMatrix.MakeIdentityMatrix();
-    m_WorldMatrix.Scale(m_Scale.x, m_Scale.y, m_Scale.z);
-
-    // Build rotation matrix in xyz-order
-    m_WorldMatrix.RotateXYZ(m_Rotation.x, m_Rotation.y, m_Rotation.z);
-
-    m_WorldMatrix.Translate(m_Pos.x, m_Pos.y, m_Pos.z);
 }
 
 render::shader::Descriptor Object::CalculateShaderDesc() {
@@ -396,9 +367,6 @@ DecalObject* DecalObject::Create(const char* decalObjectFile, math::Vector pos, 
             obj = new DecalObject();
             if (obj) {
                 obj->m_Model = model;
-                obj->m_Pos = pos;
-                obj->m_Scale = scale;
-                obj->m_Rotation = rotation;
                 obj->m_WorldMatrix.MakeIdentityMatrix();
                 obj->m_ShaderDesc = obj->CalculateShaderDesc();
             } else {
@@ -447,23 +415,10 @@ void InstanceRenderObject::Update() {
 
     std::vector<math::Matrix> matV;
     for (int32_t i = 0; i < m_CurInstanceNum; i++) {
-        math::Vector pos = it->second->GetPos();
-        math::Vector scale = it->second->GetScale();
-        math::Vector rotate = it->second->GetRotation();
-
         // Build world transform matrix
         math::Matrix worldMatrix;
         worldMatrix.MakeIdentityMatrix();
-
-        // Scale
-        worldMatrix.Scale(scale.x, scale.y, scale.z);
-
-        // Rotate
-        worldMatrix.RotateXYZ(rotate.x, rotate.y, rotate.z);
-
-        // Translate
-        worldMatrix.Translate(pos.x, pos.y, pos.z);
-
+        worldMatrix = it->second->GetWorldMatrix();
 
         matV.push_back(worldMatrix);
         it++;
@@ -536,9 +491,6 @@ InstanceObject* InstanceObject::Create(InstanceRenderObject* instanceRenderObjec
     if (instanceRenderObject != NULL) {
         obj = new InstanceObject();
         obj->m_InstanceRenderObject = instanceRenderObject;
-        obj->m_Pos = pos;
-        obj->m_Scale = scale;
-        obj->m_Rotation = rotate;
     } else {
         GLB_SAFE_ASSERT(false);
     }
@@ -551,7 +503,7 @@ math::Vector InstanceObject::GetBoundBoxMax() {
 
     if (m_InstanceRenderObject) {
         boxMax = m_InstanceRenderObject->GetModel()->GetBoundBoxMax();
-        boxMax = boxMax + m_Pos;
+        boxMax = boxMax + m_WorldMatrix.GetTranslation();
     }
 
     return boxMax;
@@ -562,7 +514,7 @@ math::Vector InstanceObject::GetBoundBoxMin() {
 
     if (m_InstanceRenderObject) {
         boxMin = m_InstanceRenderObject->GetModel()->GetBoundBoxMin();
-        boxMin = boxMin + m_Pos;
+        boxMin = boxMin + m_WorldMatrix.GetTranslation();
     }
 
     return boxMin;
