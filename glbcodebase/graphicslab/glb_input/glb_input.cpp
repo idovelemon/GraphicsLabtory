@@ -30,51 +30,23 @@ public:
         scene::Scene::SetCamera(scene::SECONDARY_CAM, cam);
 
         // Light
-        scene::Light light(scene::PARALLEL_LIGHT);
-        light.ambient = math::Vector(1.0f, 1.0f, 1.0f);
-        light.diffuse = math::Vector(2.0f, 2.0f, 2.0f);
-        light.specular = math::Vector(1.0f, 1.0f, 1.0f);
+        scene::Light light;
+        light.type = scene::AMBIENT_LIGHT;
+        light.color = math::Vector(0.4f, 0.4f, 0.4f);
+        scene::Scene::SetLight(light, 0);
+
+        light.type = scene::PARALLEL_LIGHT;
+        light.color = math::Vector(2.0f, 2.0f, 2.0f);
         light.dir = math::Vector(-1.0f, -1.0f, 0.0f);
         light.dir.Normalize();
-        light.pow = 128.0f;
-        scene::Scene::SetLight(light, 0);
+        scene::Scene::SetLight(light, 1);
 
         // Perspective
         render::Render::SetPerspective(render::Render::PRIMARY_PERS, 69.0f, 800 * 1.0f / 600, 0.1f, 100.0f);
         render::Render::SetPerspective(render::Render::SECONDARY_PERS, 69.0f, 800 * 1.0f / 600, 0.1f, 10000.0f);
 
         // HDR
-        render::Render::SetExposureLevel(1.0f);
-        render::Render::SetLightAdaption(0.1f);
         render::Render::SetHighLightBase(0.95f);
-
-        // Add ground
-        int32_t ground = scene::Scene::AddObject("res/ground.obj");
-        scene::Object* obj = scene::Scene::GetObjectById(ground);
-        obj->SetCullFaceEnable(true);
-        obj->SetCullFaceMode(render::CULL_BACK);
-        obj->SetDepthTestEnable(true);
-        obj->SetPos(math::Vector(0.0f, -1.0f, 0.0f));
-
-        int32_t num = 4;
-        for (int32_t i = 0; i < num; i++) {
-            for (int32_t j = 0; j < num; j++) {
-                // Add object
-                int32_t tree_header = scene::Scene::AddObject("res/tree_header.obj");
-                scene::Object* obj = scene::Scene::GetObjectById(tree_header);
-                obj->SetCullFaceEnable(true);
-                obj->SetCullFaceMode(render::CULL_BACK);
-                obj->SetDepthTestEnable(true);
-                obj->SetPos(math::Vector(0.0f - (j - num/2) * 20.0f, 5.0f, 0.0f - (i - num/2) * 20.0f));
-
-                int32_t tree_trunk = scene::Scene::AddObject("res/tree_trunk.obj");
-                obj = scene::Scene::GetObjectById(tree_trunk);
-                obj->SetCullFaceEnable(true);
-                obj->SetCullFaceMode(render::CULL_BACK);
-                obj->SetDepthTestEnable(true);
-                obj->SetPos(math::Vector(0.0f - (j - num/2) * 20.0f, 0.0f, 0.0f - (i - num/2) * 20.0f));
-            }
-        }
 
         return true;
     }
@@ -139,6 +111,8 @@ int _stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPreInstance, LPSTR cmdLine,
     config.screen_height = 600;
     config.shadow_map_width = 2048;
     config.shadow_map_height = 2048;
+    config.decalMapWidth = 1024;
+    config.decalMapHeight = 1024;
     config.icon = IDI_ICON1;
     if (!glb::app::Application::Initialize(ApplicationInput::Create, hInstance, config)) {
         return 0;

@@ -24,21 +24,22 @@ public:
         glb::scene::Scene::SetCamera(glb::scene::PRIMIAY_CAM, cam);
 
         // Light
-        scene::Light light(scene::PARALLEL_LIGHT);
-        light.ambient = math::Vector(0.2f, 0.2f, 0.2f);
-        light.diffuse = math::Vector(0.8f, 0.8f, 0.8f);
-        light.specular = math::Vector(1.0f, 1.0f, 1.0f);
-        light.dir = math::Vector(-1.0f, -1.0f, 1.0f);
+        // Light
+        scene::Light light;
+        light.type = scene::AMBIENT_LIGHT;
+        light.color = math::Vector(0.4f, 0.4f, 0.4f);
+        scene::Scene::SetLight(light, 0);
+
+        light.type = scene::PARALLEL_LIGHT;
+        light.color = math::Vector(2.0f, 2.0f, 2.0f);
+        light.dir = math::Vector(-1.0f, -1.0f, 0.0f);
         light.dir.Normalize();
-        light.pow = 128.0f;
-        glb::scene::Scene::SetLight(light, 0);
+        scene::Scene::SetLight(light, 1);
 
         // Perspective
         glb::render::Render::SetPerspective(glb::render::Render::PRIMARY_PERS, 69.0f, 800 * 1.0f / 600, 0.1f, 500.0f);
 
         // HDR
-        glb::render::Render::SetExposureLevel(0.7f);
-        glb::render::Render::SetLightAdaption(0.04f);
 
         glb::scene::Scene::AddSkyObject("sky.obj");
 
@@ -46,19 +47,19 @@ public:
         glb::scene::Scene::GetObjectById(floor)->SetCullFaceEnable(true);
         glb::scene::Scene::GetObjectById(floor)->SetCullFaceMode(glb::render::CULL_BACK);
         glb::scene::Scene::GetObjectById(floor)->SetDepthTestEnable(true);
-        glb::scene::Scene::GetObjectById(floor)->SetPos(math::Vector(0.0, 0.0, 0.0));
+        glb::scene::Scene::GetObjectById(floor)->SetWorldMatrix(math::Matrix::CreateTranslateMatrix(0.0, 0.0, 0.0));
 
         int32_t cube = glb::scene::Scene::AddObject("cube.obj");
         glb::scene::Scene::GetObjectById(cube)->SetCullFaceEnable(true);
         glb::scene::Scene::GetObjectById(cube)->SetCullFaceMode(glb::render::CULL_BACK);
         glb::scene::Scene::GetObjectById(cube)->SetDepthTestEnable(true);
-        glb::scene::Scene::GetObjectById(cube)->SetPos(math::Vector(70.0f, 50.0f, 0.0f));
+        glb::scene::Scene::GetObjectById(cube)->SetWorldMatrix(math::Matrix::CreateTranslateMatrix(70.0f, 50.0f, 0.0f));
 
         cube = glb::scene::Scene::AddObject("cube.obj");
         glb::scene::Scene::GetObjectById(cube)->SetCullFaceEnable(true);
         glb::scene::Scene::GetObjectById(cube)->SetCullFaceMode(glb::render::CULL_BACK);
         glb::scene::Scene::GetObjectById(cube)->SetDepthTestEnable(true);
-        glb::scene::Scene::GetObjectById(cube)->SetPos(math::Vector(-70.0f, 50.0f, 0.0f));
+        glb::scene::Scene::GetObjectById(cube)->SetWorldMatrix(math::Matrix::CreateTranslateMatrix(-70.0f, 50.0f, 0.0f));
         return true;
     }
 
@@ -93,6 +94,8 @@ int _stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPreInstance, LPSTR cmdLine,
     config.screen_height = 600;
     config.shadow_map_width = 1024;
     config.shadow_map_height = 1024;
+    config.decalMapWidth = 1024;
+    config.decalMapHeight = 1024;
     config.icon = IDI_ICON1;
     if (!glb::app::Application::Initialize(ApplicationShadowMap::Create, hInstance, config)) {
         return 0;

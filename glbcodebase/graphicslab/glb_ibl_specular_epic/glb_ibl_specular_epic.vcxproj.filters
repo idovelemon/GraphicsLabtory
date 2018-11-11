@@ -150,6 +150,9 @@
     <ClCompile Include="..\glb\thirdparty\rgbe\rgbe.cpp">
       <Filter>源文件\glb\thirdparty\rgbe</Filter>
     </ClCompile>
+    <ClCompile Include="..\glb\render\glbfont.cpp">
+      <Filter>源文件\glb\render</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\glb\glb.h">
@@ -286,6 +289,9 @@
     </ClInclude>
     <ClInclude Include="..\glb\thirdparty\rgbe\rgbe.h">
       <Filter>源文件\glb\thirdparty\rgbe</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\render\glbfont.h">
+      <Filter>源文件\glb\render</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

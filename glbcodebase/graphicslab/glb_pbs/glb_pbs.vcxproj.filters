@@ -150,6 +150,9 @@
     <ClCompile Include="..\glb\util\glbtexturewriter.cpp">
       <Filter>源文件\glb\util</Filter>
     </ClCompile>
+    <ClCompile Include="..\glb\render\glbfont.cpp">
+      <Filter>源文件\glb\render</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\glb\glb.h">
@@ -286,6 +289,9 @@
     </ClInclude>
     <ClInclude Include="..\glb\util\glbtexturewriter.h">
       <Filter>源文件\glb\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\render\glbfont.h">
+      <Filter>源文件\glb\render</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

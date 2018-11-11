@@ -150,6 +150,9 @@
     <ClCompile Include="..\glb\glbinput.cpp">
       <Filter>Source Files\glb</Filter>
     </ClCompile>
+    <ClCompile Include="..\glb\render\glbfont.cpp">
+      <Filter>Source Files\glb\render</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\glb\math\glbbv.h">
@@ -286,6 +289,9 @@
     </ClInclude>
     <ClInclude Include="..\glb\glbinput.h">
       <Filter>Source Files\glb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\render\glbfont.h">
+      <Filter>Source Files\glb\render</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

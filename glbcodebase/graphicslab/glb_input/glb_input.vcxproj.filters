@@ -37,15 +37,18 @@
     <Filter Include="源文件\glb\render\imp\gl">
       <UniqueIdentifier>{5ebbb810-d9a8-46c1-8f84-c3bf1d5eed18}</UniqueIdentifier>
     </Filter>
+    <Filter Include="源文件\glb\thirdparty">
+      <UniqueIdentifier>{41f33c44-bbb7-4769-ab16-5c452d4707da}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\glb\thirdparty\rgbe">
+      <UniqueIdentifier>{7b10e94e-866c-4996-b9fa-a3ead15f0c31}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\glb\thirdparty\stb_image">
+      <UniqueIdentifier>{895d3e1f-e151-45b1-880a-c17e0f9f8d52}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\glb\comm.cpp">
-      <Filter>源文件\glb</Filter>
-    </ClCompile>
     <ClCompile Include="..\glb\glbapplication.cpp">
-      <Filter>源文件\glb</Filter>
-    </ClCompile>
-    <ClCompile Include="..\glb\glbeditorcomm.cpp">
       <Filter>源文件\glb</Filter>
     </ClCompile>
     <ClCompile Include="..\glb\glbinput.cpp">
@@ -138,14 +141,17 @@
     <ClCompile Include="..\glb\render\imp\gl\glbtextureimp.cpp">
       <Filter>源文件\glb\render\imp\gl</Filter>
     </ClCompile>
-    <ClCompile Include="glb_input.cpp">
-      <Filter>源文件</Filter>
+    <ClCompile Include="..\glb\render\glbfont.cpp">
+      <Filter>源文件\glb\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\util\glbtexturewriter.cpp">
+      <Filter>源文件\glb\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\thirdparty\rgbe\rgbe.cpp">
+      <Filter>源文件\glb\thirdparty\rgbe</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\glb\comm.h">
-      <Filter>源文件\glb</Filter>
-    </ClInclude>
     <ClInclude Include="..\glb\glb.h">
       <Filter>源文件\glb</Filter>
     </ClInclude>
@@ -153,9 +159,6 @@
       <Filter>源文件\glb</Filter>
     </ClInclude>
     <ClInclude Include="..\glb\glbcomm.h">
-      <Filter>源文件\glb</Filter>
-    </ClInclude>
-    <ClInclude Include="..\glb\glbeditorcomm.h">
       <Filter>源文件\glb</Filter>
     </ClInclude>
     <ClInclude Include="..\glb\glbinput.h">
@@ -272,6 +275,18 @@
     <ClInclude Include="resource.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="..\glb\render\glbfont.h">
+      <Filter>源文件\glb\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\util\glbtexturewriter.h">
+      <Filter>源文件\glb\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\thirdparty\stb_image\std_image.h">
+      <Filter>源文件\glb\thirdparty\stb_image</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\thirdparty\rgbe\rgbe.h">
+      <Filter>源文件\glb\thirdparty\rgbe</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\glb\math\glbvector.inl">
@@ -287,5 +302,10 @@
     <Image Include="res\glb.ico">
       <Filter>资源文件</Filter>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\glb\thirdparty\rgbe\rgbe.txt">
+      <Filter>源文件\glb\thirdparty\rgbe</Filter>
+    </Text>
   </ItemGroup>
 </Project>

@@ -85,6 +85,7 @@
     <ClCompile Include="..\glb\glbinput.cpp" />
     <ClCompile Include="..\glb\math\glbbv.cpp" />
     <ClCompile Include="..\glb\math\glbmath.cpp" />
+    <ClCompile Include="..\glb\render\glbfont.cpp" />
     <ClCompile Include="..\glb\render\glbmaterial.cpp" />
     <ClCompile Include="..\glb\render\glbmesh.cpp" />
     <ClCompile Include="..\glb\render\glbrender.cpp" />
@@ -125,6 +126,7 @@
     <ClInclude Include="..\glb\math\glbmatrix.cpp.h" />
     <ClInclude Include="..\glb\math\glbmatrix.h" />
     <ClInclude Include="..\glb\math\glbvector.h" />
+    <ClInclude Include="..\glb\render\glbfont.h" />
     <ClInclude Include="..\glb\render\glbmaterial.h" />
     <ClInclude Include="..\glb\render\glbmesh.h" />
     <ClInclude Include="..\glb\render\glbrender.h" />
