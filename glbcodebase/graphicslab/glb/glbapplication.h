@@ -40,6 +40,8 @@ struct AppConfig {
     int32_t icon;
     wchar_t caption[128];
     HWND    wnd;
+    char    fontImg[128];
+    char    fontList[128];
 
     AppConfig()
     : screen_width(0)
@@ -50,8 +52,16 @@ struct AppConfig {
     , decalMapHeight(0)
     , platform_api(0)
     , icon(0)
-    , wnd(NULL) {
+    , wnd(NULL)
+    , fontImg()
+    , fontList() {
         memset(caption, 0, sizeof(caption));
+
+        static const char kDefaultFontImgPath[] = "../glb/resource/font/font.bmp";
+        static const char kDefaultFontListPath[] = "../glb/resource/font/font.list";
+
+        memcpy(fontImg, kDefaultFontImgPath, sizeof(kDefaultFontImgPath));
+        memcpy(fontList, kDefaultFontListPath, sizeof(kDefaultFontListPath));
     }
 };
 

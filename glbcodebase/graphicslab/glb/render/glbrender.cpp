@@ -9,6 +9,7 @@
 #include <map>
 
 #include "glbapplication.h"
+#include "glbfont.h"
 #include "glbmesh.h"
 #include "glbrenderdevice.h"
 #include "glbrendertarget.h"
@@ -150,6 +151,7 @@ public:
 
     void AddLine(math::Vector start, math::Vector end, math::Vector color);
     void AddBoundBox(math::AABB bv, math::Vector color);
+    void AddText(const char* text, math::Vector pos, math::Vector color, float scale);
 
 protected:
     void PreDraw();
@@ -158,9 +160,11 @@ protected:
     void DrawAOMap();
     void DrawLightLoop();
     void DrawDebug();
+    void DrawFont();
     void DrawHDR();
     void AfterDraw();
 
+    void PrepareFont();
     void PrepareShadowMap();
     void PrepareDecalMap();
     void PrepareDebug();
@@ -272,9 +276,11 @@ private:
 
     // Debug
     shader::UserProgram*                    m_DebugLineShader;
+    shader::UserProgram*                    m_FontShader;
 
     mesh::ScreenMesh*                       m_ScreenMesh;
     mesh::DebugMesh*                        m_DebugMesh;
+    mesh::FontMesh*                         m_FontMesh;
 };
 
 //-----------------------------------------------------------------------------------
@@ -424,10 +430,13 @@ RenderImp::RenderImp()
 
 // Debug
 , m_DebugLineShader(NULL)
+, m_FontShader(NULL)
 
 // Env
 
-, m_DebugMesh(NULL) {
+, m_DebugMesh(NULL)
+, m_ScreenMesh(NULL)
+, m_FontMesh(NULL) {
     memset(m_Perspective, 0, sizeof(m_Perspective));
     m_ShaderGroups.clear();
     memset(m_ShadowRenderTarget, 0, sizeof(m_ShadowRenderTarget));
@@ -452,6 +461,7 @@ void RenderImp::Initialize(int32_t width, int32_t height) {
     m_Width = width;
     m_Height = height;
 
+    PrepareFont();
     PrepareShadowMap();
     PrepareDecalMap();
     PrepareDebug();
@@ -505,9 +515,11 @@ void RenderImp::Destroy() {
 
     // Debug
     GLB_SAFE_DELETE(m_DebugLineShader);
+    GLB_SAFE_DELETE(m_FontShader);
 
     GLB_SAFE_DELETE(m_DebugMesh);
     GLB_SAFE_DELETE(m_ScreenMesh);
+    GLB_SAFE_DELETE(m_FontMesh);
 }
 
 void RenderImp::Draw() {
@@ -518,6 +530,7 @@ void RenderImp::Draw() {
     DrawLightLoop();
     DrawHDR();
     DrawDebug();
+    DrawFont();
     AfterDraw();
 
 #ifdef GLB_PLATFORM_OPENGL
@@ -704,6 +717,25 @@ void RenderImp::AddBoundBox(math::AABB bv, math::Vector color) {
     render::Render::AddLine(points[render::Render::NRD], points[render::Render::FRD], color);
 }
 
+void RenderImp::AddText(const char* text, math::Vector pos, math::Vector color, float scale) {
+    math::Vector preCharNDCSize(0.0f, 0.0f, 0.0f);
+    math::Vector preCharPos = pos;
+
+    for (int32_t i = 0; i < strlen(text); i++) {
+        float ltU = 0, ltV = 0, rbU = 0, rbV = 0;
+        float ndcSizeX = 0.0f, ndcSizeY = 0.0f;
+        font::Mgr::GetCharacter(text[i], ltU, ltV, rbU, rbV, ndcSizeX, ndcSizeY);
+
+        math::Vector newPos = preCharPos + math::Vector(preCharNDCSize.x, 0.0f, 0.0f);
+        if (text[i] != ' ') {
+            m_FontMesh->AddChar(math::Vector(ltU, ltV, 0.0f), math::Vector(rbU, rbV, 0.0f), newPos, math::Vector(ndcSizeX, ndcSizeY, 0.0f) * scale, color);
+        }
+
+        preCharNDCSize = math::Vector(ndcSizeX, ndcSizeY, 0.0f) * scale;
+        preCharPos = newPos;
+    }
+}
+
 void RenderImp::PreDraw() {
     //{  // Draw split frustum
     //    math::Matrix view_to_world = scene::Scene::GetCamera(scene::PRIMIAY_CAM)->GetViewMatrix();
@@ -803,6 +835,47 @@ void RenderImp::DrawDebug() {
     render::Device::SetRenderTarget(0);
 }
 
+void RenderImp::DrawFont() {
+    // Render Target
+    render::Device::SetRenderTarget(render::RenderTarget::DefaultRenderTarget());
+
+    // Draw Buffer
+    render::Device::SetDrawColorBuffer(render::COLORBUF_BACK);
+
+    // Clear
+    render::Device::SetCullFaceEnable(false);
+    render::Device::SetDepthTestEnable(true);
+    render::Device::SetAlphaBlendEnable(true);
+    render::Device::SetAlphaBlendFunc(render::FACTOR_SRC, render::FUNC_SRC_ALPHA);
+    render::Device::SetAlphaBlendFunc(render::FACTOR_DST, render::FUNC_ONE_MINUS_SRC_ALPHA);
+
+    // Setup Shader
+    render::Device::SetShader(m_FontShader);
+    render::Device::SetShaderLayout(m_FontShader->GetShaderLayout());
+
+    // Setup Vertex
+    render::Device::SetVertexBuffer(m_FontMesh->GetVertexBuffer());
+    render::Device::SetVertexLayout(m_FontMesh->GetVertexLayout());
+
+    // Setup Texture
+    render::Device::SetTexture(0, render::texture::Mgr::GetTextureById(font::Mgr::GetFontTexture()), 0);
+
+    // Setup Uniform
+    render::Device::SetUniformSampler2D(m_FontShader->GetUniformLocation("glb_FontMap"), 0);
+
+    // Draw
+    render::Device::Draw(render::PT_TRIANGLES, 0, m_FontMesh->GetVertexNum());
+
+    // Reset debug mesh
+    m_FontMesh->ClearAllChars();
+
+    // Reset render target
+    render::Device::SetRenderTarget(0);
+
+    // Reset alpha blend
+    render::Device::SetAlphaBlendEnable(false);
+}
+
 void RenderImp::DrawHDR() {
     FilterBrightness();
     DownsampleTex();
@@ -812,6 +885,11 @@ void RenderImp::DrawHDR() {
 
 void RenderImp::AfterDraw() {
     render::Device::SwapBuffer();
+}
+
+void RenderImp::PrepareFont() {
+    m_FontShader = render::shader::UserProgram::Create("..\\glb\\shader\\font.vs", "..\\glb\\shader\\font.fs");
+    m_FontMesh = render::mesh::FontMesh::Create();
 }
 
 void RenderImp::PrepareShadowMap() {
@@ -2576,6 +2654,15 @@ void Render::AddBoundBox(math::AABB bv, math::Vector color) {
         GLB_SAFE_ASSERT(false);
     }
 }
+
+void Render::AddText(const char* text, math::Vector pos, math::Vector color, float scale) {
+    if (s_RenderImp != NULL) {
+        s_RenderImp->AddText(text, pos, color, scale);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+}
+
 };  // namespace render
 
 };  // namespace glb

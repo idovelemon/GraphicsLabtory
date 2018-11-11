@@ -429,6 +429,87 @@ VertexBuffer* ScreenMesh::GetVertexBuffer() {
 }
 
 //-----------------------------------------------------------------------------------
+// FontMesh DEFINITION
+//-----------------------------------------------------------------------------------
+FontMesh::FontMesh()
+: m_Imp(NULL) {
+}
+
+FontMesh::~FontMesh() {
+    GLB_SAFE_DELETE(m_Imp);
+}
+
+FontMesh* FontMesh::Create(int32_t maxCharacter) {
+    FontMesh* mesh = NULL;
+
+    FontMesh::Imp* imp = FontMesh::Imp::Create(maxCharacter);
+    if (imp != NULL) {
+        mesh = new FontMesh;
+        if (mesh != NULL) {
+            mesh->m_Imp = imp;
+        } else {
+            GLB_SAFE_ASSERT(false);
+        }
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return mesh;
+}
+
+void FontMesh::AddChar(math::Vector ltUV, math::Vector rbUV, math::Vector pos, math::Vector size, math::Vector color) {
+    if (m_Imp != nullptr) {
+        m_Imp->AddChar(ltUV, rbUV, pos, size, color);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+}
+
+void FontMesh::ClearAllChars() {
+    if (m_Imp != NULL) {
+        m_Imp->ClearAllChars();
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+}
+
+VertexLayout FontMesh::GetVertexLayout() {
+    VertexLayout layout;
+
+    if (m_Imp != NULL) {
+        layout = m_Imp->GetVertexLayout();
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return layout;
+}
+
+int32_t FontMesh::GetVertexNum() {
+    int32_t vn = 0;
+
+    if (m_Imp != NULL) {
+        vn = m_Imp->GetVertexNum();
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return vn;
+}
+
+VertexBuffer* FontMesh::GetVertexBuffer() {
+    VertexBuffer* buf = NULL;
+
+    if (m_Imp != NULL) {
+        buf = m_Imp->GetVertexBuffer();
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return buf;
+}
+
+//-----------------------------------------------------------------------------------
 // TriangleMeshMgrImp DEFINITION
 //-----------------------------------------------------------------------------------
 MgrImp::MgrImp()

@@ -25,6 +25,7 @@ namespace mesh {
 // CONSTANT VALUE
 //-----------------------------------------------------------------------------------
 static const int32_t kDefaultMaxLines = 1000;
+static const int32_t kDefaultMaxCharacter = 1000;
 
 //-----------------------------------------------------------------------------------
 // TYPE DECLARATION
@@ -180,6 +181,30 @@ private:
     class Imp;
     Imp*                m_Imp;
 };
+
+//-----------------------------------------------------------------------------------
+// FontMesh DECLARATION
+//----------------------------------------------------------------------------------
+class FontMesh {
+public:
+    virtual ~FontMesh();
+    static FontMesh* Create(int32_t maxFontNum = kDefaultMaxCharacter);
+
+public:
+    void AddChar(math::Vector ltUV, math::Vector rbUV, math::Vector pos, math::Vector size, math::Vector color);
+    void ClearAllChars();
+    VertexLayout GetVertexLayout();
+    int32_t GetVertexNum();
+    VertexBuffer* GetVertexBuffer();
+
+protected:
+    FontMesh();
+
+private:
+    class Imp;
+    Imp*            m_Imp;
+};
+
 
 //-----------------------------------------------------------------------------------
 // Mgr DECLARATION

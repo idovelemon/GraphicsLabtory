@@ -71,6 +71,7 @@ public:
     // Debug draw
     static void AddLine(math::Vector start, math::Vector end, math::Vector color);
     static void AddBoundBox(math::AABB bv, math::Vector color);
+    static void AddText(const char* text, math::Vector pos, math::Vector color, float scale);
 };
 
 };  // namespace render

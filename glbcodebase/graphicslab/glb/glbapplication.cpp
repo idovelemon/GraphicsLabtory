@@ -7,6 +7,7 @@
 #include "glbapplication.h"
 
 #include "glbinput.h"
+#include "render/glbfont.h"
 #include "render/glbmaterial.h"
 #include "render/glbmesh.h"
 #include "render/glbrender.h"
@@ -273,6 +274,7 @@ bool ApplicationImp::SetupGLBBeforeUserApp(int32_t width, int32_t height) {
     render::Device::Initialize();
     render::Render::Initialize(width, height);
     Input::Initialize();
+    render::font::Mgr::Initialize(m_Config.fontImg, m_Config.fontList);
     //EditorComm::Initialize();
     //EditorComm::PostData();
 

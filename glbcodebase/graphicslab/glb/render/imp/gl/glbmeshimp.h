@@ -171,6 +171,33 @@ private:
     int32_t             m_VertexNum;
 };
 
+//-----------------------------------------------------------------------------------
+// FontMesh::Imp DECLARATION
+//----------------------------------------------------------------------------------
+class FontMesh::Imp {
+public:
+    virtual ~Imp();
+    static FontMesh::Imp* Create(int32_t maxFontNum = kDefaultMaxCharacter);
+
+public:
+    void AddChar(math::Vector ltUV, math::Vector rbUV, math::Vector pos, math::Vector size, math::Vector color);
+    void ClearAllChars();
+    VertexLayout GetVertexLayout();
+    int32_t GetVertexNum();
+    VertexBuffer* GetVertexBuffer();
+
+protected:
+    Imp();
+
+private:
+    VertexBuffer*       m_VertexBuffer;
+    VertexLayout        m_VertexLayout;
+    shader::Descriptor  m_ShaderDesc;
+    int32_t             m_VertexNum;
+    int32_t             m_CurCharacterNum;
+    int32_t             m_MaxCharacterNum;
+};
+
 };  // namespace mesh
 
 };  // namespace render

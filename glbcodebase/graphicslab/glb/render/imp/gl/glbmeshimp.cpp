@@ -672,6 +672,156 @@ int32_t ScreenMesh::Imp::GetVertexNum() {
 VertexBuffer* ScreenMesh::Imp::GetVertexBuffer() {
     return m_VertexBuffer;
 }
+
+//-----------------------------------------------------------------------------------
+// FontMesh::Imp DEFINITION
+//-----------------------------------------------------------------------------------
+FontMesh::Imp::Imp()
+: m_VertexBuffer(NULL)
+, m_VertexLayout()
+, m_ShaderDesc()
+, m_VertexNum(0) {
+}
+
+FontMesh::Imp::~Imp() {
+    GLB_SAFE_DELETE(m_VertexBuffer);
+}
+
+FontMesh::Imp* FontMesh::Imp::Create(int32_t maxCharacter) {
+    FontMesh::Imp* mesh = NULL;
+
+    // This mesh only has line primitive with position, color and uv
+    int32_t buf_size = (sizeof(float) * (3 + 3 + 2)) * maxCharacter * 6;
+
+    // Create vertex array object
+    VertexBuffer* vbuf = new VertexBuffer;
+    uint32_t vao = vbuf->GetVAO();
+    uint32_t vbo = vbuf->GetVBO();
+    glBindVertexArray(vao);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(GL_ARRAY_BUFFER, buf_size, NULL, GL_DYNAMIC_DRAW);
+
+    if (vao != 0 && vbo != 0) {
+        mesh = new FontMesh::Imp;
+        if (mesh != NULL) {
+            mesh->m_VertexBuffer = vbuf;
+            mesh->m_VertexNum = 0;
+            mesh->m_CurCharacterNum = 0;
+            mesh->m_MaxCharacterNum = maxCharacter;
+            mesh->m_VertexLayout.count = 3;
+
+            // Pos attribute layout
+            mesh->m_VertexLayout.layouts[0].attriType = VA_POS;
+            mesh->m_VertexLayout.layouts[0].offset = 0;
+            mesh->m_VertexLayout.layouts[0].size = 0;
+
+            // Color attribute layout
+            mesh->m_VertexLayout.layouts[1].attriType = VA_COLOR;
+            mesh->m_VertexLayout.layouts[1].offset = sizeof(float) * 3 * 6 * maxCharacter;
+            mesh->m_VertexLayout.layouts[1].size = 0;
+
+            // UV attribute layout
+            mesh->m_VertexLayout.layouts[2].attriType = VA_TEXCOORD;
+            mesh->m_VertexLayout.layouts[2].offset = sizeof(float) * (3 + 3) * 6 * maxCharacter;
+            mesh->m_VertexLayout.layouts[2].size = 0;
+
+            // Shader desc
+            mesh->m_ShaderDesc.SetFlag(shader::GLB_COLOR_IN_VERTEX, true);
+            mesh->m_ShaderDesc.SetFlag(shader::GLB_TEXCOORD_IN_VERTEX, true);
+        } else {
+            GLB_SAFE_ASSERT(false);
+        }
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return mesh;
+}
+
+void FontMesh::Imp::AddChar(math::Vector ltUV, math::Vector rbUV, math::Vector pos, math::Vector size, math::Vector color) {
+    if (m_CurCharacterNum < m_MaxCharacterNum) {
+        GLfloat vertex_buf[18];
+        vertex_buf[0] = pos.x;
+        vertex_buf[1] = pos.y;
+        vertex_buf[2] = 0.0f;
+        vertex_buf[3] = pos.x + size.x;
+        vertex_buf[4] = pos.y;
+        vertex_buf[5] = 0.0f;
+        vertex_buf[6] = pos.x + size.x;
+        vertex_buf[7] = pos.y - size.y;
+        vertex_buf[8] = 0.0f;
+        vertex_buf[9] = pos.x;
+        vertex_buf[10] = pos.y;
+        vertex_buf[11] = 0.0f;
+        vertex_buf[12] = pos.x + size.x;
+        vertex_buf[13] = pos.y - size.y;
+        vertex_buf[14] = 0.0f;
+        vertex_buf[15] = pos.x;
+        vertex_buf[16] = pos.y - size.y;
+        vertex_buf[17] = 0.0f;
+
+        GLfloat color_buf[18];
+        color_buf[0] = color.x;
+        color_buf[1] = color.y;
+        color_buf[2] = color.z;
+        color_buf[3] = color.x;
+        color_buf[4] = color.y;
+        color_buf[5] = color.z;
+        color_buf[6] = color.x;
+        color_buf[7] = color.y;
+        color_buf[8] = color.z;
+        color_buf[9] = color.x;
+        color_buf[10] = color.y;
+        color_buf[11] = color.z;
+        color_buf[12] = color.x;
+        color_buf[13] = color.y;
+        color_buf[14] = color.z;
+        color_buf[15] = color.x;
+        color_buf[16] = color.y;
+        color_buf[17] = color.z;
+
+        GLfloat uvBuf[12];
+        uvBuf[0] = ltUV.x;
+        uvBuf[1] = ltUV.y;
+        uvBuf[2] = rbUV.x;
+        uvBuf[3] = ltUV.y;
+        uvBuf[4] = rbUV.x;
+        uvBuf[5] = rbUV.y;
+        uvBuf[6] = ltUV.x;
+        uvBuf[7] = ltUV.y;
+        uvBuf[8] = rbUV.x;
+        uvBuf[9] = rbUV.y;
+        uvBuf[10] = ltUV.x;
+        uvBuf[11] = rbUV.y;
+
+        GLuint va = m_VertexBuffer->GetVAO();
+        GLuint vb = m_VertexBuffer->GetVBO();
+        glBindVertexArray(va);
+        glBindBuffer(GL_ARRAY_BUFFER, vb);
+        glBufferSubData(GL_ARRAY_BUFFER, m_CurCharacterNum * 6 * 3 * sizeof(float), sizeof(vertex_buf), vertex_buf);
+        glBufferSubData(GL_ARRAY_BUFFER, m_MaxCharacterNum * 6 * 3 * sizeof(float) + m_CurCharacterNum * 6 * 3 * sizeof(float), sizeof(color_buf), color_buf);
+        glBufferSubData(GL_ARRAY_BUFFER, m_MaxCharacterNum * 6 * 3 * sizeof(float) + m_MaxCharacterNum * 6 * 3 * sizeof(float) + m_CurCharacterNum * 6 * 2 * sizeof(float), sizeof(uvBuf), uvBuf);
+
+        m_CurCharacterNum++;
+    }
+}
+
+void FontMesh::Imp::ClearAllChars() {
+    m_CurCharacterNum = 0;
+}
+
+VertexLayout FontMesh::Imp::GetVertexLayout() {
+    return m_VertexLayout;
+}
+
+int32_t FontMesh::Imp::GetVertexNum() {
+    return m_CurCharacterNum * 6;
+}
+
+VertexBuffer* FontMesh::Imp::GetVertexBuffer() {
+    return m_VertexBuffer;
+}
+
 };  // namespace mesh
 
 };  // namespace render
