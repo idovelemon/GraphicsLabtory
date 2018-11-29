@@ -149,6 +149,9 @@
     <ClCompile Include="..\glb\render\glbfont.cpp">
       <Filter>源文件\glb\render</Filter>
     </ClCompile>
+    <ClCompile Include="..\glb\glbdebugmenu.cpp">
+      <Filter>源文件\glb</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="glb_hdr.h">
@@ -286,6 +289,9 @@
     </ClInclude>
     <ClInclude Include="..\glb\render\glbfont.h">
       <Filter>源文件\glb\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\glbdebugmenu.h">
+      <Filter>源文件\glb</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

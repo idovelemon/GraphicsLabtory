@@ -83,6 +83,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\glb\glbapplication.cpp" />
+    <ClCompile Include="..\glb\glbdebugmenu.cpp" />
     <ClCompile Include="..\glb\glbinput.cpp" />
     <ClCompile Include="..\glb\math\glbbv.cpp" />
     <ClCompile Include="..\glb\math\glbmath.cpp" />
@@ -121,6 +122,7 @@
   <ItemGroup>
     <ClInclude Include="..\glb\glb.h" />
     <ClInclude Include="..\glb\glbapplication.h" />
+    <ClInclude Include="..\glb\glbdebugmenu.h" />
     <ClInclude Include="..\glb\glbinput.h" />
     <ClInclude Include="..\glb\math\glbbv.h" />
     <ClInclude Include="..\glb\math\glbmath.h" />

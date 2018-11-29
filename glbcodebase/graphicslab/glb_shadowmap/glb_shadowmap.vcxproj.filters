@@ -183,6 +183,9 @@
     <ClInclude Include="..\glb\thirdparty\rgbe\rgbe.h">
       <Filter>源文件\glb\thirdparty\rgbe</Filter>
     </ClInclude>
+    <ClInclude Include="..\glb\glbdebugmenu.h">
+      <Filter>源文件\glb</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="glb_shadowmap.cpp">
@@ -289,6 +292,9 @@
     </ClCompile>
     <ClCompile Include="..\glb\thirdparty\rgbe\rgbe.cpp">
       <Filter>源文件\glb\thirdparty\rgbe</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glb\glbdebugmenu.cpp">
+      <Filter>源文件\glb</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
