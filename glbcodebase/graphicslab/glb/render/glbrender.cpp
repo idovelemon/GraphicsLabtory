@@ -9,6 +9,7 @@
 #include <map>
 
 #include "glbapplication.h"
+#include "glbdebugmenu.h"
 #include "glbfont.h"
 #include "glbmesh.h"
 #include "glbrenderdevice.h"
@@ -38,6 +39,7 @@ namespace render {
 static const int32_t kDefaultEnvBakersNum = 4;
 static const int32_t kPSSMSplitNum = 4;
 static const float kMaxSceneSize = 100000.0f;
+static const int32_t kMaxDebugMenuTriangleNum = 128;
 
 //-----------------------------------------------------------------------------------
 // TYPE DECLARATION
@@ -150,6 +152,7 @@ public:
     void SetBloomWeights(float w0, float w1, float w2, float w3);
 
     void AddLine(math::Vector start, math::Vector end, math::Vector color);
+    void AddMenuMesh(math::Vector lt, math::Vector rb, math::Vector color);
     void AddBoundBox(math::AABB bv, math::Vector color);
     void AddText(const char* text, math::Vector pos, math::Vector color, float scale);
 
@@ -159,7 +162,8 @@ protected:
     void DrawDecalMap();
     void DrawAOMap();
     void DrawLightLoop();
-    void DrawDebug();
+    void DrawDebugLine();
+    void DrawDebugMenu();
     void DrawFont();
     void DrawHDR();
     void AfterDraw();
@@ -167,7 +171,8 @@ protected:
     void PrepareFont();
     void PrepareShadowMap();
     void PrepareDecalMap();
-    void PrepareDebug();
+    void PrepareDebugLine();
+    void PrepareDebugMenu();
     void PrepareAOMap();
     void PrepareHDR();
     void PrepareEnvMap();
@@ -276,10 +281,12 @@ private:
 
     // Debug
     shader::UserProgram*                    m_DebugLineShader;
+    shader::UserProgram*                    m_DebugMenuShader;
     shader::UserProgram*                    m_FontShader;
 
     mesh::ScreenMesh*                       m_ScreenMesh;
     mesh::DebugMesh*                        m_DebugMesh;
+    mesh::DynamicTriangleMesh*              m_DebugMenuMesh;
     mesh::FontMesh*                         m_FontMesh;
 };
 
@@ -430,11 +437,13 @@ RenderImp::RenderImp()
 
 // Debug
 , m_DebugLineShader(NULL)
+, m_DebugMenuShader(nullptr)
 , m_FontShader(NULL)
 
 // Env
 
 , m_DebugMesh(NULL)
+, m_DebugMenuMesh(nullptr)
 , m_ScreenMesh(NULL)
 , m_FontMesh(NULL) {
     memset(m_Perspective, 0, sizeof(m_Perspective));
@@ -464,7 +473,8 @@ void RenderImp::Initialize(int32_t width, int32_t height) {
     PrepareFont();
     PrepareShadowMap();
     PrepareDecalMap();
-    PrepareDebug();
+    PrepareDebugLine();
+    PrepareDebugMenu();
     PrepareHDR();
     PrepareEnvMap();
 
@@ -515,9 +525,11 @@ void RenderImp::Destroy() {
 
     // Debug
     GLB_SAFE_DELETE(m_DebugLineShader);
+    GLB_SAFE_DELETE(m_DebugMenuShader);
     GLB_SAFE_DELETE(m_FontShader);
 
     GLB_SAFE_DELETE(m_DebugMesh);
+    GLB_SAFE_DELETE(m_DebugMenuMesh);
     GLB_SAFE_DELETE(m_ScreenMesh);
     GLB_SAFE_DELETE(m_FontMesh);
 }
@@ -529,7 +541,8 @@ void RenderImp::Draw() {
     //DrawDepthMap();
     DrawLightLoop();
     DrawHDR();
-    DrawDebug();
+    DrawDebugLine();
+    DrawDebugMenu();
     DrawFont();
     AfterDraw();
 
@@ -692,6 +705,14 @@ void RenderImp::AddLine(math::Vector start, math::Vector end, math::Vector color
     }
 }
 
+void RenderImp::AddMenuMesh(math::Vector lt, math::Vector rb, math::Vector color) {
+    if (m_DebugMenuMesh != nullptr) {
+        m_DebugMenuMesh->AddRect(lt, rb, color);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+}
+
 void RenderImp::AddBoundBox(math::AABB bv, math::Vector color) {
     math::Vector points[8];
     points[render::Render::NLU] = math::Vector(bv.m_Min.x, bv.m_Max.y, bv.m_Max.z);
@@ -792,7 +813,7 @@ void RenderImp::DrawLightLoop() {
     DrawLightLoopCore();
 }
 
-void RenderImp::DrawDebug() {
+void RenderImp::DrawDebugLine() {
     // Render Target
     render::Device::SetRenderTarget(render::RenderTarget::DefaultRenderTarget());
 
@@ -833,6 +854,29 @@ void RenderImp::DrawDebug() {
 
     // Reset render target
     render::Device::SetRenderTarget(0);
+}
+
+void RenderImp::DrawDebugMenu() {
+    // Setup Render State
+    render::Device::SetCullFaceEnable(false);
+    render::Device::SetDepthTestEnable(false);
+    render::Device::SetAlphaBlendEnable(true);
+    render::Device::SetAlphaBlendFunc(render::FACTOR_SRC, render::FUNC_SRC_ALPHA);
+    render::Device::SetAlphaBlendFunc(render::FACTOR_DST, render::FUNC_ONE_MINUS_SRC_ALPHA);
+
+    // Setup Shader
+    render::Device::SetShader(m_DebugMenuShader);
+    render::Device::SetShaderLayout(m_DebugMenuShader->GetShaderLayout());
+
+    // Setup Vertex
+    render::Device::SetVertexBuffer(m_DebugMenuMesh->GetVertexBuffer());
+    render::Device::SetVertexLayout(m_DebugMenuMesh->GetVertexLayout());
+
+    // Draw
+    render::Device::Draw(render::PT_TRIANGLES, 0, m_DebugMenuMesh->GetVertexNum());
+
+    // Reset debug menu
+    m_DebugMenuMesh->Clear();
 }
 
 void RenderImp::DrawFont() {
@@ -941,7 +985,7 @@ void RenderImp::PrepareDecalMap() {
     }
 }
 
-void RenderImp::PrepareDebug() {
+void RenderImp::PrepareDebugLine() {
     // Create depth map
     texture::Texture* depth_map = texture::Texture::CreateFloat32DepthTexture(static_cast<int32_t>(m_Width), static_cast<int32_t>(m_Height), false);
     if (depth_map != NULL) {
@@ -952,6 +996,14 @@ void RenderImp::PrepareDebug() {
 
     // Create Shader
     m_DebugLineShader = render::shader::UserProgram::Create("..\\glb\\shader\\debugline.vs", "..\\glb\\shader\\debugline.fs");
+}
+
+void RenderImp::PrepareDebugMenu() {
+    // Create Shader
+    m_DebugMenuShader = render::shader::UserProgram::Create("..\\glb\\shader\\menu.vs", "..\\glb\\shader\\menu.fs");
+
+    // Create Mesh
+    m_DebugMenuMesh = render::mesh::DynamicTriangleMesh::Create(kMaxDebugMenuTriangleNum);
 }
 
 void RenderImp::PrepareHDR() {
@@ -2642,6 +2694,14 @@ void Render::SetBloomWeights(float w0, float w1, float w2, float w3) {
 void Render::AddLine(math::Vector start, math::Vector end, math::Vector color) {
     if (s_RenderImp != NULL) {
         s_RenderImp->AddLine(start, end, color);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+}
+
+void Render::AddMenuMesh(math::Vector lt, math::Vector rb, math::Vector color) {
+    if (s_RenderImp != NULL) {
+        s_RenderImp->AddMenuMesh(lt, rb, color);
     } else {
         GLB_SAFE_ASSERT(false);
     }

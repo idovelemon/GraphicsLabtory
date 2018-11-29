@@ -6,6 +6,7 @@
 //-------------------------------------------------------------------
 #include "glbapplication.h"
 
+#include "glbdebugmenu.h"
 #include "glbinput.h"
 #include "render/glbfont.h"
 #include "render/glbmaterial.h"
@@ -178,6 +179,7 @@ void ApplicationImp::Destroy() {
     }
 
     //EditorComm::Destroy();
+    debugmenu::Mgr::Destroy();
     Input::Destroy();
     render::Render::Destroy();
     render::Device::Destroy();
@@ -275,6 +277,7 @@ bool ApplicationImp::SetupGLBBeforeUserApp(int32_t width, int32_t height) {
     render::Render::Initialize(width, height);
     Input::Initialize();
     render::font::Mgr::Initialize(m_Config.fontImg, m_Config.fontList);
+    debugmenu::Mgr::Initialize();
     //EditorComm::Initialize();
     //EditorComm::PostData();
 

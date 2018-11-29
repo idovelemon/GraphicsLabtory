@@ -42,6 +42,7 @@ public:
 
     int64_t GetMouseMoveX();
     int64_t GetMouseMoveY();
+    int64_t GetMouseMoveZ();
     int64_t GetMousePosX();
     int64_t GetMousePosY();
     bool IsMouseButtonPressed(ButtonMouse mouse);
@@ -174,6 +175,10 @@ int64_t InputImp::GetMouseMoveY() {
     return m_MouseState.lY;
 }
 
+int64_t InputImp::GetMouseMoveZ() {
+    return m_MouseState.lZ;
+}
+
 int64_t InputImp::GetMousePosX() {
     POINT point;
     GetCursorPos(&point);
@@ -258,6 +263,18 @@ int64_t Input::GetMouseMoveY() {
 
     if (s_InputImp != NULL) {
         result = s_InputImp->GetMouseMoveY();
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return result;
+}
+
+int64_t Input::GetMouseMoveZ() {
+    int64_t result = 0;
+
+    if (s_InputImp != nullptr) {
+        result = s_InputImp->GetMouseMoveZ();
     } else {
         GLB_SAFE_ASSERT(false);
     }

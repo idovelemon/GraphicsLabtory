@@ -99,6 +99,7 @@ public:
 
     static int64_t GetMouseMoveX();
     static int64_t GetMouseMoveY();
+    static int64_t GetMouseMoveZ();
     static int64_t GetMousePosX();
     static int64_t GetMousePosY();
     static bool IsMouseButtonPressed(ButtonMouse mouse);

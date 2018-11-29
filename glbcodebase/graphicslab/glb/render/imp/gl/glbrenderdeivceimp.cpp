@@ -607,10 +607,10 @@ void DeviceImp::SetupVertexLayout() {
                     }
                 }
 
-                // Must have position
+                // Vertex Color is optional
                 if (location != -1) {
                     glEnableVertexAttribArray(location);
-                    glVertexAttribPointer(location, 3, GL_FLOAT, GL_FALSE, 0, reinterpret_cast<GLvoid*>(m_VertexLayout.layouts[i].offset));
+                    glVertexAttribPointer(location, 4, GL_FLOAT, GL_FALSE, 0, reinterpret_cast<GLvoid*>(m_VertexLayout.layouts[i].offset));
                 }
             }
             break;

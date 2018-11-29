@@ -120,6 +120,40 @@ protected:
 };
 
 //-----------------------------------------------------------------------------------
+// DynamicTriangleMesh::Imp DECLARATION
+//----------------------------------------------------------------------------------
+
+class DynamicTriangleMesh::Imp {
+public:
+    virtual ~Imp();
+    static Imp* Create(int32_t maxTriangleNum);
+
+protected:
+    Imp();
+
+public:
+    VertexLayout GetVertexLayout();
+    shader::Descriptor GetShaderDesc();
+    int32_t GetVertexNum();
+    VertexBuffer* GetVertexBuffer();
+
+    void AddRect(math::Vector lt, math::Vector rb, math::Vector color);
+    void AddRect(math::Vector v0, math::Vector c0, math::Vector uv0,
+                 math::Vector v1, math::Vector c1, math::Vector uv1,
+                 math::Vector v2, math::Vector c2, math::Vector uv2,
+                 math::Vector v3, math::Vector c3, math::Vector uv3);
+    void Clear();
+
+private:
+    VertexBuffer*       m_VertexBuffer;
+    VertexLayout        m_VertexLayout;
+    shader::Descriptor  m_ShaderDesc;
+    int32_t             m_VertexNum;
+    int32_t             m_MaxTriangleNum;
+    int32_t             m_CurrentTriangleNum;
+};
+
+//-----------------------------------------------------------------------------------
 // DebugMesh::Imp DECLARATION
 //----------------------------------------------------------------------------------
 

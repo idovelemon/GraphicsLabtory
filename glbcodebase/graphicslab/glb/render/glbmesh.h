@@ -138,6 +138,36 @@ private:
 };
 
 //-----------------------------------------------------------------------------------
+// DynamicTriangleMesh DECLARATION
+//----------------------------------------------------------------------------------
+
+class DynamicTriangleMesh {
+public:
+    virtual ~DynamicTriangleMesh();
+    static DynamicTriangleMesh* Create(int32_t maxTriangleNum);
+
+protected:
+    DynamicTriangleMesh();
+
+public:
+    VertexLayout GetVertexLayout();
+    shader::Descriptor GetShaderDesc();
+    int32_t GetVertexNum();
+    VertexBuffer* GetVertexBuffer();
+
+    void AddRect(math::Vector lt, math::Vector rb, math::Vector color);
+    void AddRect(math::Vector v0, math::Vector c0, math::Vector uv0,
+                 math::Vector v1, math::Vector c1, math::Vector uv1,
+                 math::Vector v2, math::Vector c2, math::Vector uv2,
+                 math::Vector v3, math::Vector c3, math::Vector uv3);
+    void Clear();
+
+private:
+    class Imp;
+    Imp*    m_Imp;
+};
+
+//-----------------------------------------------------------------------------------
 // DebugMesh DECLARATION
 //----------------------------------------------------------------------------------
 class DebugMesh {

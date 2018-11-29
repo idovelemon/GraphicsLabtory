@@ -261,7 +261,7 @@ InstanceTriangleMesh::Imp::Imp()
 , m_BufSizeInBytes(0)
 , m_InstanceBufSizeInBytes(0)
 , m_VertexBuffer(NULL)
-, m_VertexLayout()  {
+, m_VertexLayout() {
     memset(&m_VertexLayout, 0, sizeof(m_VertexLayout));
 }
 
@@ -452,6 +452,175 @@ void InstanceTriangleMesh::Imp::UpdateInstanceBuffer(void* buf) {
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
+}
+
+//-----------------------------------------------------------------------------------
+// DynamicTriangleMesh::Imp DEFINITION
+//-----------------------------------------------------------------------------------
+
+DynamicTriangleMesh::Imp::Imp()
+: m_VertexBuffer(NULL)
+, m_VertexLayout()
+, m_ShaderDesc()
+, m_CurrentTriangleNum(0)
+, m_MaxTriangleNum(0) {
+}
+
+DynamicTriangleMesh::Imp::~Imp() {
+}
+
+DynamicTriangleMesh::Imp* DynamicTriangleMesh::Imp::Create(int32_t maxTriangleNum) {
+    DynamicTriangleMesh::Imp* mesh = NULL;
+
+    // This mesh only has line primitive with position, color and uv
+    int32_t buf_size = (sizeof(float) * (3 + 4 + 2)) * maxTriangleNum * 3;
+
+    // Create vertex array object
+    VertexBuffer* vbuf = new VertexBuffer;
+    uint32_t vao = vbuf->GetVAO();
+    uint32_t vbo = vbuf->GetVBO();
+    glBindVertexArray(vao);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(GL_ARRAY_BUFFER, buf_size, NULL, GL_DYNAMIC_DRAW);
+
+    if (vao != 0 && vbo != 0) {
+        mesh = new DynamicTriangleMesh::Imp;
+        if (mesh != NULL) {
+            mesh->m_VertexBuffer = vbuf;
+            mesh->m_VertexNum = maxTriangleNum * 2;
+            mesh->m_MaxTriangleNum = maxTriangleNum;
+            mesh->m_VertexLayout.count = 3;
+
+            // Pos attribute layout
+            mesh->m_VertexLayout.layouts[0].attriType = VA_POS;
+            mesh->m_VertexLayout.layouts[0].offset = 0;
+            mesh->m_VertexLayout.layouts[0].size = 0;
+
+            // Color attribute layout
+            mesh->m_VertexLayout.layouts[1].attriType = VA_COLOR;
+            mesh->m_VertexLayout.layouts[1].offset = sizeof(float) * 3 * 3 * maxTriangleNum;
+            mesh->m_VertexLayout.layouts[1].size = 0;
+
+            // UV attribute layout
+            mesh->m_VertexLayout.layouts[2].attriType = VA_TEXCOORD;
+            mesh->m_VertexLayout.layouts[2].offset = sizeof(float) * 3 * 3 * maxTriangleNum + sizeof(float) * 4 * 3 * maxTriangleNum;
+            mesh->m_VertexLayout.layouts[2].size = 0;
+
+            // Shader desc
+            mesh->m_ShaderDesc.SetFlag(shader::GLB_COLOR_IN_VERTEX, true);
+            mesh->m_ShaderDesc.SetFlag(shader::GLB_TEXCOORD_IN_VERTEX, true);
+        } else {
+            GLB_SAFE_ASSERT(false);
+        }
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return mesh;
+}
+
+VertexLayout DynamicTriangleMesh::Imp::GetVertexLayout() {
+    return m_VertexLayout;
+}
+
+shader::Descriptor DynamicTriangleMesh::Imp::GetShaderDesc() {
+    return m_ShaderDesc;
+}
+
+int32_t DynamicTriangleMesh::Imp::GetVertexNum() {
+    return m_CurrentTriangleNum * 3;
+}
+
+VertexBuffer* DynamicTriangleMesh::Imp::GetVertexBuffer() {
+    return m_VertexBuffer;
+}
+
+void DynamicTriangleMesh::Imp::AddRect(math::Vector lt, math::Vector rb, math::Vector color) {
+    AddRect(lt, color, math::Vector(0.0f, 0.0f, 0.0f)
+        , math::Vector(rb.x, lt.y, rb.z), color, math::Vector(0.0f, 0.0f, 0.0f)
+        , rb, color, math::Vector(0.0f, 0.0f, 0.0f)
+        , math::Vector(lt.x, rb.y, lt.z), color, math::Vector(0.0f, 0.0f, 0.0f));
+}
+
+void DynamicTriangleMesh::Imp::AddRect(math::Vector v0, math::Vector c0, math::Vector uv0,
+                                    math::Vector v1, math::Vector c1, math::Vector uv1,
+                                    math::Vector v2, math::Vector c2, math::Vector uv2,
+                                    math::Vector v3, math::Vector c3, math::Vector uv3) {
+    if (m_CurrentTriangleNum < m_MaxTriangleNum) {
+        GLfloat vertexBuf[18];
+        vertexBuf[0] = v0.x;
+        vertexBuf[1] = v0.y;
+        vertexBuf[2] = v0.z;
+        vertexBuf[3] = v1.x;
+        vertexBuf[4] = v1.y;
+        vertexBuf[5] = v1.z;
+        vertexBuf[6] = v2.x;
+        vertexBuf[7] = v2.y;
+        vertexBuf[8] = v2.z;
+        vertexBuf[9] = v0.x;
+        vertexBuf[10] = v0.y;
+        vertexBuf[11] = v0.z;
+        vertexBuf[12] = v2.x;
+        vertexBuf[13] = v2.y;
+        vertexBuf[14] = v2.z;
+        vertexBuf[15] = v3.x;
+        vertexBuf[16] = v3.y;
+        vertexBuf[17] = v3.z;
+
+        GLfloat colorBuf[24];
+        colorBuf[0] = c0.x;
+        colorBuf[1] = c0.y;
+        colorBuf[2] = c0.z;
+        colorBuf[3] = c0.w;
+        colorBuf[4] = c1.x;
+        colorBuf[5] = c1.y;
+        colorBuf[6] = c1.z;
+        colorBuf[7] = c1.w;
+        colorBuf[8] = c2.x;
+        colorBuf[9] = c2.y;
+        colorBuf[10] = c2.z;
+        colorBuf[11] = c2.w;
+        colorBuf[12] = c0.x;
+        colorBuf[13] = c0.y;
+        colorBuf[14] = c0.z;
+        colorBuf[15] = c0.w;
+        colorBuf[16] = c2.x;
+        colorBuf[17] = c2.y;
+        colorBuf[18] = c2.z;
+        colorBuf[19] = c2.w;
+        colorBuf[20] = c3.x;
+        colorBuf[21] = c3.y;
+        colorBuf[22] = c3.z;
+        colorBuf[23] = c3.w;
+
+        GLfloat uvBuf[12];
+        uvBuf[0] = uv0.x;
+        uvBuf[1] = uv0.y;
+        uvBuf[2] = uv1.x;
+        uvBuf[3] = uv1.y;
+        uvBuf[4] = uv2.x;
+        uvBuf[5] = uv2.y;
+        uvBuf[6] = uv0.x;
+        uvBuf[7] = uv0.y;
+        uvBuf[8] = uv2.x;
+        uvBuf[9] = uv2.y;
+        uvBuf[10] = uv3.x;
+        uvBuf[11] = uv3.y;
+
+        GLuint va = m_VertexBuffer->GetVAO();
+        GLuint vb = m_VertexBuffer->GetVBO();
+        glBindVertexArray(va);
+        glBindBuffer(GL_ARRAY_BUFFER, vb);
+        glBufferSubData(GL_ARRAY_BUFFER, m_CurrentTriangleNum * 3 * 3 * sizeof(float), sizeof(vertexBuf), vertexBuf);
+        glBufferSubData(GL_ARRAY_BUFFER, m_MaxTriangleNum * 3 * 3 * sizeof(float) + m_CurrentTriangleNum * 3 * 4 * sizeof(float), sizeof(colorBuf), colorBuf);
+        glBufferSubData(GL_ARRAY_BUFFER, m_MaxTriangleNum * 3 * 3 * sizeof(float) + m_MaxTriangleNum * 3 * 4 * sizeof(float) + m_CurrentTriangleNum * 3 * 2 * sizeof(float), sizeof(uvBuf), uvBuf);
+
+        m_CurrentTriangleNum = m_CurrentTriangleNum + 2;
+    }
+}
+
+void DynamicTriangleMesh::Imp::Clear() {
+    m_CurrentTriangleNum = 0;
 }
 
 //-----------------------------------------------------------------------------------
@@ -691,7 +860,7 @@ FontMesh::Imp* FontMesh::Imp::Create(int32_t maxCharacter) {
     FontMesh::Imp* mesh = NULL;
 
     // This mesh only has line primitive with position, color and uv
-    int32_t buf_size = (sizeof(float) * (3 + 3 + 2)) * maxCharacter * 6;
+    int32_t buf_size = (sizeof(float) * (3 + 4 + 2)) * maxCharacter * 6;
 
     // Create vertex array object
     VertexBuffer* vbuf = new VertexBuffer;
@@ -722,7 +891,7 @@ FontMesh::Imp* FontMesh::Imp::Create(int32_t maxCharacter) {
 
             // UV attribute layout
             mesh->m_VertexLayout.layouts[2].attriType = VA_TEXCOORD;
-            mesh->m_VertexLayout.layouts[2].offset = sizeof(float) * (3 + 3) * 6 * maxCharacter;
+            mesh->m_VertexLayout.layouts[2].offset = sizeof(float) * (3 + 4) * 6 * maxCharacter;
             mesh->m_VertexLayout.layouts[2].size = 0;
 
             // Shader desc
@@ -760,25 +929,31 @@ void FontMesh::Imp::AddChar(math::Vector ltUV, math::Vector rbUV, math::Vector p
         vertex_buf[16] = pos.y - size.y;
         vertex_buf[17] = 0.0f;
 
-        GLfloat color_buf[18];
+        GLfloat color_buf[24];
         color_buf[0] = color.x;
         color_buf[1] = color.y;
         color_buf[2] = color.z;
-        color_buf[3] = color.x;
-        color_buf[4] = color.y;
-        color_buf[5] = color.z;
-        color_buf[6] = color.x;
-        color_buf[7] = color.y;
-        color_buf[8] = color.z;
-        color_buf[9] = color.x;
-        color_buf[10] = color.y;
-        color_buf[11] = color.z;
+        color_buf[3] = color.w;
+        color_buf[4] = color.x;
+        color_buf[5] = color.y;
+        color_buf[6] = color.z;
+        color_buf[7] = color.w;
+        color_buf[8] = color.x;
+        color_buf[9] = color.y;
+        color_buf[10] = color.z;
+        color_buf[11] = color.w;
         color_buf[12] = color.x;
         color_buf[13] = color.y;
         color_buf[14] = color.z;
-        color_buf[15] = color.x;
-        color_buf[16] = color.y;
-        color_buf[17] = color.z;
+        color_buf[15] = color.w;
+        color_buf[16] = color.x;
+        color_buf[17] = color.y;
+        color_buf[18] = color.z;
+        color_buf[19] = color.w;
+        color_buf[20] = color.x;
+        color_buf[21] = color.y;
+        color_buf[22] = color.z;
+        color_buf[23] = color.w;
 
         GLfloat uvBuf[12];
         uvBuf[0] = ltUV.x;
@@ -799,8 +974,8 @@ void FontMesh::Imp::AddChar(math::Vector ltUV, math::Vector rbUV, math::Vector p
         glBindVertexArray(va);
         glBindBuffer(GL_ARRAY_BUFFER, vb);
         glBufferSubData(GL_ARRAY_BUFFER, m_CurCharacterNum * 6 * 3 * sizeof(float), sizeof(vertex_buf), vertex_buf);
-        glBufferSubData(GL_ARRAY_BUFFER, m_MaxCharacterNum * 6 * 3 * sizeof(float) + m_CurCharacterNum * 6 * 3 * sizeof(float), sizeof(color_buf), color_buf);
-        glBufferSubData(GL_ARRAY_BUFFER, m_MaxCharacterNum * 6 * 3 * sizeof(float) + m_MaxCharacterNum * 6 * 3 * sizeof(float) + m_CurCharacterNum * 6 * 2 * sizeof(float), sizeof(uvBuf), uvBuf);
+        glBufferSubData(GL_ARRAY_BUFFER, m_MaxCharacterNum * 6 * 3 * sizeof(float) + m_CurCharacterNum * 6 * 4 * sizeof(float), sizeof(color_buf), color_buf);
+        glBufferSubData(GL_ARRAY_BUFFER, m_MaxCharacterNum * 6 * 3 * sizeof(float) + m_MaxCharacterNum * 6 * 4 * sizeof(float) + m_CurCharacterNum * 6 * 2 * sizeof(float), sizeof(uvBuf), uvBuf);
 
         m_CurCharacterNum++;
     }

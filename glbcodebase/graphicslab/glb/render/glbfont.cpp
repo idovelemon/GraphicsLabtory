@@ -46,6 +46,7 @@ public:
     void Destroy();
 
     void GetCharacter(const char c, float& ltX, float& ltY, float& rbX, float& rbY, float& ndcSizeX, float& ndcSizeY);
+    void GetTextSize(const char* text, float& ndcSizeX, float& ndcSizeY);
     int32_t GetFontTexture();
 
 protected:
@@ -146,6 +147,26 @@ void MgrImp::GetCharacter(const char c, float& ltU, float& ltV, float& rbU, floa
     rbV = rbY * 1.0f / height;
 }
 
+void MgrImp::GetTextSize(const char* text, float& ndcSizeX, float& ndcSizeY) {
+    ndcSizeX = 0.0f, ndcSizeY = 0.0f;
+
+    if (text) {
+        for (int32_t i = 0; i < strlen(text); i++) {
+            float ltU = 0.0f, ltV = 0.0f, rbU = 0.0f, rbV = 0.0f, ndcSizeXPerChar = 0.0f, ndcSizeYPerChar = 0.0f;
+            if (text[i] == ' ') {
+                GetCharacter(',', ltU, ltV, rbU, rbV, ndcSizeXPerChar, ndcSizeYPerChar);
+            } else {
+                GetCharacter(text[i], ltU, ltV, rbU, rbV, ndcSizeXPerChar, ndcSizeYPerChar);
+            }
+
+            ndcSizeX = ndcSizeX + ndcSizeXPerChar;
+            if (ndcSizeYPerChar > ndcSizeY) {
+                ndcSizeY = ndcSizeYPerChar;
+            }
+        }
+    }
+}
+
 int32_t MgrImp::GetFontTexture() {
     return m_FontTexture;
 }
@@ -184,6 +205,14 @@ void Mgr::Destroy() {
 void Mgr::GetCharacter(const char c, float& ltX, float& ltY, float& rbX, float& rbY, float& ndcSizeX, float& ndcSizeY) {
     if (s_MgrImp != NULL) {
         s_MgrImp->GetCharacter(c, ltX, ltY, rbX, rbY, ndcSizeX, ndcSizeY);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+}
+
+void Mgr::GetTextSize(const char* text, float& ndcSizeX, float& ndcSizeY) {
+    if (s_MgrImp != NULL) {
+        s_MgrImp->GetTextSize(text, ndcSizeX, ndcSizeY);
     } else {
         GLB_SAFE_ASSERT(false);
     }

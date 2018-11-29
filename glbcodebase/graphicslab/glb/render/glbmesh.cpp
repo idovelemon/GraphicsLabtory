@@ -271,6 +271,111 @@ void InstanceTriangleMesh::UpdateInstanceBuffer(void* data) {
 }
 
 //-----------------------------------------------------------------------------------
+// DynamicTriangleMesh DEFINITION
+//-----------------------------------------------------------------------------------
+
+DynamicTriangleMesh::DynamicTriangleMesh()
+: m_Imp(NULL) {
+}
+
+DynamicTriangleMesh::~DynamicTriangleMesh() {
+    GLB_SAFE_DELETE(m_Imp);
+}
+
+DynamicTriangleMesh* DynamicTriangleMesh::Create(int32_t maxTriangleNum) {
+    DynamicTriangleMesh* mesh = NULL;
+
+    DynamicTriangleMesh::Imp* imp = DynamicTriangleMesh::Imp::Create(maxTriangleNum);
+    if (imp != NULL) {
+        mesh = new DynamicTriangleMesh;
+        if (mesh != NULL) {
+            mesh->m_Imp = imp;
+        } else {
+            GLB_SAFE_ASSERT(false);
+        }
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return mesh;
+}
+
+VertexLayout DynamicTriangleMesh::GetVertexLayout() {
+    VertexLayout layout;
+
+    if (m_Imp != NULL) {
+        layout = m_Imp->GetVertexLayout();
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return layout;
+}
+
+shader::Descriptor DynamicTriangleMesh::GetShaderDesc() {
+    shader::Descriptor desc;
+
+    if (m_Imp != NULL) {
+        desc = m_Imp->GetShaderDesc();
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return desc;
+}
+
+int32_t DynamicTriangleMesh::GetVertexNum() {
+    int32_t result = 0;
+
+    if (m_Imp) {
+        result = m_Imp->GetVertexNum();
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return result;
+}
+
+VertexBuffer* DynamicTriangleMesh::GetVertexBuffer() {
+    VertexBuffer* buf = NULL;
+
+    if (m_Imp != NULL) {
+        buf = m_Imp->GetVertexBuffer();
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return buf;
+}
+
+void DynamicTriangleMesh::AddRect(math::Vector lt, math::Vector rb, math::Vector color) {
+    if (m_Imp != NULL) {
+        m_Imp->AddRect(lt, rb, color);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+}
+
+void DynamicTriangleMesh::AddRect(math::Vector v0, math::Vector c0, math::Vector uv0,
+                                math::Vector v1, math::Vector c1, math::Vector uv1,
+                                math::Vector v2, math::Vector c2, math::Vector uv2,
+                                math::Vector v3, math::Vector c3, math::Vector uv3) {
+    if (m_Imp != NULL) {
+        m_Imp->AddRect(v0, c0, uv0, v1, c1, uv1, v2, c2, uv2, v3, c3, uv3);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+}
+
+void DynamicTriangleMesh::Clear() {
+    if (m_Imp) {
+        m_Imp->Clear();
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+}
+
+//-----------------------------------------------------------------------------------
 // DebugMesh DEFINITION
 //-----------------------------------------------------------------------------------
 DebugMesh::DebugMesh()

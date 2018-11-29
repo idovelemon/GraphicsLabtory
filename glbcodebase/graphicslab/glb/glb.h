@@ -26,6 +26,7 @@
 #endif
 
 #include "glbapplication.h"
+#include "glbdebugmenu.h"
 #include "glbinput.h"
 
 #include "math/glbmath.h"
@@ -36,6 +37,7 @@
 #include "scene/glbobject.h"
 #include "scene/glbscene.h"
 
+#include "render/glbfont.h"
 #include "render/glbmaterial.h"
 #include "render/glbmesh.h"
 #include "render/glbrender.h"

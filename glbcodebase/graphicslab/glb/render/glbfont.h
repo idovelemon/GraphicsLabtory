@@ -26,6 +26,7 @@ public:
     static void Destroy();
 
     static void GetCharacter(const char c, float& ltX, float& ltY, float& rbX, float& rbY, float& ndcSizeX, float& ndcSizeY);
+    static void GetTextSize(const char* text, float& ndcSizeX, float& ndcSizeY);
     static int32_t GetFontTexture();
 };
 
