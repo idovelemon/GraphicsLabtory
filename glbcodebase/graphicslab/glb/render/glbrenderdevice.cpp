@@ -159,6 +159,70 @@ void Device::SetUniformSamplerCube(int32_t location, int32_t sampler) {
     }
 }
 
+void Device::SetUniform1i(const char* name, int32_t v) {
+    if (s_DeviceImp != nullptr) {
+        s_DeviceImp->SetUniform1i(name, v);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+}
+
+void Device::SetUniform1f(const char* name, float v) {
+    if (s_DeviceImp != nullptr) {
+        s_DeviceImp->SetUniform1f(name, v);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+}
+
+void Device::SetUniform3f(const char* name, const math::Vector& v) {
+    if (s_DeviceImp != nullptr) {
+        s_DeviceImp->SetUniform3f(name, v);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+}
+
+void Device::SetUniform4f(const char* name, const math::Vector& v) {
+    if (s_DeviceImp != nullptr) {
+        s_DeviceImp->SetUniform4f(name, v);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+}
+
+void Device::SetUniformMatrix(const char* name, math::Matrix& m) {
+    if (s_DeviceImp != nullptr) {
+        s_DeviceImp->SetUniformMatrix(name, m);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+}
+
+void Device::SetUniformSampler2D(const char* name, texture::Texture* tex, int32_t texUnit) {
+    if (s_DeviceImp != nullptr) {
+        s_DeviceImp->SetUniformSampler2D(name, tex, texUnit);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+}
+
+void Device::SetUniformSampler3D(const char* name, texture::Texture* tex, int32_t texUnit) {
+    if (s_DeviceImp != nullptr) {
+        s_DeviceImp->SetUniformSampler3D(name, tex, texUnit);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+}
+
+void Device::SetUniformSamplerCube(const char* name, texture::Texture* tex, int32_t texUnit) {
+    if (s_DeviceImp != nullptr) {
+        s_DeviceImp->SetUniformSamplerCube(name, tex, texUnit);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+}
+
 void Device::SetDepthTestEnable(bool enable) {
     if (s_DeviceImp != NULL) {
         s_DeviceImp->SetDepthTestEnable(enable);

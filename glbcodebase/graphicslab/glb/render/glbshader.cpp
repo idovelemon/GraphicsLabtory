@@ -300,6 +300,18 @@ void* UberProgram::GetNativeShader() {
     return shader;
 }
 
+std::vector<ShaderParameter> UberProgram::GetProgramParameter() {
+    std::vector<ShaderParameter> result;
+
+    if (m_Imp != nullptr) {
+        result = m_Imp->GetProgramParameter();
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return result;
+}
+
 std::vector<uniform::UniformEntry>& UberProgram::GetUniforms() {
     return m_Imp->GetUniforms();
 }
@@ -413,6 +425,18 @@ void* UserProgram::GetNativeShader() {
     }
 
     return shader;
+}
+
+std::vector<ShaderParameter> UserProgram::GetProgramParameter() {
+    std::vector<ShaderParameter> result;
+
+    if (m_Imp != nullptr) {
+        result = m_Imp->GetProgramParameter();
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return result;
 }
 
 int32_t UserProgram::GetUniformLocation(const char* uniform_name) {

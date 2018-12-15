@@ -52,6 +52,8 @@ public:
     //--------------------------------------------------------------------------------
     static Object* Create(const char* file_name, math::Vector pos = math::Vector(0.0f, 0.0f, 0.0f),
         math::Vector scale = math::Vector(1.0f, 1.0f, 1.0f), math::Vector rotation = math::Vector(0.0f, 0.0f, 0.0f));
+    static Object* Create(const char* meshFile, const char* materialGroupFile, math::Vector pos = math::Vector(0.0f, 0.0f, 0.0f),
+        math::Vector scale = math::Vector(1.0f, 1.0f, 1.0f), math::Vector rotation = math::Vector(0.0f, 0.0f, 0.0f));
     static Object* Create(scene::Model* model, math::Vector pos = math::Vector(0.0f, 0.0f, 0.0f),
         math::Vector scale = math::Vector(1.0f, 1.0f, 1.0f), math::Vector rotation = math::Vector(0.0f, 0.0f, 0.0f));
 

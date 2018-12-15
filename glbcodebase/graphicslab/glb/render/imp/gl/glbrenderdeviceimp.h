@@ -70,6 +70,14 @@ public:
     void SetUniformSampler2D(int32_t location, int32_t slot);
     void SetUniformSampler3D(int32_t location, int32_t slot);
     void SetUniformSamplerCube(int32_t location, int32_t slot);
+    void SetUniform1i(const char* name, int32_t v);
+    void SetUniform1f(const char* name, float v);
+    void SetUniform3f(const char* name, const math::Vector& v);
+    void SetUniform4f(const char* name, const math::Vector& v);
+    void SetUniformMatrix(const char* name, math::Matrix& m);
+    void SetUniformSampler2D(const char* name, texture::Texture* tex, int32_t texUnit);
+    void SetUniformSampler3D(const char* name, texture::Texture* tex, int32_t texUnit);
+    void SetUniformSamplerCube(const char* name, texture::Texture* tex, int32_t texUnit);
 
     // Render State
     void SetDepthTestEnable(bool enable);
@@ -125,6 +133,7 @@ private:
     TextureUnit         m_Texture[TS_MAX];
 
     // Shader
+    int32_t             m_Shader;
     ShaderLayout        m_ShaderLayout;
 
     // Render State

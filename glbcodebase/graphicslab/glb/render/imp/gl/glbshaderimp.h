@@ -85,6 +85,7 @@ public:
     int32_t GetProgramType();
     ShaderLayout GetShaderLayout();
     void* GetNativeShader();
+    std::vector<ShaderParameter> GetProgramParameter();
 
     Descriptor GetShaderDescriptor();
     std::vector<uniform::UniformEntry>& GetUniforms();
@@ -100,6 +101,7 @@ private:
     FragmentShader*                      m_FragmentShader;
     ShaderLayout                         m_ShaderLayout;
     Descriptor                           m_ShaderDescptor;
+    std::vector<ShaderParameter>         m_ShaderParameter;
     std::vector<uniform::UniformEntry>   m_Uniforms;
 };
 
@@ -116,6 +118,7 @@ public:
     int32_t GetProgramType();
     ShaderLayout GetShaderLayout();
     void* GetNativeShader();
+    std::vector<ShaderParameter> GetProgramParameter();
 
     int32_t GetUniformLocation(const char* uniform_name);
 
@@ -129,6 +132,7 @@ private:
     VertexShader*                        m_VertexShader;
     FragmentShader*                      m_FragmentShader;
     ShaderLayout                         m_ShaderLayout;
+    std::vector<ShaderParameter>         m_ShaderParameter;
 };
 
 };  // namespace shader

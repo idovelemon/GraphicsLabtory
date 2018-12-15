@@ -30,35 +30,35 @@ namespace shader {
 
 //----------------------------------------------------------------------------------
 
-char* glbLoadShaderBufferFromFile(const char* file_name) {
-    char* shader_str = NULL;
-    if (file_name != NULL) {
+char* glbLoadShaderBufferFromFile(const char* fileName) {
+    char* shader_str = nullptr;
+    if (fileName != nullptr) {
         // @TODO:Must use rb mode to read shader string, otherwise it will encounter some weird compile error.
         // Don't know why now.
-        FILE* shader_file = fopen(file_name, "rb");
+        FILE* shaderFile = fopen(fileName, "rb");
 
-        if (shader_file != NULL) {
-            fseek(shader_file, 0, SEEK_END);
-            int32_t size = ftell(shader_file);
+        if (shaderFile != nullptr) {
+            fseek(shaderFile, 0, SEEK_END);
+            int32_t size = ftell(shaderFile);
 
             shader_str = new char[size + 1];
-            if (shader_str != NULL) {
+            if (shader_str != nullptr) {
                 memset(shader_str, 0, size);
 
-                fseek(shader_file, 0, SEEK_SET);
-                fread(shader_str, sizeof(char), size, shader_file);
+                fseek(shaderFile, 0, SEEK_SET);
+                fread(shader_str, sizeof(char), size, shaderFile);
                 shader_str[size] = '\0';  // @Warning:Must have a null-terminator
             } else {
                 GLB_SAFE_ASSERT(false);
             }
         } else {
-            char buffer[64];
-            sprintf(buffer, "Do not exist shader file:%s", file_name);
-            GLB_SAFE_ASSERT(false);
+            std::string msg = fileName;
+            msg += " doesn't exsit";
+            GLB_SAFE_ASSERT_LOG(false, msg.c_str());
         }
 
-        if (shader_file != NULL) {
-            fclose(shader_file);
+        if (shaderFile != NULL) {
+            fclose(shaderFile);
         }
     } else {
         GLB_SAFE_ASSERT(false);
@@ -117,7 +117,7 @@ VertexShader::Imp* VertexShader::Imp::Create(const char* vertex_shader_name) {
                 printf(reinterpret_cast<char*>(info_log));
                 util::log::LogPrint(info_log);
 
-                GLB_SAFE_ASSERT(false);
+                GLB_SAFE_ASSERT_LOG(false, info_log);
             } else {
                 result = new VertexShader::Imp();
                 if (result != NULL) {
@@ -305,7 +305,7 @@ FragmentShader::Imp* FragmentShader::Imp::Create(const char* fragment_shader_nam
                 util::log::LogPrint("Compile fragment shader failed!");
                 util::log::LogPrint("Failed fragment shader name:%s", fragment_shader_name);
                 util::log::LogPrint("Failed fragment shader log:%s", info_log);
-                GLB_SAFE_ASSERT(false);
+                GLB_SAFE_ASSERT_LOG(false, info_log);
             } else {
                 result = new FragmentShader::Imp();
                 if (result != NULL) {
@@ -415,6 +415,7 @@ UberProgram::Imp::Imp()
 , m_ShaderLayout()
 , m_ShaderDescptor() {
     memset(&m_ShaderLayout, 0, sizeof(m_ShaderLayout));
+    m_ShaderParameter.clear();
 }
 
 UberProgram::Imp::~Imp() {
@@ -474,6 +475,7 @@ UberProgram::Imp* UberProgram::Imp::Create(const char* vertex_shader_file, const
             GLint uniform_num = 0;
             glGetProgramiv(program, GL_ACTIVE_UNIFORMS, &uniform_num);
             std::vector<uniform::UniformEntry> uniforms;
+            std::vector<ShaderParameter> shaderParameters;
             for (int32_t i = 0; i < uniform_num; i++) {
                 GLsizei length = 0;
                 GLint size = 0;
@@ -491,6 +493,30 @@ UberProgram::Imp* UberProgram::Imp::Create(const char* vertex_shader_file, const
                     }
                 }
                 GLB_SAFE_ASSERT(entry.id != -1);
+
+                ShaderParameter parameter;
+                memcpy(parameter.name, name, strlen(name));
+                parameter.name[strlen(name)] = '\0';
+                if (type == GL_INT) {
+                    parameter.format = PARAMETER_FORMAT_INT;
+                } else if (type == GL_FLOAT) {
+                    parameter.format = PARAMETER_FORMAT_FLOAT;
+                } else if (type == GL_SAMPLER_2D) {
+                    parameter.format = PARAMETER_FORMAT_TEXTURE_2D;
+                } else if (type == GL_SAMPLER_3D) {
+                    parameter.format = PARAMETER_FORMAT_TEXTURE_3D;
+                } else if (type == GL_SAMPLER_CUBE) {
+                    parameter.format = PARAMETER_FORMAT_TEXTURE_CUBE;
+                } else if (type == GL_FLOAT_VEC3) {
+                    parameter.format = PARAMETER_FORMAT_FLOAT3;
+                } else if (type == GL_FLOAT_VEC4) {
+                    parameter.format = PARAMETER_FORMAT_FLOAT4;
+                } else if (type == GL_FLOAT_MAT4) {
+                    parameter.format = PARAMETER_FORMAT_MATRIX;
+                } else {
+                    GLB_SAFE_ASSERT(false);
+                }
+                shaderParameters.push_back(parameter);
 
                 entry.location = glGetUniformLocation(program, name);
 
@@ -514,6 +540,7 @@ UberProgram::Imp* UberProgram::Imp::Create(const char* vertex_shader_file, const
                     memcpy(&shader_program->m_ShaderLayout, &layout, sizeof(layout));
                     shader_program->m_Uniforms = uniforms;
                     shader_program->m_Type = UBER_PROGRAM;
+                    shader_program->m_ShaderParameter = shaderParameters;
                 } else {
                     GLB_SAFE_ASSERT(false);
                 }
@@ -572,6 +599,7 @@ UberProgram::Imp* UberProgram::Imp::Create(Descriptor desc) {
             GLint uniform_num = 0;
             glGetProgramiv(program, GL_ACTIVE_UNIFORMS, &uniform_num);
             std::vector<uniform::UniformEntry> uniforms;
+            std::vector<ShaderParameter> shaderParameters;
             for (int32_t i = 0; i < uniform_num; i++) {
                 GLsizei length = 0;
                 GLint size = 0;
@@ -587,6 +615,30 @@ UberProgram::Imp* UberProgram::Imp::Create(Descriptor desc) {
                         break;
                     }
                 }
+
+                ShaderParameter parameter;
+                memcpy(parameter.name, name, strlen(name));
+                parameter.name[strlen(name)] = '\0';
+                if (type == GL_INT) {
+                    parameter.format = PARAMETER_FORMAT_INT;
+                } else if (type == GL_FLOAT) {
+                    parameter.format = PARAMETER_FORMAT_FLOAT;
+                } else if (type == GL_SAMPLER_2D) {
+                    parameter.format = PARAMETER_FORMAT_TEXTURE_2D;
+                } else if (type == GL_SAMPLER_3D) {
+                    parameter.format = PARAMETER_FORMAT_TEXTURE_3D;
+                } else if (type == GL_SAMPLER_CUBE) {
+                    parameter.format = PARAMETER_FORMAT_TEXTURE_CUBE;
+                } else if (type == GL_FLOAT_VEC3) {
+                    parameter.format = PARAMETER_FORMAT_FLOAT3;
+                } else if (type == GL_FLOAT_VEC4) {
+                    parameter.format = PARAMETER_FORMAT_FLOAT4;
+                } else if (type == GL_FLOAT_MAT4) {
+                    parameter.format = PARAMETER_FORMAT_MATRIX;
+                } else {
+                    GLB_SAFE_ASSERT(false);
+                }
+                shaderParameters.push_back(parameter);
 
                 entry.location = glGetUniformLocation(program, name);
 
@@ -609,6 +661,7 @@ UberProgram::Imp* UberProgram::Imp::Create(Descriptor desc) {
                     shader_program->m_FragmentShader = fs;
                     memcpy(&shader_program->m_ShaderLayout, &layout, sizeof(layout));
                     shader_program->m_Uniforms = uniforms;
+                    shader_program->m_ShaderParameter = shaderParameters;
                     shader_program->m_ShaderDescptor = desc;
                     shader_program->m_Type = UBER_PROGRAM;
                 } else {
@@ -649,6 +702,10 @@ void* UberProgram::Imp::GetNativeShader() {
     return reinterpret_cast<void*>(m_Program);
 }
 
+std::vector<ShaderParameter> UberProgram::Imp::GetProgramParameter() {
+    return m_ShaderParameter;
+}
+
 std::vector<uniform::UniformEntry>& UberProgram::Imp::GetUniforms() {
     return m_Uniforms;
 }
@@ -662,6 +719,7 @@ UserProgram::Imp::Imp()
 , m_FragmentShader(0)
 , m_ShaderLayout() {
     memset(&m_ShaderLayout, 0, sizeof(m_ShaderLayout));
+    m_ShaderParameter.clear();
 }
 
 UserProgram::Imp::~Imp() {
@@ -706,6 +764,8 @@ UserProgram::Imp* UserProgram::Imp::Create(const char* vertex_shader_file, const
             ShaderLayout layout;
             memset(&layout, 0, sizeof(layout));
             layout.count = attributes_num;
+
+            std::vector<ShaderParameter> shaderParameters;
             for (int32_t i = 0; i < attributes_num; i++) {
                 GLsizei length = 0;
                 GLint size = 0;
@@ -715,6 +775,32 @@ UserProgram::Imp* UserProgram::Imp::Create(const char* vertex_shader_file, const
                 layout.layouts[i].attriType = UserProgram::GetVertexAttribute(name);
                 layout.layouts[i].location = glGetAttribLocation(program, name);
                 memcpy(layout.layouts[i].name, name, length);
+
+                ShaderParameter parameter;
+                memcpy(parameter.name, name, strlen(name));
+                parameter.name[strlen(name)] = '\0';
+                if (type == GL_INT) {
+                    parameter.format = PARAMETER_FORMAT_INT;
+                } else if (type == GL_FLOAT) {
+                    parameter.format = PARAMETER_FORMAT_FLOAT;
+                } else if (type == GL_SAMPLER_2D) {
+                    parameter.format = PARAMETER_FORMAT_TEXTURE_2D;
+                } else if (type == GL_SAMPLER_3D) {
+                    parameter.format = PARAMETER_FORMAT_TEXTURE_3D;
+                } else if (type == GL_SAMPLER_CUBE) {
+                    parameter.format = PARAMETER_FORMAT_TEXTURE_CUBE;
+                } else if (type == GL_FLOAT_VEC2) {
+                    parameter.format = PARAMETER_FORMAT_FLOAT3;  // TODO:
+                } else if (type == GL_FLOAT_VEC3) {
+                    parameter.format = PARAMETER_FORMAT_FLOAT3;
+                } else if (type == GL_FLOAT_VEC4) {
+                    parameter.format = PARAMETER_FORMAT_FLOAT4;
+                } else if (type == GL_FLOAT_MAT4) {
+                    parameter.format = PARAMETER_FORMAT_MATRIX;
+                } else {
+                    GLB_SAFE_ASSERT(false);
+                }
+                shaderParameters.push_back(parameter);
             }
 
             GLint success = 0;
@@ -733,6 +819,7 @@ UserProgram::Imp* UserProgram::Imp::Create(const char* vertex_shader_file, const
                     shader_program->m_FragmentShader = fragment_shader;
                     memcpy(&shader_program->m_ShaderLayout, &layout, sizeof(layout));
                     shader_program->m_Type = USER_PROGRAM;
+                    shader_program->m_ShaderParameter = shaderParameters;
                 } else {
                     GLB_SAFE_ASSERT(false);
                 }
@@ -765,6 +852,10 @@ ShaderLayout UserProgram::Imp::GetShaderLayout() {
 
 void* UserProgram::Imp::GetNativeShader() {
     return reinterpret_cast<void*>(m_Program);
+}
+
+std::vector<ShaderParameter> UserProgram::Imp::GetProgramParameter() {
+    return m_ShaderParameter;
 }
 
 int32_t UserProgram::Imp::GetUniformLocation(const char* uniform_name) {

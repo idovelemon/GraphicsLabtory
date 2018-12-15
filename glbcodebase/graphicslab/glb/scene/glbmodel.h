@@ -7,6 +7,7 @@
 #ifndef GLB_GLBMODEL_H_
 #define GLB_GLBMODEL_H_
 
+#include "render/glbmaterial.h"
 #include "render/glbmesh.h"
 #include "scene/glbmodelfile.h"
 
@@ -45,7 +46,8 @@ public:
     std::string GetName() const;
     int32_t GetMeshId() const;
     int32_t GetTexId(int32_t slot) const;
-    int32_t GetMaterial() const;
+    void SetMaterialGroup(render::material::MaterialGroup group);
+    render::material::MaterialGroup GetMaterialGroup() const;
     math::Vector GetBoundBoxMax() const;
     math::Vector GetBoundBoxMin() const;
 
@@ -76,13 +78,13 @@ public:
     void SetTexWithId(int32_t slot, int32_t tex_id);
 
 protected:
-    std::string         m_Name;
-    int32_t             m_Mesh;
-    int32_t             m_Tex[MT_MAX];
-    int32_t             m_Material;
-    math::Vector        m_BoundBoxMax;
-    math::Vector        m_BoundBoxMin;
-    ModelEffectParam    m_ModelEffectParam;
+    std::string                                 m_Name;
+    int32_t                                     m_Mesh;
+    int32_t                                     m_Tex[MT_MAX];
+    render::material::MaterialGroup             m_MaterialGroup;
+    math::Vector                                m_BoundBoxMax;
+    math::Vector                                m_BoundBoxMin;
+    ModelEffectParam                            m_ModelEffectParam;
 };
 
 //--------------------------------------------------------------------------

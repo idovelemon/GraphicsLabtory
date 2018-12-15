@@ -54,7 +54,6 @@ private:
 Model::Model()
 : m_Name()
 , m_Mesh(-1)
-, m_Material(-1)
 , m_ModelEffectParam()
 , m_BoundBoxMax(0.0f, 0.0f, 0.0f)
 , m_BoundBoxMin(0.0f, 0.0f, 0.0f) {
@@ -81,7 +80,6 @@ Model* Model::Create(const char* fileName) {
         int32_t light0Tex = -1;
         int32_t light1Tex = -1;
         int32_t light2Tex = -1;
-        int32_t material = -1;
 
         float* vertexBuf = NULL;
         float* texBuf = NULL;
@@ -163,19 +161,6 @@ Model* Model::Create(const char* fileName) {
             GLB_SAFE_ASSERT(false);
         }
 
-        render::material::Material mat;
-        mat.ambient = materialParam.ambient;
-        mat.diffuse = materialParam.diffuse;
-        mat.specular = materialParam.specular;
-        mat.emission = materialParam.emission;
-        mat.specular_pow = materialParam.pow;
-        mat.albedo = materialParam.albedo;
-        mat.roughness = materialParam.roughness;
-        mat.metallic = materialParam.metallic;
-        memcpy(mat.mat_name, fileName, strlen(fileName));
-        mat.mat_name[strlen(fileName)] = '\0';
-        material = render::material::Mgr::AddMaterial(mat);
-
         model = new Model;
         model->m_Name = std::string(fileName);
         model->m_Mesh = mesh->GetId();
@@ -208,7 +193,6 @@ Model* Model::Create(const char* fileName) {
             model->m_Tex[MT_LIGHT1] = light1Tex;
             model->m_Tex[MT_LIGHT2] = light2Tex;
         }
-        model->m_Material = material;
         model->m_ModelEffectParam = effectParam;
         model->m_BoundBoxMax = materialParam.boundboxMax;
         model->m_BoundBoxMin = materialParam.boundboxMin;
@@ -251,13 +235,6 @@ Model* Model::Create(int32_t numTriangles, float* vertexBuf, float* texBuf, floa
 
         model->m_Tex[MT_DIFFUSE_PFC] = render::texture::Mgr::LoadPFCTexture("..\\glb\\resource\\texture\\diffuse.pfc");
         model->m_Tex[MT_SPECULAR_PFC] = render::texture::Mgr::LoadPFCTexture("..\\glb\\resource\\texture\\specular.pfc");
-
-        render::material::Material material;
-        material.albedo = math::Vector(1.0f, 1.0f, 1.0f);
-        material.roughness = 0.5f;
-        material.metallic = 0.5f;
-        material.emission = math::Vector(0.0f, 0.0f, 0.0f);
-        model->m_Material = render::material::Mgr::AddMaterial(material);
     } else {
         GLB_SAFE_ASSERT(false);
     }
@@ -282,8 +259,12 @@ int32_t Model::GetTexId(int32_t slot) const {
     return result;
 }
 
-int32_t Model::GetMaterial() const {
-    return m_Material;
+void Model::SetMaterialGroup(render::material::MaterialGroup group) {
+    m_MaterialGroup = group;
+}
+
+render::material::MaterialGroup Model::GetMaterialGroup() const {
+    return m_MaterialGroup;
 }
 
 math::Vector Model::GetBoundBoxMax() const {
@@ -545,19 +526,6 @@ InstanceModel* InstanceModel::Create(const char* fileName, int32_t maxInstance) 
             GLB_SAFE_ASSERT(false);
         }
 
-        render::material::Material mat;
-        mat.ambient = materialParam.ambient;
-        mat.diffuse = materialParam.diffuse;
-        mat.specular = materialParam.specular;
-        mat.emission = materialParam.emission;
-        mat.specular_pow = materialParam.pow;
-        mat.albedo = materialParam.albedo;
-        mat.roughness = materialParam.roughness;
-        mat.metallic = materialParam.metallic;
-        memcpy(mat.mat_name, fileName, strlen(fileName));
-        mat.mat_name[strlen(fileName)] = '\0';
-        material = render::material::Mgr::AddMaterial(mat);
-
         model = new InstanceModel;
         model->m_MaxInstance = maxInstance;
         model->m_Name = std::string(fileName);
@@ -591,7 +559,6 @@ InstanceModel* InstanceModel::Create(const char* fileName, int32_t maxInstance) 
             model->m_Tex[MT_LIGHT1] = light1Tex;
             model->m_Tex[MT_LIGHT2] = light2Tex;
         }
-        model->m_Material = material;
         model->m_ModelEffectParam = effectParam;
         model->m_BoundBoxMax = materialParam.boundboxMax;
         model->m_BoundBoxMin = materialParam.boundboxMin;

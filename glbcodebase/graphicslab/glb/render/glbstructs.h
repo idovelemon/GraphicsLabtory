@@ -58,6 +58,23 @@ struct ShaderLayout {
     ShaderLayoutAttribute layouts[VA_MAX];
 };
 
+// Parameter's data type
+enum ParameterFormat {
+    PARAMETER_FORMAT_INT = 0,
+    PARAMETER_FORMAT_FLOAT,
+    PARAMETER_FORMAT_FLOAT3,
+    PARAMETER_FORMAT_FLOAT4,
+    PARAMETER_FORMAT_TEXTURE_2D,
+    PARAMETER_FORMAT_TEXTURE_3D,
+    PARAMETER_FORMAT_TEXTURE_CUBE,
+    PARAMETER_FORMAT_MATRIX,
+};
+
+struct ShaderParameter {
+    ParameterFormat format;
+    char            name[kMaxUniformName];
+};
+
 };  // namespace render
 
 };  // namespace glb

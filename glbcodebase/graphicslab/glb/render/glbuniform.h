@@ -164,6 +164,9 @@ public:
     void SetSampler2D(int32_t sampler);
     int32_t GetSampler2D();
 
+    void SetSampler3D(int32_t sampler);
+    int32_t GetSampler3D();
+
     void SetSamplerCube(int32_t sampler);
     int32_t GetSamplerCube();
 
@@ -176,6 +179,7 @@ public:
 private:
     int32_t                 m_Int;
     int32_t                 m_Sampler2D;
+    int32_t                 m_Sampler3D;
     int32_t                 m_SamplerCube;
     float                   m_Float;
     math::Vector            m_Vector;
@@ -300,6 +304,10 @@ struct UniformEntry {
     int                 id;
     int32_t             flag;  // 0:Scene Uniforms 1:Object Uniforms
 };
+
+//---------------------------------------------------------------------
+
+bool IsInternalParameter(const char* name);
 
 };  // namespace uniform
 

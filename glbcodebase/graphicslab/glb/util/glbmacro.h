@@ -8,6 +8,7 @@
 #define GLB_GLBMACRO_H_
 
 #include <assert.h>
+#include <stdio.h>
 
 #include <Windows.h>
 
@@ -30,17 +31,20 @@
     }
 
 #if _DEBUG
-#define GLB_SAFE_ASSERT(_expression_) GLB_SAFE_ASSERT_D(_expression_)
+#define GLB_SAFE_ASSERT(_expression_) GLB_SAFE_ASSERT_D(_expression_, "Error")
+#define GLB_SAFE_ASSERT_LOG(_expression_, _error_msg_) GLB_SAFE_ASSERT_D(_expression_, _error_msg_)
 #else
 #define GLB_SAFE_ASSERT(_expression_) GLB_SAFE_ASSERT_R(_expression_)
 #endif
 
-#define GLB_SAFE_ASSERT_D(_expression_) \
+#define GLB_SAFE_ASSERT_D(_expression_, _error_msg_) \
     do {\
         bool result = _expression_; \
         if (result == false) {\
-            OutputDebugStringA(__FUNCTION__); \
-            MessageBoxA(NULL, __FUNCTION__, "Assert-Error", MB_OK); \
+            char buffer[256];\
+            sprintf(buffer, "%s: %s", __FUNCTION__, _error_msg_);\
+            OutputDebugStringA(buffer); \
+            MessageBoxA(NULL, buffer, "Assert-Error", MB_OK); \
         } \
         assert(result); \
     }while(false);

@@ -128,6 +128,14 @@ public:
     static void SetUniformSampler2D(int32_t location, int32_t slot);
     static void SetUniformSampler3D(int32_t location, int32_t slot);
     static void SetUniformSamplerCube(int32_t location, int32_t slot);
+    static void SetUniform1i(const char* name, int32_t v);
+    static void SetUniform1f(const char* name, float v);
+    static void SetUniform3f(const char* name, const math::Vector& v);
+    static void SetUniform4f(const char* name, const math::Vector& v);
+    static void SetUniformMatrix(const char* name, math::Matrix& m);
+    static void SetUniformSampler2D(const char* name, texture::Texture* tex, int32_t texUnit);
+    static void SetUniformSampler3D(const char* name, texture::Texture* tex, int32_t texUnit);
+    static void SetUniformSamplerCube(const char* name, texture::Texture* tex, int32_t texUnit);
 
     // Render State
     static void SetDepthTestEnable(bool enable);

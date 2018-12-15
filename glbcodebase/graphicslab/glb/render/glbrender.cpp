@@ -11,6 +11,7 @@
 #include "glbapplication.h"
 #include "glbdebugmenu.h"
 #include "glbfont.h"
+#include "glbmaterial.h"
 #include "glbmesh.h"
 #include "glbrenderdevice.h"
 #include "glbrendertarget.h"
@@ -131,6 +132,8 @@ public:
     void Destroy();
     void Draw();
 
+    int32_t GetBRDFMap();
+
     void SetPerspective(int32_t type, float fov, float aspect, float znear, float zfar);
     math::Matrix& GetPerspective(int32_t type);
     void SetCurPerspectiveType(int32_t type);
@@ -177,6 +180,8 @@ protected:
     void PrepareHDR();
     void PrepareEnvMap();
 
+    void SetupInternalMaterialParameters();
+
     // PSSM
     void SplitFrustum();
     void SplitShadowReceivers();
@@ -201,6 +206,7 @@ protected:
     // Light Loop
     void PreDrawLightLoop();
     void DrawLightLoopCore();
+    void DrawLightLoopCoreTest();
 
     // HDR
     void DownsampleTex();
@@ -551,6 +557,10 @@ void RenderImp::Draw() {
 #endif
 }
 
+int32_t RenderImp::GetBRDFMap() {
+    return m_BRDFPFTMap;
+}
+
 void RenderImp::SetPerspective(int32_t type, float fov, float aspect, float znear, float zfar) {
     if (0 <= type && type < Render::MAX_PERS) {
         m_Perspective[type].fov = fov;
@@ -789,6 +799,7 @@ void RenderImp::PreDraw() {
     //        render::Render::AddLine(points[render::Render::NRD], points[render::Render::FRD], color);
     //    }
     //}
+    SetupInternalMaterialParameters();
 }
 
 void RenderImp::DrawShadowMap() {
@@ -810,7 +821,8 @@ void RenderImp::DrawDecalMap() {
 
 void RenderImp::DrawLightLoop() {
     PreDrawLightLoop();
-    DrawLightLoopCore();
+    //DrawLightLoopCore();
+    DrawLightLoopCoreTest();
 }
 
 void RenderImp::DrawDebugLine() {
@@ -1061,6 +1073,60 @@ void RenderImp::PrepareHDR() {
 
 void RenderImp::PrepareEnvMap() {
     m_BRDFPFTMap = texture::Mgr::LoadPFTTexture("..\\glb\\resource\\texture\\dfg.pft");
+}
+
+void RenderImp::SetupInternalMaterialParameters() {
+    std::vector<scene::Object*> objs;
+    scene::Scene::GetAllObjects(objs);
+
+    // Loop every objects
+    for (auto obj : objs) {
+        if (obj) {
+            if (obj->GetObjectType() == scene::Object::OBJECT_TYPE_NORMAL) {
+                material::MaterialGroup group = obj->GetModel()->GetMaterialGroup();
+
+                // Loop every pass material
+                std::vector<material::MaterialGroup::Entry> allPassMaterials = group.GetAllPassMaterial();
+                for (auto& pass : allPassMaterials) {
+                    material::Material* mat = material::Mgr::GetMaterial(pass.materialID);
+
+                    // Loop every internal parameters
+                    std::vector<material::Material::ParameterEntry>& parameters = mat->GetAllParameters();
+                    for (auto& entry : parameters) {
+                        if (entry.type == material::Material::PARAMETER_TYPE_INTERNAL) {
+                            // Find match picker
+                            for (auto& pick : uniform::kEngineUniforms) {
+                                if (!strcmp(entry.name, pick.name)) {
+                                    uniform::Wrapper data = uniform::kUniformPickers[pick.id].picker(obj);
+
+                                    // Fill data
+                                    if (entry.format == PARAMETER_FORMAT_FLOAT) {
+                                        entry.floatValue = data.GetFloat();
+                                    } else if (entry.format == PARAMETER_FORMAT_FLOAT3) {
+                                        entry.vecValue = data.GetVector();
+                                    } else if (entry.format == PARAMETER_FORMAT_FLOAT4) {
+                                        entry.vecValue = data.GetVector();
+                                    } else if (entry.format == PARAMETER_FORMAT_INT) {
+                                        entry.intValue = data.GetInt();
+                                    } else if (entry.format == PARAMETER_FORMAT_MATRIX) {
+                                        entry.matValue = data.GetMatrix();
+                                    } else if (entry.format == PARAMETER_FORMAT_TEXTURE_2D) {
+                                        entry.intValue = data.GetSampler2D();  // TODO:
+                                    } else if (entry.format == PARAMETER_FORMAT_TEXTURE_3D) {
+                                        entry.intValue = data.GetSampler3D();  // TODO:
+                                    } else if (entry.format == PARAMETER_FORMAT_TEXTURE_CUBE) {
+                                        entry.intValue = data.GetSamplerCube();  // TODO:
+                                    } else {
+                                        GLB_SAFE_ASSERT(false);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 void RenderImp::SplitFrustum() {
@@ -2196,6 +2262,101 @@ void RenderImp::DrawLightLoopCore() {
     render::Device::SetRenderTarget(0);
 }
 
+void RenderImp::DrawLightLoopCoreTest() {
+    // Render Target
+    render::Device::SetRenderTarget(m_HDRRenderTarget);
+
+    // Draw Buffer
+    render::Device::SetDrawColorBuffer(render::COLORBUF_COLOR_ATTACHMENT0);
+
+    // Clear
+    render::Device::SetClearColor(0.0f, 0.0f, 0.0f);
+    render::Device::SetClearDepth(1.0f);
+    render::Device::Clear(CLEAR_COLOR | CLEAR_DEPTH);
+
+    for (int32_t i = 0; i < static_cast<int32_t>(m_ShaderGroups.size()); i++) {
+        std::vector<scene::Object*> objs = m_ShaderGroups[i].GetObjects();
+        shader::UberProgram* program = static_cast<shader::UberProgram*>(m_ShaderGroups[i].GetShaderProgram());
+
+        // Shader
+        render::Device::SetShader(program);
+        render::Device::SetShaderLayout(program->GetShaderLayout());
+
+        // Objects
+        for (int32_t j = 0; j < static_cast<int32_t>(objs.size()); j++) {
+            scene::Object* obj = objs[j];
+
+            // Check if enable draw
+            if (!obj->IsDrawEnable() || obj->GetObjectType() == scene::Object::OBJECT_TYPE_INSTANCE
+                || obj->GetObjectType() == scene::Object::OBJECT_TYPE_DECAL) {
+                continue;
+            }
+
+            // Material Parameters
+            material::Material* material = material::Mgr::GetMaterial(obj->GetModel()->GetMaterialGroup().GetPassMaterial("lightloop"));
+            int32_t texUnit = 0;
+            for (auto& param : material->GetAllParameters()) {
+                if (param.format == PARAMETER_FORMAT_FLOAT) {
+                    render::Device::SetUniform1f(param.name, param.floatValue);
+                } else if (param.format == PARAMETER_FORMAT_FLOAT3) {
+                    render::Device::SetUniform3f(param.name, param.vecValue);
+                } else if (param.format == PARAMETER_FORMAT_FLOAT4) {
+                    render::Device::SetUniform4f(param.name, param.vecValue);
+                } else if (param.format == PARAMETER_FORMAT_INT) {
+                    render::Device::SetUniform1i(param.name, param.intValue);
+                } else if (param.format == PARAMETER_FORMAT_MATRIX) {
+                    render::Device::SetUniformMatrix(param.name, param.matValue);
+                } else if (param.format == PARAMETER_FORMAT_TEXTURE_2D) {
+                    render::Device::SetUniformSampler2D(param.name, texture::Mgr::GetTextureById(param.intValue), texUnit++);
+                } else if (param.format == PARAMETER_FORMAT_TEXTURE_3D) {
+                    render::Device::SetUniformSampler3D(param.name, texture::Mgr::GetTextureById(param.intValue), texUnit++);
+                } else if (param.format == PARAMETER_FORMAT_TEXTURE_CUBE) {
+                    render::Device::SetUniformSamplerCube(param.name, texture::Mgr::GetTextureById(param.intValue), texUnit++);
+                }
+            }
+
+            // Vertex Buffer
+            int32_t mesh_id = obj->GetModel()->GetMeshId();
+            VertexLayout layout = mesh::Mgr::GetMeshById(mesh_id)->GetVertexLayout();
+            int32_t num = mesh::Mgr::GetMeshById(mesh_id)->GetVertexNum();
+            render::Device::SetVertexBuffer(mesh::Mgr::GetMeshById(mesh_id)->GetVertexBuffer());
+            render::Device::SetVertexLayout(layout);
+
+            if (obj->IsCullFaceEnable()) {
+                render::Device::SetCullFaceEnable(true);
+                render::Device::SetCullFaceMode(obj->GetCullFaceMode());
+            } else {
+                render::Device::SetCullFaceEnable(false);
+            }
+
+            if (obj->IsDepthTestEnable()) {
+                render::Device::SetDepthTestEnable(true);
+            } else {
+                render::Device::SetDepthTestEnable(false);
+            }
+
+            if (obj->IsAlphaBlendEnable()) {
+                render::Device::SetAlphaBlendEnable(true);
+                render::Device::SetAlphaBlendFunc(render::FACTOR_SRC, obj->GetAlphaBlendFunc(render::FACTOR_SRC));
+                render::Device::SetAlphaBlendFunc(render::FACTOR_DST, obj->GetAlphaBlendFunc(render::FACTOR_DST));
+            } else {
+                render::Device::SetAlphaBlendEnable(false);
+            }
+
+            // Draw
+            if (obj->GetObjectType() == scene::Object::OBJECT_TYPE_NORMAL) {
+                render::Device::Draw(render::PT_TRIANGLES, 0, num);
+            } else if (obj->GetObjectType() == scene::Object::OBJECT_TYPE_INSTANCE_RENDER) {
+                int32_t instanceNum = reinterpret_cast<scene::InstanceRenderObject*>(obj)->GetCurInstanceNum();
+                render::Device::DrawInstance(render::PT_TRIANGLES, 0, num, instanceNum);
+            }
+        }
+    }
+
+    // Reset render target
+    render::Device::SetRenderTarget(0);
+}
+
 void RenderImp::FilterBrightness() {
     // Render Target
     render::Device::SetRenderTarget(m_FilterBrightnessRT);
@@ -2513,6 +2674,18 @@ void Render::Draw() {
     } else {
         GLB_SAFE_ASSERT(false);
     }
+}
+
+int32_t Render::GetBRDFMap() {
+    int32_t result = -1;
+
+    if (s_RenderImp != NULL) {
+        result = s_RenderImp->GetBRDFMap();
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return result;
 }
 
 void Render::SetPerspective(int32_t type, float fov, float aspect, float znear, float zfar) {

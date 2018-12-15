@@ -10,6 +10,7 @@
 
 #include "glbmodel.h"
 
+#include "render/glbmaterial.h"
 #include "util/glbmacro.h"
 
 namespace glb {
@@ -53,6 +54,43 @@ Object* Object::Create(const char* file_name, math::Vector pos, math::Vector sca
             } else {
                 GLB_SAFE_ASSERT(false);
             }
+        } else {
+            GLB_SAFE_ASSERT(false);
+        }
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return obj;
+}
+
+Object* Object::Create(const char* meshFile, const char* materialGroupFile, math::Vector pos, math::Vector scale, math::Vector rotation) {
+    Object* obj = nullptr;
+    
+    Model* model = nullptr;
+    if (meshFile) {
+        model = ModelMgr::GetModelByName(meshFile);
+        if (model == nullptr) {
+            model = ModelMgr::AddModel(meshFile);
+        }
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    render::material::MaterialGroup group;
+    if (materialGroupFile) {
+        group = render::material::Mgr::AddMaterialGroup(materialGroupFile);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    if (model) {
+        obj = new Object();
+        model->SetMaterialGroup(group);
+        if (obj) {
+            obj->m_Model = model;
+            obj->m_WorldMatrix.MakeIdentityMatrix();
+            obj->m_ShaderDesc = obj->CalculateShaderDesc();
         } else {
             GLB_SAFE_ASSERT(false);
         }

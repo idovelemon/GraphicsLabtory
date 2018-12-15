@@ -44,6 +44,9 @@ public:
     static void Destroy();
     static void Draw();
 
+    // Texture
+    static int32_t GetBRDFMap();
+
     // Perspective
     static void SetPerspective(int32_t type, float fov, float aspect, float znear, float zfar);
     static math::Matrix GetPerspective(int32_t type);

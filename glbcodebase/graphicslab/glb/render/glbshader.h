@@ -164,6 +164,7 @@ public:
     virtual void SetID(int32_t id) = 0;
     virtual ShaderLayout GetShaderLayout() = 0;
     virtual void* GetNativeShader() = 0;
+    virtual std::vector<ShaderParameter> GetProgramParameter() = 0;
 };
 
 //--------------------------------------------------------------------
@@ -180,6 +181,7 @@ public:
     virtual int32_t GetProgramType();
     virtual ShaderLayout GetShaderLayout();
     virtual void* GetNativeShader();
+    virtual std::vector<ShaderParameter> GetProgramParameter();
 
     Descriptor GetShaderDescriptor();
     std::vector<uniform::UniformEntry>& GetUniforms();
@@ -211,6 +213,7 @@ public:
     virtual int32_t GetProgramType();
     virtual ShaderLayout GetShaderLayout();
     virtual void* GetNativeShader();
+    virtual std::vector<ShaderParameter> GetProgramParameter();
 
     int32_t GetUniformLocation(const char* uniform_name);
 

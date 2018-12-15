@@ -41,6 +41,7 @@ DeviceImp::DeviceImp()
 , m_VertexBufferObject(-1)
 , m_InstanceBufferObject(-1)
 , m_VertexLayout()
+, m_Shader(-1)
 , m_ShaderLayout()
 , m_EnableDepthTest(false)
 , m_EnableDepthWrite(false)
@@ -182,8 +183,8 @@ void DeviceImp::ClearTexture() {
 // Shader
 void DeviceImp::SetShader(shader::Program* program) {
     if (program != NULL) {
-        int32_t shader = reinterpret_cast<int32_t>(program->GetNativeShader());
-        glUseProgram(shader);
+        m_Shader = reinterpret_cast<int32_t>(program->GetNativeShader());
+        glUseProgram(m_Shader);
     } else {
         GLB_SAFE_ASSERT(false);
     }
@@ -261,6 +262,95 @@ void DeviceImp::SetUniformSamplerCube(int32_t location, int32_t slot) {
         glActiveTexture(GL_TEXTURE0 + m_Texture[slot].tex_unit);
         glBindTexture(GL_TEXTURE_CUBE_MAP, m_Texture[slot].tex_obj);
         glUniform1i(location, m_Texture[slot].tex_unit);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+}
+
+void DeviceImp::SetUniform1i(const char* name, int32_t v) {
+    int32_t location = glGetUniformLocation(m_Shader, name);
+
+    if (location > -1) {
+        glUniform1i(location, v);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+}
+
+void DeviceImp::SetUniform1f(const char* name, float v) {
+    int32_t location = glGetUniformLocation(m_Shader, name);
+
+    if (location > -1) {
+        glUniform1f(location, v);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+}
+
+void DeviceImp::SetUniform3f(const char* name, const math::Vector& v) {
+    int32_t location = glGetUniformLocation(m_Shader, name);
+
+    if (location > -1) {
+        glUniform3f(location, v.x, v.y, v.z);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+}
+
+void DeviceImp::SetUniform4f(const char* name, const math::Vector& v) {
+    int32_t location = glGetUniformLocation(m_Shader, name);
+
+    if (location > -1) {
+        glUniform4f(location, v.x, v.y, v.z, v.w);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+}
+
+void DeviceImp::SetUniformMatrix(const char* name, math::Matrix& m) {
+    int32_t location = glGetUniformLocation(m_Shader, name);
+
+    if (location > -1) {
+        glUniformMatrix4fv(location, 1, true, m.GetData());
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+}
+
+void DeviceImp::SetUniformSampler2D(const char* name, texture::Texture* tex, int32_t texUnit) {
+    int32_t location = glGetUniformLocation(m_Shader, name);
+
+    if (location > -1) {
+        glEnable(GL_TEXTURE_2D);
+        glActiveTexture(GL_TEXTURE0 + texUnit);
+        glBindTexture(GL_TEXTURE_2D, reinterpret_cast<GLuint>(tex->GetNativeTex()));
+        glUniform1i(location, texUnit);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+}
+
+void DeviceImp::SetUniformSampler3D(const char* name, texture::Texture* tex, int32_t texUnit) {
+    int32_t location = glGetUniformLocation(m_Shader, name);
+
+    if (location > -1) {
+        glEnable(GL_TEXTURE_3D);
+        glActiveTexture(GL_TEXTURE0 + texUnit);
+        glBindTexture(GL_TEXTURE_3D, reinterpret_cast<GLuint>(tex->GetNativeTex()));
+        glUniform1i(location, texUnit);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+}
+
+void DeviceImp::SetUniformSamplerCube(const char* name, texture::Texture* tex, int32_t texUnit) {
+    int32_t location = glGetUniformLocation(m_Shader, name);
+
+    if (location > -1) {
+        glEnable(GL_TEXTURE_CUBE_MAP);
+        glActiveTexture(GL_TEXTURE0 + texUnit);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, reinterpret_cast<GLuint>(tex->GetNativeTex()));
+        glUniform1i(location, texUnit);
     } else {
         GLB_SAFE_ASSERT(false);
     }
