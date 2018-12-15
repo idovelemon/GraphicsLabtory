@@ -1,0 +1,1 @@
+pass lightloop res/floor.mat
