@@ -40,22 +40,25 @@ static MgrImp* s_MgrImp = NULL;
 // MgrImp DECLARATION
 //----------------------------------------------------------------------------------
 class MgrImp {
- public:
-     MgrImp();
-     virtual ~MgrImp();
+public:
+    MgrImp();
+    virtual ~MgrImp();
 
- public:
-     void Initialize();
-     void Destroy();
+public:
+    void Initialize();
+    void Destroy();
 
-     int32_t AddMaterial(const char* name);
-     MaterialGroup AddMaterialGroup(const char* name);
-     Material* GetMaterial(int32_t id);
-     int32_t GetMaterialCount();
+    int32_t AddMaterial(const char* name);
+    MaterialGroup AddMaterialGroup(const char* name);
+    Material* GetMaterial(int32_t id);
+    int32_t GetMaterialCount();
 
- protected:
-     std::map<int32_t, Material*>   m_MaterialDataBase;
-     int32_t                        m_IDGen;
+protected:
+    int32_t GetMaterialByName(const char* name);
+
+protected:
+    std::map<int32_t, Material*>   m_MaterialDataBase;
+    int32_t                        m_IDGen;
 };
 
 //-----------------------------------------------------------------------------------
@@ -73,6 +76,8 @@ Material* Material::Create(const char* materialName) {
 
     if (!input.fail()) {
         result = new Material(-1);
+        memcpy(result->m_MaterialName, materialName, strlen(materialName));
+        result->m_MaterialName[strlen(materialName)] = '\0';
 
         while (!input.eof()) {
             char buffer[kMaterialKeywordMaxLength];
@@ -136,6 +141,7 @@ Material::Material(int32_t shaderID)
 : m_ID(-1)
 , m_ShaderID(shaderID) {
     m_Parameters.clear();
+    memset(m_MaterialName, 0, sizeof(m_MaterialName));
 }
 
 Material::~Material() {
@@ -147,6 +153,14 @@ void Material::SetMaterialID(int32_t id) {
 
 int32_t Material::GetMaterialID() const {
     return m_ID;
+}
+
+int32_t Material::GetShaderID() const {
+    return m_ShaderID;
+}
+
+const char* Material::GetMaterialName() const {
+    return m_MaterialName;
 }
 
 void Material::SetFloatParameterByName(const char* name, float value) {
@@ -336,6 +350,7 @@ void Material::CollectParameter() {
                 || !strcmp(entry.name, "glb_unif_RoughnessTex")
                 || !strcmp(entry.name, "glb_unif_MetallicTex")
                 || !strcmp(entry.name, "glb_unif_NormalTex")
+                || !strcmp(entry.name, "glb_unif_EmissionTex")
                 || !strcmp(entry.name, "glb_unif_DiffusePFCTex")
                 || !strcmp(entry.name, "glb_unif_SpecularPFCTex")) {
                 entry.type = PARAMETER_TYPE_USER;
@@ -452,6 +467,8 @@ int32_t MgrImp::AddMaterial(const char* name) {
         m_IDGen++;
         material->SetMaterialID(m_IDGen);
         m_MaterialDataBase.insert(std::make_pair(m_IDGen, material));
+    } else {
+        GLB_SAFE_ASSERT(false);
     }
 
     return m_IDGen;
@@ -476,6 +493,21 @@ Material* MgrImp::GetMaterial(int32_t id) {
 
 int32_t MgrImp::GetMaterialCount() {
     return m_MaterialDataBase.size();
+}
+
+int32_t MgrImp::GetMaterialByName(const char* name) {
+    int32_t result = -1;
+
+    for (auto& material : m_MaterialDataBase) {
+        if (material.second) {
+            if (!strcmp(name, material.second->GetMaterialName())) {
+                result = material.first;
+                break;
+            }
+        }
+    }
+
+    return result;
 }
 
 //-----------------------------------------------------------------------------------

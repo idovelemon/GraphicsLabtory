@@ -46,8 +46,6 @@ public:
     std::string GetName() const;
     int32_t GetMeshId() const;
     int32_t GetTexId(int32_t slot) const;
-    void SetMaterialGroup(render::material::MaterialGroup group);
-    render::material::MaterialGroup GetMaterialGroup() const;
     math::Vector GetBoundBoxMax() const;
     math::Vector GetBoundBoxMin() const;
 
@@ -81,7 +79,6 @@ protected:
     std::string                                 m_Name;
     int32_t                                     m_Mesh;
     int32_t                                     m_Tex[MT_MAX];
-    render::material::MaterialGroup             m_MaterialGroup;
     math::Vector                                m_BoundBoxMax;
     math::Vector                                m_BoundBoxMin;
     ModelEffectParam                            m_ModelEffectParam;

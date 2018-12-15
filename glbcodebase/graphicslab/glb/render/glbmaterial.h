@@ -30,6 +30,7 @@ namespace material {
 //-----------------------------------------------------------------------------------
 static const int32_t kMaxTexUnits = 8;
 static const int32_t kMaxParameterNameLength = 128;
+static const int32_t kMaterialFileNameMaxLength = 128;
 static const int32_t kMaxPassNameLength = 64;
 
 //-----------------------------------------------------------------------------------
@@ -80,6 +81,10 @@ public:
     virtual void SetMaterialID(int32_t id);
     virtual int32_t GetMaterialID() const;
 
+    virtual int32_t GetShaderID() const;
+
+    virtual const char* GetMaterialName() const;
+
     virtual void SetFloatParameterByName(const char* name, float value);
     virtual float GetFloatParameterByName(const char* name) const;
 
@@ -111,6 +116,7 @@ protected:
 protected:
     int32_t                             m_ID;
     int32_t                             m_ShaderID;
+    char                                m_MaterialName[kMaterialFileNameMaxLength];
     std::vector<ParameterEntry>         m_Parameters;
 };
 

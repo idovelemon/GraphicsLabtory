@@ -259,14 +259,6 @@ int32_t Model::GetTexId(int32_t slot) const {
     return result;
 }
 
-void Model::SetMaterialGroup(render::material::MaterialGroup group) {
-    m_MaterialGroup = group;
-}
-
-render::material::MaterialGroup Model::GetMaterialGroup() const {
-    return m_MaterialGroup;
-}
-
 math::Vector Model::GetBoundBoxMax() const {
     return m_BoundBoxMax;
 }

@@ -159,6 +159,7 @@ public:
         UNKOWN_PROGRAM,
     };
 
+    virtual const char* GetShaderName() const = 0;
     virtual void SetProgramType(int32_t type) = 0;
     virtual int32_t GetProgramType() = 0;
     virtual void SetID(int32_t id) = 0;
@@ -177,6 +178,7 @@ public:
 
 public:
     virtual void SetID(int32_t id);
+    virtual const char* GetShaderName() const;
     virtual void SetProgramType(int32_t type);
     virtual int32_t GetProgramType();
     virtual ShaderLayout GetShaderLayout();
@@ -209,6 +211,7 @@ public:
 
 public:
     virtual void SetID(int32_t id);
+    const char* GetShaderName() const;
     virtual void SetProgramType(int32_t type);
     virtual int32_t GetProgramType();
     virtual ShaderLayout GetShaderLayout();

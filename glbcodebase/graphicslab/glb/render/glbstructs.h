@@ -75,6 +75,10 @@ struct ShaderParameter {
     char            name[kMaxUniformName];
 };
 
+// Shader Pass name
+static const char* kLightLoopPassName = "lightloop";
+static const char* kDecalPassName = "decal";
+
 };  // namespace render
 
 };  // namespace glb

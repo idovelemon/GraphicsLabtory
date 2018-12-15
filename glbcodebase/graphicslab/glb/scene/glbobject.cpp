@@ -66,7 +66,7 @@ Object* Object::Create(const char* file_name, math::Vector pos, math::Vector sca
 
 Object* Object::Create(const char* meshFile, const char* materialGroupFile, math::Vector pos, math::Vector scale, math::Vector rotation) {
     Object* obj = nullptr;
-    
+
     Model* model = nullptr;
     if (meshFile) {
         model = ModelMgr::GetModelByName(meshFile);
@@ -86,9 +86,9 @@ Object* Object::Create(const char* meshFile, const char* materialGroupFile, math
 
     if (model) {
         obj = new Object();
-        model->SetMaterialGroup(group);
         if (obj) {
             obj->m_Model = model;
+            obj->m_MaterialGroup = group;
             obj->m_WorldMatrix.MakeIdentityMatrix();
             obj->m_ShaderDesc = obj->CalculateShaderDesc();
         } else {
@@ -173,6 +173,10 @@ void Object::SetWorldMatrix(math::Matrix worldMatrix) {
 
 Model* Object::GetModel() {
     return m_Model;
+}
+
+render::material::MaterialGroup Object::GetMaterialGroup() {
+    return m_MaterialGroup;
 }
 
 render::shader::Descriptor Object::GetShaderDesc() {

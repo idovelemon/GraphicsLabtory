@@ -36,6 +36,9 @@ public:
     Program* GetShader(int32_t shader_id);
     int32_t GetUberShaderID(Descriptor desc);
 
+protected:
+    int32_t GetShaderByName(const char* vertex_shader_file, const char* fragment_shader_file, const char* geometry_shader_file);
+
 private:
     std::vector<Program*> m_ShaderDataBase;
 };
@@ -244,6 +247,16 @@ void UberProgram::SetID(int32_t shader_id) {
     }
 }
 
+const char* UberProgram::GetShaderName() const {
+    if (m_Imp != nullptr) {
+        return m_Imp->GetShaderName();
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return nullptr;
+}
+
 int32_t UberProgram::GetProgramType() {
     int32_t type = Program::UNKOWN_PROGRAM;
 
@@ -381,6 +394,10 @@ void UserProgram::SetID(int32_t shader_id) {
     } else {
         GLB_SAFE_ASSERT(false);
     }
+}
+
+const char* UserProgram::GetShaderName() const {
+    return "";  // TODO:
 }
 
 int32_t UserProgram::GetProgramType() {
@@ -563,15 +580,17 @@ void MgrImp::Destroy() {
 }
 
 int32_t MgrImp::AddUberShader(const char* vertex_shader_file, const char* fragment_shader_file, const char* geometry_shader_file) {
-    int32_t id = -1;
+    int32_t id = GetShaderByName(vertex_shader_file, fragment_shader_file, geometry_shader_file);
 
-    UberProgram* program = UberProgram::Create(vertex_shader_file, fragment_shader_file, geometry_shader_file);
-    if (program != NULL) {
-        id = m_ShaderDataBase.size();
-        program->SetID(id);
-        m_ShaderDataBase.push_back(program);
-    } else {
-        GLB_SAFE_ASSERT(false);
+    if (id == -1) {
+        UberProgram* program = UberProgram::Create(vertex_shader_file, fragment_shader_file, geometry_shader_file);
+        if (program != NULL) {
+            id = m_ShaderDataBase.size();
+            program->SetID(id);
+            m_ShaderDataBase.push_back(program);
+        } else {
+            GLB_SAFE_ASSERT(false);
+        }
     }
 
     return id;
@@ -611,6 +630,26 @@ int32_t MgrImp::GetUberShaderID(Descriptor desc) {
         program = UberProgram::Create(desc);
         result = m_ShaderDataBase.size();
         m_ShaderDataBase.push_back(program);
+    }
+
+    return result;
+}
+
+int32_t MgrImp::GetShaderByName(const char* vertexShaderFile, const char* fragmentShaderFile, const char* geometryShaderFile) {
+    std::string shaderName = vertexShaderFile;
+    shaderName += "-";
+    shaderName += fragmentShaderFile;
+    if (geometryShaderFile) {
+        shaderName += "-";
+        shaderName += geometryShaderFile;
+    }
+
+    int32_t result = -1;
+    for (std::vector<Program*>::size_type i = 0; i < m_ShaderDataBase.size(); i++) {
+        if (!strcmp(m_ShaderDataBase[i]->GetShaderName(), shaderName.c_str())) {
+            result = i;
+            break;
+        }
     }
 
     return result;

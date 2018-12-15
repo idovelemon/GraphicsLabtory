@@ -75,6 +75,7 @@ public:
     virtual void SetWorldMatrix(math::Matrix worldMatrix);
 
     virtual Model* GetModel();
+    virtual render::material::MaterialGroup GetMaterialGroup();
     virtual render::shader::Descriptor GetShaderDesc();
 
     virtual void SetDrawEnable(bool enable);
@@ -106,6 +107,7 @@ protected:
     int32_t                         m_ObjectId;
     bool                            m_IsDead;
     Model*                          m_Model;
+    render::material::MaterialGroup m_MaterialGroup;
     math::Matrix                    m_WorldMatrix;
     render::shader::Descriptor      m_ShaderDesc;
 

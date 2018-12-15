@@ -18,6 +18,9 @@ namespace render {
 namespace shader {
 
 //----------------------------------------------------------------------------------
+static const int32_t kShaderNameMaxLength = 258;
+
+//----------------------------------------------------------------------------------
 
 class VertexShader::Imp {
 public:
@@ -81,6 +84,7 @@ public:
 
 public:
     void SetID(int32_t id);
+    const char* GetShaderName() const;
     void SetProgramType(int32_t type);
     int32_t GetProgramType();
     ShaderLayout GetShaderLayout();
@@ -97,6 +101,7 @@ private:
     int32_t                              m_ID;
     int32_t                              m_Type;
     uint32_t                             m_Program;
+    char                                 m_ShaderName[kShaderNameMaxLength];
     VertexShader*                        m_VertexShader;
     FragmentShader*                      m_FragmentShader;
     ShaderLayout                         m_ShaderLayout;

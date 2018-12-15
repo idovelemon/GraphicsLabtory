@@ -415,6 +415,7 @@ UberProgram::Imp::Imp()
 , m_ShaderLayout()
 , m_ShaderDescptor() {
     memset(&m_ShaderLayout, 0, sizeof(m_ShaderLayout));
+    memset(m_ShaderName, 0, sizeof(m_ShaderName));
     m_ShaderParameter.clear();
 }
 
@@ -438,7 +439,7 @@ UberProgram::Imp* UberProgram::Imp::Create(const char* vertex_shader_file, const
     VertexShader* vertex_shader = VertexShader::Create(vertex_shader_file);
     FragmentShader* fragment_shader = FragmentShader::Create(fragment_shader_file);
     GeometryShader* geometry_shader = NULL;
-    if (geometry_shader) {
+    if (geometry_shader_file) {
         geometry_shader = GeometryShader::Create(geometry_shader_file);
     }
 
@@ -446,6 +447,14 @@ UberProgram::Imp* UberProgram::Imp::Create(const char* vertex_shader_file, const
         GLuint program = glCreateProgram();
 
         if (program != 0) {
+            std::string shaderName = vertex_shader_file;
+            shaderName += "-";
+            shaderName += fragment_shader_file;
+            if (geometry_shader_file) {
+                shaderName += "-";
+                shaderName += geometry_shader_file;
+            }
+
             glAttachShader(program, vertex_shader->GetHandle());
             glAttachShader(program, fragment_shader->GetHandle());
             if (geometry_shader) {
@@ -492,7 +501,6 @@ UberProgram::Imp* UberProgram::Imp::Create(const char* vertex_shader_file, const
                         break;
                     }
                 }
-                GLB_SAFE_ASSERT(entry.id != -1);
 
                 ShaderParameter parameter;
                 memcpy(parameter.name, name, strlen(name));
@@ -520,7 +528,9 @@ UberProgram::Imp* UberProgram::Imp::Create(const char* vertex_shader_file, const
 
                 entry.location = glGetUniformLocation(program, name);
 
-                uniforms.push_back(entry);
+                if (entry.id != -1) {  // Internal parameters
+                    uniforms.push_back(entry);
+                }
             }
 
             GLint success = 0;
@@ -535,6 +545,8 @@ UberProgram::Imp* UberProgram::Imp::Create(const char* vertex_shader_file, const
                 shader_program = new UberProgram::Imp();
                 if (shader_program != NULL) {
                     shader_program->m_Program = program;
+                    memcpy(shader_program->m_ShaderName, shaderName.c_str(), shaderName.length());
+                    shader_program->m_ShaderName[shaderName.length()] = '\0';
                     shader_program->m_VertexShader = vertex_shader;
                     shader_program->m_FragmentShader = fragment_shader;
                     memcpy(&shader_program->m_ShaderLayout, &layout, sizeof(layout));
@@ -680,6 +692,10 @@ UberProgram::Imp* UberProgram::Imp::Create(Descriptor desc) {
 
 void UberProgram::Imp::SetID(int32_t shader_id) {
     m_ID = shader_id;
+}
+
+const char* UberProgram::Imp::GetShaderName() const {
+    return m_ShaderName;
 }
 
 void UberProgram::Imp::SetProgramType(int32_t type) {
