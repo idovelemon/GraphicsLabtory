@@ -77,6 +77,7 @@ struct ShaderParameter {
 
 // Shader Pass name
 static const char* kLightLoopPassName = "lightloop";
+static const char* kShadowPassName = "shadow";
 static const char* kDecalPassName = "decal";
 
 };  // namespace render

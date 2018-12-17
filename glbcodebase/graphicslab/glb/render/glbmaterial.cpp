@@ -386,6 +386,18 @@ MaterialGroup MaterialGroup::Create(const char* groupFile) {
                 entry.materialID = Mgr::AddMaterial(buffer);
 
                 result.m_AllPassMaterial.push_back(entry);
+            } else if (!strcmp(buffer, "parameter")) {
+                // Parameter Name
+                input >> buffer;
+                if (!strcmp(buffer, "castshadow")) {
+                    int32_t enable = 0;
+                    input >> enable;
+                    result.m_EnableCastShadow = enable;
+                } else if (!strcmp(buffer, "receiveshadow")) {
+                    int32_t enable = 0;
+                    input >> enable;
+                    result.m_EnableReceiveShadow = enable;
+                }
             } else {
                 std::string msg = groupFile;
                 msg += " invalid keyword [";
@@ -403,7 +415,9 @@ MaterialGroup MaterialGroup::Create(const char* groupFile) {
     return result;
 }
 
-MaterialGroup::MaterialGroup() {
+MaterialGroup::MaterialGroup()
+: m_EnableCastShadow(false)
+, m_EnableReceiveShadow(false) {
     m_AllPassMaterial.clear();
 }
 
@@ -411,6 +425,8 @@ MaterialGroup::MaterialGroup(const MaterialGroup& group) {
     for (auto& entry : group.m_AllPassMaterial) {
         m_AllPassMaterial.push_back(entry);
     }
+    m_EnableCastShadow = group.m_EnableCastShadow;
+    m_EnableReceiveShadow = group.m_EnableReceiveShadow;
 }
 
 MaterialGroup::~MaterialGroup() {
@@ -439,6 +455,14 @@ int32_t MaterialGroup::GetPassMaterial(const char* passName) {
 
 std::vector<MaterialGroup::Entry> MaterialGroup::GetAllPassMaterial() {
     return m_AllPassMaterial;
+}
+
+bool MaterialGroup::IsCastShadowEnable() const {
+    return m_EnableCastShadow;
+}
+
+bool MaterialGroup::IsReceiveShadowEnable() const {
+    return m_EnableReceiveShadow;
 }
 
 //-----------------------------------------------------------------------------------

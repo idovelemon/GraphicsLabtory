@@ -372,10 +372,6 @@ render::shader::Descriptor Object::CalculateShaderDesc() {
         }
     }
 
-    if (m_Model->IsAcceptShadow()) {
-        desc.SetFlag(render::shader::GLB_ENABLE_SHADOW, true);
-    }
-
     if (m_Model->IsUseAO()) {
         desc.SetFlag(render::shader::GLB_ENABLE_AO, true);
     }

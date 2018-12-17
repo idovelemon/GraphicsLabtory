@@ -10,3 +10,4 @@
 #include "constant.gsh"
 #include "texture.gsh"
 #include "light.gsh"
+#include "shadow.gsh"

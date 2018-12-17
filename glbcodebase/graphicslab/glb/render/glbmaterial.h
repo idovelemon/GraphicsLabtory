@@ -143,8 +143,13 @@ public:
     int32_t GetPassMaterial(const char* passName);
     std::vector<Entry> GetAllPassMaterial();
 
+    bool IsCastShadowEnable() const;
+    bool IsReceiveShadowEnable() const;
+
 protected:
     std::vector<Entry>      m_AllPassMaterial;
+    bool                    m_EnableCastShadow;
+    bool                    m_EnableReceiveShadow;
 };
 
 //-----------------------------------------------------------------------------------

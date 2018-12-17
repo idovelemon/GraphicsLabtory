@@ -144,6 +144,7 @@ public:
     math::Matrix GetShadowMapMatrix(int32_t index);
     int32_t GetCurShadowMapIndex();
     float GetShadowSplitValue(int32_t index);
+    int32_t GetShadowMap(int32_t index);
 
     math::Matrix GetDecalViewMatrix();
     math::Matrix GetDecalProjMatrix();
@@ -178,6 +179,7 @@ protected:
     void PrepareHDR();
     void PrepareEnvMap();
 
+    void SetupShadowMatrix();
     void SetupInternalMaterialParameters();
 
     // PSSM
@@ -188,6 +190,7 @@ protected:
     void SplitShadowCasters(math::Matrix light_space_to_world_space);
     void ShrinkAllLightFrustums(math::Matrix light_space_to_world_space);
     void BuildShadowMatrixs(math::Matrix light_space_to_world_space);
+    void PreDrawShadowMapCore();
     void DrawShadowMapCore();
     math::AABB CalcAllObjectsBoundBox(math::Matrix trans, Frustum& frustum);
     void ShrinkLightFrustum(math::AABB caster, math::AABB receiver, Frustum& frustum);
@@ -677,6 +680,10 @@ float RenderImp::GetShadowSplitValue(int32_t index) {
     return m_ShadowSplitValue[index];
 }
 
+int32_t RenderImp::GetShadowMap(int32_t index) {
+    return m_ShadowMap[index];
+}
+
 math::Matrix RenderImp::GetDecalViewMatrix() {
     return m_DecalViewMatrix;
 }
@@ -792,16 +799,12 @@ void RenderImp::PreDraw() {
     //        render::Render::AddLine(points[render::Render::NRD], points[render::Render::FRD], color);
     //    }
     //}
+    SetupShadowMatrix();
     SetupInternalMaterialParameters();
 }
 
 void RenderImp::DrawShadowMap() {
-    SplitShadowReceivers();
-    math::Matrix light_space_to_world_space = BuildRefLightSpaceMatrix();
-    BuildBasicLightFrustums(light_space_to_world_space);
-    SplitShadowCasters(light_space_to_world_space);
-    ShrinkAllLightFrustums(light_space_to_world_space);
-    BuildShadowMatrixs(light_space_to_world_space);
+    PreDrawShadowMapCore();
     DrawShadowMapCore();
 }
 
@@ -1067,6 +1070,15 @@ void RenderImp::PrepareEnvMap() {
     m_BRDFPFTMap = texture::Mgr::LoadPFTTexture("..\\glb\\resource\\texture\\dfg.pft");
 }
 
+void RenderImp::SetupShadowMatrix() {
+    SplitShadowReceivers();
+    math::Matrix light_space_to_world_space = BuildRefLightSpaceMatrix();
+    BuildBasicLightFrustums(light_space_to_world_space);
+    SplitShadowCasters(light_space_to_world_space);
+    ShrinkAllLightFrustums(light_space_to_world_space);
+    BuildShadowMatrixs(light_space_to_world_space);
+}
+
 void RenderImp::SetupInternalMaterialParameters() {
     std::vector<scene::Object*> objs;
     scene::Scene::GetAllObjects(objs);
@@ -1103,14 +1115,16 @@ void RenderImp::SetupInternalMaterialParameters() {
                                     } else if (entry.format == PARAMETER_FORMAT_MATRIX) {
                                         entry.matValue = data.GetMatrix();
                                     } else if (entry.format == PARAMETER_FORMAT_TEXTURE_2D) {
-                                        entry.intValue = data.GetSampler2D();  // TODO:
+                                        entry.intValue = data.GetSampler2D();
                                     } else if (entry.format == PARAMETER_FORMAT_TEXTURE_3D) {
-                                        entry.intValue = data.GetSampler3D();  // TODO:
+                                        entry.intValue = data.GetSampler3D();
                                     } else if (entry.format == PARAMETER_FORMAT_TEXTURE_CUBE) {
-                                        entry.intValue = data.GetSamplerCube();  // TODO:
+                                        entry.intValue = data.GetSamplerCube();
                                     } else {
                                         GLB_SAFE_ASSERT(false);
                                     }
+
+                                    break;
                                 }
                             }
                         }
@@ -1157,7 +1171,7 @@ void RenderImp::SplitShadowReceivers() {
     std::vector<scene::Object*>::iterator it = objs.begin();
     for (; it != objs.end();) {
         scene::Object* obj = *it;
-        if (!obj->GetModel()->IsAcceptShadow() || !obj->IsDrawEnable()) {
+        if (!obj->GetMaterialGroup().IsReceiveShadowEnable() || !obj->IsDrawEnable()) {
             it = objs.erase(it);
         } else {
             ++it;
@@ -1260,7 +1274,7 @@ void RenderImp::SplitShadowCasters(math::Matrix light_space_to_world_space) {
     std::vector<scene::Object*>::iterator it = objs.begin();
     for (; it != objs.end();) {
         scene::Object* obj = *it;
-        if (!obj->GetModel()->IsCastShadow() || !obj->IsDrawEnable() || obj->GetObjectType() == scene::Object::OBJECT_TYPE_INSTANCE_RENDER) {
+        if (!obj->GetMaterialGroup().IsCastShadowEnable() || !obj->IsDrawEnable() || obj->GetObjectType() == scene::Object::OBJECT_TYPE_INSTANCE_RENDER) {
             it = objs.erase(it);
         } else {
             ++it;
@@ -1412,6 +1426,54 @@ void RenderImp::BuildShadowMatrixs(math::Matrix light_space_to_world_space) {
         m_ShadowMatrix[i].MakeIdentityMatrix();
         m_ShadowMatrix[i].Mul(proj);
         m_ShadowMatrix[i].Mul(view);
+    }
+}
+
+void RenderImp::PreDrawShadowMapCore() {
+    std::vector<scene::Object*> objs;
+    m_ShaderGroups.clear();
+
+    // Add sky object
+    scene::Object* obj = glb::scene::Scene::GetSkyObject();
+    if (obj != NULL) {
+        objs.push_back(obj);
+    }
+
+    // Add normal object
+    glb::scene::Scene::GetAllObjects(objs);
+
+    // Sort object by shader
+    std::map<int32_t, ShaderGroup> opaqueGroup;
+    for (int32_t i = 0; i < static_cast<int32_t>(objs.size()); i++) {
+        if (objs[i]->GetObjectType() == scene::Object::OBJECT_TYPE_INSTANCE) continue;
+        if (objs[i]->GetObjectType() == scene::Object::OBJECT_TYPE_DECAL) continue;
+
+        material::MaterialGroup group = objs[i]->GetMaterialGroup();
+        if (!group.IsCastShadowEnable()) continue;
+
+        // Only deal with light loop material
+        int32_t materialID = group.GetPassMaterial(kShadowPassName);
+        if (materialID != -1) {
+            material::Material* material = material::Mgr::GetMaterial(materialID);
+            if (material) {
+                int32_t shaderID = material->GetShaderID();
+                std::map<int32_t, ShaderGroup>::iterator it = opaqueGroup.find(shaderID);
+                if (it != opaqueGroup.end()) {
+                    it->second.AddObject(objs[i]);
+                } else {
+                    ShaderGroup newGroup(shader::Mgr::GetShader(shaderID));
+                    newGroup.AddObject(objs[i]);
+                    opaqueGroup.insert(std::pair<int32_t, ShaderGroup>(shaderID, newGroup));
+                }
+            } else {
+                GLB_SAFE_ASSERT(false);
+            }
+        }
+    }
+
+    // Copy shader group
+    for (std::map<int32_t, ShaderGroup>::iterator it = opaqueGroup.begin(); it != opaqueGroup.end(); ++it) {
+        m_ShaderGroups.push_back(it->second);
     }
 }
 
@@ -1606,48 +1668,48 @@ void RenderImp::SplitObjIntoFrustum(std::vector<scene::Object*>& objs, Frustum& 
 }
 
 void RenderImp::DrawShadowMapNormal() {
-    // Shader
-    shader::UberProgram* program = static_cast<shader::UberProgram*>(shader::Mgr::GetShader(m_ShadowShader));
-    std::vector<uniform::UniformEntry>& uniforms = program->GetUniforms();
-    render::Device::SetShader(program);
-    render::Device::SetShaderLayout(program->GetShaderLayout());
+    for (int32_t i = 0; i < static_cast<int32_t>(m_ShaderGroups.size()); i++) {
+        std::vector<scene::Object*> objs = m_ShaderGroups[i].GetObjects();
+        shader::UberProgram* program = static_cast<shader::UberProgram*>(m_ShaderGroups[i].GetShaderProgram());
 
-    // Scene uniforms
-    for (int32_t j = 0; j < static_cast<int32_t>(uniforms.size()); j++) {
-        uniform::UniformEntry entry = uniforms[j];
-        if (entry.flag) {
-            // TODO: for now, id is the index of the uniform picker table
-            uniform::Wrapper uniform_wrapper = uniform::kUniformPickers[entry.id].picker(NULL);
-            SetUniform(entry.location, uniform_wrapper);
-        }
-    }
+        // Shader
+        render::Device::SetShader(program);
+        render::Device::SetShaderLayout(program->GetShaderLayout());
 
-    std::vector<scene::Object*> objs;
-    scene::Object* sky_obj = scene::Scene::GetSkyObject();
-    if (sky_obj != NULL) {
-        objs.push_back(sky_obj);
-    }
+        // Objects
+        for (int32_t j = 0; j < static_cast<int32_t>(objs.size()); j++) {
+            scene::Object* obj = objs[j];
 
-    scene::Scene::GetAllObjects(objs);
+            // Check if enable draw
+            if (!obj->IsDrawEnable() || obj->GetObjectType() != scene::Object::OBJECT_TYPE_NORMAL) {
+                continue;
+            }
 
-    // Objects
-    for (int32_t j = 0; j < static_cast<int32_t>(objs.size()); j++) {
-        scene::Object* obj = objs[j];
+            // Material Parameters
+            material::Material* material = material::Mgr::GetMaterial(obj->GetMaterialGroup().GetPassMaterial(kShadowPassName));
+            int32_t texUnit = 0;
+            for (auto& param : material->GetAllParameters()) {
+                // Special case: glb_unif_ShadowMIndex
+                if (!strcmp(param.name, "glb_unif_ShadowMIndex")) {
+                    param.intValue = GetCurShadowMapIndex();
+                }
 
-        // Check if enable draw
-        if (!obj->IsDrawEnable() || obj->GetObjectType() != scene::Object::OBJECT_TYPE_NORMAL) {
-            continue;
-        }
-
-        // Check if cast shadow & enable depth
-        if (obj->GetModel()->IsCastShadow() && obj->IsDepthTestEnable()) {
-            // scene::Object Uniform
-            for (int32_t k = 0; k < static_cast<int32_t>(uniforms.size()); k++) {
-                uniform::UniformEntry entry = uniforms[k];
-                if (!entry.flag) {
-                    // TODO: for now, id is the index of the uniform picker table
-                    uniform::Wrapper uniform_wrapper = uniform::kUniformPickers[entry.id].picker(obj);
-                    SetUniform(entry.location, uniform_wrapper);
+                if (param.format == PARAMETER_FORMAT_FLOAT) {
+                    render::Device::SetUniform1f(param.name, param.floatValue);
+                } else if (param.format == PARAMETER_FORMAT_FLOAT3) {
+                    render::Device::SetUniform3f(param.name, param.vecValue);
+                } else if (param.format == PARAMETER_FORMAT_FLOAT4) {
+                    render::Device::SetUniform4f(param.name, param.vecValue);
+                } else if (param.format == PARAMETER_FORMAT_INT) {
+                    render::Device::SetUniform1i(param.name, param.intValue);
+                } else if (param.format == PARAMETER_FORMAT_MATRIX) {
+                    render::Device::SetUniformMatrix(param.name, param.matValue);
+                } else if (param.format == PARAMETER_FORMAT_TEXTURE_2D) {
+                    render::Device::SetUniformSampler2D(param.name, texture::Mgr::GetTextureById(param.intValue), texUnit++);
+                } else if (param.format == PARAMETER_FORMAT_TEXTURE_3D) {
+                    render::Device::SetUniformSampler3D(param.name, texture::Mgr::GetTextureById(param.intValue), texUnit++);
+                } else if (param.format == PARAMETER_FORMAT_TEXTURE_CUBE) {
+                    render::Device::SetUniformSamplerCube(param.name, texture::Mgr::GetTextureById(param.intValue), texUnit++);
                 }
             }
 
@@ -1671,8 +1733,21 @@ void RenderImp::DrawShadowMapNormal() {
                 render::Device::SetDepthTestEnable(false);
             }
 
+            if (obj->IsAlphaBlendEnable()) {
+                render::Device::SetAlphaBlendEnable(true);
+                render::Device::SetAlphaBlendFunc(render::FACTOR_SRC, obj->GetAlphaBlendFunc(render::FACTOR_SRC));
+                render::Device::SetAlphaBlendFunc(render::FACTOR_DST, obj->GetAlphaBlendFunc(render::FACTOR_DST));
+            } else {
+                render::Device::SetAlphaBlendEnable(false);
+            }
+
             // Draw
-            render::Device::Draw(render::PT_TRIANGLES, 0, num);
+            if (obj->GetObjectType() == scene::Object::OBJECT_TYPE_NORMAL) {
+                render::Device::Draw(render::PT_TRIANGLES, 0, num);
+            } else if (obj->GetObjectType() == scene::Object::OBJECT_TYPE_INSTANCE_RENDER) {
+                int32_t instanceNum = reinterpret_cast<scene::InstanceRenderObject*>(obj)->GetCurInstanceNum();
+                render::Device::DrawInstance(render::PT_TRIANGLES, 0, num, instanceNum);
+            }
         }
     }
 }
@@ -1712,7 +1787,7 @@ void RenderImp::DrawShadowMapInstance() {
         }
 
         // Check if cast shadow & enable depth
-        if (obj->GetModel()->IsCastShadow() && obj->IsDepthTestEnable()) {
+        if (obj->GetMaterialGroup().IsCastShadowEnable() && obj->IsDepthTestEnable()) {
             // scene::Object Uniform
             for (int32_t k = 0; k < static_cast<int32_t>(uniforms.size()); k++) {
                 uniform::UniformEntry entry = uniforms[k];
@@ -2571,6 +2646,18 @@ float Render::GetShadowSplitValue(int32_t index) {
 
     if (s_RenderImp != NULL) {
         result = s_RenderImp->GetShadowSplitValue(index);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return result;
+}
+
+int32_t Render::GetShadowMap(int32_t index) {
+    int32_t result = -1;
+
+    if (s_RenderImp != NULL) {
+        result = s_RenderImp->GetShadowMap(index);
     } else {
         GLB_SAFE_ASSERT(false);
     }

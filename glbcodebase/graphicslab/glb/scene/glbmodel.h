@@ -66,9 +66,7 @@ public:
     bool HasBinormal() const;
     bool IsAcceptLight() const;
     void SetAcceptLight(bool accept);
-    bool IsAcceptShadow() const;
     void SetAcceptShadow(bool accept);
-    bool IsCastShadow() const;
     void SetCastShadow(bool cast);
     bool IsUseAO() const;
     bool IsAcceptDecal() const;

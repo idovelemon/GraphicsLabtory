@@ -61,6 +61,7 @@ public:
     static math::Matrix GetShadowMapMatrix(int32_t index);
     static int GetCurShadowMapIndex();
     static float GetShadowSplitValue(int32_t index);
+    static int32_t GetShadowMap(int32_t index);
 
     // Decal
     static math::Matrix GetDecalViewMatrix();

@@ -337,28 +337,28 @@ Wrapper uniform_reflect_texslot_picker(scene::Object* obj) {
 Wrapper uniform_shadow0_texslot_picker(scene::Object* obj) {
     Wrapper wrapper;
     wrapper.SetFormat(Wrapper::FMT_SAMPLER2D);
-    wrapper.SetSampler2D(render::TS_SHADOW0);
+    wrapper.SetSampler2D(render::Render::GetShadowMap(0));
     return wrapper;
 }
 
 Wrapper uniform_shadow1_texslot_picker(scene::Object* obj) {
     Wrapper wrapper;
     wrapper.SetFormat(Wrapper::FMT_SAMPLER2D);
-    wrapper.SetSampler2D(render::TS_SHADOW1);
+    wrapper.SetSampler2D(render::Render::GetShadowMap(1));
     return wrapper;
 }
 
 Wrapper uniform_shadow2_texslot_picker(scene::Object* obj) {
     Wrapper wrapper;
     wrapper.SetFormat(Wrapper::FMT_SAMPLER2D);
-    wrapper.SetSampler2D(render::TS_SHADOW2);
+    wrapper.SetSampler2D(render::Render::GetShadowMap(2));
     return wrapper;
 }
 
 Wrapper uniform_shadow3_texslot_picker(scene::Object* obj) {
     Wrapper wrapper;
     wrapper.SetFormat(Wrapper::FMT_SAMPLER2D);
-    wrapper.SetSampler2D(render::TS_SHADOW3);
+    wrapper.SetSampler2D(render::Render::GetShadowMap(3));
     return wrapper;
 }
 

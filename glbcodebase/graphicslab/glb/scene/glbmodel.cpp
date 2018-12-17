@@ -341,16 +341,8 @@ void Model::SetAcceptLight(bool accept) {
     m_ModelEffectParam.acceptLight = accept;
 }
 
-bool Model::IsAcceptShadow() const {
-    return m_ModelEffectParam.acceptShadow;
-}
-
 void Model::SetAcceptShadow(bool accept) {
     m_ModelEffectParam.acceptShadow = accept;
-}
-
-bool Model::IsCastShadow() const {
-    return m_ModelEffectParam.castShadow;
 }
 
 void Model::SetCastShadow(bool cast) {
