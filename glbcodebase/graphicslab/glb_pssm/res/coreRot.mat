@@ -1,0 +1,7 @@
+shader res/normal.vs res/glb_normal.fs
+parameter glb_unif_AlbedoTex res/Core_Rot_Base_Color.bmp
+parameter glb_unif_RoughnessTex res/Core_Rot_Roughness.bmp
+parameter glb_unif_MetallicTex res/Core_Rot_Metallic.bmp
+parameter glb_unif_NormalTex res/Core_Rot_Normal_OpenGL.bmp
+parameter glb_unif_DiffusePFCTex res/diffuse.pfc
+parameter glb_unif_SpecularPFCTex res/specular.pfc
