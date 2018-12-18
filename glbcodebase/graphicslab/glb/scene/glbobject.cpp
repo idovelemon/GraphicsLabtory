@@ -448,6 +448,23 @@ InstanceRenderObject* InstanceRenderObject::Create(const char* objFileName, int3
     return obj;
 }
 
+InstanceRenderObject* InstanceRenderObject::Create(const char* meshFile, const char* materialFile, int32_t maxInstance) {
+    InstanceRenderObject* obj = nullptr;
+
+    if (meshFile != nullptr && materialFile != nullptr) {
+        obj = new InstanceRenderObject();
+        obj->m_Model = ModelMgr::AddInstanceModel(meshFile, maxInstance);
+        obj->m_MaterialGroup = render::material::MaterialGroup::Create(materialFile);
+        obj->m_ShaderDesc = obj->CalculateShaderDesc();
+        obj->m_ShaderDesc.SetFlag(render::shader::GLB_ENABLE_INSTANCE_RENDERING, true);
+        obj->m_MaxInstanceNum = maxInstance;
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return obj;
+}
+
 void InstanceRenderObject::Update() {
     InstanceObjectMap::iterator it = m_InstanceObjects.begin();
 
@@ -564,6 +581,16 @@ Model* InstanceObject::GetModel() {
     } else {
         return NULL;
     }
+}
+
+render::material::MaterialGroup InstanceObject::GetMaterialGroup() {
+    render::material::MaterialGroup group;
+
+    if (m_InstanceRenderObject) {
+        group = m_InstanceRenderObject->GetMaterialGroup();
+    }
+
+    return group;
 }
 
 void InstanceObject::Update() {

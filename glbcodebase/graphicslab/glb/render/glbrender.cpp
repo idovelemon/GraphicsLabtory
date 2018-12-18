@@ -197,7 +197,6 @@ protected:
     void CalculateFrustumInView(Frustum& frustum);
     void SplitObjIntoFrustum(std::vector<scene::Object*>& objs, Frustum& frustum, math::Matrix trans);
     void DrawShadowMapNormal();
-    void DrawShadowMapInstance();
 
     // Decal
     void PreDrawDecalMap();
@@ -1086,7 +1085,8 @@ void RenderImp::SetupInternalMaterialParameters() {
     // Loop every objects
     for (auto obj : objs) {
         if (obj) {
-            if (obj->GetObjectType() == scene::Object::OBJECT_TYPE_NORMAL) {
+            if (obj->GetObjectType() == scene::Object::OBJECT_TYPE_NORMAL
+                || obj->GetObjectType() == scene::Object::OBJECT_TYPE_INSTANCE_RENDER) {
                 material::MaterialGroup group = obj->GetMaterialGroup();
 
                 // Loop every pass material
@@ -1496,8 +1496,6 @@ void RenderImp::DrawShadowMapCore() {
 
         DrawShadowMapNormal();
 
-        DrawShadowMapInstance();
-
         // Reset
         render::Device::SetViewport(0, 0, static_cast<int32_t>(m_Width), static_cast<int32_t>(m_Height));
         render::Device::SetRenderTarget(NULL);
@@ -1681,7 +1679,7 @@ void RenderImp::DrawShadowMapNormal() {
             scene::Object* obj = objs[j];
 
             // Check if enable draw
-            if (!obj->IsDrawEnable() || obj->GetObjectType() != scene::Object::OBJECT_TYPE_NORMAL) {
+            if (!obj->IsDrawEnable() || (obj->GetObjectType() != scene::Object::OBJECT_TYPE_NORMAL && obj->GetObjectType() != scene::Object::OBJECT_TYPE_INSTANCE_RENDER)) {
                 continue;
             }
 
@@ -1748,79 +1746,6 @@ void RenderImp::DrawShadowMapNormal() {
                 int32_t instanceNum = reinterpret_cast<scene::InstanceRenderObject*>(obj)->GetCurInstanceNum();
                 render::Device::DrawInstance(render::PT_TRIANGLES, 0, num, instanceNum);
             }
-        }
-    }
-}
-
-void RenderImp::DrawShadowMapInstance() {
-    // Shader
-    shader::UberProgram* program = static_cast<shader::UberProgram*>(shader::Mgr::GetShader(m_InstanceShadowShader));
-    std::vector<uniform::UniformEntry>& uniforms = program->GetUniforms();
-    render::Device::SetShader(program);
-    render::Device::SetShaderLayout(program->GetShaderLayout());
-
-    // Scene uniforms
-    for (int32_t j = 0; j < static_cast<int32_t>(uniforms.size()); j++) {
-        uniform::UniformEntry entry = uniforms[j];
-        if (entry.flag) {
-            // TODO: for now, id is the index of the uniform picker table
-            uniform::Wrapper uniform_wrapper = uniform::kUniformPickers[entry.id].picker(NULL);
-            SetUniform(entry.location, uniform_wrapper);
-        }
-    }
-
-    std::vector<scene::Object*> objs;
-    scene::Object* sky_obj = scene::Scene::GetSkyObject();
-    if (sky_obj != NULL) {
-        objs.push_back(sky_obj);
-    }
-
-    scene::Scene::GetAllObjects(objs);
-
-    // Objects
-    for (int32_t j = 0; j < static_cast<int32_t>(objs.size()); j++) {
-        scene::Object* obj = objs[j];
-
-        // Check if enable draw
-        if (!obj->IsDrawEnable() || obj->GetObjectType() != scene::Object::OBJECT_TYPE_INSTANCE_RENDER) {
-            continue;
-        }
-
-        // Check if cast shadow & enable depth
-        if (obj->GetMaterialGroup().IsCastShadowEnable() && obj->IsDepthTestEnable()) {
-            // scene::Object Uniform
-            for (int32_t k = 0; k < static_cast<int32_t>(uniforms.size()); k++) {
-                uniform::UniformEntry entry = uniforms[k];
-                if (!entry.flag) {
-                    // TODO: for now, id is the index of the uniform picker table
-                    uniform::Wrapper uniform_wrapper = uniform::kUniformPickers[entry.id].picker(obj);
-                    SetUniform(entry.location, uniform_wrapper);
-                }
-            }
-
-            // Vertex Buffer
-            int32_t mesh_id = obj->GetModel()->GetMeshId();
-            VertexLayout layout = mesh::Mgr::GetMeshById(mesh_id)->GetVertexLayout();
-            int32_t num = mesh::Mgr::GetMeshById(mesh_id)->GetVertexNum();
-            render::Device::SetVertexBuffer(mesh::Mgr::GetMeshById(mesh_id)->GetVertexBuffer());
-            render::Device::SetVertexLayout(layout);
-
-            if (obj->IsCullFaceEnable()) {
-                render::Device::SetCullFaceEnable(true);
-                render::Device::SetCullFaceMode(obj->GetCullFaceMode());
-            } else {
-                render::Device::SetCullFaceEnable(false);
-            }
-
-            if (obj->IsDepthTestEnable()) {
-                render::Device::SetDepthTestEnable(true);
-            } else {
-                render::Device::SetDepthTestEnable(false);
-            }
-
-            // Draw
-            int32_t instance = reinterpret_cast<scene::InstanceRenderObject*>(obj)->GetCurInstanceNum();
-            render::Device::DrawInstance(render::PT_TRIANGLES, 0, num, instance);
         }
     }
 }

@@ -1,0 +1,1 @@
+shader res/shadow_instance.vs res/shadow.fs

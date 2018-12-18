@@ -139,6 +139,7 @@ public:
     virtual ~InstanceRenderObject();
 
     static InstanceRenderObject* Create(const char* objFileName, int32_t maxInstance = 256);
+    static InstanceRenderObject* Create(const char* meshFile, const char* materialFile, int32_t maxInstance = 256);
 
 public:
     virtual void Update();
@@ -168,6 +169,7 @@ public:
     virtual math::Vector GetBoundBoxMin();
 
     virtual Model* GetModel();
+    virtual render::material::MaterialGroup GetMaterialGroup();
 
     virtual void Update();
     virtual void ClearInstanceRenderObject();
