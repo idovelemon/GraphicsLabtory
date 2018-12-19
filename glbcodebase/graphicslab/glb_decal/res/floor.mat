@@ -1,0 +1,6 @@
+shader res/normal.vs res/glb_normal_decal.fs
+parameter glb_unif_AlbedoTex res/Material_Base_Color.bmp
+parameter glb_unif_Roughness 0.75
+parameter glb_unif_Metallic 0.0
+parameter glb_unif_DiffusePFCTex res/diffuse.pfc
+parameter glb_unif_SpecularPFCTex res/specular.pfc

@@ -1,0 +1,2 @@
+shader res/normal.vs res/glb_normal.fs
+parameter glb_unif_AlbedoTex res/wood01.bmp
