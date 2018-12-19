@@ -420,6 +420,37 @@ DecalObject* DecalObject::Create(const char* decalObjectFile, math::Vector pos, 
     return obj;
 }
 
+DecalObject* DecalObject::Create(const char* meshFile, const char* materialFile, math::Vector pos, math::Vector scale, math::Vector rotation) {
+    DecalObject* obj = NULL;
+    
+    if (meshFile && materialFile) {
+        Model* model = ModelMgr::GetModelByName(meshFile);
+        if (model == nullptr) {
+            model = ModelMgr::AddModel(meshFile);
+        }
+
+        render::material::MaterialGroup group = render::material::MaterialGroup::Create(materialFile);
+
+        if (model && group.GetPassMaterial(render::kDecalPassName) != -1) {
+            obj = new DecalObject();
+            if (obj) {
+                obj->m_Model = model;
+                obj->m_MaterialGroup = group;
+                obj->m_WorldMatrix.MakeIdentityMatrix();
+                obj->m_ShaderDesc = obj->CalculateShaderDesc();
+            } else {
+                GLB_SAFE_ASSERT(false);
+            }
+        } else {
+            GLB_SAFE_ASSERT(false);
+        }
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return obj;
+}
+
 //---------------------------------------------------------------------------------------------
 
 InstanceRenderObject::InstanceRenderObject()

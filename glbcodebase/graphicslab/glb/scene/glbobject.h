@@ -129,6 +129,8 @@ public:
 
     static DecalObject* Create(const char* decalObjectFile, math::Vector pos = math::Vector(0.0f, 0.0f, 0.0f),
         math::Vector scale = math::Vector(1.0f, 1.0f, 1.0f), math::Vector rotation = math::Vector(0.0f, 0.0f, 0.0f));
+    static DecalObject* Create(const char* meshFile, const char* materialFile, math::Vector pos = math::Vector(0.0f, 0.0f, 0.0f),
+        math::Vector scale = math::Vector(1.0f, 1.0f, 1.0f), math::Vector rotation = math::Vector(0.0f, 0.0f, 0.0f));
 };
 
 //---------------------------------------------------------------------------------------------

@@ -66,6 +66,7 @@ public:
     // Decal
     static math::Matrix GetDecalViewMatrix();
     static math::Matrix GetDecalProjMatrix();
+    static int32_t GetDecalTexture();
 
     // HDR
     static void SetHighLightBase(float base);

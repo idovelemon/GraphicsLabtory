@@ -148,6 +148,7 @@ public:
 
     math::Matrix GetDecalViewMatrix();
     math::Matrix GetDecalProjMatrix();
+    int32_t GetDecalTexture();
 
     void SetHighLightBase(float base);
     float GetHighLightBase();
@@ -691,6 +692,10 @@ math::Matrix RenderImp::GetDecalProjMatrix() {
     return m_DecalProjMatrix;
 }
 
+int32_t RenderImp::GetDecalTexture() {
+    return m_DecalMap;
+}
+
 void RenderImp::SetHighLightBase(float base) {
     m_HightLightBase = base;
 }
@@ -1086,7 +1091,8 @@ void RenderImp::SetupInternalMaterialParameters() {
     for (auto obj : objs) {
         if (obj) {
             if (obj->GetObjectType() == scene::Object::OBJECT_TYPE_NORMAL
-                || obj->GetObjectType() == scene::Object::OBJECT_TYPE_INSTANCE_RENDER) {
+                || obj->GetObjectType() == scene::Object::OBJECT_TYPE_INSTANCE_RENDER
+                || obj->GetObjectType() == scene::Object::OBJECT_TYPE_DECAL) {
                 material::MaterialGroup group = obj->GetMaterialGroup();
 
                 // Loop every pass material
@@ -1848,44 +1854,12 @@ void RenderImp::DrawDecalMapCore() {
     for (int32_t i = 0; i < static_cast<int32_t>(m_ShaderGroups.size()); i++) {
         std::vector<scene::Object*> objs = m_ShaderGroups[i].GetObjects();
         shader::UberProgram* program = static_cast<shader::UberProgram*>(m_ShaderGroups[i].GetShaderProgram());
-        std::vector<uniform::UniformEntry>& uniforms = program->GetUniforms();
 
         // Shader
         render::Device::SetShader(program);
         render::Device::SetShaderLayout(program->GetShaderLayout());
 
-        // Common Texture
-        int32_t texUnit = 0;
-        render::Device::SetTexture(render::TS_SHADOW0, texture::Mgr::GetTextureById(m_ShadowMap[0]), texUnit++);
-        render::Device::SetTexture(render::TS_SHADOW1, texture::Mgr::GetTextureById(m_ShadowMap[1]), texUnit++);
-        render::Device::SetTexture(render::TS_SHADOW2, texture::Mgr::GetTextureById(m_ShadowMap[2]), texUnit++);
-        render::Device::SetTexture(render::TS_SHADOW3, texture::Mgr::GetTextureById(m_ShadowMap[3]), texUnit++);
-        render::Device::SetTexture(render::TS_BRDF_PFT, texture::Mgr::GetTextureById(m_BRDFPFTMap), texUnit++);
-
-        // Scene uniforms
-        for (int32_t j = 0; j < static_cast<int32_t>(uniforms.size()); j++) {
-            uniform::UniformEntry entry = uniforms[j];
-            if (entry.flag) {
-                // TODO: for now, id is the index of the uniform picker table
-                if (entry.id == uniform::GLB_VIEWM) {
-                    uniform::Wrapper uniformWrapper;
-                    uniformWrapper.SetFormat(uniform::Wrapper::FMT_MATRIX);
-                    uniformWrapper.SetMatrix(m_DecalViewMatrix);
-                    SetUniform(entry.location, uniformWrapper);
-                } else if (entry.id == uniform::GLB_PROJM) {
-                    uniform::Wrapper uniformWrapper;
-                    uniformWrapper.SetFormat(uniform::Wrapper::FMT_MATRIX);
-                    uniformWrapper.SetMatrix(m_DecalProjMatrix);
-                    SetUniform(entry.location, uniformWrapper);
-                } else {
-                    uniform::Wrapper uniform_wrapper = uniform::kUniformPickers[entry.id].picker(NULL);
-                    SetUniform(entry.location, uniform_wrapper);
-                }
-            }
-        }
-
         // Objects
-        int32_t objectTexUnitStart = texUnit;
         for (int32_t j = 0; j < static_cast<int32_t>(objs.size()); j++) {
             scene::Object* obj = objs[j];
 
@@ -1894,50 +1868,36 @@ void RenderImp::DrawDecalMapCore() {
                 continue;
             }
 
-            // Reset object texture unit index
-            texUnit = objectTexUnitStart;
+            // Material Parameters
+            material::Material* material = material::Mgr::GetMaterial(obj->GetMaterialGroup().GetPassMaterial(kDecalPassName));
+            int32_t texUnit = 0;
+            for (auto& param : material->GetAllParameters()) {
+                // Special case: glb_unif_ProjM
+                if (!strcmp(param.name, "glb_unif_ProjM")) {
+                    param.matValue = m_DecalProjMatrix;
+                }
 
-            // Textures
-            if (obj->GetModel()->HasAlbedoTexture()) {
-                render::Device::SetTexture(render::TS_ALBEDO, texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(scene::Model::MT_ALBEDO)), texUnit++);
-            }
-            if (obj->GetModel()->HasRoughnessTexture()) {
-                render::Device::SetTexture(render::TS_ROUGHNESS, texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(scene::Model::MT_ROUGHNESS)), texUnit++);
-            }
-            if (obj->GetModel()->HasMettalicTexture()) {
-                render::Device::SetTexture(render::TS_METALLIC, texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(scene::Model::MT_METALLIC)), texUnit++);
-            }
-            if (obj->GetModel()->HasAlphaTexture()) {
-                render::Device::SetTexture(render::TS_ALPHA, texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(scene::Model::MT_ALPHA)), texUnit++);
-            }
-            if (obj->GetModel()->HasNormalTexture()) {
-                render::Device::SetTexture(render::TS_NORMAL, texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(scene::Model::MT_NORMAL)), texUnit++);
-            }
-            if (obj->GetModel()->HasEmissionTexture()) {
-                render::Device::SetTexture(render::TS_EMISSION, texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(scene::Model::MT_EMISSION)), texUnit++);
-            }
-            if (obj->GetModel()->HasReflectTexture()) {
-                render::Device::SetTexture(render::TS_REFLECT, texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(scene::Model::MT_REFLECT)), texUnit++);
-            }
-            if (obj->GetModel()->HasDiffusePFCTexture()) {
-                render::Device::SetTexture(render::TS_DIFFUSE_PFC, texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(scene::Model::MT_DIFFUSE_PFC)), texUnit++);
-            }
-            if (obj->GetModel()->HasSpecularPFCTexture()) {
-                render::Device::SetTexture(render::TS_SPECULAR_PFC, texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(scene::Model::MT_SPECULAR_PFC)), texUnit++);
-            }
-            if (obj->GetModel()->HasLightTexture()) {
-                render::Device::SetTexture(render::TS_LIGHT0, texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(scene::Model::MT_LIGHT0)), texUnit++);
-                render::Device::SetTexture(render::TS_LIGHT1, texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(scene::Model::MT_LIGHT1)), texUnit++);
-                render::Device::SetTexture(render::TS_LIGHT2, texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(scene::Model::MT_LIGHT2)), texUnit++);
-            }
+                // Special case: glb_unif_ViewM
+                if (!strcmp(param.name, "glb_unif_ViewM")) {
+                    param.matValue = m_DecalViewMatrix;
+                }
 
-            // Object Uniform
-            for (int32_t k = 0; k < static_cast<int32_t>(uniforms.size()); k++) {
-                uniform::UniformEntry entry = uniforms[k];
-                if (!entry.flag) {
-                    // TODO: for now, id is the index of the uniform picker table
-                    uniform::Wrapper uniform_wrapper = uniform::kUniformPickers[entry.id].picker(obj);
-                    SetUniform(entry.location, uniform_wrapper);
+                if (param.format == PARAMETER_FORMAT_FLOAT) {
+                    render::Device::SetUniform1f(param.name, param.floatValue);
+                } else if (param.format == PARAMETER_FORMAT_FLOAT3) {
+                    render::Device::SetUniform3f(param.name, param.vecValue);
+                } else if (param.format == PARAMETER_FORMAT_FLOAT4) {
+                    render::Device::SetUniform4f(param.name, param.vecValue);
+                } else if (param.format == PARAMETER_FORMAT_INT) {
+                    render::Device::SetUniform1i(param.name, param.intValue);
+                } else if (param.format == PARAMETER_FORMAT_MATRIX) {
+                    render::Device::SetUniformMatrix(param.name, param.matValue);
+                } else if (param.format == PARAMETER_FORMAT_TEXTURE_2D) {
+                    render::Device::SetUniformSampler2D(param.name, texture::Mgr::GetTextureById(param.intValue), texUnit++);
+                } else if (param.format == PARAMETER_FORMAT_TEXTURE_3D) {
+                    render::Device::SetUniformSampler3D(param.name, texture::Mgr::GetTextureById(param.intValue), texUnit++);
+                } else if (param.format == PARAMETER_FORMAT_TEXTURE_CUBE) {
+                    render::Device::SetUniformSamplerCube(param.name, texture::Mgr::GetTextureById(param.intValue), texUnit++);
                 }
             }
 
@@ -2607,6 +2567,18 @@ math::Matrix Render::GetDecalProjMatrix() {
 
     if (s_RenderImp != NULL) {
         result = s_RenderImp->GetDecalProjMatrix();
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return result;
+}
+
+int32_t Render::GetDecalTexture() {
+    int32_t result = -1;
+
+    if (s_RenderImp != nullptr) {
+        result = s_RenderImp->GetDecalTexture();
     } else {
         GLB_SAFE_ASSERT(false);
     }

@@ -423,7 +423,7 @@ Wrapper uniform_light2_texslot_picker(scene::Object* obj) {
 Wrapper uniform_decal_texslot_picker(scene::Object* obj) {
     Wrapper wrapper;
     wrapper.SetFormat(Wrapper::FMT_SAMPLER2D);
-    wrapper.SetSampler2D(render::TS_DECAL);
+    wrapper.SetSampler2D(render::Render::GetDecalTexture());
     return wrapper;
 }
 

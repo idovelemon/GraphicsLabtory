@@ -30,6 +30,11 @@ uniform float glb_unif_ShadowSplit0;
 uniform float glb_unif_ShadowSplit1;
 uniform float glb_unif_ShadowSplit2;
 
+// Decal map setting
+uniform mat4 glb_unif_DecalViewM;
+uniform mat4 glb_unif_DecalProjM;
+uniform sampler2D glb_unif_DecalTex;
+
 //----------------------------------------------------
 // end: Build-in parameter uniforms
 //----------------------------------------------------
