@@ -10,8 +10,8 @@
 class ApplicationDecal : public glb::app::ApplicationBase {
 public:
     ApplicationDecal()
-    : m_ColorProgram(NULL)
-    , m_Camera(NULL)
+    : m_ColorProgram(nullptr)
+    , m_Camera(nullptr)
     , m_Proj()
     , m_View() {
     }
@@ -41,13 +41,14 @@ public:
         m_DecalShaderWVPLoc = m_DecalProgram->GetUniformLocation("glb_WVP");
 
         // Create Floor
-        m_Floor = scene::Model::Create("res/floor.obj");
+        m_Floor = render::mesh::Mgr::GetMeshById(render::mesh::Mgr::AddMesh("res/floor.obj"));
 
         // Create Decal
-        m_Decal = scene::Model::Create("res/decal.obj");
+        m_Decal = render::mesh::Mgr::GetMeshById(render::mesh::Mgr::AddMesh("res/decal.obj"));
 
         // Create Texture
         m_FloorAlbedoMap = render::texture::Texture::Create("res/Material_Base_Color.bmp");
+        m_DecalAlbedoMap = render::texture::Texture::Create("res/wood01.bmp");
 
         // Change Texture parameters
         glBindTexture(GL_TEXTURE_2D, reinterpret_cast<GLuint>(m_DecalMap->GetNativeTex()));
@@ -102,6 +103,7 @@ public:
         GLB_SAFE_DELETE(m_Floor);
         GLB_SAFE_DELETE(m_Decal);
         GLB_SAFE_DELETE(m_FloorAlbedoMap);
+        GLB_SAFE_DELETE(m_DecalAlbedoMap);
         GLB_SAFE_DELETE(m_DecalMap);
     }
 
@@ -124,11 +126,11 @@ public:
 
         // Setup texture
         render::Device::ClearTexture();
-        render::Device::SetTexture(0, render::texture::Mgr::GetTextureById(m_Decal->GetTexId(scene::Model::MT_ALBEDO)), 0);
+        render::Device::SetTexture(0, m_DecalAlbedoMap, 0);
 
         // Setup mesh
-        render::Device::SetVertexLayout(render::mesh::Mgr::GetMeshById(m_Decal->GetMeshId())->GetVertexLayout());
-        render::Device::SetVertexBuffer(render::mesh::Mgr::GetMeshById(m_Decal->GetMeshId())->GetVertexBuffer());
+        render::Device::SetVertexLayout(m_Decal->GetVertexLayout());
+        render::Device::SetVertexBuffer(m_Decal->GetVertexBuffer());
 
         // Setup render state
         render::Device::SetDepthTestEnable(true);
@@ -143,7 +145,7 @@ public:
             render::Device::SetUniformSampler2D(m_DecalShaderAlbedoLoc, 0);
 
             // Draw
-            render::Device::Draw(render::PT_TRIANGLES, 0, render::mesh::Mgr::GetMeshById(m_Decal->GetMeshId())->GetVertexNum());
+            render::Device::Draw(render::PT_TRIANGLES, 0, m_Decal->GetVertexNum());
         }
 
         // Reset viewport
@@ -164,8 +166,8 @@ public:
         render::Device::SetTexture(1, m_DecalMap, 1);
 
         // Setup mesh
-        render::Device::SetVertexLayout(render::mesh::Mgr::GetMeshById(m_Floor->GetMeshId())->GetVertexLayout());
-        render::Device::SetVertexBuffer(render::mesh::Mgr::GetMeshById(m_Floor->GetMeshId())->GetVertexBuffer());
+        render::Device::SetVertexLayout(m_Decal->GetVertexLayout());
+        render::Device::SetVertexBuffer(m_Decal->GetVertexBuffer());
 
         // Setup render state
         render::Device::SetDepthTestEnable(true);
@@ -177,8 +179,8 @@ public:
         static float sPosX = 0.0f, sPosY = 0.0f, sPosZ = 0.0f;
         math::Matrix world;
         world.MakeIdentityMatrix();
-        float mouseMoveX = Input::GetMouseMoveX();
-        float mouseMoveY = Input::GetMouseMoveY();
+        float mouseMoveX = static_cast<float>(Input::GetMouseMoveX());
+        float mouseMoveY = static_cast<float>(Input::GetMouseMoveY());
         sRotX = sRotX + mouseMoveX * 0.1f;
         sRotY = sRotY + mouseMoveY * 0.1f;
         world.RotateY(sRotX);
@@ -216,7 +218,7 @@ public:
         render::Device::SetUniformSampler2D(m_ColorShaderDecalMapLoc, 1);
 
         // Draw
-        render::Device::Draw(render::PT_TRIANGLES, 0, render::mesh::Mgr::GetMeshById(m_Floor->GetMeshId())->GetVertexNum());
+        render::Device::Draw(render::PT_TRIANGLES, 0, m_Decal->GetVertexNum());
     }
 
     void UpdateDecalPos() {
@@ -228,7 +230,7 @@ public:
             };
 
             for (math::Vector& pos : m_DecalPos) {
-                pos = math::Vector(1.0f * RandRange(-20.0f, 20.0f), 0.0f, 1.0f * RandRange(-20.0f, 20.0f));
+                pos = math::Vector(1.0f * RandRange(-20, 20), 0.0f, 1.0f * RandRange(-20, 20));
             }
 
             // Create Decal View Projection Matrix
@@ -292,9 +294,10 @@ protected:
     render::shader::UserProgram*    m_ColorProgram;
     render::shader::UserProgram*    m_DecalProgram;
     scene::CameraBase*              m_Camera;
-    scene::Model*                   m_Floor;
-    scene::Model*                   m_Decal;
+    render::mesh::MeshBase*         m_Floor;
+    render::mesh::MeshBase*         m_Decal;
     render::texture::Texture*       m_FloorAlbedoMap;
+    render::texture::Texture*       m_DecalAlbedoMap;
     math::Matrix                    m_Proj;
     math::Matrix                    m_View;
 
@@ -378,8 +381,8 @@ public:
         static float sPosX = 0.0f, sPosY = 20.0f, sPosZ = 0.0f;
         math::Matrix cameraOffset;
         cameraOffset.MakeIdentityMatrix();
-        float mouseMoveX = Input::GetMouseMoveX();
-        float mouseMoveY = Input::GetMouseMoveY();
+        float mouseMoveX = static_cast<float>(Input::GetMouseMoveX());
+        float mouseMoveY = static_cast<float>(Input::GetMouseMoveY());
         sRotX = sRotX + mouseMoveX * 0.1f;
         sRotY = sRotY + mouseMoveY * 0.1f;
         cameraOffset.RotateY(sRotX);
