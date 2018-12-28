@@ -52,7 +52,7 @@ struct AppConfig {
     , decalMapHeight(0)
     , platform_api(0)
     , icon(0)
-    , wnd(NULL) {
+    , wnd(nullptr) {
         memset(caption, 0, sizeof(caption));
 
         static const char kDefaultFontImgPath[] = "../glb/resource/font/font.bmp";

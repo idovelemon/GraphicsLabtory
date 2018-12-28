@@ -13,21 +13,21 @@
 #include <Windows.h>
 
 #define GLB_SAFE_DELETE(_pointer_) \
-    if (_pointer_ != NULL) {\
+    if (_pointer_ != nullptr) {\
         delete _pointer_; \
-        _pointer_ = NULL; \
+        _pointer_ = nullptr; \
     }
 
 #define GLB_SAFE_DELETE_ARRAY(_pointer_) \
-    if (_pointer_ != NULL) { \
+    if (_pointer_ != nullptr) { \
         delete[] _pointer_; \
-        _pointer_ = NULL; \
+        _pointer_ = nullptr; \
     }
 
 #define GLB_SAFE_RELEASE(_pointer_) \
-    if (_pointer_ != NULL) { \
+    if (_pointer_ != nullptr) { \
         _pointer_->Release(); \
-        _pointer_ = NULL; \
+        _pointer_ = nullptr; \
     }
 
 #if _DEBUG
@@ -42,9 +42,9 @@
         bool result = _expression_; \
         if (result == false) {\
             char buffer[256];\
-            sprintf(buffer, "%s: %s", __FUNCTION__, _error_msg_);\
+            sprintf_s(buffer, "%s: %s", __FUNCTION__, _error_msg_);\
             OutputDebugStringA(buffer); \
-            MessageBoxA(NULL, buffer, "Assert-Error", MB_OK); \
+            MessageBoxA(nullptr, buffer, "Assert-Error", MB_OK); \
         } \
         assert(result); \
     }while(false);
@@ -63,9 +63,9 @@
         if (err != GL_NO_ERROR) {\
             const GLubyte* err_str = glewGetErrorString(err);\
             char buffer[128];\
-            sprintf(buffer, "ERR:%d Desc:%s", err, reinterpret_cast<LPCSTR>(const_cast<GLubyte*>(err_str)));\
+            sprintf_s(buffer, "ERR:%d Desc:%s", err, reinterpret_cast<LPCSTR>(const_cast<GLubyte*>(err_str)));\
             OutputDebugStringA(buffer);\
-            MessageBoxA(NULL, buffer, "GL-Error", MB_OKCANCEL);\
+            MessageBoxA(nullptr, buffer, "GL-Error", MB_OKCANCEL);\
         }\
     }
 

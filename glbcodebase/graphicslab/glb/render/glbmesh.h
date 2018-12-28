@@ -51,6 +51,10 @@ public:
     virtual void SetName(std::string name) = 0;
     virtual std::string GetName() = 0;
 
+    virtual void SetBoundBox(math::Vector min, math::Vector max) = 0;
+    virtual math::Vector GetBoundBoxMin() = 0;
+    virtual math::Vector GetBoundBoxMax() = 0;
+
     virtual VertexLayout GetVertexLayout() = 0;
     virtual int32_t GetVertexNum() = 0;
 
@@ -87,16 +91,20 @@ public:
     static TriangleMesh* Create(int32_t triangle_num, float* vertex_buf, float* coord_buf = 0, float* lightMapTexCoordBuf = 0, float* normal_buf = 0, float* tanget_buf = 0, float* binormal_buf = 0);
 
 public:
-    virtual void SetId(int32_t id);
-    virtual int32_t GetId();
+    virtual void SetId(int32_t id) override;
+    virtual int32_t GetId() override;
 
-    virtual void SetName(std::string name);
-    virtual std::string GetName();
+    virtual void SetName(std::string name) override;
+    virtual std::string GetName() override;
 
-    virtual VertexLayout GetVertexLayout();
-    virtual int32_t GetVertexNum();
+    virtual void SetBoundBox(math::Vector min, math::Vector max) override;
+    virtual math::Vector GetBoundBoxMin() override;
+    virtual math::Vector GetBoundBoxMax() override;
 
-    virtual VertexBuffer* GetVertexBuffer();
+    virtual VertexLayout GetVertexLayout() override;
+    virtual int32_t GetVertexNum() override;
+
+    virtual VertexBuffer* GetVertexBuffer() override;
 
 protected:
     TriangleMesh();
@@ -119,16 +127,20 @@ protected:
     InstanceTriangleMesh();
 
 public:
-    virtual void SetId(int32_t id);
-    virtual int32_t GetId();
+    virtual void SetId(int32_t id) override;
+    virtual int32_t GetId() override;
 
-    virtual void SetName(std::string name);
-    virtual std::string GetName();
+    virtual void SetName(std::string name) override;
+    virtual std::string GetName() override;
 
-    virtual VertexLayout GetVertexLayout();
-    virtual int32_t GetVertexNum();
+    virtual void SetBoundBox(math::Vector min, math::Vector max) override;
+    virtual math::Vector GetBoundBoxMin() override;
+    virtual math::Vector GetBoundBoxMax() override;
 
-    virtual VertexBuffer* GetVertexBuffer();
+    virtual VertexLayout GetVertexLayout() override;
+    virtual int32_t GetVertexNum() override;
+
+    virtual VertexBuffer* GetVertexBuffer() override;
 
     void UpdateInstanceBuffer(void* data);
 
@@ -243,7 +255,9 @@ class Mgr {
 public:
     static void Initialize();
     static void Destroy();
+    static int32_t AddMesh(const char* meshFile);
     static int32_t AddMesh(MeshBase* mesh);
+    static int32_t AddInstanceMesh(const char* meshFile, int32_t maxInstance);
     static MeshBase* GetMeshById(int32_t mesh_id);
     static MeshBase* GetMeshByName(std::string mesh_name);
 };

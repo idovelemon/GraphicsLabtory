@@ -16,7 +16,7 @@ namespace glb {
 namespace render {
 
 RenderTarget::RenderTarget()
-: m_Imp(NULL) {
+: m_Imp(nullptr) {
 }
 
 RenderTarget::~RenderTarget() {
@@ -24,11 +24,11 @@ RenderTarget::~RenderTarget() {
 }
 
 RenderTarget* RenderTarget::Create(int32_t width, int32_t height) {
-    RenderTarget* target = NULL;
+    RenderTarget* target = nullptr;
     RenderTarget::Imp* imp = RenderTarget::Imp::Create(width, height);
-    if (imp != NULL) {
+    if (imp != nullptr) {
         target = new RenderTarget();
-        if (target != NULL) {
+        if (target != nullptr) {
             target->m_Imp = imp;
         } else {
             GLB_SAFE_ASSERT(false);
@@ -41,11 +41,11 @@ RenderTarget* RenderTarget::Create(int32_t width, int32_t height) {
 }
 
 RenderTarget* RenderTarget::DefaultRenderTarget() {
-    return NULL;
+    return nullptr;
 }
 
 void RenderTarget::AttachDepthTexture(texture::Texture* depth_tex) {
-    if (m_Imp != NULL) {
+    if (m_Imp != nullptr) {
         m_Imp->AttachDepthTexture(depth_tex);
     } else {
         GLB_SAFE_ASSERT(false);
@@ -53,7 +53,7 @@ void RenderTarget::AttachDepthTexture(texture::Texture* depth_tex) {
 }
 
 void RenderTarget::AttachColorTexture(render::DrawColorBuffer index, texture::Texture* color_tex, int32_t level) {
-    if (m_Imp != NULL) {
+    if (m_Imp != nullptr) {
         m_Imp->AttachColorTexture(index, color_tex, level);
     } else {
         GLB_SAFE_ASSERT(false);
@@ -61,7 +61,7 @@ void RenderTarget::AttachColorTexture(render::DrawColorBuffer index, texture::Te
 }
 
 void RenderTarget::AttachCubeTexture(render::DrawColorBuffer* index, texture::Texture* cube_tex, int32_t level) {
-    if (m_Imp != NULL) {
+    if (m_Imp != nullptr) {
         m_Imp->AttachCubeTexture(index, cube_tex, level);
     } else {
         GLB_SAFE_ASSERT(false);
@@ -69,7 +69,7 @@ void RenderTarget::AttachCubeTexture(render::DrawColorBuffer* index, texture::Te
 }
 
 void RenderTarget::Attach3DColorTexture(render::DrawColorBuffer index, texture::Texture* color_tex_3d, int32_t layer, int32_t level) {
-    if (m_Imp != NULL) {
+    if (m_Imp != nullptr) {
         m_Imp->Attach3DColorTexture(index, color_tex_3d, layer, level);
     } else {
         GLB_SAFE_ASSERT(false);
@@ -77,7 +77,7 @@ void RenderTarget::Attach3DColorTexture(render::DrawColorBuffer index, texture::
 }
 
 void RenderTarget::EnableDrawColorBuffer(render::DrawColorBuffer index) {
-    if (m_Imp != NULL) {
+    if (m_Imp != nullptr) {
         m_Imp->EnableDrawColorBuffer(index);
     } else {
         GLB_SAFE_ASSERT(false);
@@ -85,7 +85,7 @@ void RenderTarget::EnableDrawColorBuffer(render::DrawColorBuffer index) {
 }
 
 void RenderTarget::DisableDrawColorBuffer(render::DrawColorBuffer index) {
-    if (m_Imp != NULL) {
+    if (m_Imp != nullptr) {
         m_Imp->DisableDrawColorBuffer(index);
     } else {
         GLB_SAFE_ASSERT(false);
@@ -93,7 +93,7 @@ void RenderTarget::DisableDrawColorBuffer(render::DrawColorBuffer index) {
 }
 
 void RenderTarget::DisableAllDrawColorBuffers() {
-    if (m_Imp != NULL) {
+    if (m_Imp != nullptr) {
         m_Imp->DisableAllDrawColorBuffers();
     } else {
         GLB_SAFE_ASSERT(false);
@@ -101,9 +101,9 @@ void RenderTarget::DisableAllDrawColorBuffers() {
 }
 
 void* RenderTarget::GetNativeRenderTarget() {
-    void* rt = NULL;
+    void* rt = nullptr;
 
-    if (m_Imp != NULL) {
+    if (m_Imp != nullptr) {
         rt = m_Imp->GetNativeRenderTarget();
     } else {
         GLB_SAFE_ASSERT(false);
@@ -115,7 +115,7 @@ void* RenderTarget::GetNativeRenderTarget() {
 int32_t RenderTarget::GetWidth() const {
     int32_t result = 0;
 
-    if (m_Imp != NULL) {
+    if (m_Imp != nullptr) {
         result = m_Imp->GetWidth();
     } else {
         GLB_SAFE_ASSERT(false);
@@ -127,7 +127,7 @@ int32_t RenderTarget::GetWidth() const {
 int32_t RenderTarget::GetHeight() const {
     int32_t result = 0;
 
-    if (m_Imp != NULL) {
+    if (m_Imp != nullptr) {
         result = m_Imp->GetHeight();
     } else {
         GLB_SAFE_ASSERT(false);

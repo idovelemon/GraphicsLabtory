@@ -72,7 +72,7 @@ void RenderTarget::Imp::DisableAllDrawColorBuffers() {
 }
 
 void* RenderTarget::Imp::GetNativeRenderTarget() {
-    return NULL;
+    return nullptr;
 }
 
 };  // namespace glb

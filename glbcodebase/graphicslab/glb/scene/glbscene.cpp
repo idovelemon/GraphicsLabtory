@@ -23,7 +23,7 @@ namespace scene {
 // TYPE DECLARATION
 //-----------------------------------------------------------------------------------
 class SceneImp;
-static SceneImp* s_SceneImp = NULL;
+static SceneImp* s_SceneImp = nullptr;
 
 static const int32_t kObjectMaxNum = 10000;
 //-----------------------------------------------------------------------------------
@@ -55,7 +55,7 @@ public:
     int32_t AddInstanceRenderObject(const char* objectFile, int32_t maxInstance);
     int32_t AddInstanceRenderObject(const char* meshFile, const char* materialFile, int32_t maxInstance);
     int32_t AddInstanceObject(int32_t instanceRenderObject, math::Vector pos, math::Vector scale, math::Vector rotate);
-    int32_t AddObject(scene::Model* model);
+    int32_t AddObject(render::mesh::MeshBase* mesh);
     int32_t AddSkyObject(const char* objectFile);
     Object* GetObjectById(int32_t id);
     Object* GetSkyObject();
@@ -100,11 +100,11 @@ private:
 SceneImp::SceneImp()
 : m_CurCameraType(PRIMIAY_CAM)
 , m_ObjectDataBase()
-, m_SkyObject(NULL)
+, m_SkyObject(nullptr)
 , m_BoundBoxMax(0.0f, 0.0f, 0.0f)
 , m_BoundBoxMin(0.0f, 0.0f, 0.0f) {
     memset(m_Camera, 0, sizeof(m_Camera));
-    m_ObjectDataBase.resize(10000, NULL);
+    m_ObjectDataBase.resize(10000, nullptr);
 }
 
 SceneImp::~SceneImp() {
@@ -129,19 +129,19 @@ void SceneImp::Destroy() {
 
 void SceneImp::Update() {
     for (int32_t i = 0; i < MAX_CAM; i++) {
-        if (m_Camera[i] != NULL) {
+        if (m_Camera[i] != nullptr) {
             m_Camera[i]->Update(0.0f);
         } 
     }
 
-    if (m_SkyObject != NULL && m_Camera[PRIMIAY_CAM] != NULL) {
+    if (m_SkyObject != nullptr && m_Camera[PRIMIAY_CAM] != nullptr) {
         //m_SkyObject->SetPos(m_Camera[PRIMIAY_CAM]->GetPos()); // TODO
         m_SkyObject->Update();
     }
 
     // Remove dead objects
     for (int32_t i = 0; i < static_cast<int32_t>(m_ObjectDataBase.size()); i++) {
-        if (m_ObjectDataBase[i] != NULL) {
+        if (m_ObjectDataBase[i] != nullptr) {
             if (m_ObjectDataBase[i]->IsDead()) {
                 GLB_SAFE_DELETE(m_ObjectDataBase[i]);
             }
@@ -152,7 +152,7 @@ void SceneImp::Update() {
     m_BoundBoxMax = math::Vector(0.0f, 0.0f, 0.0f);
     m_BoundBoxMin = math::Vector(FLT_MAX, FLT_MAX, FLT_MAX);
     for (int32_t i = 0; i < static_cast<int32_t>(m_ObjectDataBase.size()); i++) {
-        if (m_ObjectDataBase[i] != NULL) {
+        if (m_ObjectDataBase[i] != nullptr) {
             m_ObjectDataBase[i]->Update();
             math::Vector max = m_ObjectDataBase[i]->GetBoundBoxMax();
             math::Vector min = m_ObjectDataBase[i]->GetBoundBoxMin();
@@ -189,9 +189,9 @@ math::Vector SceneImp::GetSceneBoundBoxMin() {
 int32_t SceneImp::AddObject(const char* object_file) {
     int32_t id = -1;
 
-    if (object_file != NULL) {
+    if (object_file != nullptr) {
         Object* obj = Object::Create(object_file);
-        if (obj != NULL) {
+        if (obj != nullptr) {
             id = FindEmptyID();
             if (id != -1) {
                 m_ObjectDataBase[id] = obj;
@@ -235,9 +235,9 @@ int32_t SceneImp::AddObject(const char* meshFile, const char* materialGroupFile)
 int32_t SceneImp::AddDecalObject(const char* decalObjectFile) {
     int32_t id = -1;
 
-    if (decalObjectFile != NULL) {
+    if (decalObjectFile != nullptr) {
         Object* obj = DecalObject::Create(decalObjectFile);
-        if (obj != NULL) {
+        if (obj != nullptr) {
             id = FindEmptyID();
             if (id != -1) {
                 m_ObjectDataBase[id] = obj;
@@ -281,9 +281,9 @@ int32_t SceneImp::AddDecalObject(const char* meshFile, const char* materialFile)
 int32_t SceneImp::AddInstanceRenderObject(const char* objectFile, int32_t maxInstance) {
     int32_t id = -1;
 
-    if (objectFile != NULL) {
+    if (objectFile != nullptr) {
         Object* obj = InstanceRenderObject::Create(objectFile, maxInstance);
-        if (obj != NULL) {
+        if (obj != nullptr) {
             id = FindEmptyID();
             if (id != -1) {
                 m_ObjectDataBase[id] = obj;
@@ -327,10 +327,10 @@ int32_t SceneImp::AddInstanceRenderObject(const char* meshFile, const char* mate
 int32_t SceneImp::AddInstanceObject(int32_t instanceRenderObjectId, math::Vector pos, math::Vector scale, math::Vector rotate) {
     int32_t id = -1;
 
-    if (0 <= instanceRenderObjectId && instanceRenderObjectId < m_ObjectDataBase.size()) {
+    if (0 <= instanceRenderObjectId && instanceRenderObjectId < static_cast<int32_t>(m_ObjectDataBase.size())) {
         InstanceRenderObject* instanceRenderObject = reinterpret_cast<InstanceRenderObject*>(m_ObjectDataBase[instanceRenderObjectId]);
         InstanceObject* obj = InstanceObject::Create(instanceRenderObject, pos, scale, rotate);
-        if (obj != NULL) {
+        if (obj != nullptr) {
             id = FindEmptyID();
             if (id != -1) {
                 m_ObjectDataBase[id] = obj;
@@ -349,12 +349,12 @@ int32_t SceneImp::AddInstanceObject(int32_t instanceRenderObjectId, math::Vector
     return id;
 }
 
-int32_t SceneImp::AddObject(scene::Model* model) {
+int32_t SceneImp::AddObject(render::mesh::MeshBase* mesh) {
     int32_t id = -1;
 
-    if (model != NULL) {
-        Object* obj = Object::Create(model);
-        if (obj != NULL) {
+    if (mesh != nullptr) {
+        Object* obj = Object::Create(mesh);
+        if (obj != nullptr) {
             id = FindEmptyID();
             if (id != -1) {
                 m_ObjectDataBase[id] = obj;
@@ -372,9 +372,9 @@ int32_t SceneImp::AddObject(scene::Model* model) {
 int32_t SceneImp::AddSkyObject(const char* object_file) {
     int32_t id = -1;
 
-    if (object_file != NULL) {
+    if (object_file != nullptr) {
         Object* obj = Object::Create(object_file);
-        if (obj != NULL) {
+        if (obj != nullptr) {
             id = 0;
             m_SkyObject = obj;
 
@@ -392,7 +392,7 @@ int32_t SceneImp::AddSkyObject(const char* object_file) {
 }
 
 Object* SceneImp::GetObjectById(int32_t id) {
-    Object* obj = NULL;
+    Object* obj = nullptr;
 
     if (0 <= id && id < static_cast<int32_t>(m_ObjectDataBase.size())) {
         obj = m_ObjectDataBase[id];
@@ -409,7 +409,7 @@ Object* SceneImp::GetSkyObject() {
 
 void SceneImp::GetAllObjects(std::vector<Object*>& objs) {
     for (int32_t i = 0; i < static_cast<int32_t>(m_ObjectDataBase.size()); i++) {
-        if (m_ObjectDataBase[i] != NULL && !m_ObjectDataBase[i]->IsDead()) {
+        if (m_ObjectDataBase[i] != nullptr && !m_ObjectDataBase[i]->IsDead()) {
             objs.push_back(m_ObjectDataBase[i]);
         }
     }
@@ -417,7 +417,7 @@ void SceneImp::GetAllObjects(std::vector<Object*>& objs) {
 
 void SceneImp::DestroyObject(int32_t object_id) {
     if (0 <= object_id && object_id < static_cast<int32_t>(m_ObjectDataBase.size())) {
-        if (m_ObjectDataBase[object_id] != NULL) {
+        if (m_ObjectDataBase[object_id] != nullptr) {
             m_ObjectDataBase[object_id]->SetDead(true);
         }
     }
@@ -452,7 +452,7 @@ void SceneImp::SetCamera(int32_t type, CameraBase* cam) {
 }
 
 CameraBase* SceneImp::GetCamera(int32_t type) {
-    CameraBase* cam = NULL;
+    CameraBase* cam = nullptr;
 
     if (0 <= type && type < MAX_CAM) {
         cam = m_Camera[type];
@@ -514,7 +514,7 @@ int32_t SceneImp::FindEmptyID() {
     int32_t id = -1;
 
     for (int32_t i = 0; i < static_cast<int32_t>(m_ObjectDataBase.size()); i++) {
-        if (m_ObjectDataBase[i] == NULL) {
+        if (m_ObjectDataBase[i] == nullptr) {
             id  = i;
             break;
         }
@@ -526,9 +526,9 @@ int32_t SceneImp::FindEmptyID() {
 // Scene DEFINITION
 //-----------------------------------------------------------------------------------
 void Scene::Initialize() {
-    if (s_SceneImp == NULL) {
+    if (s_SceneImp == nullptr) {
         s_SceneImp = new SceneImp;
-        if (s_SceneImp != NULL) {
+        if (s_SceneImp != nullptr) {
             s_SceneImp->Initialize();
         } else {
             GLB_SAFE_ASSERT(false);
@@ -537,7 +537,7 @@ void Scene::Initialize() {
 }
 
 void Scene::Destroy() {
-    if (s_SceneImp != NULL) {
+    if (s_SceneImp != nullptr) {
         s_SceneImp->Destroy();
         GLB_SAFE_DELETE(s_SceneImp);
     } else {
@@ -546,7 +546,7 @@ void Scene::Destroy() {
 }
 
 void Scene::Update() {
-    if (s_SceneImp != NULL) {
+    if (s_SceneImp != nullptr) {
         s_SceneImp->Update();
     } else {
         GLB_SAFE_ASSERT(false);
@@ -556,7 +556,7 @@ void Scene::Update() {
 math::Vector Scene::GetSceneBoundBoxMax() {
     math::Vector result(0.0f, 0.0f, 0.0f);
 
-    if (s_SceneImp != NULL) {
+    if (s_SceneImp != nullptr) {
         result = s_SceneImp->GetSceneBoundBoxMax();
     } else {
         GLB_SAFE_ASSERT(false);
@@ -568,7 +568,7 @@ math::Vector Scene::GetSceneBoundBoxMax() {
 math::Vector Scene::GetSceneBoundBoxMin() {
     math::Vector result(0.0f, 0.0f, 0.0f);
 
-    if (s_SceneImp != NULL) {
+    if (s_SceneImp != nullptr) {
         result = s_SceneImp->GetSceneBoundBoxMin();
     } else {
         GLB_SAFE_ASSERT(false);
@@ -580,7 +580,7 @@ math::Vector Scene::GetSceneBoundBoxMin() {
 int32_t Scene::AddObject(const char* objectFile) {
     int32_t result = -1;
 
-    if (s_SceneImp != NULL) {
+    if (s_SceneImp != nullptr) {
         result = s_SceneImp->AddObject(objectFile);
     } else {
         GLB_SAFE_ASSERT(false);
@@ -604,7 +604,7 @@ int32_t Scene::AddObject(const char* meshFile, const char* materialFile) {
 int32_t Scene::AddInstanceRenderObject(const char* objectFile, int32_t maxInstance) {
     int32_t result = -1;
 
-    if (s_SceneImp != NULL) {
+    if (s_SceneImp != nullptr) {
         result = s_SceneImp->AddInstanceRenderObject(objectFile, maxInstance);
     } else {
         GLB_SAFE_ASSERT(false);
@@ -628,7 +628,7 @@ int32_t Scene::AddInstanceRenderObject(const char* meshFile, const char* materia
 int32_t Scene::AddInstanceObject(int32_t instanceRenderObject, math::Vector pos, math::Vector scale, math::Vector rotate) {
     int32_t result = -1;
 
-    if (s_SceneImp != NULL) {
+    if (s_SceneImp != nullptr) {
         result = s_SceneImp->AddInstanceObject(instanceRenderObject, pos, scale, rotate);
     } else {
         GLB_SAFE_ASSERT(false);
@@ -640,7 +640,7 @@ int32_t Scene::AddInstanceObject(int32_t instanceRenderObject, math::Vector pos,
 int32_t Scene::AddDecalObject(const char* decalObjectFile) {
     int32_t result = -1;
 
-    if (s_SceneImp != NULL) {
+    if (s_SceneImp != nullptr) {
         result = s_SceneImp->AddDecalObject(decalObjectFile);
     } else {
         GLB_SAFE_ASSERT(false);
@@ -661,11 +661,11 @@ int32_t Scene::AddDecalObject(const char* meshFile, const char* materialFile) {
     return result;
 }
 
-int32_t Scene::AddObject(scene::Model* model) {
+int32_t Scene::AddObject(render::mesh::MeshBase* mesh) {
     int32_t result = -1;
 
-    if (s_SceneImp != NULL) {
-        result = s_SceneImp->AddObject(model);
+    if (s_SceneImp != nullptr) {
+        result = s_SceneImp->AddObject(mesh);
     } else {
         GLB_SAFE_ASSERT(false);
     }
@@ -676,7 +676,7 @@ int32_t Scene::AddObject(scene::Model* model) {
 int32_t Scene::AddSkyObject(const char* objectFile) {
     int32_t result = -1;
 
-    if (s_SceneImp != NULL) {
+    if (s_SceneImp != nullptr) {
         result = s_SceneImp->AddSkyObject(objectFile);
     } else {
         GLB_SAFE_ASSERT(false);
@@ -686,9 +686,9 @@ int32_t Scene::AddSkyObject(const char* objectFile) {
 }
 
 Object* Scene::GetObjectById(int32_t id) {
-    Object* result = NULL;
+    Object* result = nullptr;
 
-    if (s_SceneImp != NULL) {
+    if (s_SceneImp != nullptr) {
         result = s_SceneImp->GetObjectById(id);
     } else {
         GLB_SAFE_ASSERT(false);
@@ -698,9 +698,9 @@ Object* Scene::GetObjectById(int32_t id) {
 }
 
 Object* Scene::GetSkyObject() {
-    Object* result = NULL;
+    Object* result = nullptr;
 
-    if (s_SceneImp != NULL) {
+    if (s_SceneImp != nullptr) {
         result = s_SceneImp->GetSkyObject();
     } else {
         GLB_SAFE_ASSERT(false);
@@ -710,7 +710,7 @@ Object* Scene::GetSkyObject() {
 }
 
 void Scene::GetAllObjects(std::vector<Object*>& objs) {
-    if (s_SceneImp != NULL) {
+    if (s_SceneImp != nullptr) {
         s_SceneImp->GetAllObjects(objs);
     } else {
         GLB_SAFE_ASSERT(false);
@@ -718,7 +718,7 @@ void Scene::GetAllObjects(std::vector<Object*>& objs) {
 }
 
 void Scene::DestroyObject(int32_t objectId) {
-    if (s_SceneImp != NULL) {
+    if (s_SceneImp != nullptr) {
         s_SceneImp->DestroyObject(objectId);
     } else {
         GLB_SAFE_ASSERT(false);
@@ -726,7 +726,7 @@ void Scene::DestroyObject(int32_t objectId) {
 }
 
 void Scene::SetLight(Light lit, int32_t id) {
-    if (s_SceneImp != NULL) {
+    if (s_SceneImp != nullptr) {
         s_SceneImp->SetLight(lit, id);
     } else {
         GLB_SAFE_ASSERT(false);
@@ -736,7 +736,7 @@ void Scene::SetLight(Light lit, int32_t id) {
 Light Scene::GetLight(int32_t id) {
     Light lit(PARALLEL_LIGHT);
 
-    if (s_SceneImp != NULL) {
+    if (s_SceneImp != nullptr) {
         lit = s_SceneImp->GetLight(id);
     } else {
         GLB_SAFE_ASSERT(false);
@@ -746,7 +746,7 @@ Light Scene::GetLight(int32_t id) {
 }
 
 void Scene::SetCamera(int32_t type, CameraBase* cam) {
-    if (s_SceneImp != NULL) {
+    if (s_SceneImp != nullptr) {
         s_SceneImp->SetCamera(type, cam);
     } else {
         GLB_SAFE_ASSERT(false);
@@ -754,9 +754,9 @@ void Scene::SetCamera(int32_t type, CameraBase* cam) {
 }
 
 CameraBase* Scene::GetCamera(int32_t type) {
-    CameraBase* cam = NULL;
+    CameraBase* cam = nullptr;
 
-    if (s_SceneImp != NULL) {
+    if (s_SceneImp != nullptr) {
         cam = s_SceneImp->GetCamera(type);
     } else {
         GLB_SAFE_ASSERT(false);
@@ -766,7 +766,7 @@ CameraBase* Scene::GetCamera(int32_t type) {
 }
 
 void Scene::SetCurCamera(int32_t type) {
-    if (s_SceneImp != NULL) {
+    if (s_SceneImp != nullptr) {
         s_SceneImp->SetCurCamera(type);
     } else {
         GLB_SAFE_ASSERT(false);
@@ -776,7 +776,7 @@ void Scene::SetCurCamera(int32_t type) {
 int32_t Scene::GetCurCameraType() {
     int32_t result = PRIMIAY_CAM;
 
-    if (s_SceneImp != NULL) {
+    if (s_SceneImp != nullptr) {
         result = s_SceneImp->GetCurCameraType();
     } else {
         GLB_SAFE_ASSERT(false);
@@ -786,9 +786,9 @@ int32_t Scene::GetCurCameraType() {
 }
 
 CameraBase* Scene::GetCurCamera() {
-    CameraBase* cam = NULL;
+    CameraBase* cam = nullptr;
 
-    if (s_SceneImp != NULL) {
+    if (s_SceneImp != nullptr) {
         cam = s_SceneImp->GetCurCamera();
     } else {
         GLB_SAFE_ASSERT(false);
@@ -800,7 +800,7 @@ CameraBase* Scene::GetCurCamera() {
 math::Matrix Scene::GetViewMatrix(int32_t type) {
     math::Matrix mat = math::Matrix::CreateIdentityMatrix();
 
-    if (s_SceneImp != NULL) {
+    if (s_SceneImp != nullptr) {
         mat = s_SceneImp->GetViewMatrix(type);
     } else {
         GLB_SAFE_ASSERT(false);
@@ -810,7 +810,7 @@ math::Matrix Scene::GetViewMatrix(int32_t type) {
 }
 
 void Scene::AddBoundBox(math::Vector color) {
-    if (s_SceneImp != NULL) {
+    if (s_SceneImp != nullptr) {
         s_SceneImp->AddBoundBox(color);
     } else {
         GLB_SAFE_ASSERT(false);

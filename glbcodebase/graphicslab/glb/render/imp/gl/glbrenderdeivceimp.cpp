@@ -25,7 +25,7 @@ namespace render {
 //-----------------------------------------------------------------------------------
 
 typedef void (APIENTRY *PFNWGLEXTSWAPCONTROLPROC) (int);
-PFNWGLEXTSWAPCONTROLPROC wglSwapIntervalEXT = NULL;
+PFNWGLEXTSWAPCONTROLPROC wglSwapIntervalEXT = nullptr;
 
 //-----------------------------------------------------------------------------------
 // CLASS DEFINITION
@@ -35,8 +35,8 @@ PFNWGLEXTSWAPCONTROLPROC wglSwapIntervalEXT = NULL;
 // DeviceImp DEFINITION
 //-----------------------------------------------------------------------------------
 DeviceImp::DeviceImp()
-: m_WindowDC(NULL)
-, m_OpenGLContext(NULL)
+: m_WindowDC(nullptr)
+, m_OpenGLContext(nullptr)
 , m_VertexArrayObject(-1)
 , m_VertexBufferObject(-1)
 , m_InstanceBufferObject(-1)
@@ -111,7 +111,7 @@ void DeviceImp::Initialize() {
 
     // Create opengl render context
     m_OpenGLContext = wglCreateContext(m_WindowDC);
-    if (m_OpenGLContext == NULL) {
+    if (m_OpenGLContext == nullptr) {
         return;
     }
     wglMakeCurrent(m_WindowDC, m_OpenGLContext);
@@ -144,11 +144,11 @@ void DeviceImp::Initialize() {
 
 void DeviceImp::Destroy() {
     if (m_WindowDC && m_OpenGLContext) {
-        wglMakeCurrent(m_WindowDC, NULL);
+        wglMakeCurrent(m_WindowDC, nullptr);
         wglDeleteContext(m_OpenGLContext);
         ReleaseDC(app::Application::GetWindowHandle(), m_WindowDC);
-        m_WindowDC = NULL;
-        m_OpenGLContext = NULL;
+        m_WindowDC = nullptr;
+        m_OpenGLContext = nullptr;
     }
 }
 
@@ -182,7 +182,7 @@ void DeviceImp::ClearTexture() {
 
 // Shader
 void DeviceImp::SetShader(shader::Program* program) {
-    if (program != NULL) {
+    if (program != nullptr) {
         m_Shader = reinterpret_cast<int32_t>(program->GetNativeShader());
         glUseProgram(m_Shader);
     } else {
@@ -394,7 +394,7 @@ void DeviceImp::SetCullFaceMode(CullMode mode) {
 }
 
 void DeviceImp::SetRenderTarget(RenderTarget* rt) {
-    if (rt != NULL) {
+    if (rt != nullptr) {
         int32_t fbo = reinterpret_cast<int32_t>(rt->GetNativeRenderTarget());
         glBindFramebuffer(GL_FRAMEBUFFER, fbo);
     } else {

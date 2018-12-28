@@ -115,7 +115,7 @@ Wrapper uniform_viewm_picker(scene::Object*) {
 
     int32_t type = scene::Scene::GetCurCameraType();
     scene::CameraBase* cam = scene::Scene::GetCamera(type);
-    if (cam != NULL) {
+    if (cam != nullptr) {
         wrapper.SetMatrix(cam->GetViewMatrix());
     } else {
         GLB_SAFE_ASSERT(false);
@@ -128,7 +128,7 @@ Wrapper uniform_worldm_picker(scene::Object* obj) {
     Wrapper wrapper;
     wrapper.SetFormat(Wrapper::FMT_MATRIX);
 
-    if (obj != NULL) {
+    if (obj != nullptr) {
         math::Matrix m = obj->GetWorldMatrix();
         wrapper.SetMatrix(m);
     } else {
@@ -214,7 +214,7 @@ Wrapper uniform_trans_inv_worldm_picker(scene::Object* obj) {
     Wrapper wrapper;
     wrapper.SetFormat(Wrapper::FMT_MATRIX);
 
-    if (obj != NULL) {
+    if (obj != nullptr) {
         math::Matrix m = obj->GetWorldMatrix();
         m.Inverse();
         m.Transpose();
@@ -247,7 +247,7 @@ Wrapper uniform_albedo_texslot_picker(scene::Object* obj) {
     Wrapper wrapper;
     wrapper.SetFormat(Wrapper::FMT_SAMPLER2D);
 
-    if (obj != NULL) {
+    if (obj != nullptr) {
         wrapper.SetSampler2D(render::TS_ALBEDO);
     } else {
         GLB_SAFE_ASSERT(false);
@@ -261,7 +261,7 @@ Wrapper uniform_roughness_texslot_picker(scene::Object* obj) {
     Wrapper wrapper;
     wrapper.SetFormat(Wrapper::FMT_SAMPLER2D);
 
-    if (obj != NULL) {
+    if (obj != nullptr) {
         wrapper.SetSampler2D(render::TS_ROUGHNESS);
     } else {
         GLB_SAFE_ASSERT(false);
@@ -275,7 +275,7 @@ Wrapper uniform_metallic_texslot_picker(scene::Object* obj) {
     Wrapper wrapper;
     wrapper.SetFormat(Wrapper::FMT_SAMPLER2D);
 
-    if (obj != NULL) {
+    if (obj != nullptr) {
         wrapper.SetSampler2D(render::TS_METALLIC);
     } else {
         GLB_SAFE_ASSERT(false);
@@ -289,7 +289,7 @@ Wrapper uniform_alpha_texslot_picker(scene::Object* obj) {
     Wrapper wrapper;
     wrapper.SetFormat(Wrapper::FMT_SAMPLER2D);
 
-    if (obj != NULL) {
+    if (obj != nullptr) {
         wrapper.SetSampler2D(render::TS_ALPHA);
     } else {
         GLB_SAFE_ASSERT(false);
@@ -303,7 +303,7 @@ Wrapper uniform_normal_texslot_picker(scene::Object* obj) {
     Wrapper wrapper;
     wrapper.SetFormat(Wrapper::FMT_SAMPLER2D);
 
-    if (obj != NULL) {
+    if (obj != nullptr) {
         wrapper.SetSampler2D(render::TS_NORMAL);
     } else {
         GLB_SAFE_ASSERT(false);
@@ -317,7 +317,7 @@ Wrapper uniform_emission_texslot_picker(scene::Object* obj) {
     Wrapper wrapper;
     wrapper.SetFormat(Wrapper::FMT_SAMPLER2D);
 
-    if (obj != NULL) {
+    if (obj != nullptr) {
         wrapper.SetSampler2D(render::TS_EMISSION);
     } else {
         GLB_SAFE_ASSERT(false);
@@ -379,7 +379,6 @@ Wrapper uniform_specular_pfc_texslot_picker(scene::Object* obj) {
 Wrapper uniform_brdf_pft_texslot_picker(scene::Object* obj) {
     Wrapper wrapper;
     wrapper.SetFormat(Wrapper::FMT_SAMPLER2D);
-    //wrapper.SetSampler2D(render::TS_BRDF_PFT);  // TODO:
     wrapper.SetSampler2D(render::Render::GetBRDFMap());
     return wrapper;
 }
@@ -389,9 +388,7 @@ Wrapper uniform_specular_pfc_lod_pciker(scene::Object* obj) {
     wrapper.SetFormat(Wrapper::FMT_FLOAT);
 
     if (obj) {
-        float width = texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(scene::Model::MT_SPECULAR_PFC))->GetWidth();
-        float height = texture::Mgr::GetTextureById(obj->GetModel()->GetTexId(scene::Model::MT_SPECULAR_PFC))->GetHeight();
-        wrapper.SetFloat(log(max(width, height)) / log(2));
+        //wrapper.SetFloat(log(max(width, height)) / log(2));  // TODO: make specular pfc lod user parameter
     } else {
         wrapper.SetFloat(8.0f);
     }
@@ -431,7 +428,7 @@ Wrapper uniform_material_ambient_picker(scene::Object* obj) {
     Wrapper wrapper;
     wrapper.SetFormat(Wrapper::FMT_FLOAT3);
 
-    if (obj != NULL) {
+    if (obj != nullptr) {
         //int32_t mat_id = obj->GetModel()->GetMaterial();
         //wrapper.SetVector(material::Mgr::GetMaterial(mat_id).ambient);
     } else {
@@ -446,7 +443,7 @@ Wrapper uniform_material_diffuse_picker(scene::Object* obj) {
     Wrapper wrapper;
     wrapper.SetFormat(Wrapper::FMT_FLOAT3);
 
-    if (obj != NULL) {
+    if (obj != nullptr) {
         //int32_t mat_id = obj->GetModel()->GetMaterial();
         //wrapper.SetVector(material::Mgr::GetMaterial(mat_id).diffuse);
     } else {
@@ -461,7 +458,7 @@ Wrapper uniform_material_specular_picker(scene::Object* obj) {
     Wrapper wrapper;
     wrapper.SetFormat(Wrapper::FMT_FLOAT3);
 
-    if (obj != NULL) {
+    if (obj != nullptr) {
         //int32_t mat_id = obj->GetModel()->GetMaterial();
         //wrapper.SetVector(material::Mgr::GetMaterial(mat_id).specular);
     } else {
@@ -477,7 +474,7 @@ Wrapper uniform_material_emission_picker(scene::Object* obj) {
     Wrapper wrapper;
     wrapper.SetFormat(Wrapper::FMT_FLOAT3);
 
-    if (obj != NULL) {
+    if (obj != nullptr) {
         //int32_t mat_id = obj->GetModel()->GetMaterial();
         //wrapper.SetVector(material::Mgr::GetMaterial(mat_id).emission);
     } else {
@@ -492,7 +489,7 @@ Wrapper uniform_material_pow_picker(scene::Object* obj) {
     Wrapper wrapper;
     wrapper.SetFormat(Wrapper::FMT_FLOAT);
 
-    if (obj != NULL) {
+    if (obj != nullptr) {
         //int32_t mat_id = obj->GetModel()->GetMaterial();
         //wrapper.SetFloat(material::Mgr::GetMaterial(mat_id).specular_pow);
     } else {
@@ -507,7 +504,7 @@ Wrapper uniform_material_albedo_picker(scene::Object* obj) {
     Wrapper wrapper;
     wrapper.SetFormat(Wrapper::FMT_FLOAT3);
 
-    if (obj != NULL) {
+    if (obj != nullptr) {
         //int32_t mat_id = obj->GetModel()->GetMaterial();
         //wrapper.SetVector(material::Mgr::GetMaterial(mat_id).albedo);
     } else {
@@ -522,7 +519,7 @@ Wrapper uniform_material_roughness_picker(scene::Object* obj) {
     Wrapper wrapper;
     wrapper.SetFormat(Wrapper::FMT_FLOAT);
 
-    if (obj != NULL) {
+    if (obj != nullptr) {
         //int32_t mat_id = obj->GetModel()->GetMaterial();
         //wrapper.SetFloat(material::Mgr::GetMaterial(mat_id).roughness);
     } else {
@@ -537,7 +534,7 @@ Wrapper uniform_material_metallic_picker(scene::Object* obj) {
     Wrapper wrapper;
     wrapper.SetFormat(Wrapper::FMT_FLOAT);
 
-    if (obj != NULL) {
+    if (obj != nullptr) {
         //int32_t mat_id = obj->GetModel()->GetMaterial();
         //wrapper.SetFloat(material::Mgr::GetMaterial(mat_id).metallic);
     } else {
@@ -553,7 +550,7 @@ Wrapper uniform_eye_pos_picker(scene::Object*) {
     wrapper.SetFormat(Wrapper::FMT_FLOAT3);
 
     scene::CameraBase* cam = scene::Scene::GetCamera(scene::PRIMIAY_CAM);
-    if (cam != NULL) {
+    if (cam != nullptr) {
         wrapper.SetVector(cam->GetPos());
     } else {
         GLB_SAFE_ASSERT(false);

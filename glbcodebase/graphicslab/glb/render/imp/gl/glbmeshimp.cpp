@@ -88,10 +88,12 @@ int32_t VertexBuffer::GetIBO() {
 TriangleMesh::Imp::Imp()
 : m_ID(-1)
 , m_Name()
+, m_BoundBoxMax(0.0f, 0.0f, 0.0f)
+, m_BoundBoxMin(0.0f, 0.0f, 0.0f)
 , m_VertexNum(0)
 , m_TriangleNum(0)
 , m_BufSizeInBytes(0)
-, m_VertexBuffer(NULL)
+, m_VertexBuffer(nullptr)
 , m_VertexLayout()  {
     memset(&m_VertexLayout, 0, sizeof(m_VertexLayout));
 }
@@ -101,9 +103,9 @@ TriangleMesh::Imp::~Imp() {
 }
 
 TriangleMesh::Imp* TriangleMesh::Imp::Create(int32_t triangle_num, float* vertices, float* tex_coords, float* lightMapTexCoordBuf, float* normals, float* tangets, float* binormals) {
-    TriangleMesh::Imp* triangle_mesh = NULL;
+    TriangleMesh::Imp* triangle_mesh = nullptr;
 
-    if (triangle_num > 0 && vertices != NULL) {
+    if (triangle_num > 0 && vertices != nullptr) {
         // Calculate buffer size in bytes
         VertexLayout layout;
         memset(&layout, 0, sizeof(layout));
@@ -168,7 +170,7 @@ TriangleMesh::Imp* TriangleMesh::Imp::Create(int32_t triangle_num, float* vertic
         // Create vertex buffer object
         uint32_t vbo = vbuf->GetVBO();
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBufferData(GL_ARRAY_BUFFER, buf_size, NULL, GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, buf_size, nullptr, GL_STATIC_DRAW);
 
         // Update vertex data
         glBufferSubData(GL_ARRAY_BUFFER, 0, vertices_buf_size, vertices);
@@ -202,7 +204,7 @@ TriangleMesh::Imp* TriangleMesh::Imp::Create(int32_t triangle_num, float* vertic
 
         // Create TriangleMesh and save value
         triangle_mesh = new TriangleMesh::Imp();
-        if (triangle_mesh != NULL) {
+        if (triangle_mesh != nullptr) {
             triangle_mesh->m_TriangleNum = triangle_num;
             triangle_mesh->m_VertexNum = 3 * triangle_num;
             triangle_mesh->m_BufSizeInBytes = buf_size;
@@ -237,6 +239,19 @@ std::string TriangleMesh::Imp::GetName() {
     return m_Name;
 }
 
+void TriangleMesh::Imp::SetBoundBox(math::Vector min, math::Vector max) {
+    m_BoundBoxMin = min;
+    m_BoundBoxMax = max;
+}
+
+math::Vector TriangleMesh::Imp::GetBoundBoxMin() {
+    return m_BoundBoxMin;
+}
+
+math::Vector TriangleMesh::Imp::GetBoundBoxMax() {
+    return m_BoundBoxMax;
+}
+
 VertexLayout TriangleMesh::Imp::GetVertexLayout() {
     return m_VertexLayout;
 }
@@ -256,11 +271,13 @@ VertexBuffer* TriangleMesh::Imp::GetVertexBuffer() {
 InstanceTriangleMesh::Imp::Imp()
 : m_ID(-1)
 , m_Name()
+, m_BoundBoxMax(0.0f, 0.0f, 0.0f)
+, m_BoundBoxMin(0.0f, 0.0f, 0.0f)
 , m_VertexNum(0)
 , m_TriangleNum(0)
 , m_BufSizeInBytes(0)
 , m_InstanceBufSizeInBytes(0)
-, m_VertexBuffer(NULL)
+, m_VertexBuffer(nullptr)
 , m_VertexLayout() {
     memset(&m_VertexLayout, 0, sizeof(m_VertexLayout));
 }
@@ -270,9 +287,9 @@ InstanceTriangleMesh::Imp::~Imp() {
 }
 
 InstanceTriangleMesh::Imp* InstanceTriangleMesh::Imp::Create(int32_t maxInstance, int32_t triangle_num, float* vertices, float* tex_coords, float* lightMapTexCoordBuf, float* normals, float* tangets, float* binormals) {
-    InstanceTriangleMesh::Imp* triangle_mesh = NULL;
+    InstanceTriangleMesh::Imp* triangle_mesh = nullptr;
 
-    if (triangle_num > 0 && vertices != NULL) {
+    if (triangle_num > 0 && vertices != nullptr) {
         // Calculate buffer size in bytes
         VertexLayout layout;
         memset(&layout, 0, sizeof(layout));
@@ -357,12 +374,12 @@ InstanceTriangleMesh::Imp* InstanceTriangleMesh::Imp::Create(int32_t maxInstance
         // Create instance buffer object
         uint32_t ibo = vbuf->GetIBO();
         glBindBuffer(GL_ARRAY_BUFFER, ibo);
-        glBufferData(GL_ARRAY_BUFFER, instanceBufSize, NULL, GL_DYNAMIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, instanceBufSize, nullptr, GL_DYNAMIC_DRAW);
 
         // Create vertex buffer object
         uint32_t vbo = vbuf->GetVBO();
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBufferData(GL_ARRAY_BUFFER, buf_size, NULL, GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, buf_size, nullptr, GL_STATIC_DRAW);
 
         // Update vertex data
         glBufferSubData(GL_ARRAY_BUFFER, 0, vertices_buf_size, vertices);
@@ -396,7 +413,7 @@ InstanceTriangleMesh::Imp* InstanceTriangleMesh::Imp::Create(int32_t maxInstance
 
         // Create TriangleMesh and save value
         triangle_mesh = new InstanceTriangleMesh::Imp();
-        if (triangle_mesh != NULL) {
+        if (triangle_mesh != nullptr) {
             triangle_mesh->m_TriangleNum = triangle_num;
             triangle_mesh->m_VertexNum = 3 * triangle_num;
             triangle_mesh->m_BufSizeInBytes = buf_size;
@@ -432,6 +449,19 @@ std::string InstanceTriangleMesh::Imp::GetName() {
     return m_Name;
 }
 
+void InstanceTriangleMesh::Imp::SetBoundBox(math::Vector min, math::Vector max) {
+    m_BoundBoxMin = min;
+    m_BoundBoxMax = max;
+}
+
+math::Vector InstanceTriangleMesh::Imp::GetBoundBoxMin() {
+    return m_BoundBoxMin;
+}
+
+math::Vector InstanceTriangleMesh::Imp::GetBoundBoxMax() {
+    return m_BoundBoxMax;
+}
+
 VertexLayout InstanceTriangleMesh::Imp::GetVertexLayout() {
     return m_VertexLayout;
 }
@@ -459,7 +489,7 @@ void InstanceTriangleMesh::Imp::UpdateInstanceBuffer(void* buf) {
 //-----------------------------------------------------------------------------------
 
 DynamicTriangleMesh::Imp::Imp()
-: m_VertexBuffer(NULL)
+: m_VertexBuffer(nullptr)
 , m_VertexLayout()
 , m_ShaderDesc()
 , m_CurrentTriangleNum(0)
@@ -470,7 +500,7 @@ DynamicTriangleMesh::Imp::~Imp() {
 }
 
 DynamicTriangleMesh::Imp* DynamicTriangleMesh::Imp::Create(int32_t maxTriangleNum) {
-    DynamicTriangleMesh::Imp* mesh = NULL;
+    DynamicTriangleMesh::Imp* mesh = nullptr;
 
     // This mesh only has line primitive with position, color and uv
     int32_t buf_size = (sizeof(float) * (3 + 4 + 2)) * maxTriangleNum * 3;
@@ -481,11 +511,11 @@ DynamicTriangleMesh::Imp* DynamicTriangleMesh::Imp::Create(int32_t maxTriangleNu
     uint32_t vbo = vbuf->GetVBO();
     glBindVertexArray(vao);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, buf_size, NULL, GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, buf_size, nullptr, GL_DYNAMIC_DRAW);
 
     if (vao != 0 && vbo != 0) {
         mesh = new DynamicTriangleMesh::Imp;
-        if (mesh != NULL) {
+        if (mesh != nullptr) {
             mesh->m_VertexBuffer = vbuf;
             mesh->m_VertexNum = maxTriangleNum * 2;
             mesh->m_MaxTriangleNum = maxTriangleNum;
@@ -627,7 +657,7 @@ void DynamicTriangleMesh::Imp::Clear() {
 // DebugMesh::Imp DEFINITION
 //-----------------------------------------------------------------------------------
 DebugMesh::Imp::Imp()
-: m_VertexBuffer(NULL)
+: m_VertexBuffer(nullptr)
 , m_VertexLayout()
 , m_ShaderDesc()
 , m_VertexNum(0)
@@ -639,7 +669,7 @@ DebugMesh::Imp::~Imp() {
 }
 
 DebugMesh::Imp* DebugMesh::Imp::Create(int32_t max_lines) {
-    DebugMesh::Imp* mesh = NULL;
+    DebugMesh::Imp* mesh = nullptr;
 
     // This mesh only has line primitive with position and color
     int32_t buf_size = (sizeof(float) * (3 + 3)) * max_lines * 2;
@@ -650,11 +680,11 @@ DebugMesh::Imp* DebugMesh::Imp::Create(int32_t max_lines) {
     uint32_t vbo = vbuf->GetVBO();
     glBindVertexArray(vao);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, buf_size, NULL, GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, buf_size, nullptr, GL_DYNAMIC_DRAW);
 
     if (vao != 0 && vbo != 0) {
         mesh = new DebugMesh::Imp;
-        if (mesh != NULL) {
+        if (mesh != nullptr) {
             mesh->m_VertexBuffer = vbuf;
             mesh->m_VertexNum = max_lines * 2;
             mesh->m_MaxLineNum = max_lines;
@@ -735,7 +765,7 @@ VertexBuffer* DebugMesh::Imp::GetVertexBuffer() {
 // ScreenMesh::Imp DEFINITION
 //-----------------------------------------------------------------------------------
 ScreenMesh::Imp::Imp()
-: m_VertexBuffer(NULL)
+: m_VertexBuffer(nullptr)
 , m_VertexLayout()
 , m_VertexNum(0) {
 }
@@ -745,7 +775,7 @@ ScreenMesh::Imp::~Imp() {
 }
 
 ScreenMesh::Imp* ScreenMesh::Imp::Create(int32_t width, int32_t height) {
-    ScreenMesh::Imp* mesh = NULL;
+    ScreenMesh::Imp* mesh = nullptr;
 
     if (0 < width && 0 < height) {
         // This mesh only has position and texture coordinate
@@ -797,12 +827,12 @@ ScreenMesh::Imp* ScreenMesh::Imp::Create(int32_t width, int32_t height) {
         uint32_t vbo = vbuf->GetVBO();
         glBindVertexArray(vao);
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBufferData(GL_ARRAY_BUFFER, kScreenMeshBufSize * sizeof(float), NULL, GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, kScreenMeshBufSize * sizeof(float), nullptr, GL_STATIC_DRAW);
         glBufferSubData(GL_ARRAY_BUFFER, 0, kScreenMeshBufSize * sizeof(float), buffer);
 
         if (vao != 0 && vbo != 0) {
             mesh = new ScreenMesh::Imp();
-            if (mesh != NULL) {
+            if (mesh != nullptr) {
                 mesh->m_VertexBuffer = vbuf;
                 mesh->m_VertexNum = 6;
 
@@ -846,7 +876,7 @@ VertexBuffer* ScreenMesh::Imp::GetVertexBuffer() {
 // FontMesh::Imp DEFINITION
 //-----------------------------------------------------------------------------------
 FontMesh::Imp::Imp()
-: m_VertexBuffer(NULL)
+: m_VertexBuffer(nullptr)
 , m_VertexLayout()
 , m_ShaderDesc()
 , m_VertexNum(0) {
@@ -857,7 +887,7 @@ FontMesh::Imp::~Imp() {
 }
 
 FontMesh::Imp* FontMesh::Imp::Create(int32_t maxCharacter) {
-    FontMesh::Imp* mesh = NULL;
+    FontMesh::Imp* mesh = nullptr;
 
     // This mesh only has line primitive with position, color and uv
     int32_t buf_size = (sizeof(float) * (3 + 4 + 2)) * maxCharacter * 6;
@@ -868,11 +898,11 @@ FontMesh::Imp* FontMesh::Imp::Create(int32_t maxCharacter) {
     uint32_t vbo = vbuf->GetVBO();
     glBindVertexArray(vao);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, buf_size, NULL, GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, buf_size, nullptr, GL_DYNAMIC_DRAW);
 
     if (vao != 0 && vbo != 0) {
         mesh = new FontMesh::Imp;
-        if (mesh != NULL) {
+        if (mesh != nullptr) {
             mesh->m_VertexBuffer = vbuf;
             mesh->m_VertexNum = 0;
             mesh->m_CurCharacterNum = 0;

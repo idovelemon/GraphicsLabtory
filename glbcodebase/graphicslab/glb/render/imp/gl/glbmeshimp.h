@@ -65,6 +65,10 @@ public:
     void SetName(std::string name);
     std::string GetName();
 
+    void SetBoundBox(math::Vector min, math::Vector max);
+    math::Vector GetBoundBoxMin();
+    math::Vector GetBoundBoxMax();
+
     VertexLayout GetVertexLayout();
     int32_t GetVertexNum();
 
@@ -76,6 +80,8 @@ protected:
 protected:
     int32_t         m_ID;
     std::string     m_Name;
+    math::Vector    m_BoundBoxMax;
+    math::Vector    m_BoundBoxMin;
     int32_t         m_VertexNum;
     int32_t         m_TriangleNum;
     int32_t         m_BufSizeInBytes;
@@ -99,6 +105,10 @@ public:
     void SetName(std::string name);
     std::string GetName();
 
+    void SetBoundBox(math::Vector min, math::Vector max);
+    math::Vector GetBoundBoxMin();
+    math::Vector GetBoundBoxMax();
+
     VertexLayout GetVertexLayout();
     int32_t GetVertexNum();
 
@@ -111,6 +121,8 @@ protected:
 protected:
     int32_t         m_ID;
     std::string     m_Name;
+    math::Vector    m_BoundBoxMax;
+    math::Vector    m_BoundBoxMin;
     int32_t         m_VertexNum;
     int32_t         m_TriangleNum;
     int32_t         m_BufSizeInBytes;

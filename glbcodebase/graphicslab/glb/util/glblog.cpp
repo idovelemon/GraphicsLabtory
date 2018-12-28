@@ -19,19 +19,19 @@ namespace util {
 
 namespace log {
 
-static FILE* s_LogFile = NULL;
+static FILE* s_LogFile = nullptr;
 static const char s_LogFileName[] = {"debug_log.txt"};
 static const int32_t kLogMaxChar = 4096;
 
 void Initialize() {
-    s_LogFile = fopen(s_LogFileName, "w+");
-    GLB_SAFE_ASSERT(s_LogFile != NULL);
+    fopen_s(&s_LogFile, s_LogFileName, "w+");
+    GLB_SAFE_ASSERT(s_LogFile != nullptr);
 }
 
 void Destroy() {
     if (s_LogFile) {
         fclose(s_LogFile);
-        s_LogFile = NULL;
+        s_LogFile = nullptr;
     } else {
         GLB_SAFE_ASSERT(false);
     }
@@ -43,7 +43,7 @@ void LogPrint(const char* fmt, ...) {
 
     va_list va;
     va_start(va, fmt);
-    vsprintf(log, fmt, va);
+    vsprintf_s(log, kLogMaxChar, fmt, va);
     va_end(va);
 
     int32_t len = strlen(log);

@@ -79,7 +79,7 @@ private:
 class UberProgram::Imp {
 public:
     virtual ~Imp();
-    static UberProgram::Imp* Create(const char* vertex_shader_file, const char* fragment_shader_file, const char* geometry_shader_file = NULL);
+    static UberProgram::Imp* Create(const char* vertex_shader_file, const char* fragment_shader_file, const char* geometry_shader_file = nullptr);
     static UberProgram::Imp* Create(Descriptor desc);
 
 public:
@@ -115,7 +115,7 @@ private:
 class UserProgram::Imp {
 public:
     virtual ~Imp();
-    static UserProgram::Imp* Create(const char* vertex_shader_file, const char* fragment_shader_file, const char* geometry_shader_file = NULL);
+    static UserProgram::Imp* Create(const char* vertex_shader_file, const char* fragment_shader_file, const char* geometry_shader_file = nullptr);
 
 public:
     void SetID(int32_t id);

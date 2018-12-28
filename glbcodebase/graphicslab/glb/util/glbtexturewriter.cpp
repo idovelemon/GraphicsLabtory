@@ -114,7 +114,8 @@ DDSWriter::~DDSWriter() {
 bool DDSWriter::Write(const char* file_name, int8_t* data, int32_t width, int32_t height, int32_t pixel_format, int32_t bit_count) {
     bool result = false;
 
-    FILE* file = fopen(file_name, "wb");
+    FILE* file = nullptr;
+    fopen_s(&file, file_name, "wb");
 
     if (file) {
         // Build dds file
@@ -154,7 +155,7 @@ bool DDSWriter::Write(const char* file_name, int8_t* data, int32_t width, int32_
         fwrite(dds.main_data, sizeof(int8_t), width * height * bit_count / 8, file);
 
         delete[] dds.main_data;
-        dds.main_data = NULL;
+        dds.main_data = nullptr;
         memset(&dds, 0, sizeof(dds));
 
         result = true;
@@ -177,7 +178,7 @@ void DDSWriter::SetRGBAMask(DDSPixelFormat& pf, int32_t pixel_format) {
 }
 
 void DDSWriter::ReorganizeRGBData(int8_t* data, TEXTURE_PIXEL_FORMAT_TYPE type) {
-    if (data != NULL) {
+    if (data != nullptr) {
         if (type == TPFT_R16G16) {
             unsigned short * data16 = reinterpret_cast<unsigned short*>(data);
             unsigned int data32 = *reinterpret_cast<unsigned int*>(data);
@@ -204,7 +205,8 @@ HDRWriter::~HDRWriter() {
 bool HDRWriter::Write(const char* fileName, int8_t* data, int32_t width, int32_t height, int32_t pixelFormat, int32_t bitCount) {
     bool result = false;
 
-    FILE* file = fopen(fileName, "wb");
+    FILE* file = nullptr;
+    fopen_s(&file, fileName, "wb");
 
     if (file) {
         if (pixelFormat == TPFT_R32G32B32A32F) {
@@ -220,11 +222,11 @@ bool HDRWriter::Write(const char* fileName, int8_t* data, int32_t width, int32_t
                 }
             }
 
-            RGBE_WriteHeader(file, width, height, NULL);
+            RGBE_WriteHeader(file, width, height, nullptr);
             RGBE_WritePixels(file, fp, width * height);
 
             delete[] fp;
-            fp = NULL;
+            fp = nullptr;
             result = true;
         } else {
             // TODO: do not support now
@@ -248,13 +250,14 @@ PFCWriter::~PFCWriter() {
 bool PFCWriter::Write(const char* file_name, int8_t* data, int32_t width, int32_t height, int32_t pixel_format, int32_t bit_count) {
     bool result = false;
 
-    FILE* file = fopen(file_name, "wb");
+    FILE* file = nullptr;
+    fopen_s(&file, file_name, "wb");
 
     if (file) {
-        int32_t miplevels = log(max(width, height)) / log(2) + 1;
+        int32_t miplevels = static_cast<int32_t>(log(max(width, height)) / log(2) + 1);
         int32_t sizeBytes = 0;
         for (int32_t i = 0; i < miplevels; i++) {
-            sizeBytes = sizeBytes + sizeof(int16_t) * 4 * (width * pow(2, -i)) * (height * pow(2, -i)) * 6;
+            sizeBytes = sizeBytes + static_cast<int32_t>(sizeof(int16_t) * 4 * (width * pow(2, -i)) * (height * pow(2, -i)) * 6);
         }
 
         fwrite(&width, sizeof(width), 1, file);
@@ -280,7 +283,8 @@ PFTWriter::~PFTWriter() {
 bool PFTWriter::Write(const char* file_name, int8_t* data, int32_t width, int32_t height, int32_t pixel_format, int32_t bit_count) {
     bool result = false;
 
-    FILE* file = fopen(file_name, "wb");
+    FILE* file = nullptr;
+    fopen_s(&file, file_name, "wb");
 
     if (file) {
         fwrite(&width, sizeof(width), 1, file);

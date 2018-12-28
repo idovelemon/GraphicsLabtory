@@ -48,7 +48,7 @@ TriangleMesh::Imp::Imp()
 , m_VertexNum(0)
 , m_TriangleNum(0)
 , m_BufSizeInBytes(0)
-, m_VertexBuffer(NULL)
+, m_VertexBuffer(nullptr)
 , m_VertexLayout()  {
     memset(&m_VertexLayout, 0, sizeof(m_VertexLayout));
 }
@@ -58,9 +58,9 @@ TriangleMesh::Imp::~Imp() {
 }
 
 TriangleMesh::Imp* TriangleMesh::Imp::Create(int32_t triangle_num, float* vertices, float* tex_coords, float* normals, float* tangets, float* binormals) {
-    TriangleMesh::Imp* triangle_mesh = NULL;
+    TriangleMesh::Imp* triangle_mesh = nullptr;
 
-    if (triangle_num > 0 && vertices != NULL) {
+    if (triangle_num > 0 && vertices != nullptr) {
         // Calculate buffer size in bytes
         VertexLayout layout;
         memset(&layout, 0, sizeof(layout));
@@ -130,7 +130,7 @@ TriangleMesh::Imp* TriangleMesh::Imp::Create(int32_t triangle_num, float* vertic
 
         // Create TriangleMesh and save value
         triangle_mesh = new TriangleMesh::Imp();
-        if (triangle_mesh != NULL) {
+        if (triangle_mesh != nullptr) {
             triangle_mesh->m_TriangleNum = triangle_num;
             triangle_mesh->m_VertexNum = 3 * triangle_num;
             triangle_mesh->m_BufSizeInBytes = buf_size;
@@ -178,7 +178,7 @@ VertexBuffer* TriangleMesh::Imp::GetVertexBuffer() {
 // DebugMesh::Imp DEFINITION
 //-----------------------------------------------------------------------------------
 DebugMesh::Imp::Imp()
-: m_VertexBuffer(NULL)
+: m_VertexBuffer(nullptr)
 , m_VertexLayout()
 , m_ShaderDesc()
 , m_VertexNum(0)
@@ -190,7 +190,7 @@ DebugMesh::Imp::~Imp() {
 }
 
 DebugMesh::Imp* DebugMesh::Imp::Create(int32_t max_lines) {
-    DebugMesh::Imp* mesh = NULL;
+    DebugMesh::Imp* mesh = nullptr;
 
     // This mesh only has line primitive with position and color
     int32_t buf_size = (sizeof(float) * (3 + 3)) * max_lines * 2;
@@ -200,7 +200,7 @@ DebugMesh::Imp* DebugMesh::Imp::Create(int32_t max_lines) {
 
     if (true) {
         mesh = new DebugMesh::Imp;
-        if (mesh != NULL) {
+        if (mesh != nullptr) {
             mesh->m_VertexBuffer = vbuf;
             mesh->m_VertexNum = max_lines * 2;
             mesh->m_MaxLineNum = max_lines;
@@ -274,7 +274,7 @@ VertexBuffer* DebugMesh::Imp::GetVertexBuffer() {
 // ScreenMesh::Imp DEFINITION
 //-----------------------------------------------------------------------------------
 ScreenMesh::Imp::Imp()
-: m_VertexBuffer(NULL)
+: m_VertexBuffer(nullptr)
 , m_VertexLayout()
 , m_VertexNum(0) {
 }
@@ -284,7 +284,7 @@ ScreenMesh::Imp::~Imp() {
 }
 
 ScreenMesh::Imp* ScreenMesh::Imp::Create(int32_t width, int32_t height) {
-    ScreenMesh::Imp* mesh = NULL;
+    ScreenMesh::Imp* mesh = nullptr;
 
     if (0 < width && 0 < height) {
         // This mesh only has position and texture coordinate
@@ -335,7 +335,7 @@ ScreenMesh::Imp* ScreenMesh::Imp::Create(int32_t width, int32_t height) {
 
         if (true) {
             mesh = new ScreenMesh::Imp();
-            if (mesh != NULL) {
+            if (mesh != nullptr) {
                 mesh->m_VertexBuffer = vbuf;
                 mesh->m_VertexNum = 6;
 

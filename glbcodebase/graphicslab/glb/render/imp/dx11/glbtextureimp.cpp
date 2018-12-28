@@ -56,10 +56,10 @@ Texture::Imp::~Imp() {
 }
 
 Texture::Imp* Texture::Imp::Create(const char* texture_name, int32_t type) {
-    Texture::Imp* tex = NULL;
+    Texture::Imp* tex = nullptr;
 
-    if (texture_name != NULL) {
-        int8_t* texture_data = NULL;
+    if (texture_name != nullptr) {
+        int8_t* texture_data = nullptr;
         int32_t texture_width = 0;
         int32_t texture_height = 0;
         if (TextureReader::ReadTexture(texture_name, &texture_data, texture_width, texture_height)) {
@@ -92,11 +92,11 @@ Texture::Imp* Texture::Imp::Create(const char* texture_name, int32_t type) {
 }
 
 Texture::Imp* Texture::Imp::Create(int32_t width, int32_t height) {
-    Texture::Imp* tex = NULL;
+    Texture::Imp* tex = nullptr;
 
     if (width > 0 && height > 0) {
         tex = new Texture::Imp();
-        if (tex != NULL) {
+        if (tex != nullptr) {
             tex->m_Type = TEX_2D;
             static char default_name[] = "DefaultEmpty";
             memcpy(tex->m_TexName, default_name, sizeof(default_name));
@@ -114,11 +114,11 @@ Texture::Imp* Texture::Imp::Create(int32_t width, int32_t height) {
 }
 
 Texture::Imp* Texture::Imp::CreateFloat16Texture(int32_t width, int32_t height) {
-    Texture::Imp* tex = NULL;
+    Texture::Imp* tex = nullptr;
 
     if (width > 0 && height > 0) {
         tex = new Texture::Imp();
-        if (tex != NULL) {
+        if (tex != nullptr) {
             tex->m_Type = TEX_2D;
             static char default_name[] = "DefaultEmpty";
             memcpy(tex->m_TexName, default_name, sizeof(default_name));
@@ -136,11 +136,11 @@ Texture::Imp* Texture::Imp::CreateFloat16Texture(int32_t width, int32_t height) 
 }
 
 Texture::Imp* Texture::Imp::CreateFloat16DepthTexture(int32_t width, int32_t height) {
-    Texture::Imp* tex = NULL;
+    Texture::Imp* tex = nullptr;
 
     if (width > 0 && height > 0) {
         tex = new Texture::Imp;
-        if (tex != NULL) {
+        if (tex != nullptr) {
             tex->m_Type = TEX_2D;
             tex->m_Depth = 0;
             tex->m_Height = height;

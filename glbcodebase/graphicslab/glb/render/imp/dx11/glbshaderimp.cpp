@@ -51,13 +51,13 @@ VertexShader::Imp::~Imp() {
 }
 
 VertexShader::Imp* VertexShader::Imp::Create(const char* vertex_shader_name) {
-    VertexShader::Imp* result = NULL;
+    VertexShader::Imp* result = nullptr;
 
     return result;
 }
 
 VertexShader::Imp* VertexShader::Imp::Create(std::vector<std::string> enable_macros, const char* uber_shader_file_name) {
-    VertexShader::Imp* result = NULL;
+    VertexShader::Imp* result = nullptr;
 
     return result;
 }
@@ -76,13 +76,13 @@ FragmentShader::Imp::~Imp() {
 }
 
 FragmentShader::Imp* FragmentShader::Imp::Create(const char* fragment_shader_name) {
-    FragmentShader::Imp* result = NULL;
+    FragmentShader::Imp* result = nullptr;
 
     return result;
 }
 
 FragmentShader::Imp* FragmentShader::Imp::Create(std::vector<std::string> enable_macros, const char* uber_shader_file_name) {
-    FragmentShader::Imp* result = NULL;
+    FragmentShader::Imp* result = nullptr;
 
     return result;
 }
@@ -104,17 +104,17 @@ Program::Imp::Imp()
 }
 
 Program::Imp::~Imp() {
-    if (m_VertexShader != NULL) {
+    if (m_VertexShader != nullptr) {
         GLB_SAFE_DELETE(m_VertexShader);
     }
 
-    if (m_FragmentShader != NULL) {
+    if (m_FragmentShader != nullptr) {
         GLB_SAFE_DELETE(m_FragmentShader);
     }
 }
 
 Program::Imp* Program::Imp::Create(const char* vertex_shader_file, const char* fragment_shader_file) {
-    Program::Imp* shader_program = NULL;
+    Program::Imp* shader_program = nullptr;
     VertexShader* vertex_shader = VertexShader::Create(vertex_shader_file);
     FragmentShader* fragment_shader = FragmentShader::Create(fragment_shader_file);
 
@@ -122,7 +122,7 @@ Program::Imp* Program::Imp::Create(const char* vertex_shader_file, const char* f
 }
 
 Program::Imp* Program::Imp::Create(Descriptor desc) {
-    Program::Imp* shader_program = NULL;
+    Program::Imp* shader_program = nullptr;
 
     std::vector<std::string> enable_macros;
     enable_macros.push_back("#version 330 core\n");
@@ -151,7 +151,7 @@ Descriptor Program::Imp::GetShaderDescriptor() {
 }
 
 void* Program::Imp::GetNativeShader() {
-    return NULL;
+    return nullptr;
 }
 
 std::vector<uniform::UniformEntry>& Program::Imp::GetUniforms() {

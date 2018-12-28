@@ -12,13 +12,14 @@
 #include <map>
 #include <vector>
 
-#include "glbmodel.h"
-
 #include "math/glbmatrix.h"
 #include "math/glbvector.h"
 
+#include "render/glbmaterial.h"
+#include "render/glbmesh.h"
 #include "render/glbrenderdevice.h"
 #include "render/glbshader.h"
+
 
 namespace glb {
 
@@ -26,7 +27,6 @@ namespace scene {
 
 class InstanceRenderObject;
 class InstanceObject;
-
 //---------------------------------------------------------------------------------------------
 
 class Object {
@@ -48,13 +48,13 @@ public:
     // @param: pos The position of the object
     // @param: scale The scale of the object
     // @param: rotation The rotation of the object
-    // @return: If failed, return NULL
+    // @return: If failed, return nullptr
     //--------------------------------------------------------------------------------
     static Object* Create(const char* file_name, math::Vector pos = math::Vector(0.0f, 0.0f, 0.0f),
         math::Vector scale = math::Vector(1.0f, 1.0f, 1.0f), math::Vector rotation = math::Vector(0.0f, 0.0f, 0.0f));
     static Object* Create(const char* meshFile, const char* materialGroupFile, math::Vector pos = math::Vector(0.0f, 0.0f, 0.0f),
         math::Vector scale = math::Vector(1.0f, 1.0f, 1.0f), math::Vector rotation = math::Vector(0.0f, 0.0f, 0.0f));
-    static Object* Create(scene::Model* model, math::Vector pos = math::Vector(0.0f, 0.0f, 0.0f),
+    static Object* Create(render::mesh::MeshBase* mesh, math::Vector pos = math::Vector(0.0f, 0.0f, 0.0f),
         math::Vector scale = math::Vector(1.0f, 1.0f, 1.0f), math::Vector rotation = math::Vector(0.0f, 0.0f, 0.0f));
 
 public:
@@ -66,6 +66,7 @@ public:
     virtual void SetDead(bool dead);
     virtual bool IsDead() const;
 
+    virtual render::mesh::MeshBase* GetMesh();
     virtual math::Vector GetBoundBoxMax();
     virtual math::Vector GetBoundBoxMin();
 
@@ -74,9 +75,7 @@ public:
     virtual math::Matrix GetWorldMatrix() const;
     virtual void SetWorldMatrix(math::Matrix worldMatrix);
 
-    virtual Model* GetModel();
     virtual render::material::MaterialGroup GetMaterialGroup();
-    virtual render::shader::Descriptor GetShaderDesc();
 
     virtual void SetDrawEnable(bool enable);
     virtual bool IsDrawEnable();
@@ -94,22 +93,15 @@ public:
     virtual void SetCullFaceMode(render::CullMode mode);
     virtual render::CullMode GetCullFaceMode();
 
-    virtual void SetTexWithId(int32_t slot, int32_t tex_id);
-    virtual int32_t GetTexId(int32_t slot);
-
     virtual void Update();
-
-protected:
-    render::shader::Descriptor CalculateShaderDesc();
 
 protected:
     int32_t                         m_ObjectType;
     int32_t                         m_ObjectId;
     bool                            m_IsDead;
-    Model*                          m_Model;
+    render::mesh::MeshBase*         m_Mesh;
     render::material::MaterialGroup m_MaterialGroup;
     math::Matrix                    m_WorldMatrix;
-    render::shader::Descriptor      m_ShaderDesc;
 
     bool                            m_EnableDraw;
     bool                            m_EnableCullFace;
@@ -155,6 +147,7 @@ protected:
     int32_t     m_CurInstanceNum;
     typedef std::map<int32_t, InstanceObject*> InstanceObjectMap;
     InstanceObjectMap m_InstanceObjects;
+    float*      m_MatrixBuf;
 };
 
 //---------------------------------------------------------------------------------------------
@@ -170,7 +163,6 @@ public:
     virtual math::Vector GetBoundBoxMax();
     virtual math::Vector GetBoundBoxMin();
 
-    virtual Model* GetModel();
     virtual render::material::MaterialGroup GetMaterialGroup();
 
     virtual void Update();

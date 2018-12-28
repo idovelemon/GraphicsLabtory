@@ -21,7 +21,7 @@ namespace glb {
 // TYPE DECLARATION
 //-----------------------------------------------------------------------------------
 class InputImp;
-static InputImp* s_InputImp = NULL;
+static InputImp* s_InputImp = nullptr;
 
 //-----------------------------------------------------------------------------------
 // CLASS DECLARATION
@@ -64,9 +64,9 @@ protected:
 // InputImp DEFINITION
 //----------------------------------------------------------------------------------
 InputImp::InputImp()
-: m_Input(NULL)
-, m_Mouse(NULL)
-, m_Keyboard(NULL)
+: m_Input(nullptr)
+, m_Mouse(nullptr)
+, m_Keyboard(nullptr)
 , m_MouseState() {
     memset(m_KeyboardState, 0, sizeof(m_KeyboardState));
 }
@@ -76,17 +76,17 @@ InputImp::~InputImp() {
 
 void InputImp::Initialize() {
     if (FAILED(DirectInput8Create(app::Application::GetWindowInst(), 0x0800, IID_IDirectInput8,
-        reinterpret_cast<void**>(&m_Input), NULL))) {
+        reinterpret_cast<void**>(&m_Input), nullptr))) {
         GLB_SAFE_ASSERT(false);
         return;
     }
 
-    if (FAILED(m_Input->CreateDevice(GUID_SysMouse, &m_Mouse, NULL))) {
+    if (FAILED(m_Input->CreateDevice(GUID_SysMouse, &m_Mouse, nullptr))) {
         GLB_SAFE_ASSERT(false);
         return;
     }
 
-    if (FAILED(m_Input->CreateDevice(GUID_SysKeyboard, &m_Keyboard, NULL))) {
+    if (FAILED(m_Input->CreateDevice(GUID_SysKeyboard, &m_Keyboard, nullptr))) {
         GLB_SAFE_ASSERT(false);
         return;
     }
@@ -109,7 +109,7 @@ void InputImp::Initialize() {
 }
 
 void InputImp::Update() {
-    if (m_Mouse != NULL) {
+    if (m_Mouse != nullptr) {
         if (FAILED(m_Mouse->Acquire())) {
             GLB_SAFE_ASSERT(false);
             return;
@@ -128,7 +128,7 @@ void InputImp::Update() {
         GLB_SAFE_ASSERT(false);
     }
 
-    if (m_Keyboard != NULL) {
+    if (m_Keyboard != nullptr) {
         if (FAILED(m_Keyboard->Acquire())) {
             GLB_SAFE_ASSERT(false);
             return;
@@ -149,21 +149,21 @@ void InputImp::Update() {
 }
 
 void InputImp::Destroy() {
-    if (m_Mouse != NULL) {
+    if (m_Mouse != nullptr) {
         m_Mouse->Unacquire();
         m_Mouse->Release();
-        m_Mouse = NULL;
+        m_Mouse = nullptr;
     }
 
-    if (m_Keyboard != NULL) {
+    if (m_Keyboard != nullptr) {
         m_Keyboard->Unacquire();
         m_Keyboard->Release();
-        m_Keyboard = NULL;
+        m_Keyboard = nullptr;
     }
 
-    if (m_Input != NULL) {
+    if (m_Input != nullptr) {
         m_Input->Release();
-        m_Input = NULL;
+        m_Input = nullptr;
     }
 }
 
@@ -219,9 +219,9 @@ bool InputImp::IsKeyboardButtonPressed(ButtonKey key) {
 // Input DEFINITION
 //----------------------------------------------------------------------------------
 void Input::Initialize() {
-    if (s_InputImp == NULL) {
+    if (s_InputImp == nullptr) {
         s_InputImp = new InputImp;
-        if (s_InputImp != NULL) {
+        if (s_InputImp != nullptr) {
             s_InputImp->Initialize();
         } else {
             GLB_SAFE_ASSERT(false);
@@ -230,7 +230,7 @@ void Input::Initialize() {
 }
 
 void Input::Update() {
-    if (s_InputImp != NULL) {
+    if (s_InputImp != nullptr) {
         s_InputImp->Update();
     } else {
         GLB_SAFE_ASSERT(false);
@@ -238,7 +238,7 @@ void Input::Update() {
 }
 
 void Input::Destroy() {
-    if (s_InputImp != NULL) {
+    if (s_InputImp != nullptr) {
         s_InputImp->Destroy();
         GLB_SAFE_DELETE(s_InputImp);
     } else {
@@ -249,7 +249,7 @@ void Input::Destroy() {
 int64_t Input::GetMouseMoveX() {
     int64_t result = 0;
 
-    if (s_InputImp != NULL) {
+    if (s_InputImp != nullptr) {
         result = s_InputImp->GetMouseMoveX();
     } else {
         GLB_SAFE_ASSERT(false);
@@ -261,7 +261,7 @@ int64_t Input::GetMouseMoveX() {
 int64_t Input::GetMouseMoveY() {
     int64_t result = 0;
 
-    if (s_InputImp != NULL) {
+    if (s_InputImp != nullptr) {
         result = s_InputImp->GetMouseMoveY();
     } else {
         GLB_SAFE_ASSERT(false);
@@ -285,7 +285,7 @@ int64_t Input::GetMouseMoveZ() {
 int64_t Input::GetMousePosX() {
     int64_t result = 0;
 
-    if (s_InputImp != NULL) {
+    if (s_InputImp != nullptr) {
         result = s_InputImp->GetMousePosX();
     } else {
         GLB_SAFE_ASSERT(false);
@@ -297,7 +297,7 @@ int64_t Input::GetMousePosX() {
 int64_t Input::GetMousePosY() {
     int64_t result = 0;
 
-    if (s_InputImp != NULL) {
+    if (s_InputImp != nullptr) {
         result = s_InputImp->GetMousePosY();
     } else {
         GLB_SAFE_ASSERT(false);
@@ -309,7 +309,7 @@ int64_t Input::GetMousePosY() {
 bool Input::IsMouseButtonPressed(ButtonMouse mouse) {
     bool result = false;
 
-    if (s_InputImp != NULL) {
+    if (s_InputImp != nullptr) {
         result = s_InputImp->IsMouseButtonPressed(mouse);
     } else {
         GLB_SAFE_ASSERT(false);
@@ -321,7 +321,7 @@ bool Input::IsMouseButtonPressed(ButtonMouse mouse) {
 bool Input::IsKeyboardButtonPressed(ButtonKey key) {
     bool result = false;
 
-    if (s_InputImp != NULL) {
+    if (s_InputImp != nullptr) {
         result = s_InputImp->IsKeyboardButtonPressed(key);
     } else {
         GLB_SAFE_ASSERT(false);

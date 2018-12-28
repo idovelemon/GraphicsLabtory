@@ -18,7 +18,7 @@ namespace shader {
 //-----------------------------------------------------------------------------------
 
 class MgrImp;
-static MgrImp* s_MgrImp = NULL;
+static MgrImp* s_MgrImp = nullptr;
 
 //-----------------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@ private:
 //---------------------------------------------------------------------------------------------------
 
 VertexShader::VertexShader()
-: m_Imp(NULL) {
+: m_Imp(nullptr) {
 }
 
 VertexShader::~VertexShader() {
@@ -54,11 +54,11 @@ VertexShader::~VertexShader() {
 }
 
 VertexShader* VertexShader::Create(const char* vertex_shader_name) {
-    VertexShader* result = NULL;
+    VertexShader* result = nullptr;
     VertexShader::Imp* imp = VertexShader::Imp::Create(vertex_shader_name);
-    if (imp != NULL) {
+    if (imp != nullptr) {
         result = new VertexShader;
-        if (result != NULL) {
+        if (result != nullptr) {
             result->m_Imp = imp;
         } else {
             GLB_SAFE_ASSERT(false);
@@ -71,11 +71,11 @@ VertexShader* VertexShader::Create(const char* vertex_shader_name) {
 }
 
 VertexShader* VertexShader::Create(std::vector<std::string> enable_macros, const char* uber_shader_file_name) {
-    VertexShader* result = NULL;
+    VertexShader* result = nullptr;
     VertexShader::Imp* imp = VertexShader::Imp::Create(enable_macros, uber_shader_file_name);
-    if (imp != NULL) {
+    if (imp != nullptr) {
         result = new VertexShader;
-        if (result != NULL) {
+        if (result != nullptr) {
             result->m_Imp = imp;
         } else {
             GLB_SAFE_ASSERT(false);
@@ -90,7 +90,7 @@ VertexShader* VertexShader::Create(std::vector<std::string> enable_macros, const
 uint32_t VertexShader::GetHandle() const {
     uint32_t handle = -1;
 
-    if (m_Imp != NULL) {
+    if (m_Imp != nullptr) {
         handle = m_Imp->GetHandle();
     } else {
         GLB_SAFE_ASSERT(false);
@@ -102,7 +102,7 @@ uint32_t VertexShader::GetHandle() const {
 //-----------------------------------------------------------------------------------
 
 GeometryShader::GeometryShader()
-: m_Imp(NULL) {
+: m_Imp(nullptr) {
 }
 
 GeometryShader::~GeometryShader() {
@@ -110,11 +110,11 @@ GeometryShader::~GeometryShader() {
 }
 
 GeometryShader* GeometryShader::Create(const char* geometry_shader_name) {
-    GeometryShader* result = NULL;
+    GeometryShader* result = nullptr;
     GeometryShader::Imp* imp = GeometryShader::Imp::Create(geometry_shader_name);
-    if (imp != NULL) {
+    if (imp != nullptr) {
         result = new GeometryShader;
-        if (result != NULL) {
+        if (result != nullptr) {
             result->m_Imp = imp;
         } else {
             GLB_SAFE_ASSERT(false);
@@ -129,7 +129,7 @@ GeometryShader* GeometryShader::Create(const char* geometry_shader_name) {
 uint32_t GeometryShader::GetHandle() const {
     uint32_t handle = -1;
 
-    if (m_Imp != NULL) {
+    if (m_Imp != nullptr) {
         handle = m_Imp->GetHandle();
     } else {
         GLB_SAFE_ASSERT(false);
@@ -141,7 +141,7 @@ uint32_t GeometryShader::GetHandle() const {
 //-----------------------------------------------------------------------------------
 
 FragmentShader::FragmentShader()
-: m_Imp(NULL) {
+: m_Imp(nullptr) {
 }
 
 FragmentShader::~FragmentShader() {
@@ -149,11 +149,11 @@ FragmentShader::~FragmentShader() {
 }
 
 FragmentShader* FragmentShader::Create(const char* fragment_shader_name) {
-    FragmentShader* result = NULL;
+    FragmentShader* result = nullptr;
     FragmentShader::Imp* imp = FragmentShader::Imp::Create(fragment_shader_name);
-    if (imp != NULL) {
+    if (imp != nullptr) {
         result = new FragmentShader;
-        if (result != NULL) {
+        if (result != nullptr) {
             result->m_Imp = imp;
         } else {
             GLB_SAFE_ASSERT(false);
@@ -166,11 +166,11 @@ FragmentShader* FragmentShader::Create(const char* fragment_shader_name) {
 }
 
 FragmentShader* FragmentShader::Create(std::vector<std::string> enable_macros, const char* uber_shader_file_name) {
-    FragmentShader* result = NULL;
+    FragmentShader* result = nullptr;
     FragmentShader::Imp* imp = FragmentShader::Imp::Create(enable_macros, uber_shader_file_name);
-    if (imp != NULL) {
+    if (imp != nullptr) {
         result = new FragmentShader;
-        if (result != NULL) {
+        if (result != nullptr) {
             result->m_Imp = imp;
         } else {
             GLB_SAFE_ASSERT(false);
@@ -185,7 +185,7 @@ FragmentShader* FragmentShader::Create(std::vector<std::string> enable_macros, c
 uint32_t FragmentShader::GetHandle() const {
     uint32_t handle = -1;
 
-    if (m_Imp != NULL) {
+    if (m_Imp != nullptr) {
         handle = m_Imp->GetHandle();
     } else {
         GLB_SAFE_ASSERT(false);
@@ -197,7 +197,7 @@ uint32_t FragmentShader::GetHandle() const {
 //-----------------------------------------------------------------------------------
 
 UberProgram::UberProgram()
-: m_Imp(NULL) {
+: m_Imp(nullptr) {
 }
 
 UberProgram::~UberProgram() {
@@ -205,11 +205,11 @@ UberProgram::~UberProgram() {
 }
 
 UberProgram* UberProgram::Create(const char* vertex_shader_file, const char* fragment_shader_file, const char* geometry_shader_file) {
-    UberProgram* shader_program = NULL;
+    UberProgram* shader_program = nullptr;
     UberProgram::Imp* imp = UberProgram::Imp::Create(vertex_shader_file, fragment_shader_file, geometry_shader_file);
-    if (imp != NULL) {
+    if (imp != nullptr) {
         shader_program = new UberProgram;
-        if (shader_program != NULL) {
+        if (shader_program != nullptr) {
             shader_program->m_Imp = imp;
         } else {
             GLB_SAFE_ASSERT(false);
@@ -222,12 +222,12 @@ UberProgram* UberProgram::Create(const char* vertex_shader_file, const char* fra
 }
 
 UberProgram* UberProgram::Create(Descriptor desc) {
-    UberProgram* shader_program = NULL;
+    UberProgram* shader_program = nullptr;
     UberProgram::Imp* imp = UberProgram::Imp::Create(desc);
 
-    if (imp != NULL) {
+    if (imp != nullptr) {
         shader_program = new UberProgram;
-        if (shader_program != NULL) {
+        if (shader_program != nullptr) {
             shader_program->m_Imp = imp;
         } else {
             GLB_SAFE_ASSERT(false);
@@ -240,7 +240,7 @@ UberProgram* UberProgram::Create(Descriptor desc) {
 }
 
 void UberProgram::SetID(int32_t shader_id) {
-    if (m_Imp != NULL) {
+    if (m_Imp != nullptr) {
         m_Imp->SetID(shader_id);
     } else {
         GLB_SAFE_ASSERT(false);
@@ -260,7 +260,7 @@ const char* UberProgram::GetShaderName() const {
 int32_t UberProgram::GetProgramType() {
     int32_t type = Program::UNKOWN_PROGRAM;
 
-    if (m_Imp != NULL) {
+    if (m_Imp != nullptr) {
         type = m_Imp->GetProgramType();
     } else {
         GLB_SAFE_ASSERT(false);
@@ -270,7 +270,7 @@ int32_t UberProgram::GetProgramType() {
 }
 
 void UberProgram::SetProgramType(int32_t type) {
-    if (m_Imp != NULL) {
+    if (m_Imp != nullptr) {
         m_Imp->SetProgramType(type);
     } else {
         GLB_SAFE_ASSERT(false);
@@ -280,7 +280,7 @@ void UberProgram::SetProgramType(int32_t type) {
 ShaderLayout UberProgram::GetShaderLayout() {
     ShaderLayout layout;
 
-    if (m_Imp != NULL) {
+    if (m_Imp != nullptr) {
         layout = m_Imp->GetShaderLayout();
     } else {
         GLB_SAFE_ASSERT(false);
@@ -292,7 +292,7 @@ ShaderLayout UberProgram::GetShaderLayout() {
 Descriptor UberProgram::GetShaderDescriptor() {
     Descriptor desc;
 
-    if (m_Imp != NULL) {
+    if (m_Imp != nullptr) {
         desc = m_Imp->GetShaderDescriptor();
     } else {
         GLB_SAFE_ASSERT(false);
@@ -302,9 +302,9 @@ Descriptor UberProgram::GetShaderDescriptor() {
 }
 
 void* UberProgram::GetNativeShader() {
-    void* shader = NULL;
+    void* shader = nullptr;
 
-    if (m_Imp != NULL) {
+    if (m_Imp != nullptr) {
         shader = m_Imp->GetNativeShader();
     } else {
         GLB_SAFE_ASSERT(false);
@@ -332,7 +332,7 @@ std::vector<uniform::UniformEntry>& UberProgram::GetUniforms() {
 VertexAttribute UberProgram::GetVertexAttribute(const char* attribute_name) {
     VertexAttribute result = VA_UNKNOWN;
 
-    if (attribute_name != NULL) {
+    if (attribute_name != nullptr) {
         if (!strcmp("glb_attr_Pos", attribute_name)) {
             result = VA_POS;
         } else if (!strcmp("glb_attr_Color", attribute_name)) {
@@ -364,7 +364,7 @@ VertexAttribute UberProgram::GetVertexAttribute(const char* attribute_name) {
 //-----------------------------------------------------------------------------------
 
 UserProgram::UserProgram()
-: m_Imp(NULL) {
+: m_Imp(nullptr) {
 }
 
 UserProgram::~UserProgram() {
@@ -372,11 +372,11 @@ UserProgram::~UserProgram() {
 }
 
 UserProgram* UserProgram::Create(const char* vertex_shader_file, const char* fragment_shader_file, const char* geometry_shader_file) {
-    UserProgram* shader_program = NULL;
+    UserProgram* shader_program = nullptr;
     UserProgram::Imp* imp = UserProgram::Imp::Create(vertex_shader_file, fragment_shader_file, geometry_shader_file);
-    if (imp != NULL) {
+    if (imp != nullptr) {
         shader_program = new UserProgram;
-        if (shader_program != NULL) {
+        if (shader_program != nullptr) {
             shader_program->m_Imp = imp;
         } else {
             GLB_SAFE_ASSERT(false);
@@ -389,7 +389,7 @@ UserProgram* UserProgram::Create(const char* vertex_shader_file, const char* fra
 }
 
 void UserProgram::SetID(int32_t shader_id) {
-    if (m_Imp != NULL) {
+    if (m_Imp != nullptr) {
         m_Imp->SetID(shader_id);
     } else {
         GLB_SAFE_ASSERT(false);
@@ -403,7 +403,7 @@ const char* UserProgram::GetShaderName() const {
 int32_t UserProgram::GetProgramType() {
     int32_t type = Program::UNKOWN_PROGRAM;
 
-    if (m_Imp != NULL) {
+    if (m_Imp != nullptr) {
         type = m_Imp->GetProgramType();
     } else {
         GLB_SAFE_ASSERT(false);
@@ -413,7 +413,7 @@ int32_t UserProgram::GetProgramType() {
 }
 
 void UserProgram::SetProgramType(int32_t type) {
-    if (m_Imp != NULL) {
+    if (m_Imp != nullptr) {
         m_Imp->SetProgramType(type);
     } else {
         GLB_SAFE_ASSERT(false);
@@ -423,7 +423,7 @@ void UserProgram::SetProgramType(int32_t type) {
 ShaderLayout UserProgram::GetShaderLayout() {
     ShaderLayout layout;
 
-    if (m_Imp != NULL) {
+    if (m_Imp != nullptr) {
         layout = m_Imp->GetShaderLayout();
     } else {
         GLB_SAFE_ASSERT(false);
@@ -433,9 +433,9 @@ ShaderLayout UserProgram::GetShaderLayout() {
 }
 
 void* UserProgram::GetNativeShader() {
-    void* shader = NULL;
+    void* shader = nullptr;
 
-    if (m_Imp != NULL) {
+    if (m_Imp != nullptr) {
         shader = m_Imp->GetNativeShader();
     } else {
         GLB_SAFE_ASSERT(false);
@@ -459,7 +459,7 @@ std::vector<ShaderParameter> UserProgram::GetProgramParameter() {
 int32_t UserProgram::GetUniformLocation(const char* uniform_name) {
     int32_t location = -1;
 
-    if (m_Imp != NULL) {
+    if (m_Imp != nullptr) {
         location = m_Imp->GetUniformLocation(uniform_name);
     } else {
         GLB_SAFE_ASSERT(false);
@@ -471,7 +471,7 @@ int32_t UserProgram::GetUniformLocation(const char* uniform_name) {
 VertexAttribute UserProgram::GetVertexAttribute(const char* attribute_name) {
     VertexAttribute result = VA_UNKNOWN;
 
-    if (attribute_name != NULL) {
+    if (attribute_name != nullptr) {
         if (!strcmp("glb_attr_Pos", attribute_name)) {
             result = VA_POS;
         } else if (!strcmp("glb_attr_Color", attribute_name)) {
@@ -584,7 +584,7 @@ int32_t MgrImp::AddUberShader(const char* vertex_shader_file, const char* fragme
 
     if (id == -1) {
         UberProgram* program = UberProgram::Create(vertex_shader_file, fragment_shader_file, geometry_shader_file);
-        if (program != NULL) {
+        if (program != nullptr) {
             id = m_ShaderDataBase.size();
             program->SetID(id);
             m_ShaderDataBase.push_back(program);
@@ -597,7 +597,7 @@ int32_t MgrImp::AddUberShader(const char* vertex_shader_file, const char* fragme
 }
 
 Program* MgrImp::GetShader(int32_t shader_id) {
-    Program* program = NULL;
+    Program* program = nullptr;
 
     if (0 <= shader_id && shader_id < static_cast<int32_t>(m_ShaderDataBase.size())) {
         program = m_ShaderDataBase[shader_id];
@@ -626,7 +626,7 @@ int32_t MgrImp::GetUberShaderID(Descriptor desc) {
 
     // Check if we need generate new shader
     if (find_shader == false) {
-        UberProgram* program = NULL;
+        UberProgram* program = nullptr;
         program = UberProgram::Create(desc);
         result = m_ShaderDataBase.size();
         m_ShaderDataBase.push_back(program);
@@ -658,9 +658,9 @@ int32_t MgrImp::GetShaderByName(const char* vertexShaderFile, const char* fragme
 //-----------------------------------------------------------------------------------
 
 void Mgr::Initialize() {
-    if (s_MgrImp == NULL) {
+    if (s_MgrImp == nullptr) {
         s_MgrImp = new MgrImp;
-        if (s_MgrImp != NULL) {
+        if (s_MgrImp != nullptr) {
             s_MgrImp->Initialize();
         } else {
             GLB_SAFE_ASSERT(false);
@@ -669,7 +669,7 @@ void Mgr::Initialize() {
 }
 
 void Mgr::Destroy() {
-    if (s_MgrImp != NULL) {
+    if (s_MgrImp != nullptr) {
         s_MgrImp->Destroy();
         GLB_SAFE_DELETE(s_MgrImp);
     } else {
@@ -680,7 +680,7 @@ void Mgr::Destroy() {
 int32_t Mgr::AddUberShader(const char* vertex_shader_file, const char* fragment_shader_file, const char* geometry_shader_file) {
     int32_t result = -1;
 
-    if (s_MgrImp != NULL) {
+    if (s_MgrImp != nullptr) {
         result = s_MgrImp->AddUberShader(vertex_shader_file, fragment_shader_file, geometry_shader_file);
     } else {
         GLB_SAFE_ASSERT(false);
@@ -690,9 +690,9 @@ int32_t Mgr::AddUberShader(const char* vertex_shader_file, const char* fragment_
 }
 
 Program* Mgr::GetShader(int32_t shader_id) {
-    Program* program = NULL;
+    Program* program = nullptr;
 
-    if (s_MgrImp != NULL) {
+    if (s_MgrImp != nullptr) {
         program = s_MgrImp->GetShader(shader_id);
     } else {
         GLB_SAFE_ASSERT(false);
@@ -704,7 +704,7 @@ Program* Mgr::GetShader(int32_t shader_id) {
 int32_t Mgr::GetUberShaderID(Descriptor desc) {
     int32_t program = -1;
 
-    if (s_MgrImp != NULL) {
+    if (s_MgrImp != nullptr) {
         program = s_MgrImp->GetUberShaderID(desc);
     } else {
         GLB_SAFE_ASSERT(false);

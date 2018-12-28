@@ -42,7 +42,7 @@ float ScreenSizeToNDCSizeHeight(float pixel);
 // TYPE DECLARATION
 //-----------------------------------------------------------------------------------
 class MgrImp;
-static MgrImp* s_MgrImp = NULL;
+static MgrImp* s_MgrImp = nullptr;
 
 //-----------------------------------------------------------------------------------
 // FUNCTION
@@ -104,7 +104,8 @@ protected:
 protected:
     char                                    m_MenuItemName[kMaxMenuItemNameLength];
     DebugMenuItem*                          m_ParentMenuItem;
-    std::vector<DebugMenuItem*>             m_ChildMenuItems;
+    typedef std::vector<DebugMenuItem*>     DebugMenuV;
+    DebugMenuV                              m_ChildMenuItems;
     float                                   m_NeedSizeX;
     float                                   m_NeedSizeY;
     float                                   m_RealSizeX;
@@ -243,7 +244,7 @@ DebugMenuItem::DebugMenuItem(const char* menuItemName)
 }
 
 DebugMenuItem::~DebugMenuItem() {
-    for (int32_t i = 0; i < m_ChildMenuItems.size(); i++) {
+    for (DebugMenuV::size_type i = 0; i < m_ChildMenuItems.size(); i++) {
         GLB_SAFE_DELETE(m_ChildMenuItems[i]);
     }
 
@@ -290,7 +291,7 @@ DebugMenuItem* DebugMenuItem::FindMenuItem(const char* menu) {
             result = this;
         } else {
             // Find it in children menu item
-            for (int32_t i = 0; i < m_ChildMenuItems.size(); i++) {
+            for (DebugMenuV::size_type i = 0; i < m_ChildMenuItems.size(); i++) {
                 if (m_ChildMenuItems[i]) {
                     result = m_ChildMenuItems[i]->FindMenuItem(menu);
                     if (result != nullptr) {
@@ -337,7 +338,7 @@ float DebugMenuItem::GetPosY() const {
 
 void DebugMenuItem::CalculateChildrenMenuSize(float& sizeX, float& sizeY) {
     sizeX = 0, sizeY = m_ChildMenuItems.size() * ScreenSizeToNDCSizeHeight(kMenuItemSizeY);
-    for (int32_t i = 0; i < m_ChildMenuItems.size(); i++) {
+    for (DebugMenuV::size_type i = 0; i < m_ChildMenuItems.size(); i++) {
         if (m_ChildMenuItems[i]) {
             if (sizeX < m_ChildMenuItems[i]->m_NeedSizeX) {
                 sizeX = m_ChildMenuItems[i]->m_NeedSizeX;
@@ -349,7 +350,7 @@ void DebugMenuItem::CalculateChildrenMenuSize(float& sizeX, float& sizeY) {
 DebugMenuItem* DebugMenuItem::GetChildrenOpenedMenuItem() {
     DebugMenuItem* menuItem = nullptr;
 
-    for (int32_t i = 0; i < m_ChildMenuItems.size(); i++) {
+    for (DebugMenuV::size_type i = 0; i < m_ChildMenuItems.size(); i++) {
         if (m_ChildMenuItems[i] && m_ChildMenuItems[i]->m_IsOpened) {
             menuItem = m_ChildMenuItems[i];
             break;
@@ -366,7 +367,7 @@ void DebugMenuItem::HandleMouseEvent() {
 void DebugMenuItem::CalculateChildrenMenuPos() {
     if (!m_ParentMenuItem) {
         // Current menu is root menu
-        for (int32_t i = 0; i < m_ChildMenuItems.size(); i++) {
+        for (DebugMenuV::size_type i = 0; i < m_ChildMenuItems.size(); i++) {
             auto item = m_ChildMenuItems[i];
             if (item) {
                 item->m_PosX = -1.0f;
@@ -375,7 +376,7 @@ void DebugMenuItem::CalculateChildrenMenuPos() {
         }
     } else {
         // Current menu is child menu
-        for (int32_t i = 0; i < m_ChildMenuItems.size(); i++) {
+        for (DebugMenuV::size_type i = 0; i < m_ChildMenuItems.size(); i++) {
             auto item = m_ChildMenuItems[i];
             if (item) {
                 item->m_PosX = m_PosX + m_RealSizeX + ScreenSizeToNDCSizeWidth(kPaddingXBetweenMenu);
@@ -398,8 +399,8 @@ void DebugMenuItem::CalculateChildrenMenuPos() {
 DebugMenuTriggerItem::DebugMenuTriggerItem(const char* menuName, bool& trigger)
 : DebugMenuItem(menuName)
 , m_Trigger(trigger)
-, m_DisplayText()
 , m_PressDelta(0.0f) {
+    memset(m_DisplayText, 0, sizeof(m_DisplayText));
 }
 
 DebugMenuTriggerItem::~DebugMenuTriggerItem() {
@@ -467,7 +468,7 @@ void DebugMenuAdjustIntItem::AddMenuItem(DebugMenuItem* item) {
 void DebugMenuAdjustIntItem::HandleMouseEvent() {
     int64_t move = glb::Input::GetMouseMoveZ();
     if (move != 0) {
-        m_Value = m_Value + move / abs(move);
+        m_Value = m_Value + static_cast<int32_t>(move / abs(move));
     }
 
     if (m_Value < m_Min) {
@@ -562,7 +563,7 @@ void MgrImp::AddMenuItem(const char* menu, bool& trigger) {
     std::vector<std::string>&& menuItemNames = ParseMenu(menu);
 
     DebugMenuItem* parentMenu = m_RootMenu;
-    for (int32_t i = 0; i < menuItemNames.size(); i++) {
+    for (std::vector<std::string>::size_type i = 0; i < menuItemNames.size(); i++) {
         if (i != menuItemNames.size() - 1) {
             // Find if already exist
             DebugMenuItem* item = parentMenu->FindMenuItem(menuItemNames[i].c_str());
@@ -586,7 +587,7 @@ void MgrImp::AddMenuItem(const char* menu, int32_t& value, int32_t min, int32_t 
     std::vector<std::string>&& menuItemNames = ParseMenu(menu);
 
     DebugMenuItem* parentMenu = m_RootMenu;
-    for (int32_t i = 0; i < menuItemNames.size(); i++) {
+    for (std::vector<std::string>::size_type i = 0; i < menuItemNames.size(); i++) {
         if (i != menuItemNames.size() - 1) {
             // Find if already exist
             DebugMenuItem* item = parentMenu->FindMenuItem(menuItemNames[i].c_str());
@@ -610,7 +611,7 @@ void MgrImp::AddMenuItem(const char* menu, float& value, float step, float min, 
     std::vector<std::string>&& menuItemNames = ParseMenu(menu);
 
     DebugMenuItem* parentMenu = m_RootMenu;
-    for (int32_t i = 0; i < menuItemNames.size(); i++) {
+    for (std::vector<std::string>::size_type i = 0; i < menuItemNames.size(); i++) {
         if (i != menuItemNames.size() - 1) {
             // Find if already exist
             DebugMenuItem* item = parentMenu->FindMenuItem(menuItemNames[i].c_str());
@@ -675,8 +676,8 @@ void MgrImp::OpenRootMenu() {
 }
 
 void MgrImp::HandleMouseEvent() {
-    float mouseX = glb::Input::GetMousePosX();
-    float mouseY = glb::Input::GetMousePosY();
+    float mouseX = static_cast<float>(glb::Input::GetMousePosX());
+    float mouseY = static_cast<float>(glb::Input::GetMousePosY());
 
     DebugMenuItem* menuItem = m_RootMenu;
     while (menuItem && menuItem->IsOpened()) {
@@ -719,7 +720,7 @@ void MgrImp::CalculateMenuText() {
         menuItem->CalculateChildrenMenuSize(sizeX, sizeY);
 
         std::vector<DebugMenuItem*>&& childItems = menuItem->GetChildrenMenuItems();
-        for (int32_t i = 0; i < childItems.size(); i++) {
+        for (std::vector<DebugMenuItem*>::size_type i = 0; i < childItems.size(); i++) {
             render::Render::AddText(childItems[i]->GetDisplayText(), math::Vector(xOffset + ScreenSizeToNDCSizeWidth(kMenuTextXOffset), yOffset - ScreenSizeToNDCSizeHeight(kMenuTextYOffset), 0.0f), math::Vector(213.0f / 256.0f, 211.0f / 256.0f, 214.0f / 256.0f, 1.0f), 1.0f);
             if (childItems[i]->IsOpened()) {
                 render::Render::AddText(">", math::Vector(xOffset + sizeX - ScreenSizeToNDCSizeWidth(kMenuOpenCharacterSizeX), yOffset - ScreenSizeToNDCSizeHeight(kMenuTextYOffset), 0.0f), math::Vector(213.0f / 256.0f, 211.0f / 256.0f, 214.0f / 256.0f, 1.0f), 1.0f);
@@ -791,7 +792,7 @@ void MgrImp::CalculateMenuOpenedBackground() {
         menuItem->CalculateChildrenMenuSize(sizeX, sizeY);
 
         std::vector<DebugMenuItem*>&& childrenItems = menuItem->GetChildrenMenuItems();
-        for (int32_t i = 0; i < childrenItems.size(); i++) {
+        for (std::vector<DebugMenuItem*>::size_type i = 0; i < childrenItems.size(); i++) {
             if (childrenItems[i] && childrenItems[i]->IsOpened() && !childrenItems[i]->IsSelected()) {
                 render::Render::AddMenuMesh(math::Vector(xOffset, yOffset, 0.0f), math::Vector(xOffset + sizeX, yOffset - childrenItems[i]->GetSizeY(), 0.0f), math::Vector(0.4f, 0.4f, 0.4f, 0.25f));
             }
@@ -816,7 +817,7 @@ void MgrImp::CalculateMenuActivedBackground() {
         menuItem->CalculateChildrenMenuSize(sizeX, sizeY);
 
         std::vector<DebugMenuItem*>&& childrenItems = menuItem->GetChildrenMenuItems();
-        for (int32_t i = 0; i < childrenItems.size(); i++) {
+        for (std::vector<DebugMenuItem*>::size_type i = 0; i < childrenItems.size(); i++) {
             if (childrenItems[i] && childrenItems[i]->IsSelected()) {
                 render::Render::AddMenuMesh(math::Vector(xOffset, yOffset, 0.0f), math::Vector(xOffset + sizeX, yOffset - childrenItems[i]->GetSizeY(), 0.0f), math::Vector(0.4f, 0.4f, 0.4f, 0.8f));
                 break;

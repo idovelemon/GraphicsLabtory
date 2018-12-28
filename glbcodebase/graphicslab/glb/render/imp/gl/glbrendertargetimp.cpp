@@ -83,7 +83,7 @@ RenderTarget::Imp* RenderTarget::Imp::Create(int32_t width, int32_t height) {
     GLB_SAFE_ASSERT(status == GL_FRAMEBUFFER_COMPLETE);
 
     RenderTarget::Imp* target = new RenderTarget::Imp();
-    if (target != NULL) {
+    if (target != nullptr) {
         target->m_FBO = fbo;
         target->m_DepthRBO = depth_rbo;
         target->m_Width = width;
@@ -97,7 +97,7 @@ RenderTarget::Imp* RenderTarget::Imp::Create(int32_t width, int32_t height) {
 }
 
 void RenderTarget::Imp::AttachDepthTexture(texture::Texture* depth_tex) {
-    if (depth_tex != NULL) {
+    if (depth_tex != nullptr) {
         glBindFramebuffer(GL_FRAMEBUFFER, m_FBO);
         glBindTexture(GL_TEXTURE_2D, reinterpret_cast<GLuint>(depth_tex->GetNativeTex()));
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, reinterpret_cast<GLuint>(depth_tex->GetNativeTex()), 0);
@@ -109,7 +109,7 @@ void RenderTarget::Imp::AttachDepthTexture(texture::Texture* depth_tex) {
 
 void RenderTarget::Imp::AttachColorTexture(render::DrawColorBuffer index, texture::Texture* color_tex, int32_t level) {
     if (render::COLORBUF_COLOR_ATTACHMENT0 <= index && index <= render::COLORBUF_COLOR_ATTACHMENT7
-        && color_tex != NULL) {
+        && color_tex != nullptr) {
         glBindFramebuffer(GL_FRAMEBUFFER, m_FBO);
         glBindTexture(GL_TEXTURE_2D, reinterpret_cast<GLuint>(color_tex->GetNativeTex()));
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index - render::COLORBUF_COLOR_ATTACHMENT0, GL_TEXTURE_2D, reinterpret_cast<GLuint>(color_tex->GetNativeTex()), level);
@@ -120,7 +120,7 @@ void RenderTarget::Imp::AttachColorTexture(render::DrawColorBuffer index, textur
 }
 
 void RenderTarget::Imp::AttachCubeTexture(render::DrawColorBuffer* index, texture::Texture* cube_tex, int32_t level) {
-    if (cube_tex != NULL) {
+    if (cube_tex != nullptr) {
         GLuint tex_obj = reinterpret_cast<GLuint>(cube_tex->GetNativeTex());
         if (cube_tex->GetType() == texture::Texture::TEX_CUBE) {
             glBindFramebuffer(GL_FRAMEBUFFER, m_FBO);
@@ -151,7 +151,7 @@ void RenderTarget::Imp::AttachCubeTexture(render::DrawColorBuffer* index, textur
 
 void RenderTarget::Imp::Attach3DColorTexture(render::DrawColorBuffer index, texture::Texture* color_tex, int32_t layer, int32_t level) {
     if (render::COLORBUF_COLOR_ATTACHMENT0 <= index && index <= render::COLORBUF_COLOR_ATTACHMENT7
-        && color_tex != NULL) {
+        && color_tex != nullptr) {
         GLuint tex_obj = reinterpret_cast<GLuint>(color_tex->GetNativeTex());
         if (color_tex->GetType() == texture::Texture::TEX_3D) {
             glBindFramebuffer(GL_FRAMEBUFFER, m_FBO);

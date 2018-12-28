@@ -46,7 +46,7 @@ static const int32_t kMaxDebugMenuTriangleNum = 128;
 // TYPE DECLARATION
 //-----------------------------------------------------------------------------------
 class RenderImp;
-static RenderImp* s_RenderImp = NULL;
+static RenderImp* s_RenderImp = nullptr;
 
 struct PerspectiveProj {
     float fov;
@@ -309,7 +309,7 @@ ShaderGroup::ShaderGroup(shader::Program* shaderProgram)
 }
 
 ShaderGroup::~ShaderGroup() {
-    m_ShaderProgram = NULL;
+    m_ShaderProgram = nullptr;
     m_Objects.clear();
 }
 
@@ -367,7 +367,7 @@ math::AABB Frustum::GetBoundBox() {
 }
 
 void Frustum::GetPoints(math::Vector* points) {
-    if (points != NULL) {
+    if (points != nullptr) {
         memcpy(points, m_Points, sizeof(m_Points));
     } else {
         GLB_SAFE_ASSERT(false);
@@ -402,27 +402,27 @@ RenderImp::RenderImp()
 , m_ShadowMapIndex(-1)
 
 // Decal
-, m_DecalRenderTarget(NULL)
+, m_DecalRenderTarget(nullptr)
 , m_DecalMap(-1)
 
 // HDR
 , m_HightLightBase(1.0f)
-, m_HDRRenderTarget(NULL)
+, m_HDRRenderTarget(nullptr)
 , m_HDRTex(-1)
 , m_DepthMap(-1)
-, m_FilterBrightnessRT(NULL)
+, m_FilterBrightnessRT(nullptr)
 , m_FilterBrightnessTex(-1)
-, m_FilterBrightnessShader(NULL)
+, m_FilterBrightnessShader(nullptr)
 , m_FBTexLoc(-1)
 , m_FBHighBaseLoc(-1)
-, m_DownsamplerShader(NULL)
+, m_DownsamplerShader(nullptr)
 , m_DSTexLoc(-1)
-, m_BlurHShader(NULL)
-, m_BlurVShader(NULL)
+, m_BlurHShader(nullptr)
+, m_BlurVShader(nullptr)
 , m_BlurHTexLoc(-1)
 , m_BlurWidthLoc(-1)
 , m_BlurHeightLoc(-1)
-, m_TonemapShader(NULL)
+, m_TonemapShader(nullptr)
 , m_TonemapTexLoc(-1)
 , m_Bloom0TexLoc(-1)
 , m_Bloom1TexLoc(-1)
@@ -438,16 +438,16 @@ RenderImp::RenderImp()
 , m_Bloom3Weight(0.01f)
 
 // Debug
-, m_DebugLineShader(NULL)
+, m_DebugLineShader(nullptr)
 , m_DebugMenuShader(nullptr)
-, m_FontShader(NULL)
+, m_FontShader(nullptr)
 
 // Env
 
-, m_DebugMesh(NULL)
+, m_DebugMesh(nullptr)
 , m_DebugMenuMesh(nullptr)
-, m_ScreenMesh(NULL)
-, m_FontMesh(NULL) {
+, m_ScreenMesh(nullptr)
+, m_FontMesh(nullptr) {
     memset(m_Perspective, 0, sizeof(m_Perspective));
     m_ShaderGroups.clear();
     memset(m_ShadowRenderTarget, 0, sizeof(m_ShadowRenderTarget));
@@ -712,7 +712,7 @@ void RenderImp::SetBloomWeights(float w0, float w1, float w2, float w3) {
 }
 
 void RenderImp::AddLine(math::Vector start, math::Vector end, math::Vector color) {
-    if (m_DebugMesh != NULL) {
+    if (m_DebugMesh != nullptr) {
         m_DebugMesh->AddLine(start, end, color);
     } else {
         GLB_SAFE_ASSERT(false);
@@ -756,7 +756,7 @@ void RenderImp::AddText(const char* text, math::Vector pos, math::Vector color, 
     math::Vector preCharNDCSize(0.0f, 0.0f, 0.0f);
     math::Vector preCharPos = pos;
 
-    for (int32_t i = 0; i < strlen(text); i++) {
+    for (size_t i = 0; i < strlen(text); i++) {
         float ltU = 0, ltV = 0, rbU = 0, rbV = 0;
         float ndcSizeX = 0.0f, ndcSizeY = 0.0f;
         font::Mgr::GetCharacter(text[i], ltU, ltV, rbU, rbV, ndcSizeX, ndcSizeY);
@@ -954,17 +954,17 @@ void RenderImp::PrepareShadowMap() {
     for (int32_t i = 0; i < kPSSMSplitNum; i++) {
         // Create shadow render target
         m_ShadowRenderTarget[i] = RenderTarget::Create(shadow_map_width, shadow_map_height);
-        GLB_SAFE_ASSERT(m_ShadowRenderTarget[i] != NULL);
+        GLB_SAFE_ASSERT(m_ShadowRenderTarget[i] != nullptr);
 
         // Create shadow map
         texture::Texture* shadow_map = texture::Texture::CreateFloat32DepthTexture(shadow_map_width, shadow_map_height, false);
-        if (shadow_map != NULL) {
+        if (shadow_map != nullptr) {
             m_ShadowMap[i] = texture::Mgr::AddTexture(shadow_map);
         } else {
             GLB_SAFE_ASSERT(false);
         }
 
-        if (m_ShadowRenderTarget[i] != NULL) {
+        if (m_ShadowRenderTarget[i] != nullptr) {
             m_ShadowRenderTarget[i]->AttachDepthTexture(texture::Mgr::GetTextureById(m_ShadowMap[i]));
         }
     }
@@ -980,18 +980,18 @@ void RenderImp::PrepareDecalMap() {
 
     // Create decal render target
     m_DecalRenderTarget = RenderTarget::Create(decalMapWidth, decalMapHeight);
-    GLB_SAFE_ASSERT(m_DecalRenderTarget != NULL);
+    GLB_SAFE_ASSERT(m_DecalRenderTarget != nullptr);
 
     // Create decal map
     texture::Texture* decalMap = texture::Texture::CreateFloat32Texture(decalMapWidth, decalMapHeight, true);
-    if (decalMap != NULL) {
+    if (decalMap != nullptr) {
         m_DecalMap = texture::Mgr::AddTexture(decalMap);
     } else {
         GLB_SAFE_ASSERT(false);
     }
 
     // Bind texture
-    if (m_DecalRenderTarget != NULL) {
+    if (m_DecalRenderTarget != nullptr) {
         m_DecalRenderTarget->AttachColorTexture(COLORBUF_COLOR_ATTACHMENT0, decalMap);
     }
 }
@@ -999,7 +999,7 @@ void RenderImp::PrepareDecalMap() {
 void RenderImp::PrepareDebugLine() {
     // Create depth map
     texture::Texture* depth_map = texture::Texture::CreateFloat32DepthTexture(static_cast<int32_t>(m_Width), static_cast<int32_t>(m_Height), false);
-    if (depth_map != NULL) {
+    if (depth_map != nullptr) {
         m_DepthMap = texture::Mgr::AddTexture(depth_map);
     } else {
         GLB_SAFE_ASSERT(false);
@@ -1441,7 +1441,7 @@ void RenderImp::PreDrawShadowMapCore() {
 
     // Add sky object
     scene::Object* obj = glb::scene::Scene::GetSkyObject();
-    if (obj != NULL) {
+    if (obj != nullptr) {
         objs.push_back(obj);
     }
 
@@ -1504,7 +1504,7 @@ void RenderImp::DrawShadowMapCore() {
 
         // Reset
         render::Device::SetViewport(0, 0, static_cast<int32_t>(m_Width), static_cast<int32_t>(m_Height));
-        render::Device::SetRenderTarget(NULL);
+        render::Device::SetRenderTarget(nullptr);
     }
 }
 
@@ -1718,10 +1718,9 @@ void RenderImp::DrawShadowMapNormal() {
             }
 
             // Vertex Buffer
-            int32_t mesh_id = obj->GetModel()->GetMeshId();
-            VertexLayout layout = mesh::Mgr::GetMeshById(mesh_id)->GetVertexLayout();
-            int32_t num = mesh::Mgr::GetMeshById(mesh_id)->GetVertexNum();
-            render::Device::SetVertexBuffer(mesh::Mgr::GetMeshById(mesh_id)->GetVertexBuffer());
+            VertexLayout layout = obj->GetMesh()->GetVertexLayout();
+            int32_t num = obj->GetMesh()->GetVertexNum();
+            render::Device::SetVertexBuffer(obj->GetMesh()->GetVertexBuffer());
             render::Device::SetVertexLayout(layout);
 
             if (obj->IsCullFaceEnable()) {
@@ -1762,7 +1761,7 @@ void RenderImp::PreDrawDecalMap() {
 
     // Add sky object
     scene::Object* obj = glb::scene::Scene::GetSkyObject();
-    if (obj != NULL) {
+    if (obj != nullptr) {
         objs.push_back(obj);
     }
 
@@ -1902,10 +1901,9 @@ void RenderImp::DrawDecalMapCore() {
             }
 
             // Vertex Buffer
-            int32_t mesh_id = obj->GetModel()->GetMeshId();
-            VertexLayout layout = mesh::Mgr::GetMeshById(mesh_id)->GetVertexLayout();
-            int32_t num = mesh::Mgr::GetMeshById(mesh_id)->GetVertexNum();
-            render::Device::SetVertexBuffer(mesh::Mgr::GetMeshById(mesh_id)->GetVertexBuffer());
+            VertexLayout layout = obj->GetMesh()->GetVertexLayout();
+            int32_t num = obj->GetMesh()->GetVertexNum();
+            render::Device::SetVertexBuffer(obj->GetMesh()->GetVertexBuffer());
             render::Device::SetVertexLayout(layout);
 
             if (obj->IsCullFaceEnable()) {
@@ -1947,7 +1945,7 @@ void RenderImp::PreDrawLightLoop() {
 
     // Add sky object
     scene::Object* obj = glb::scene::Scene::GetSkyObject();
-    if (obj != NULL) {
+    if (obj != nullptr) {
         objs.push_back(obj);
     }
 
@@ -2042,10 +2040,9 @@ void RenderImp::DrawLightLoopCore() {
             }
 
             // Vertex Buffer
-            int32_t mesh_id = obj->GetModel()->GetMeshId();
-            VertexLayout layout = mesh::Mgr::GetMeshById(mesh_id)->GetVertexLayout();
-            int32_t num = mesh::Mgr::GetMeshById(mesh_id)->GetVertexNum();
-            render::Device::SetVertexBuffer(mesh::Mgr::GetMeshById(mesh_id)->GetVertexBuffer());
+            VertexLayout layout = obj->GetMesh()->GetVertexLayout();
+            int32_t num = obj->GetMesh()->GetVertexNum();
+            render::Device::SetVertexBuffer(obj->GetMesh()->GetVertexBuffer());
             render::Device::SetVertexLayout(layout);
 
             if (obj->IsCullFaceEnable()) {
@@ -2199,7 +2196,7 @@ void RenderImp::BloomVTex() {
 
         // Uniform
         render::Device::SetUniformSampler2D(m_BlurVTexLoc, 0);
-        render::Device::SetUniform1f(m_BlurHeightLoc, m_BlurRenderTarget[i]->GetHeight());
+        render::Device::SetUniform1f(m_BlurHeightLoc, static_cast<float>(m_BlurRenderTarget[i]->GetHeight()));
 
         // Draw
         render::Device::Draw(render::PT_TRIANGLES, 0, m_ScreenMesh->GetVertexNum());
@@ -2239,7 +2236,7 @@ void RenderImp::BloomHTex() {
 
         // Uniform
         render::Device::SetUniformSampler2D(m_BlurHTexLoc, 0);
-        render::Device::SetUniform1f(m_BlurWidthLoc, m_DownsamplerRenderTarget[i]->GetWidth());
+        render::Device::SetUniform1f(m_BlurWidthLoc, static_cast<float>(m_DownsamplerRenderTarget[i]->GetWidth()));
 
         // Draw
         render::Device::Draw(render::PT_TRIANGLES, 0, m_ScreenMesh->GetVertexNum());
@@ -2342,7 +2339,7 @@ float RenderImp::ZValueFromCamera(scene::Object* obj) {
     float result = 0.0f;
 
     scene::CameraBase* cam = scene::Scene::GetCamera(scene::PRIMIAY_CAM);
-    if (obj != NULL && cam != NULL) {
+    if (obj != nullptr && cam != nullptr) {
         math::Vector cam_pos = cam->GetPos();
         math::Vector cam_target = cam->GetTarget();
         math::Vector obj_pos = obj->GetPos();
@@ -2365,9 +2362,9 @@ float RenderImp::ZValueFromCamera(scene::Object* obj) {
 // Render DEFINITION
 //-----------------------------------------------------------------------------------
 void Render::Initialize(int32_t width, int32_t height) {
-    if (s_RenderImp == NULL) {
+    if (s_RenderImp == nullptr) {
         s_RenderImp = new RenderImp;
-        if (s_RenderImp != NULL) {
+        if (s_RenderImp != nullptr) {
             s_RenderImp->Initialize(width, height);
         } else {
             GLB_SAFE_ASSERT(false);
@@ -2378,7 +2375,7 @@ void Render::Initialize(int32_t width, int32_t height) {
 }
 
 void Render::InitializeAfterUserApp() {
-    if (s_RenderImp != NULL) {
+    if (s_RenderImp != nullptr) {
         s_RenderImp->InitializeAfterUserApp();
     } else {
         GLB_SAFE_ASSERT(false);
@@ -2386,7 +2383,7 @@ void Render::InitializeAfterUserApp() {
 }
 
 void Render::Destroy() {
-    if (s_RenderImp != NULL) {
+    if (s_RenderImp != nullptr) {
         s_RenderImp->Destroy();
         GLB_SAFE_DELETE(s_RenderImp);
     } else {
@@ -2395,7 +2392,7 @@ void Render::Destroy() {
 }
 
 void Render::Draw() {
-    if (s_RenderImp != NULL) {
+    if (s_RenderImp != nullptr) {
         s_RenderImp->Draw();
     } else {
         GLB_SAFE_ASSERT(false);
@@ -2405,7 +2402,7 @@ void Render::Draw() {
 int32_t Render::GetBRDFMap() {
     int32_t result = -1;
 
-    if (s_RenderImp != NULL) {
+    if (s_RenderImp != nullptr) {
         result = s_RenderImp->GetBRDFMap();
     } else {
         GLB_SAFE_ASSERT(false);
@@ -2415,7 +2412,7 @@ int32_t Render::GetBRDFMap() {
 }
 
 void Render::SetPerspective(int32_t type, float fov, float aspect, float znear, float zfar) {
-    if (s_RenderImp != NULL) {
+    if (s_RenderImp != nullptr) {
         s_RenderImp->SetPerspective(type, fov, aspect, znear, zfar);
     } else {
         GLB_SAFE_ASSERT(false);
@@ -2425,7 +2422,7 @@ void Render::SetPerspective(int32_t type, float fov, float aspect, float znear, 
 math::Matrix Render::GetPerspective(int32_t type) {
     math::Matrix proj;
 
-    if (s_RenderImp != NULL) {
+    if (s_RenderImp != nullptr) {
         proj = s_RenderImp->GetPerspective(type);
     } else {
         GLB_SAFE_ASSERT(false);
@@ -2435,7 +2432,7 @@ math::Matrix Render::GetPerspective(int32_t type) {
 }
 
 void Render::SetCurPerspectiveType(int32_t type) {
-    if (s_RenderImp != NULL) {
+    if (s_RenderImp != nullptr) {
         s_RenderImp->SetCurPerspectiveType(type);
     } else {
         GLB_SAFE_ASSERT(false);
@@ -2445,7 +2442,7 @@ void Render::SetCurPerspectiveType(int32_t type) {
 int32_t Render::GetCurPerspectiveType() {
     int32_t result = PRIMARY_PERS;
 
-    if (s_RenderImp != NULL) {
+    if (s_RenderImp != nullptr) {
         result = s_RenderImp->GetCurPerspectiveType();
     } else {
         GLB_SAFE_ASSERT(false);
@@ -2457,7 +2454,7 @@ int32_t Render::GetCurPerspectiveType() {
 math::Vector Render::GetFrustumPointInView(int32_t index) {
     math::Vector v;
 
-    if (s_RenderImp != NULL) {
+    if (s_RenderImp != nullptr) {
         v = s_RenderImp->GetFrustumPointInView(index);
     } else {
         GLB_SAFE_ASSERT(false);
@@ -2469,7 +2466,7 @@ math::Vector Render::GetFrustumPointInView(int32_t index) {
 float Render::GetFarClip() {
     float result;
 
-    if (s_RenderImp != NULL) {
+    if (s_RenderImp != nullptr) {
         result = s_RenderImp->GetFarClip();
     } else {
         GLB_SAFE_ASSERT(false);
@@ -2481,7 +2478,7 @@ float Render::GetFarClip() {
 int32_t Render::GetScreenWidth() {
     int32_t result = 0;
 
-    if (s_RenderImp != NULL) {
+    if (s_RenderImp != nullptr) {
         result = s_RenderImp->GetScreenWidth();
     } else {
         GLB_SAFE_ASSERT(false);
@@ -2493,7 +2490,7 @@ int32_t Render::GetScreenWidth() {
 int32_t Render::GetScreenHeight() {
     int32_t result = 0;
 
-    if (s_RenderImp != NULL) {
+    if (s_RenderImp != nullptr) {
         result = s_RenderImp->GetScreenHeight();
     } else {
         GLB_SAFE_ASSERT(false);
@@ -2505,7 +2502,7 @@ int32_t Render::GetScreenHeight() {
 math::Matrix Render::GetShadowMapMatrix(int32_t index) {
     math::Matrix mat;
 
-    if (s_RenderImp != NULL) {
+    if (s_RenderImp != nullptr) {
         mat = s_RenderImp->GetShadowMapMatrix(index);
     } else {
         GLB_SAFE_ASSERT(false);
@@ -2517,7 +2514,7 @@ math::Matrix Render::GetShadowMapMatrix(int32_t index) {
 int32_t Render::GetCurShadowMapIndex() {
     int32_t result = -1;
 
-    if (s_RenderImp != NULL) {
+    if (s_RenderImp != nullptr) {
         result = s_RenderImp->GetCurShadowMapIndex();
     } else {
         GLB_SAFE_ASSERT(false);
@@ -2529,7 +2526,7 @@ int32_t Render::GetCurShadowMapIndex() {
 float Render::GetShadowSplitValue(int32_t index) {
     float result = 0.0f;
 
-    if (s_RenderImp != NULL) {
+    if (s_RenderImp != nullptr) {
         result = s_RenderImp->GetShadowSplitValue(index);
     } else {
         GLB_SAFE_ASSERT(false);
@@ -2541,7 +2538,7 @@ float Render::GetShadowSplitValue(int32_t index) {
 int32_t Render::GetShadowMap(int32_t index) {
     int32_t result = -1;
 
-    if (s_RenderImp != NULL) {
+    if (s_RenderImp != nullptr) {
         result = s_RenderImp->GetShadowMap(index);
     } else {
         GLB_SAFE_ASSERT(false);
@@ -2553,7 +2550,7 @@ int32_t Render::GetShadowMap(int32_t index) {
 math::Matrix Render::GetDecalViewMatrix() {
     math::Matrix result;
 
-    if (s_RenderImp != NULL) {
+    if (s_RenderImp != nullptr) {
         result = s_RenderImp->GetDecalViewMatrix();
     } else {
         GLB_SAFE_ASSERT(false);
@@ -2565,7 +2562,7 @@ math::Matrix Render::GetDecalViewMatrix() {
 math::Matrix Render::GetDecalProjMatrix() {
     math::Matrix result;
 
-    if (s_RenderImp != NULL) {
+    if (s_RenderImp != nullptr) {
         result = s_RenderImp->GetDecalProjMatrix();
     } else {
         GLB_SAFE_ASSERT(false);
@@ -2587,7 +2584,7 @@ int32_t Render::GetDecalTexture() {
 }
 
 void Render::SetHighLightBase(float base) {
-    if (s_RenderImp != NULL) {
+    if (s_RenderImp != nullptr) {
         s_RenderImp->SetHighLightBase(base);
     } else {
         GLB_SAFE_ASSERT(false);
@@ -2597,7 +2594,7 @@ void Render::SetHighLightBase(float base) {
 float Render::GetHighLightBase() {
     float result = 0.0f;
 
-    if (s_RenderImp != NULL) {
+    if (s_RenderImp != nullptr) {
         result = s_RenderImp->GetHighLightBase();
     } else {
         GLB_SAFE_ASSERT(false);
@@ -2607,7 +2604,7 @@ float Render::GetHighLightBase() {
 }
 
 void Render::SetBloomWeights(float w0, float w1, float w2, float w3) {
-    if (s_RenderImp != NULL) {
+    if (s_RenderImp != nullptr) {
         s_RenderImp->SetBloomWeights(w0, w1, w2, w3);
     } else {
         GLB_SAFE_ASSERT(false);
@@ -2615,7 +2612,7 @@ void Render::SetBloomWeights(float w0, float w1, float w2, float w3) {
 }
 
 void Render::AddLine(math::Vector start, math::Vector end, math::Vector color) {
-    if (s_RenderImp != NULL) {
+    if (s_RenderImp != nullptr) {
         s_RenderImp->AddLine(start, end, color);
     } else {
         GLB_SAFE_ASSERT(false);
@@ -2623,7 +2620,7 @@ void Render::AddLine(math::Vector start, math::Vector end, math::Vector color) {
 }
 
 void Render::AddMenuMesh(math::Vector lt, math::Vector rb, math::Vector color) {
-    if (s_RenderImp != NULL) {
+    if (s_RenderImp != nullptr) {
         s_RenderImp->AddMenuMesh(lt, rb, color);
     } else {
         GLB_SAFE_ASSERT(false);
@@ -2631,7 +2628,7 @@ void Render::AddMenuMesh(math::Vector lt, math::Vector rb, math::Vector color) {
 }
 
 void Render::AddBoundBox(math::AABB bv, math::Vector color) {
-    if (s_RenderImp != NULL) {
+    if (s_RenderImp != nullptr) {
         s_RenderImp->AddBoundBox(bv, color);
     } else {
         GLB_SAFE_ASSERT(false);
@@ -2639,7 +2636,7 @@ void Render::AddBoundBox(math::AABB bv, math::Vector color) {
 }
 
 void Render::AddText(const char* text, math::Vector pos, math::Vector color, float scale) {
-    if (s_RenderImp != NULL) {
+    if (s_RenderImp != nullptr) {
         s_RenderImp->AddText(text, pos, color, scale);
     } else {
         GLB_SAFE_ASSERT(false);

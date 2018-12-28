@@ -22,10 +22,10 @@ namespace scene {
 // CameraBase DEFINITION
 //-----------------------------------------------------------------------------------
 void CameraBase::Clone(CameraBase** cam) {
-    if (cam != NULL) {
-        if (*cam == NULL) {
+    if (cam != nullptr) {
+        if (*cam == nullptr) {
             FreeCamera* free_cam = new FreeCamera;
-            if (free_cam != NULL) {
+            if (free_cam != nullptr) {
                 free_cam->m_Pos = m_Pos;
                 free_cam->m_Target = m_Target;
                 free_cam->m_ViewMatrix = m_ViewMatrix;
@@ -42,8 +42,8 @@ void CameraBase::Clone(CameraBase** cam) {
 }
 
 void CameraBase::Restore(CameraBase** cam) {
-    if (cam != NULL) {
-        if (*cam != NULL) {
+    if (cam != nullptr) {
+        if (*cam != nullptr) {
             FreeCamera* free_cam = reinterpret_cast<FreeCamera*>(*cam);
             m_Pos = free_cam->m_Pos;
             m_Target = free_cam->m_Target;
@@ -72,7 +72,7 @@ FreeCamera::~FreeCamera() {
 
 FreeCamera* FreeCamera::Create(math::Vector pos, math::Vector target) {
     FreeCamera* camera = new FreeCamera();
-    if (camera != NULL) {
+    if (camera != nullptr) {
         camera->m_Pos = pos;
         camera->m_Target = target;
         camera->m_ViewMatrix.MakeViewMatrix(pos, target);
@@ -84,10 +84,10 @@ FreeCamera* FreeCamera::Create(math::Vector pos, math::Vector target) {
 }
 
 void FreeCamera::Clone(CameraBase** cam) {
-    if (cam != NULL) {
-        if (*cam == NULL) {
+    if (cam != nullptr) {
+        if (*cam == nullptr) {
             FreeCamera* free_cam = new FreeCamera;
-            if (free_cam != NULL) {
+            if (free_cam != nullptr) {
                 free_cam->m_Pos = m_Pos;
                 free_cam->m_Target = m_Target;
                 free_cam->m_ViewMatrix = m_ViewMatrix;
@@ -104,8 +104,8 @@ void FreeCamera::Clone(CameraBase** cam) {
 }
 
 void FreeCamera::Restore(CameraBase** cam) {
-    if (cam != NULL) {
-        if (*cam != NULL) {
+    if (cam != nullptr) {
+        if (*cam != nullptr) {
             FreeCamera* free_cam = reinterpret_cast<FreeCamera*>(*cam);
             m_Pos = free_cam->m_Pos;
             m_Target = free_cam->m_Target;
@@ -172,7 +172,7 @@ ModelCamera::~ModelCamera() {
 
 ModelCamera* ModelCamera::Create(math::Vector pos, math::Vector target) {
     ModelCamera* camera = new ModelCamera();
-    if (camera != NULL) {
+    if (camera != nullptr) {
         camera->m_Pos = pos;
         camera->m_Target = target;
         camera->m_ViewMatrix.MakeViewMatrix(pos, target);
@@ -184,10 +184,10 @@ ModelCamera* ModelCamera::Create(math::Vector pos, math::Vector target) {
 }
 
 void ModelCamera::Clone(CameraBase** cam) {
-    if (cam != NULL) {
-        if (*cam == NULL) {
+    if (cam != nullptr) {
+        if (*cam == nullptr) {
             ModelCamera* model_cam = new ModelCamera;
-            if (model_cam != NULL) {
+            if (model_cam != nullptr) {
                 model_cam->m_Pos = m_Pos;
                 model_cam->m_Target = m_Target;
                 model_cam->m_ViewMatrix = m_ViewMatrix;
@@ -204,8 +204,8 @@ void ModelCamera::Clone(CameraBase** cam) {
 }
 
 void ModelCamera::Restore(CameraBase** cam) {
-    if (cam != NULL) {
-        if (*cam != NULL) {
+    if (cam != nullptr) {
+        if (*cam != nullptr) {
             ModelCamera* free_cam = reinterpret_cast<ModelCamera*>(*cam);
             m_Pos = free_cam->m_Pos;
             m_Target = free_cam->m_Target;

@@ -16,7 +16,7 @@ namespace util {
 std::string path_get_dir(const char* path) {
     std::string dir("");
 
-    if (path != NULL) {
+    if (path != nullptr) {
         std::string path_s(path);
         int32_t offset0 = path_s.find_last_of("/");
         int32_t offset1 = path_s.find_last_of("\\");
@@ -34,7 +34,7 @@ std::string path_get_dir(const char* path) {
 std::string path_get_name(const char* path) {
     std::string name("");
 
-    if (path != NULL) {
+    if (path != nullptr) {
         std::string path_s(path);
         int32_t offset0 = path_s.find_last_of("/");
         int32_t offset1 = path_s.find_last_of("\\");
@@ -47,6 +47,20 @@ std::string path_get_name(const char* path) {
     }
 
     return name;
+}
+
+std::string path_get_file_type(const char* path) {
+    std::string type("");
+
+    if (path != nullptr) {
+        std::string path_s(path);
+        int32_t offset = path_s.find_last_of('.');
+        if (offset >= 0) {
+            type = path_s.substr(offset, path_s.length());
+        }
+    }
+
+    return type;
 }
 
 };

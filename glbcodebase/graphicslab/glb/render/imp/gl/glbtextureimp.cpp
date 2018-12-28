@@ -79,10 +79,10 @@ Texture::Imp::~Imp() {
 }
 
 Texture::Imp* Texture::Imp::Create(const char* texture_name, bool enableMipmapping) {
-    Texture::Imp* tex = NULL;
+    Texture::Imp* tex = nullptr;
 
-    if (texture_name != NULL) {
-        int8_t* texture_data = NULL;
+    if (texture_name != nullptr) {
+        int8_t* texture_data = nullptr;
         int32_t texture_width = 0;
         int32_t texture_height = 0;
         int32_t texture_type = util::TT_UNKOWN;
@@ -145,10 +145,10 @@ Texture::Imp* Texture::Imp::Create(const char* texture_name, bool enableMipmappi
 }
 
 Texture::Imp* Texture::Imp::CreatePrefilterCubeMap(const char* fileName) {
-    Texture::Imp* tex = NULL;
+    Texture::Imp* tex = nullptr;
 
-    if (fileName != NULL) {
-        int8_t* texture_data = NULL;
+    if (fileName != nullptr) {
+        int8_t* texture_data = nullptr;
         int32_t texture_width = 0;
         int32_t texture_height = 0;
         int32_t texture_type = util::TT_UNKOWN;
@@ -163,7 +163,7 @@ Texture::Imp* Texture::Imp::CreatePrefilterCubeMap(const char* fileName) {
             glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP);
             glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP);
 
-            int32_t miplevels = log(max(texture_width, texture_height)) / log(2) + 1;
+            int32_t miplevels = static_cast<int32_t>(log(max(texture_width, texture_height)) / log(2) + 1);
             int32_t glFaces[] = {
                 GL_TEXTURE_CUBE_MAP_POSITIVE_X,
                 GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
@@ -176,8 +176,8 @@ Texture::Imp* Texture::Imp::CreatePrefilterCubeMap(const char* fileName) {
             int32_t index = 0;
             for (int32_t i = 0; i < miplevels; i++) {
                 for(int32_t j = 0; j < 6; j++) {
-                    int32_t width = texture_width * pow(2, -i);
-                    int32_t height = texture_height * pow(2, -i);
+                    int32_t width = static_cast<int32_t>(texture_width * pow(2, -i));
+                    int32_t height = static_cast<int32_t>(texture_height * pow(2, -i));
                     glTexImage2D(glFaces[j], i, GL_RGBA16, width, height, 0, GL_RGBA, GL_UNSIGNED_SHORT, texture_data + index);
 
                     int32_t sizeBytes = sizeof(int16_t) * 4 * width * height;
@@ -207,10 +207,10 @@ Texture::Imp* Texture::Imp::CreatePrefilterCubeMap(const char* fileName) {
 }
 
 Texture::Imp* Texture::Imp::CreatePrefilterTableMap(const char* fileName) {
-    Texture::Imp* tex = NULL;
+    Texture::Imp* tex = nullptr;
 
-    if (fileName != NULL) {
-        int8_t* texture_data = NULL;
+    if (fileName != nullptr) {
+        int8_t* texture_data = nullptr;
         int32_t texture_width = 0;
         int32_t texture_height = 0;
         int32_t texture_type = util::TT_UNKOWN;
@@ -247,13 +247,13 @@ Texture::Imp* Texture::Imp::CreatePrefilterTableMap(const char* fileName) {
 }
 
 Texture::Imp* Texture::Imp::Create(int32_t width, int32_t height, bool enableMipmapping) {
-    Texture::Imp* tex = NULL;
+    Texture::Imp* tex = nullptr;
 
     if (width > 0 && height > 0) {
         int32_t tex_id = 0;
         glGenTextures(1, reinterpret_cast<GLuint*>(&tex_id));
         glBindTexture(GL_TEXTURE_2D, tex_id);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         if (enableMipmapping) {
             glGenerateMipmap(GL_TEXTURE_2D);
@@ -265,7 +265,7 @@ Texture::Imp* Texture::Imp::Create(int32_t width, int32_t height, bool enableMip
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 
         tex = new Texture::Imp();
-        if (tex != NULL) {
+        if (tex != nullptr) {
             tex->m_Type = TEX_2D;
             static char default_name[] = "DefaultEmpty";
             memcpy(tex->m_TexName, default_name, sizeof(default_name));
@@ -285,13 +285,13 @@ Texture::Imp* Texture::Imp::Create(int32_t width, int32_t height, bool enableMip
 }
 
 Texture::Imp* Texture::Imp::CreateFloat32Texture(int32_t width, int32_t height, bool enableMipmapping) {
-    Texture::Imp* tex = NULL;
+    Texture::Imp* tex = nullptr;
 
     if (width > 0 && height > 0) {
         int32_t tex_id = 0;
         glGenTextures(1, reinterpret_cast<GLuint*>(&tex_id));
         glBindTexture(GL_TEXTURE_2D, tex_id);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, width, height, 0, GL_RGBA, GL_FLOAT, NULL);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, width, height, 0, GL_RGBA, GL_FLOAT, nullptr);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         if (enableMipmapping) {
             glGenerateMipmap(GL_TEXTURE_2D);
@@ -303,7 +303,7 @@ Texture::Imp* Texture::Imp::CreateFloat32Texture(int32_t width, int32_t height, 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 
         tex = new Texture::Imp();
-        if (tex != NULL) {
+        if (tex != nullptr) {
             tex->m_Type = TEX_2D;
             static char default_name[] = "DefaultEmpty";
             memcpy(tex->m_TexName, default_name, sizeof(default_name));
@@ -323,13 +323,13 @@ Texture::Imp* Texture::Imp::CreateFloat32Texture(int32_t width, int32_t height, 
 }
 
 Texture::Imp* Texture::Imp::CreateFloat32DepthTexture(int32_t width, int32_t height, bool enableMipmapping) {
-    Texture::Imp* tex = NULL;
+    Texture::Imp* tex = nullptr;
 
     if (width > 0 && height > 0) {
         int32_t tex_id = 0;
         glGenTextures(1, reinterpret_cast<GLuint*>(&tex_id));
         glBindTexture(GL_TEXTURE_2D, tex_id);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         if (enableMipmapping) {
             glGenerateMipmap(GL_TEXTURE_2D);
@@ -341,7 +341,7 @@ Texture::Imp* Texture::Imp::CreateFloat32DepthTexture(int32_t width, int32_t hei
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
         tex = new Texture::Imp;
-        if (tex != NULL) {
+        if (tex != nullptr) {
             tex->m_Type = TEX_2D;
             tex->m_Depth = 0;
             tex->m_Height = height;
@@ -362,7 +362,7 @@ Texture::Imp* Texture::Imp::CreateFloat32DepthTexture(int32_t width, int32_t hei
 }
 
 Texture::Imp* Texture::Imp::CreateFloat32CubeTexture(int32_t width, int32_t height, bool enableMipmapping) {
-    Texture::Imp* tex = NULL;
+    Texture::Imp* tex = nullptr;
 
     // Warning: The cube map's 6 texture must be square and have the same size
     if (width > 0 && height > 0 && width == height) {
@@ -371,7 +371,7 @@ Texture::Imp* Texture::Imp::CreateFloat32CubeTexture(int32_t width, int32_t heig
         glBindTexture(GL_TEXTURE_CUBE_MAP, tex_id);
 
         for(int32_t i = 0; i < 6; i++) {
-            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA32F, width, height, 0, GL_RGBA, GL_FLOAT, NULL);
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA32F, width, height, 0, GL_RGBA, GL_FLOAT, nullptr);
         }
 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -386,7 +386,7 @@ Texture::Imp* Texture::Imp::CreateFloat32CubeTexture(int32_t width, int32_t heig
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP);
 
         tex = new Texture::Imp;
-        if (tex != NULL) {
+        if (tex != nullptr) {
             tex->m_Type = TEX_CUBE;
             tex->m_Depth = 0;
             tex->m_Height = height;
@@ -407,7 +407,7 @@ Texture::Imp* Texture::Imp::CreateFloat32CubeTexture(int32_t width, int32_t heig
 }
 
 Texture::Imp* Texture::Imp::CreateFloat16CubeTexture(int32_t width, int32_t height, bool enableMipmapping) {
-    Texture::Imp* tex = NULL;
+    Texture::Imp* tex = nullptr;
 
     // Warning: The cube map's 6 texture must be square and have the same size
     if (width > 0 && height > 0 && width == height) {
@@ -416,7 +416,7 @@ Texture::Imp* Texture::Imp::CreateFloat16CubeTexture(int32_t width, int32_t heig
         glBindTexture(GL_TEXTURE_CUBE_MAP, tex_id);
 
         for(int32_t i = 0; i < 6; i++) {
-            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA16, width, height, 0, GL_RGBA, GL_UNSIGNED_SHORT, NULL);
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA16, width, height, 0, GL_RGBA, GL_UNSIGNED_SHORT, nullptr);
         }
 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -431,7 +431,7 @@ Texture::Imp* Texture::Imp::CreateFloat16CubeTexture(int32_t width, int32_t heig
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP);
 
         tex = new Texture::Imp;
-        if (tex != NULL) {
+        if (tex != nullptr) {
             tex->m_Type = TEX_CUBE;
             tex->m_Depth = 0;
             tex->m_Height = height;
@@ -452,14 +452,14 @@ Texture::Imp* Texture::Imp::CreateFloat16CubeTexture(int32_t width, int32_t heig
 }
 
 Texture::Imp* Texture::Imp::CreateFloat323DTexture(int32_t width, int32_t height, int32_t depth, bool enableMipmapping) {
-    Texture::Imp* tex = NULL;
+    Texture::Imp* tex = nullptr;
 
     if (width > 0 && height > 0 && depth > 0) {
         int32_t tex_id = 0;
         glGenTextures(1, reinterpret_cast<GLuint*>(&tex_id));
         glBindTexture(GL_TEXTURE_3D, tex_id);
 
-        glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA32F, width, height, depth, 0, GL_RGBA, GL_FLOAT, NULL);
+        glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA32F, width, height, depth, 0, GL_RGBA, GL_FLOAT, nullptr);
 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         if (enableMipmapping) {
@@ -473,7 +473,7 @@ Texture::Imp* Texture::Imp::CreateFloat323DTexture(int32_t width, int32_t height
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP);
 
         tex = new Texture::Imp;
-        if (tex != NULL) {
+        if (tex != nullptr) {
             tex->m_Type = TEX_3D;
             tex->m_Depth = depth;
             tex->m_Height = height;
@@ -558,7 +558,7 @@ void Texture::Imp::CreateGLTextureCube(int32_t tex_obj, int32_t width, int32_t h
 }
 
 void Texture::Imp::SetTexturePixelFormat(Texture::Imp* texture, int32_t texture_pixel_format) {
-    if (texture != NULL) {
+    if (texture != nullptr) {
         struct {
             int32_t pixel_format_from_file;
             int32_t pixel_format_from_lib;
@@ -701,10 +701,10 @@ void Texture::Imp::Save(const char* fileName, util::TEXTURE_FILE_TYPE fileType) 
 void Texture::Imp::SavePrefilterCubeMap(const char* fileName) {
     if (m_Type == TEX_CUBE && m_BPP == 8 && m_Format == FMT_R16G16B16A16F) {
         // Calculate mipmap level
-        int32_t miplevels = log(max(m_Width, m_Height)) / log(2) + 1;
+        int32_t miplevels = static_cast<int32_t>(log(max(m_Width, m_Height)) / log(2) + 1);
         int32_t sizeBytes = 0;
         for (int32_t i = 0; i < miplevels; i++) {
-            sizeBytes = sizeBytes + sizeof(int16_t) * 4 * (m_Width * pow(2, -i)) * (m_Height * pow(2, -i)) * 6;
+            sizeBytes = sizeBytes + static_cast<int32_t>(sizeof(int16_t) * 4 * (m_Width * pow(2, -i)) * (m_Height * pow(2, -i)) * 6);
         }
 
         int8_t* pixel = new int8_t[sizeBytes];
@@ -714,7 +714,7 @@ void Texture::Imp::SavePrefilterCubeMap(const char* fileName) {
 
         int32_t index = 0;
         for (int32_t i = 0; i < miplevels; i++) {
-            sizeBytes = sizeof(int16_t) * 4 * (m_Width * pow(2, -i)) * (m_Height * pow(2, -i));
+            sizeBytes = static_cast<int32_t>(sizeof(int16_t) * 4 * (m_Width * pow(2, -i)) * (m_Height * pow(2, -i)));
             int8_t* data = new int8_t[sizeBytes];
 
             // +X
@@ -748,13 +748,13 @@ void Texture::Imp::SavePrefilterCubeMap(const char* fileName) {
             index = index + sizeBytes;
 
             delete[] data;
-            data = NULL;
+            data = nullptr;
         }
 
         util::TextureWriter::Write(fileName, pixel, m_Width, m_Height, -1, -1, util::TFT_PFC);
 
         delete[] pixel;
-        pixel = NULL;
+        pixel = nullptr;
 
     } else {
         GLB_SAFE_ASSERT(false);
@@ -769,7 +769,7 @@ void Texture::Imp::SavePrefilterTableMap(const char* fileName) {
         util::TextureWriter::Write(fileName, pixel, m_Width, m_Height, -1, -1, util::TFT_PFT);
 
         delete[] pixel;
-        pixel = NULL;
+        pixel = nullptr;
 
     } else {
         GLB_SAFE_ASSERT(false);

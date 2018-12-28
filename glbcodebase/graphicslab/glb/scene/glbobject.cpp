@@ -8,8 +8,6 @@
 
 #include <fstream>
 
-#include "glbmodel.h"
-
 #include "render/glbmaterial.h"
 #include "util/glbmacro.h"
 
@@ -23,7 +21,7 @@ Object::Object()
 : m_ObjectType(OBJECT_TYPE_NORMAL)
 , m_IsDead(false)
 , m_ObjectId(-1)
-, m_Model(NULL)
+, m_Mesh(nullptr)
 , m_WorldMatrix()
 , m_EnableDraw(true)
 , m_EnableCullFace(false)
@@ -33,24 +31,23 @@ Object::Object()
 }
 
 Object::~Object() {
-    m_Model = NULL;
+    m_Mesh = nullptr;
 }
 
-Object* Object::Create(const char* file_name, math::Vector pos, math::Vector scale, math::Vector rotation) {
-    Object* obj = NULL;
+Object* Object::Create(const char* fileName, math::Vector pos, math::Vector scale, math::Vector rotation) {
+    Object* obj = nullptr;
     
-    if (file_name) {
-        Model* model = ModelMgr::GetModelByName(file_name);
-        if (model == NULL) {
-            model = ModelMgr::AddModel(file_name);
+    if (fileName) {
+        render::mesh::MeshBase* mesh = render::mesh::Mgr::GetMeshByName(fileName);
+        if (mesh == nullptr) {
+            mesh = render::mesh::Mgr::GetMeshById(render::mesh::Mgr::AddMesh(fileName));
         }
 
-        if (model) {
+        if (mesh) {
             obj = new Object();
             if (obj) {
-                obj->m_Model = model;
+                obj->m_Mesh = mesh;
                 obj->m_WorldMatrix.MakeIdentityMatrix();
-                obj->m_ShaderDesc = obj->CalculateShaderDesc();
             } else {
                 GLB_SAFE_ASSERT(false);
             }
@@ -67,14 +64,9 @@ Object* Object::Create(const char* file_name, math::Vector pos, math::Vector sca
 Object* Object::Create(const char* meshFile, const char* materialGroupFile, math::Vector pos, math::Vector scale, math::Vector rotation) {
     Object* obj = nullptr;
 
-    Model* model = nullptr;
-    if (meshFile) {
-        model = ModelMgr::GetModelByName(meshFile);
-        if (model == nullptr) {
-            model = ModelMgr::AddModel(meshFile);
-        }
-    } else {
-        GLB_SAFE_ASSERT(false);
+    render::mesh::MeshBase* mesh = render::mesh::Mgr::GetMeshByName(meshFile);
+    if (mesh == nullptr) {
+        mesh = render::mesh::Mgr::GetMeshById(render::mesh::Mgr::AddMesh(meshFile));
     }
 
     render::material::MaterialGroup group;
@@ -84,13 +76,12 @@ Object* Object::Create(const char* meshFile, const char* materialGroupFile, math
         GLB_SAFE_ASSERT(false);
     }
 
-    if (model) {
+    if (mesh) {
         obj = new Object();
         if (obj) {
-            obj->m_Model = model;
+            obj->m_Mesh = mesh;
             obj->m_MaterialGroup = group;
             obj->m_WorldMatrix.MakeIdentityMatrix();
-            obj->m_ShaderDesc = obj->CalculateShaderDesc();
         } else {
             GLB_SAFE_ASSERT(false);
         }
@@ -101,16 +92,14 @@ Object* Object::Create(const char* meshFile, const char* materialGroupFile, math
     return obj;
 }
 
-Object* Object::Create(scene::Model* model, math::Vector pos, math::Vector scale, math::Vector rotation) {
-    Object* obj = NULL;
+Object* Object::Create(render::mesh::MeshBase* mesh, math::Vector pos, math::Vector scale, math::Vector rotation) {
+    Object* obj = nullptr;
 
-    if (model) {
+    if (mesh) {
         obj = new Object();
         if (obj) {
-            ModelMgr::AddModel(model);
-            obj->m_Model = model;
+            obj->m_Mesh = mesh;
             obj->m_WorldMatrix.MakeIdentityMatrix();
-            obj->m_ShaderDesc = obj->CalculateShaderDesc();
         } else {
             GLB_SAFE_ASSERT(false);
         }
@@ -141,18 +130,22 @@ bool Object::IsDead() const {
     return m_IsDead;
 }
 
+render::mesh::MeshBase* Object::GetMesh() {
+    return m_Mesh;
+}
+
 math::Vector Object::GetBoundBoxMax() {
-    math::Vector boundbox_max = m_Model->GetBoundBoxMax();
-    boundbox_max = boundbox_max * m_WorldMatrix.GetScale();
-    boundbox_max += m_WorldMatrix.GetTranslation();
-    return boundbox_max;
+    math::Vector boundboxMax = m_Mesh->GetBoundBoxMax();
+    boundboxMax = boundboxMax * m_WorldMatrix.GetScale();
+    boundboxMax += m_WorldMatrix.GetTranslation();
+    return boundboxMax;
 }
 
 math::Vector Object::GetBoundBoxMin() {
-    math::Vector boundbox_min = m_Model->GetBoundBoxMin();
-    boundbox_min = boundbox_min * m_WorldMatrix.GetScale();
-    boundbox_min += m_WorldMatrix.GetTranslation();
-    return boundbox_min;
+    math::Vector boundboxMin = m_Mesh->GetBoundBoxMin();
+    boundboxMin = boundboxMin * m_WorldMatrix.GetScale();
+    boundboxMin += m_WorldMatrix.GetTranslation();
+    return boundboxMin;
 }
 
 math::Vector Object::GetPos() {
@@ -171,16 +164,8 @@ void Object::SetWorldMatrix(math::Matrix worldMatrix) {
     m_WorldMatrix = worldMatrix;
 }
 
-Model* Object::GetModel() {
-    return m_Model;
-}
-
 render::material::MaterialGroup Object::GetMaterialGroup() {
     return m_MaterialGroup;
-}
-
-render::shader::Descriptor Object::GetShaderDesc() {
-    return m_ShaderDesc;
 }
 
 void Object::SetDrawEnable(bool enable) {
@@ -243,144 +228,7 @@ render::CullMode Object::GetCullFaceMode() {
     return m_CullMode;
 }
 
-void Object::SetTexWithId(int32_t slot, int32_t tex_id) {
-    bool bTryUsingLightMapping = false;
-    if (m_Model) {
-        switch (slot) {
-        case Model::MT_ALBEDO:
-            m_ShaderDesc.SetFlag(render::shader::GLB_ENABLE_ALBEDO_TEX, true);
-            break;
-
-        case Model::MT_ROUGHNESS:
-            m_ShaderDesc.SetFlag(render::shader::GLB_ENABLE_ROUGHNESS_TEX, true);
-            break;
-
-        case Model::MT_METALLIC:
-            m_ShaderDesc.SetFlag(render::shader::GLB_ENABLE_METALLIC_TEX, true);
-            break;
-
-        case Model::MT_ALPHA:
-            m_ShaderDesc.SetFlag(render::shader::GLB_ENABLE_ALPHA_TEX, true);
-            break;
-
-        case Model::MT_NORMAL:
-            m_ShaderDesc.SetFlag(render::shader::GLB_ENABLE_NORMAL_TEX, true);
-            break;
-
-        case Model::MT_EMISSION:
-            m_ShaderDesc.SetFlag(render::shader::GLB_ENABLE_EMISSION_TEX, true);
-            break;
-
-        case Model::MT_LIGHT0:
-        case Model::MT_LIGHT1:
-        case Model::MT_LIGHT2:
-            bTryUsingLightMapping = true;
-            break;
-
-        case Model::MT_REFLECT:
-            m_ShaderDesc.SetFlag(render::shader::GLB_ENABLE_REFLECT_TEX, true);
-            break;
-        }
-
-        m_Model->SetTexWithId(slot, tex_id);
-
-        if (bTryUsingLightMapping && m_Model->GetTexId(Model::MT_LIGHT0) != -1 && m_Model->GetTexId(Model::MT_LIGHT1) != -1 && m_Model->GetTexId(Model::MT_LIGHT2) != -1) {
-            m_ShaderDesc.SetFlag(render::shader::GLB_ENABLE_LIGHT_TEX, true);
-        }
-    } else {
-        GLB_SAFE_ASSERT(false);
-    }
-}
-
-int32_t Object::GetTexId(int32_t slot) {
-    int32_t result = -1;
-
-    if (m_Model) {
-        result = m_Model->GetTexId(slot);
-    } else {
-        GLB_SAFE_ASSERT(false);
-    }
-
-    return result;
-}
-
 void Object::Update() {
-}
-
-render::shader::Descriptor Object::CalculateShaderDesc() {
-    render::shader::Descriptor desc;
-
-    if (m_Model->HasTexCoord()) {
-        desc.SetFlag(render::shader::GLB_TEXCOORD_IN_VERTEX, true);
-    }
-
-    if (m_Model->HasLightMapTexCoord()) {
-        desc.SetFlag(render::shader::GLB_LIGHT_TEXCOORD_IN_VERTEX, true);
-    }
-
-    if (m_Model->HasAlbedoTexture()) {
-        desc.SetFlag(render::shader::GLB_ENABLE_ALBEDO_TEX, true);
-    }
-
-    if (m_Model->HasRoughnessTexture()) {
-        desc.SetFlag(render::shader::GLB_ENABLE_ROUGHNESS_TEX, true);
-    }
-
-    if (m_Model->HasMettalicTexture()) {
-        desc.SetFlag(render::shader::GLB_ENABLE_METALLIC_TEX, true);
-    }
-
-    if (m_Model->HasAlphaTexture()) {
-        desc.SetFlag(render::shader::GLB_ENABLE_ALPHA_TEX, true);
-    }
-
-    if (m_Model->HasNormalTexture()) {
-        desc.SetFlag(render::shader::GLB_ENABLE_NORMAL_TEX, true);
-    }
-
-    if (m_Model->HasEmissionTexture()) {
-        desc.SetFlag(render::shader::GLB_ENABLE_EMISSION_TEX, true);
-    }
-
-    if (m_Model->HasLightTexture()) {
-        desc.SetFlag(render::shader::GLB_ENABLE_LIGHT_TEX, true);
-    }
-
-    if (m_Model->HasNormal()) {
-        desc.SetFlag(render::shader::GLB_NORMAL_IN_VERTEX, true);
-    }
-
-    if (m_Model->HasTangent()) {
-        desc.SetFlag(render::shader::GLB_TANGENT_IN_VERTEX, true);
-    }
-
-    if (m_Model->HasBinormal()) {
-        desc.SetFlag(render::shader::GLB_BINORMAL_IN_VERTEX, true);
-    }
-
-    if (m_Model->IsAcceptLight()) {
-        desc.SetFlag(render::shader::GLB_ENABLE_LIGHTING, true);
-
-        for (int32_t i = 0; i < scene::kMaxLight; i++) {
-            scene::Light lit = scene::Scene::GetLight(i);
-
-            switch(lit.type) {
-            case scene::PARALLEL_LIGHT:
-                desc.SetFlag(render::shader::GLB_USE_PARALLEL_LIGHT, true);
-                break;
-            }
-        }
-    }
-
-    if (m_Model->IsUseAO()) {
-        desc.SetFlag(render::shader::GLB_ENABLE_AO, true);
-    }
-
-    if (m_Model->IsAcceptDecal()) {
-        desc.SetFlag(render::shader::GLB_ENABLE_DECAL, true);
-    }
-
-    return desc;
 }
 
 //---------------------------------------------------------------------------------------------
@@ -393,20 +241,19 @@ DecalObject::~DecalObject() {
 }
 
 DecalObject* DecalObject::Create(const char* decalObjectFile, math::Vector pos, math::Vector scale, math::Vector rotation) {
-    DecalObject* obj = NULL;
+    DecalObject* obj = nullptr;
     
     if (decalObjectFile) {
-        Model* model = ModelMgr::GetModelByName(decalObjectFile);
-        if (model == NULL) {
-            model = ModelMgr::AddModel(decalObjectFile);
+        render::mesh::MeshBase* mesh = render::mesh::Mgr::GetMeshByName(decalObjectFile);
+        if (mesh == nullptr) {
+            mesh = render::mesh::Mgr::GetMeshById(render::mesh::Mgr::AddMesh(decalObjectFile));
         }
 
-        if (model) {
+        if (mesh) {
             obj = new DecalObject();
             if (obj) {
-                obj->m_Model = model;
+                obj->m_Mesh = mesh;
                 obj->m_WorldMatrix.MakeIdentityMatrix();
-                obj->m_ShaderDesc = obj->CalculateShaderDesc();
             } else {
                 GLB_SAFE_ASSERT(false);
             }
@@ -421,23 +268,22 @@ DecalObject* DecalObject::Create(const char* decalObjectFile, math::Vector pos, 
 }
 
 DecalObject* DecalObject::Create(const char* meshFile, const char* materialFile, math::Vector pos, math::Vector scale, math::Vector rotation) {
-    DecalObject* obj = NULL;
+    DecalObject* obj = nullptr;
     
     if (meshFile && materialFile) {
-        Model* model = ModelMgr::GetModelByName(meshFile);
-        if (model == nullptr) {
-            model = ModelMgr::AddModel(meshFile);
+        render::mesh::MeshBase* mesh = render::mesh::Mgr::GetMeshByName(meshFile);
+        if (mesh == nullptr) {
+            mesh = render::mesh::Mgr::GetMeshById(render::mesh::Mgr::AddMesh(meshFile));
         }
 
         render::material::MaterialGroup group = render::material::MaterialGroup::Create(materialFile);
 
-        if (model && group.GetPassMaterial(render::kDecalPassName) != -1) {
+        if (mesh && group.GetPassMaterial(render::kDecalPassName) != -1) {
             obj = new DecalObject();
             if (obj) {
-                obj->m_Model = model;
+                obj->m_Mesh = mesh;
                 obj->m_MaterialGroup = group;
                 obj->m_WorldMatrix.MakeIdentityMatrix();
-                obj->m_ShaderDesc = obj->CalculateShaderDesc();
             } else {
                 GLB_SAFE_ASSERT(false);
             }
@@ -455,23 +301,31 @@ DecalObject* DecalObject::Create(const char* meshFile, const char* materialFile,
 
 InstanceRenderObject::InstanceRenderObject()
 : m_MaxInstanceNum(0)
-, m_CurInstanceNum(0) {
+, m_CurInstanceNum(0)
+, m_MatrixBuf(nullptr) {
     m_ObjectType = OBJECT_TYPE_INSTANCE_RENDER;
 }
 
 InstanceRenderObject::~InstanceRenderObject() {
     RemoveAllInstanceObject();
+    GLB_SAFE_DELETE(m_MatrixBuf);
 }
 
-InstanceRenderObject* InstanceRenderObject::Create(const char* objFileName, int32_t maxInstance) {
-    InstanceRenderObject* obj = NULL;
+InstanceRenderObject* InstanceRenderObject::Create(const char* meshFile, int32_t maxInstance) {
+    InstanceRenderObject* obj = nullptr;
 
-    if (objFileName != NULL) {
-        obj = new InstanceRenderObject();
-        obj->m_Model = ModelMgr::AddInstanceModel(objFileName, maxInstance);
-        obj->m_ShaderDesc = obj->CalculateShaderDesc();
-        obj->m_ShaderDesc.SetFlag(render::shader::GLB_ENABLE_INSTANCE_RENDERING, true);
-        obj->m_MaxInstanceNum = maxInstance;
+    if (meshFile != nullptr) {
+        render::mesh::MeshBase* mesh = render::mesh::Mgr::GetMeshByName(meshFile);
+        if (mesh == nullptr) {
+            mesh = render::mesh::Mgr::GetMeshById(render::mesh::Mgr::AddInstanceMesh(meshFile, maxInstance));
+        }
+
+        if (mesh) {
+            obj = new InstanceRenderObject();
+            obj->m_Mesh = mesh;
+            obj->m_MaxInstanceNum = maxInstance;
+            obj->m_MatrixBuf = new float[maxInstance * 16 * 2];  // WorldMatrix and TransInvWorldMatrix
+        }
     } else {
         GLB_SAFE_ASSERT(false);
     }
@@ -483,12 +337,22 @@ InstanceRenderObject* InstanceRenderObject::Create(const char* meshFile, const c
     InstanceRenderObject* obj = nullptr;
 
     if (meshFile != nullptr && materialFile != nullptr) {
-        obj = new InstanceRenderObject();
-        obj->m_Model = ModelMgr::AddInstanceModel(meshFile, maxInstance);
-        obj->m_MaterialGroup = render::material::MaterialGroup::Create(materialFile);
-        obj->m_ShaderDesc = obj->CalculateShaderDesc();
-        obj->m_ShaderDesc.SetFlag(render::shader::GLB_ENABLE_INSTANCE_RENDERING, true);
-        obj->m_MaxInstanceNum = maxInstance;
+        render::mesh::MeshBase* mesh = render::mesh::Mgr::GetMeshByName(meshFile);
+        if (mesh == nullptr) {
+            mesh = render::mesh::Mgr::GetMeshById(render::mesh::Mgr::AddInstanceMesh(meshFile, maxInstance));
+        }
+
+        render::material::MaterialGroup group = render::material::MaterialGroup::Create(materialFile);
+
+        if (mesh) {
+            obj = new InstanceRenderObject();
+            obj->m_Mesh = mesh;
+            obj->m_MaterialGroup = group;
+            obj->m_MaxInstanceNum = maxInstance;
+            obj->m_MatrixBuf = new float[maxInstance * 16 * 2];  // WorldMatrix and TransInvWorldMatrix
+        } else {
+            GLB_SAFE_ASSERT(false);
+        }
     } else {
         GLB_SAFE_ASSERT(false);
     }
@@ -511,12 +375,28 @@ void InstanceRenderObject::Update() {
     }
 
     // Update world matrix attribute
-    InstanceModel* model = reinterpret_cast<InstanceModel*>(m_Model);
-    model->UpdateMatrixAttribute(matV);
+    for (std::vector<math::Matrix>::size_type i = 0; i < matV.size(); i++) {
+        // OpenGL store matrix in transpose, so we must transpose the result matrix and upload to opengl server
+        math::Matrix world = matV[i];
+        world.Transpose();
+        memcpy(m_MatrixBuf + i * 16, world.m_Matrix.v, sizeof(world.m_Matrix.v));
+
+        math::Matrix transInvM = matV[i];
+        transInvM.Inverse();
+
+        memcpy(m_MatrixBuf + (m_MaxInstanceNum + i) * 16, transInvM.m_Matrix.v, sizeof(transInvM.m_Matrix.v));
+    }
+
+    render::mesh::InstanceTriangleMesh* mesh = reinterpret_cast<render::mesh::InstanceTriangleMesh*>(m_Mesh);
+    if (mesh) {
+        mesh->UpdateInstanceBuffer(m_MatrixBuf);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
 }
 
 void InstanceRenderObject::AddInstanceObject(InstanceObject* obj) {
-    if (obj != NULL) {
+    if (obj != nullptr) {
         if (m_CurInstanceNum < m_MaxInstanceNum) {
             m_InstanceObjects.insert(std::pair<int32_t, InstanceObject*>(obj->GetObjectId(), obj));
             m_CurInstanceNum++;
@@ -527,7 +407,7 @@ void InstanceRenderObject::AddInstanceObject(InstanceObject* obj) {
 }
 
 void InstanceRenderObject::RemoveInstanceObject(InstanceObject* obj) {
-    if (obj != NULL) {
+    if (obj != nullptr) {
         InstanceObjectMap::iterator it = m_InstanceObjects.find(obj->GetObjectId());
         if (it != m_InstanceObjects.end()) {
             obj->ClearInstanceRenderObject();
@@ -543,9 +423,9 @@ void InstanceRenderObject::RemoveAllInstanceObject() {
     InstanceObjectMap::iterator it = m_InstanceObjects.begin();
 
     for (; it != m_InstanceObjects.end(); ++it) {
-        if (it->second != NULL) {
+        if (it->second != nullptr) {
             it->second->ClearInstanceRenderObject();
-            it->second = NULL;
+            it->second = nullptr;
         }
     }
 
@@ -560,7 +440,7 @@ int32_t InstanceRenderObject::GetCurInstanceNum() const {
 //---------------------------------------------------------------------------------------------
 
 InstanceObject::InstanceObject()
-: m_InstanceRenderObject(NULL) {
+: m_InstanceRenderObject(nullptr) {
     m_ObjectType = OBJECT_TYPE_INSTANCE;
 }
 
@@ -568,13 +448,13 @@ InstanceObject::~InstanceObject() {
     if (m_InstanceRenderObject) {
         m_InstanceRenderObject->RemoveInstanceObject(this);
     }
-    m_InstanceRenderObject = NULL;
+    m_InstanceRenderObject = nullptr;
 }
 
 InstanceObject* InstanceObject::Create(InstanceRenderObject* instanceRenderObject, math::Vector pos, math::Vector scale, math::Vector rotate) {
-    InstanceObject* obj = NULL;
+    InstanceObject* obj = nullptr;
 
-    if (instanceRenderObject != NULL) {
+    if (instanceRenderObject != nullptr) {
         obj = new InstanceObject();
         obj->m_InstanceRenderObject = instanceRenderObject;
     } else {
@@ -588,7 +468,7 @@ math::Vector InstanceObject::GetBoundBoxMax() {
     math::Vector boxMax(0.0f, 0.0f, 0.0f);
 
     if (m_InstanceRenderObject) {
-        boxMax = m_InstanceRenderObject->GetModel()->GetBoundBoxMax();
+        boxMax = m_InstanceRenderObject->GetMesh()->GetBoundBoxMax();
         boxMax = boxMax + m_WorldMatrix.GetTranslation();
     }
 
@@ -599,19 +479,11 @@ math::Vector InstanceObject::GetBoundBoxMin() {
     math::Vector boxMin(0.0f, 0.0f, 0.0f);
 
     if (m_InstanceRenderObject) {
-        boxMin = m_InstanceRenderObject->GetModel()->GetBoundBoxMin();
+        boxMin = m_InstanceRenderObject->GetMesh()->GetBoundBoxMin();
         boxMin = boxMin + m_WorldMatrix.GetTranslation();
     }
 
     return boxMin;
-}
-
-Model* InstanceObject::GetModel() {
-    if (m_InstanceRenderObject) {
-        return m_InstanceRenderObject->GetModel();
-    } else {
-        return NULL;
-    }
 }
 
 render::material::MaterialGroup InstanceObject::GetMaterialGroup() {
@@ -629,7 +501,7 @@ void InstanceObject::Update() {
 }
 
 void InstanceObject::ClearInstanceRenderObject() {
-    m_InstanceRenderObject = NULL;
+    m_InstanceRenderObject = nullptr;
 }
 
 };  // namespace scene

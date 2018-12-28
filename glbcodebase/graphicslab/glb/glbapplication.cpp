@@ -16,7 +16,6 @@
 #include "render/glbshader.h"
 #include "render/glbtexture.h"
 
-#include "scene/glbmodel.h"
 #include "scene/glbscene.h"
 
 #include "util/glblog.h"
@@ -34,7 +33,7 @@ namespace app {
 // TYPE DECLARATION
 //-----------------------------------------------------------------------------------
 class ApplicationImp;
-static ApplicationImp* s_ApplicationImp = NULL;
+static ApplicationImp* s_ApplicationImp = nullptr;
 
 //-----------------------------------------------------------------------------------
 // CLASS DECLARATION
@@ -98,9 +97,9 @@ LRESULT CALLBACK GLB_WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) 
 // ApplicationImp DEFINITION
 //-----------------------------------------------------------------------------------
 ApplicationImp::ApplicationImp()
-: m_Application(NULL)
-, m_WndHandle(NULL)
-, m_WndInstance(NULL)
+: m_Application(nullptr)
+, m_WndHandle(nullptr)
+, m_WndInstance(nullptr)
 , m_Config() {
 }
 
@@ -156,7 +155,7 @@ void ApplicationImp::Update() {
     if (!m_Config.wnd) {
         MSG msg = {0};
         while (msg.message != WM_QUIT) {
-            if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
+            if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
                 TranslateMessage(&msg);
                 DispatchMessage(&msg);
             } else {
@@ -183,7 +182,6 @@ void ApplicationImp::Destroy() {
     Input::Destroy();
     render::Render::Destroy();
     render::Device::Destroy();
-    scene::ModelMgr::Destroy();
     render::mesh::Mgr::Destroy();
     render::material::Mgr::Destroy();
     render::texture::Mgr::Destroy();
@@ -230,15 +228,15 @@ bool ApplicationImp::CreateWnd(HINSTANCE hInstance, HWND hWnd, int32_t width, in
         WNDCLASSEX wnd;
         wnd.cbClsExtra = 0;
         wnd.cbSize = sizeof(wnd);
-        wnd.cbWndExtra = NULL;
+        wnd.cbWndExtra = 0;
         wnd.hbrBackground = HBRUSH(COLOR_WINDOW + 1);
-        wnd.hCursor = LoadCursor(NULL, IDC_ARROW);
+        wnd.hCursor = LoadCursor(nullptr, IDC_ARROW);
         wnd.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(icon));
-        wnd.hIconSm = NULL;
+        wnd.hIconSm = nullptr;
         wnd.hInstance = hInstance;
         wnd.lpfnWndProc = GLB_WndProc;
         wnd.lpszClassName = L"GraphicsLab";
-        wnd.lpszMenuName = NULL;
+        wnd.lpszMenuName = nullptr;
         wnd.style = CS_HREDRAW | CS_VREDRAW;
         int32_t err = GetLastError();
 
@@ -250,8 +248,8 @@ bool ApplicationImp::CreateWnd(HINSTANCE hInstance, HWND hWnd, int32_t width, in
         RECT client_rect = {0, 0, static_cast<LONG>(width), static_cast<LONG>(height)};
         AdjustWindowRect(&client_rect, WS_OVERLAPPEDWINDOW, FALSE);
         m_WndHandle = CreateWindow(L"GraphicsLab", caption, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT
-            , client_rect.right - client_rect.left, client_rect.bottom - client_rect.top, NULL, NULL, hInstance, NULL);
-        if (m_WndHandle == NULL) {
+            , client_rect.right - client_rect.left, client_rect.bottom - client_rect.top, nullptr, nullptr, hInstance, nullptr);
+        if (m_WndHandle == nullptr) {
             return false;
         }
 
@@ -272,14 +270,11 @@ bool ApplicationImp::SetupGLBBeforeUserApp(int32_t width, int32_t height) {
     render::texture::Mgr::Initialize();
     render::material::Mgr::Initialize();
     render::mesh::Mgr::Initialize();
-    scene::ModelMgr::Initialize();
     render::Device::Initialize();
     render::Render::Initialize(width, height);
     Input::Initialize();
     render::font::Mgr::Initialize(m_Config.fontImg, m_Config.fontList);
     debugmenu::Mgr::Initialize();
-    //EditorComm::Initialize();
-    //EditorComm::PostData();
 
     return true;
 }
@@ -295,9 +290,9 @@ bool ApplicationImp::SetupGLBAfterUserApp() {
 //-----------------------------------------------------------------------------------
 bool Application::Initialize(APPLICATION_CREATOR creator, HINSTANCE hInstance, AppConfig config) {
     bool result = true;
-    if (s_ApplicationImp == NULL) {
+    if (s_ApplicationImp == nullptr) {
         s_ApplicationImp = new ApplicationImp;
-        if (s_ApplicationImp != NULL) {
+        if (s_ApplicationImp != nullptr) {
             result = s_ApplicationImp->Initialize(creator, hInstance, config);
         } else {
             GLB_SAFE_ASSERT(false);
@@ -312,7 +307,7 @@ bool Application::Initialize(APPLICATION_CREATOR creator, HINSTANCE hInstance, A
 }
 
 void Application::Update() {
-    if (s_ApplicationImp != NULL) {
+    if (s_ApplicationImp != nullptr) {
         s_ApplicationImp->Update();
     } else {
         // GLB_SAFE_ASSERT(false);  // Allow multi-in
@@ -320,7 +315,7 @@ void Application::Update() {
 }
 
 void Application::Destroy() {
-    if (s_ApplicationImp != NULL) {
+    if (s_ApplicationImp != nullptr) {
         s_ApplicationImp->Destroy();
         GLB_SAFE_DELETE(s_ApplicationImp);
     } else {
@@ -329,8 +324,8 @@ void Application::Destroy() {
 }
 
 HWND Application::GetWindowHandle() {
-    HWND result = NULL;
-    if (s_ApplicationImp != NULL) {
+    HWND result = nullptr;
+    if (s_ApplicationImp != nullptr) {
         result = s_ApplicationImp->GetWindowHandle();
     } else {
         GLB_SAFE_ASSERT(false);
@@ -340,9 +335,9 @@ HWND Application::GetWindowHandle() {
 }
 
 HINSTANCE Application::GetWindowInst() {
-    HINSTANCE result = NULL;
+    HINSTANCE result = nullptr;
 
-    if (s_ApplicationImp != NULL) {
+    if (s_ApplicationImp != nullptr) {
         result = s_ApplicationImp->GetWindowInst();
     } else {
         GLB_SAFE_ASSERT(false);
@@ -353,7 +348,7 @@ HINSTANCE Application::GetWindowInst() {
 
 int32_t Application::GetWindowWidth() {
     int32_t result = 0;
-    if (s_ApplicationImp != NULL) {
+    if (s_ApplicationImp != nullptr) {
         result = s_ApplicationImp->GetWindowWidth();
     } else {
         GLB_SAFE_ASSERT(false);
@@ -364,7 +359,7 @@ int32_t Application::GetWindowWidth() {
 
 int32_t Application::GetWindowHeight() {
     int32_t result = 0;
-    if (s_ApplicationImp != NULL) {
+    if (s_ApplicationImp != nullptr) {
         result = s_ApplicationImp->GetWindowHeight();
     } else {
         GLB_SAFE_ASSERT(false);
@@ -375,7 +370,7 @@ int32_t Application::GetWindowHeight() {
 
 int32_t Application::GetShadowMapWidth() {
     int32_t result = 0;
-    if (s_ApplicationImp != NULL) {
+    if (s_ApplicationImp != nullptr) {
         result = s_ApplicationImp->GetShadowMapWidth();
     } else {
         GLB_SAFE_ASSERT(false);
@@ -386,7 +381,7 @@ int32_t Application::GetShadowMapWidth() {
 
 int32_t Application::GetShadowMapHeight() {
     int32_t result = 0;
-    if (s_ApplicationImp != NULL) {
+    if (s_ApplicationImp != nullptr) {
         result = s_ApplicationImp->GetShadowMapHeight();
     } else {
         GLB_SAFE_ASSERT(false);
@@ -398,7 +393,7 @@ int32_t Application::GetShadowMapHeight() {
 int32_t Application::GetDecalMapWidth() {
     int32_t result = 0;
 
-    if (s_ApplicationImp != NULL) {
+    if (s_ApplicationImp != nullptr) {
         result = s_ApplicationImp->GetDecalMapWidth();
     } else {
         GLB_SAFE_ASSERT(false);
@@ -410,7 +405,7 @@ int32_t Application::GetDecalMapWidth() {
 int32_t Application::GetDecalMapHeight() {
     int32_t result = 0;
 
-    if (s_ApplicationImp != NULL) {
+    if (s_ApplicationImp != nullptr) {
         result = s_ApplicationImp->GetDecalMapHeight();
     } else {
         GLB_SAFE_ASSERT(false);

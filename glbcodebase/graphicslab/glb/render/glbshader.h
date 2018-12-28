@@ -173,7 +173,7 @@ public:
 class UberProgram : public Program {
 public:
     virtual ~UberProgram();
-    static UberProgram* Create(const char* vertex_shader_file, const char* fragment_shader_file, const char* geometry_shader = NULL);
+    static UberProgram* Create(const char* vertex_shader_file, const char* fragment_shader_file, const char* geometry_shader = nullptr);
     static UberProgram* Create(Descriptor desc);
 
 public:
@@ -207,7 +207,7 @@ private:
 class UserProgram : public Program {
 public:
     virtual ~UserProgram();
-    static UserProgram* Create(const char* vertex_shader_file, const char* fragment_shader_file, const char* geometry_shader = NULL);
+    static UserProgram* Create(const char* vertex_shader_file, const char* fragment_shader_file, const char* geometry_shader = nullptr);
 
 public:
     virtual void SetID(int32_t id);
@@ -242,7 +242,7 @@ public:
     static void Destroy();
 
 public:
-    static int32_t AddUberShader(const char* vertex_shader_file, const char* fragment_shader_file, const char* geometry_shader_file = NULL);
+    static int32_t AddUberShader(const char* vertex_shader_file, const char* fragment_shader_file, const char* geometry_shader_file = nullptr);
     static Program* GetShader(int32_t shader_id);
     static int32_t GetUberShaderID(Descriptor desc);
 };

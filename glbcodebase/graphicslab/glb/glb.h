@@ -33,7 +33,6 @@
 
 #include "scene/glbcamera.h"
 #include "scene/glblight.h"
-#include "scene/glbmodel.h"
 #include "scene/glbobject.h"
 #include "scene/glbscene.h"
 
@@ -48,6 +47,7 @@
 
 #include "util/glblog.h"
 #include "util/glbmacro.h"
+#include "util/glbmeshreader.h"
 #include "util/glbprofile.h"
 #include "util/glbutil.h"
 

@@ -24,12 +24,12 @@ namespace render {
 // DeviceImp DEFINITION
 //-----------------------------------------------------------------------------------
 DeviceImp::DeviceImp()
-: m_D3DDevice(NULL)
-, m_D3DContext(NULL)
-, m_SwapChain(NULL)
-, m_RenderTargetView(NULL)
-, m_DepthStencilTex(NULL)
-, m_DepthStencilView(NULL)
+: m_D3DDevice(nullptr)
+, m_D3DContext(nullptr)
+, m_SwapChain(nullptr)
+, m_RenderTargetView(nullptr)
+, m_DepthStencilTex(nullptr)
+, m_DepthStencilView(nullptr)
 , m_VertexLayout()
 , m_ShaderLayout()
 , m_EnableDepthTest(false)
@@ -58,11 +58,11 @@ void DeviceImp::Initialize() {
 
     D3D_FEATURE_LEVEL feature_level;
     HRESULT hr = D3D11CreateDevice(
-        NULL,  // Default adapter
+        nullptr,  // Default adapter
         D3D_DRIVER_TYPE_HARDWARE,  // Hardware accelerate
         0,  // No software device
         create_device_flag,
-        NULL, 0,  // Default feature level array
+        nullptr, 0,  // Default feature level array
         D3D11_SDK_VERSION,  // DX11
         &m_D3DDevice,
         &feature_level,
@@ -72,13 +72,13 @@ void DeviceImp::Initialize() {
     GLB_SAFE_ASSERT(feature_level == D3D_FEATURE_LEVEL_11_0);
 
     // Create swap chain
-    IDXGIDevice* dxgi_device = NULL;
+    IDXGIDevice* dxgi_device = nullptr;
     hr = m_D3DDevice->QueryInterface(__uuidof(IDXGIDevice), (void**)&dxgi_device);
     GLB_SAFE_ASSERT(!FAILED(hr));
-    IDXGIAdapter* dxgi_adapter = NULL;
+    IDXGIAdapter* dxgi_adapter = nullptr;
     hr = dxgi_device->GetParent(__uuidof(IDXGIAdapter), (void**)&dxgi_adapter);
     GLB_SAFE_ASSERT(!FAILED(hr));
-    IDXGIFactory* dxgi_factory = NULL;
+    IDXGIFactory* dxgi_factory = nullptr;
     hr = dxgi_adapter->GetParent(__uuidof(IDXGIFactory), (void**)&dxgi_factory);
     GLB_SAFE_ASSERT(!FAILED(hr));
 
@@ -101,20 +101,20 @@ void DeviceImp::Initialize() {
     hr = dxgi_factory->CreateSwapChain(m_D3DDevice, &sd, &m_SwapChain);
     GLB_SAFE_ASSERT(!FAILED(hr));
     dxgi_device->Release();
-    dxgi_device = NULL;
+    dxgi_device = nullptr;
     dxgi_adapter->Release();
-    dxgi_adapter = NULL;
+    dxgi_adapter = nullptr;
     dxgi_factory->Release();
-    dxgi_factory = NULL;
+    dxgi_factory = nullptr;
 
     // Create render target view
-    ID3D11Texture2D* back_buf_tex = NULL;
+    ID3D11Texture2D* back_buf_tex = nullptr;
     hr = m_SwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&back_buf_tex));
     GLB_SAFE_ASSERT(!FAILED(hr));
-    hr = m_D3DDevice->CreateRenderTargetView(back_buf_tex, NULL, &m_RenderTargetView);
+    hr = m_D3DDevice->CreateRenderTargetView(back_buf_tex, nullptr, &m_RenderTargetView);
     GLB_SAFE_ASSERT(!FAILED(hr));
     back_buf_tex->Release();
-    back_buf_tex = NULL;
+    back_buf_tex = nullptr;
 
     // Create depth/stencil view
     D3D11_TEXTURE2D_DESC desc;
@@ -129,9 +129,9 @@ void DeviceImp::Initialize() {
     desc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
     desc.CPUAccessFlags = 0;
     desc.MiscFlags = 0;
-    hr = m_D3DDevice->CreateTexture2D(&desc, NULL, &m_DepthStencilTex);
+    hr = m_D3DDevice->CreateTexture2D(&desc, nullptr, &m_DepthStencilTex);
     GLB_SAFE_ASSERT(!FAILED(hr));
-    hr = m_D3DDevice->CreateDepthStencilView(m_DepthStencilTex, NULL, &m_DepthStencilView);
+    hr = m_D3DDevice->CreateDepthStencilView(m_DepthStencilTex, nullptr, &m_DepthStencilView);
     GLB_SAFE_ASSERT(!FAILED(hr));
 
     // Bind render target and depth/stencil view to Output Merge stage at default

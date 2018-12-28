@@ -27,7 +27,7 @@ namespace font {
 // TYPE DECLARATION
 //-----------------------------------------------------------------------------------
 class MgrImp;
-static MgrImp* s_MgrImp = NULL;
+static MgrImp* s_MgrImp = nullptr;
 
 //-----------------------------------------------------------------------------------
 // CLASS DECLARATION
@@ -151,7 +151,7 @@ void MgrImp::GetTextSize(const char* text, float& ndcSizeX, float& ndcSizeY) {
     ndcSizeX = 0.0f, ndcSizeY = 0.0f;
 
     if (text) {
-        for (int32_t i = 0; i < strlen(text); i++) {
+        for (size_t i = 0; i < strlen(text); i++) {
             float ltU = 0.0f, ltV = 0.0f, rbU = 0.0f, rbV = 0.0f, ndcSizeXPerChar = 0.0f, ndcSizeYPerChar = 0.0f;
             if (text[i] == ' ') {
                 GetCharacter(',', ltU, ltV, rbU, rbV, ndcSizeXPerChar, ndcSizeYPerChar);
@@ -175,9 +175,9 @@ int32_t MgrImp::GetFontTexture() {
 // Mgr DEFINITION
 //-----------------------------------------------------------------------------------
 void Mgr::Initialize(const char* fontImage, const char* fontList) {
-    if (s_MgrImp == NULL) {
+    if (s_MgrImp == nullptr) {
         s_MgrImp = new MgrImp;
-        if (s_MgrImp != NULL) {
+        if (s_MgrImp != nullptr) {
             s_MgrImp->Initialize(fontImage, fontList);
         } else {
             GLB_SAFE_ASSERT(false);
@@ -186,7 +186,7 @@ void Mgr::Initialize(const char* fontImage, const char* fontList) {
 }
 
 void Mgr::Update() {
-    if (s_MgrImp != NULL) {
+    if (s_MgrImp != nullptr) {
         s_MgrImp->Update();
     } else {
         GLB_SAFE_ASSERT(false);
@@ -194,7 +194,7 @@ void Mgr::Update() {
 }
 
 void Mgr::Destroy() {
-    if (s_MgrImp != NULL) {
+    if (s_MgrImp != nullptr) {
         s_MgrImp->Destroy();
         GLB_SAFE_DELETE(s_MgrImp);
     } else {
@@ -203,7 +203,7 @@ void Mgr::Destroy() {
 }
 
 void Mgr::GetCharacter(const char c, float& ltX, float& ltY, float& rbX, float& rbY, float& ndcSizeX, float& ndcSizeY) {
-    if (s_MgrImp != NULL) {
+    if (s_MgrImp != nullptr) {
         s_MgrImp->GetCharacter(c, ltX, ltY, rbX, rbY, ndcSizeX, ndcSizeY);
     } else {
         GLB_SAFE_ASSERT(false);
@@ -211,7 +211,7 @@ void Mgr::GetCharacter(const char c, float& ltX, float& ltY, float& rbX, float& 
 }
 
 void Mgr::GetTextSize(const char* text, float& ndcSizeX, float& ndcSizeY) {
-    if (s_MgrImp != NULL) {
+    if (s_MgrImp != nullptr) {
         s_MgrImp->GetTextSize(text, ndcSizeX, ndcSizeY);
     } else {
         GLB_SAFE_ASSERT(false);

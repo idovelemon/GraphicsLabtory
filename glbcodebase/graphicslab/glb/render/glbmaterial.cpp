@@ -13,6 +13,7 @@
 #include "glbtexture.h"
 
 #include "util/glbmacro.h"
+#include "util/glbutil.h"
 
 namespace glb {
 
@@ -30,7 +31,7 @@ static const int32_t kMaterialKeywordMaxLength = 64;
 // TYPE DECLARATION
 //-----------------------------------------------------------------------------------
 class MgrImp;
-static MgrImp* s_MgrImp = NULL;
+static MgrImp* s_MgrImp = nullptr;
 
 //-----------------------------------------------------------------------------------
 // CLASS DECLARATION
@@ -116,7 +117,12 @@ Material* Material::Create(const char* materialName) {
                     entry.intValue = texture::Mgr::LoadTexture(buffer);
                 } else if (entry.format == PARAMETER_FORMAT_TEXTURE_CUBE) {
                     input >> buffer;
-                    entry.intValue = texture::Mgr::LoadTexture(buffer);
+
+                    if (!strcmp(util::path_get_file_type(buffer).c_str(), ".pfc")) {
+                        entry.intValue = texture::Mgr::LoadPFCTexture(buffer);
+                    } else {
+                        entry.intValue = texture::Mgr::LoadTexture(buffer);
+                    }
                 } else {
                     GLB_SAFE_ASSERT(false);
                 }
@@ -195,7 +201,7 @@ void Material::SetIntParameterByName(const char* name, int32_t value) {
 }
 
 int32_t Material::GetIntParameterByName(const char* name) const {
-    int32_t result = 0.0f;
+    int32_t result = 0;
 
     for (auto& Entry : m_Parameters) {
         if (!strcmp(Entry.name, name)) {
@@ -239,7 +245,7 @@ void Material::SetTextureParameterByName(const char* name, int32_t textureID) {
 }
 
 int32_t Material::GetTextureParameterByName(const char* name) const {
-    int32_t result = 0.0f;
+    int32_t result = 0;
 
     for (auto& Entry : m_Parameters) {
         if (!strcmp(Entry.name, name)) {
@@ -352,7 +358,8 @@ void Material::CollectParameter() {
                 || !strcmp(entry.name, "glb_unif_NormalTex")
                 || !strcmp(entry.name, "glb_unif_EmissionTex")
                 || !strcmp(entry.name, "glb_unif_DiffusePFCTex")
-                || !strcmp(entry.name, "glb_unif_SpecularPFCTex")) {
+                || !strcmp(entry.name, "glb_unif_SpecularPFCTex")
+                || !strcmp(entry.name, "glb_unif_SpecularPFCLOD")) {
                 entry.type = PARAMETER_TYPE_USER;
             }
             m_Parameters.push_back(entry);
@@ -392,11 +399,19 @@ MaterialGroup MaterialGroup::Create(const char* groupFile) {
                 if (!strcmp(buffer, "castshadow")) {
                     int32_t enable = 0;
                     input >> enable;
-                    result.m_EnableCastShadow = enable;
+                    if (enable == 0) {
+                        result.m_EnableCastShadow = false;
+                    } else {
+                        result.m_EnableCastShadow = true;
+                    }
                 } else if (!strcmp(buffer, "receiveshadow")) {
                     int32_t enable = 0;
                     input >> enable;
-                    result.m_EnableReceiveShadow = enable;
+                    if (enable == 0) {
+                        result.m_EnableReceiveShadow = false;
+                    } else {
+                        result.m_EnableReceiveShadow = true;
+                    }
                 }
             } else {
                 std::string msg = groupFile;
@@ -538,9 +553,9 @@ int32_t MgrImp::GetMaterialByName(const char* name) {
 // Mgr DEFINITION
 //-----------------------------------------------------------------------------------
 void Mgr::Initialize() {
-    if (s_MgrImp == NULL) {
+    if (s_MgrImp == nullptr) {
         s_MgrImp = new MgrImp();
-        GLB_SAFE_ASSERT(s_MgrImp != NULL);
+        GLB_SAFE_ASSERT(s_MgrImp != nullptr);
         s_MgrImp->Initialize();
     } else {
         GLB_SAFE_ASSERT(false);
@@ -548,7 +563,7 @@ void Mgr::Initialize() {
 }
 
 void Mgr::Destroy() {
-    if (s_MgrImp != NULL) {
+    if (s_MgrImp != nullptr) {
         s_MgrImp->Destroy();
         GLB_SAFE_DELETE(s_MgrImp);
     } else {
@@ -583,7 +598,7 @@ MaterialGroup Mgr::AddMaterialGroup(const char* materialGroupName) {
 Material* Mgr::GetMaterial(int32_t id) {
     Material* result = nullptr;
 
-    if (s_MgrImp != NULL) {
+    if (s_MgrImp != nullptr) {
         result = s_MgrImp->GetMaterial(id);
     } else {
         GLB_SAFE_ASSERT(false);
@@ -595,7 +610,7 @@ Material* Mgr::GetMaterial(int32_t id) {
 int32_t Mgr::GetMaterialCount() {
     int32_t result = 0;
 
-    if (s_MgrImp != NULL) {
+    if (s_MgrImp != nullptr) {
         result = s_MgrImp->GetMaterialCount();
     }
 

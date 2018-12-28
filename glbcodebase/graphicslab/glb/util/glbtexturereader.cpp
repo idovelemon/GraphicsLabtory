@@ -136,8 +136,9 @@ BmpTextureReader::~BmpTextureReader() {
 int32_t BmpTextureReader::ReadTexture(const char* file_name, int8_t** texture_data, int32_t& tex_width, int32_t& tex_height, int32_t& texture_type, int32_t& pixel_format) {
     int32_t result = 0;
 
-    if (file_name != NULL && texture_data != NULL) {
-        FILE* file = fopen(file_name, "rb");
+    if (file_name != nullptr && texture_data != nullptr) {
+        FILE* file = nullptr;
+        fopen_s(&file, file_name, "rb");
 
         if (file) {
             BITMAPFILEHEADER file_header;
@@ -204,7 +205,7 @@ int32_t BmpTextureReader::ReadTexture(const char* file_name, int8_t** texture_da
             }
 
             delete[] raw_data;
-            raw_data = NULL;
+            raw_data = nullptr;
 
             tex_width = info_header.biWidth;
             tex_height = info_header.biHeight;
@@ -213,7 +214,7 @@ int32_t BmpTextureReader::ReadTexture(const char* file_name, int8_t** texture_da
             result = 1;
 
             fclose(file);
-            file = NULL;
+            file = nullptr;
 
         } else {
             GLB_SAFE_ASSERT(false);
@@ -234,8 +235,9 @@ DDSTextureReader::~DDSTextureReader() {
 int32_t DDSTextureReader::ReadTexture(const char* file_name, int8_t** texture_data, int32_t& tex_width, int32_t& tex_height, int32_t& texture_type, int32_t& pixel_format) {
     int32_t result = 0;
 
-    if (file_name != NULL && texture_data != NULL) {
-        FILE* file = fopen(file_name, "rb");
+    if (file_name != nullptr && texture_data != nullptr) {
+        FILE* file = nullptr;
+        fopen_s(&file, file_name, "rb");
 
         if (file) {
             DDSFile dds;
@@ -262,7 +264,7 @@ int32_t DDSTextureReader::ReadTexture(const char* file_name, int8_t** texture_da
             }
 
             fclose(file);
-            file = NULL;
+            file = nullptr;
         } else {
             GLB_SAFE_ASSERT(false);
         }
@@ -367,7 +369,7 @@ void DDSTextureReader::ReadTexture2D(FILE* file, TEXTURE_PIXEL_FORMAT_TYPE pixel
     pixel_format = ReorganizeRGBAFormat(pixel_type);
 
     delete[] data;
-    data = NULL;
+    data = nullptr;
 }
 
 void DDSTextureReader::ReadTexture3D() {
@@ -420,11 +422,11 @@ void DDSTextureReader::ReadTextureCube(FILE* file, TEXTURE_PIXEL_FORMAT_TYPE pix
     pixel_format = ReorganizeRGBAFormat(pixel_type);
 
     delete[] data;
-    data = NULL;
+    data = nullptr;
 }
 
 void DDSTextureReader::ReorganizeRGBAData(int8_t* data, TEXTURE_PIXEL_FORMAT_TYPE type) {
-    if (data != NULL) {
+    if (data != nullptr) {
         if (type == TPFT_R8G8B8) {
             uint32_t value  = (uint32_t(data[0]) << 0) + (uint32_t(data[1]) << 8) + (uint32_t(data[2]) << 16);
             data[0] = (value & 0x00ff0000) >> 16;  // Red
@@ -486,7 +488,7 @@ HDRTextureReader::~HDRTextureReader() {
 int32_t HDRTextureReader::ReadTexture(const char* file_name, int8_t** texture_data, int32_t& tex_width, int32_t& tex_height, int32_t& texture_type, int32_t& pixel_format) {
     TEXTURE_PIXEL_FORMAT_TYPE result = TPFT_UNKOWN;
 
-    if (file_name == NULL || texture_data == NULL) return result;
+    if (file_name == nullptr || texture_data == nullptr) return result;
 
     stbi_set_flip_vertically_on_load(true);
     int32_t width = 0, height = 0, component = 0;
@@ -511,18 +513,19 @@ PFCTextureReader::~PFCTextureReader() {
 int32_t PFCTextureReader::ReadTexture(const char* fileName, int8_t** textureData, int32_t& texWidth, int32_t& texHeight, int32_t& textureType, int32_t& pixelFormat) {
     TEXTURE_PIXEL_FORMAT_TYPE result = TPFT_UNKOWN;
 
-    if (fileName == NULL || textureData == NULL) return result;
+    if (fileName == nullptr || textureData == nullptr) return result;
 
-    FILE* file = fopen(fileName, "rb");
-    if (file == NULL) return result;
+    FILE* file = nullptr;
+    fopen_s(&file, fileName, "rb");
+    if (file == nullptr) return result;
 
     fread(&texWidth, sizeof(int32_t), 1, file);
     fread(&texHeight, sizeof(int32_t), 1, file);
 
-    int32_t miplevels = log(max(texWidth, texHeight)) / log(2) + 1;
+    int32_t miplevels = static_cast<int32_t>(log(max(texWidth, texHeight)) / log(2) + 1);
     int32_t sizeBytes = 0;
     for (int32_t i = 0; i < miplevels; i++) {
-        sizeBytes = sizeBytes + sizeof(int16_t) * 4 * (texWidth * pow(2, -i)) * (texHeight * pow(2, -i)) * 6;
+        sizeBytes = sizeBytes + static_cast<int32_t>(sizeof(int16_t) * 4 * (texWidth * pow(2, -i)) * (texHeight * pow(2, -i)) * 6);
     }
 
     *textureData = new int8_t[sizeBytes];
@@ -530,7 +533,7 @@ int32_t PFCTextureReader::ReadTexture(const char* fileName, int8_t** textureData
     fread(*textureData, sizeBytes, 1, file);
 
     fclose(file);
-    file = NULL;
+    file = nullptr;
 
     pixelFormat = result = TPFT_R16G16B16A16F;
 
@@ -548,10 +551,11 @@ PFTTextureReader::~PFTTextureReader() {
 int32_t PFTTextureReader::ReadTexture(const char* fileName, int8_t** textureData, int32_t& texWidth, int32_t& texHeight, int32_t& textureType, int32_t& pixelFormat) {
     TEXTURE_PIXEL_FORMAT_TYPE result = TPFT_UNKOWN;
 
-    if (fileName == NULL || textureData == NULL) return result;
+    if (fileName == nullptr || textureData == nullptr) return result;
 
-    FILE* file = fopen(fileName, "rb");
-    if (file == NULL) return result;
+    FILE* file = nullptr;
+    fopen_s(&file, fileName, "rb");
+    if (file == nullptr) return result;
 
     fread(&texWidth, sizeof(int32_t), 1, file);
     fread(&texHeight, sizeof(int32_t), 1, file);
@@ -562,7 +566,7 @@ int32_t PFTTextureReader::ReadTexture(const char* fileName, int8_t** textureData
     fread(*textureData, sizeBytes, 1, file);
 
     fclose(file);
-    file = NULL;
+    file = nullptr;
 
     pixelFormat = result = TPFT_R32G32B32A32F;
 
@@ -574,7 +578,7 @@ int32_t PFTTextureReader::ReadTexture(const char* fileName, int8_t** textureData
 int32_t TextureReader::ReadTexture(const char* fileName, int8_t** data, int32_t& texWidth, int32_t& texHeight, int32_t& textureType, int32_t& pixelFormat) {
     int32_t result = 0;
 
-    if (fileName != NULL) {
+    if (fileName != nullptr) {
         // Get the postfix
         int32_t file_name_len = strlen(fileName);
         int32_t index = file_name_len - 1;
@@ -616,7 +620,7 @@ void TextureReader::ReleaseData(int8_t** texture_data) {
     if (texture_data) {
         if (*texture_data) {
             delete[] *texture_data;
-            *texture_data = NULL;
+            *texture_data = nullptr;
         }
     }
 }
