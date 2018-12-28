@@ -90,7 +90,7 @@ public:
         m_TestProgram_CubeMapLoc = m_TestCubeMapProgram->GetUniformLocation("glb_CubeMap");
 
         // Create Mesh
-        m_Sphere = scene::Model::Create("res/sphere.obj");
+        m_Sphere = render::mesh::Mgr::GetMeshById(render::mesh::Mgr::AddMesh("res/sphere.obj"));
         m_ScreenMesh = render::mesh::ScreenMesh::Create();
 
         // Create texture
@@ -150,7 +150,6 @@ public:
         GLB_SAFE_DELETE(m_PBSProgram);
         GLB_SAFE_DELETE(m_TestCubeMapProgram);
         GLB_SAFE_DELETE(m_ERMap);
-        GLB_SAFE_DELETE(m_Sphere);
         GLB_SAFE_DELETE(m_ScreenMesh);
         GLB_SAFE_DELETE(m_Camera);
     }
@@ -184,8 +183,8 @@ public:
         render::Device::SetTexture(0, m_ERMap, 0);
 
         // Setup mesh
-        render::Device::SetVertexLayout(render::mesh::Mgr::GetMeshById(m_Sphere->GetMeshId())->GetVertexLayout());
-        render::Device::SetVertexBuffer(render::mesh::Mgr::GetMeshById(m_Sphere->GetMeshId())->GetVertexBuffer());
+        render::Device::SetVertexLayout(m_Sphere->GetVertexLayout());
+        render::Device::SetVertexBuffer(m_Sphere->GetVertexBuffer());
 
         // Setup render state
         render::Device::SetDepthTestEnable(true);
@@ -216,7 +215,7 @@ public:
             render::Device::SetUniformSampler2D(m_ERMapLoc, 0);
 
             // Draw
-            render::Device::Draw(render::PT_TRIANGLES, 0, render::mesh::Mgr::GetMeshById(m_Sphere->GetMeshId())->GetVertexNum());
+            render::Device::Draw(render::PT_TRIANGLES, 0, m_Sphere->GetVertexNum());
         }
     }
 
@@ -284,8 +283,8 @@ public:
         //render::Device::SetTexture(0, m_CubeMap, 0);
 
         // Setup mesh
-        render::Device::SetVertexLayout(render::mesh::Mgr::GetMeshById(m_Sphere->GetMeshId())->GetVertexLayout());
-        render::Device::SetVertexBuffer(render::mesh::Mgr::GetMeshById(m_Sphere->GetMeshId())->GetVertexBuffer());
+        render::Device::SetVertexLayout(m_Sphere->GetVertexLayout());
+        render::Device::SetVertexBuffer(m_Sphere->GetVertexBuffer());
 
         // Setup render state
         render::Device::SetDepthTestEnable(true);
@@ -315,7 +314,7 @@ public:
         render::Device::SetUniformSamplerCube(m_TestProgram_CubeMapLoc, 0);
 
         // Draw
-        render::Device::Draw(render::PT_TRIANGLES, 0, render::mesh::Mgr::GetMeshById(m_Sphere->GetMeshId())->GetVertexNum());
+        render::Device::Draw(render::PT_TRIANGLES, 0, m_Sphere->GetVertexNum());
     }
 
     void DrawScene() {
@@ -356,8 +355,8 @@ public:
         render::Device::SetTexture(0, m_CubeMap, 0);
 
         // Setup mesh
-        render::Device::SetVertexLayout(render::mesh::Mgr::GetMeshById(m_Sphere->GetMeshId())->GetVertexLayout());
-        render::Device::SetVertexBuffer(render::mesh::Mgr::GetMeshById(m_Sphere->GetMeshId())->GetVertexBuffer());
+        render::Device::SetVertexLayout(m_Sphere->GetVertexLayout());
+        render::Device::SetVertexBuffer(m_Sphere->GetVertexBuffer());
 
         // Setup render state
         render::Device::SetDepthTestEnable(false);
@@ -381,7 +380,7 @@ public:
         render::Device::SetUniformSamplerCube(m_TestProgram_CubeMapLoc, 0);
 
         // Draw
-        render::Device::Draw(render::PT_TRIANGLES, 0, render::mesh::Mgr::GetMeshById(m_Sphere->GetMeshId())->GetVertexNum());
+        render::Device::Draw(render::PT_TRIANGLES, 0, m_Sphere->GetVertexNum());
     }
 
     void DrawSphere() {
@@ -395,8 +394,8 @@ public:
         render::Device::SetTexture(1, m_CubeMap, 1);
 
         // Setup mesh
-        render::Device::SetVertexLayout(render::mesh::Mgr::GetMeshById(m_Sphere->GetMeshId())->GetVertexLayout());
-        render::Device::SetVertexBuffer(render::mesh::Mgr::GetMeshById(m_Sphere->GetMeshId())->GetVertexBuffer());
+        render::Device::SetVertexLayout(m_Sphere->GetVertexLayout());
+        render::Device::SetVertexBuffer(m_Sphere->GetVertexBuffer());
 
         // Setup render state
         render::Device::SetDepthTestEnable(true);
@@ -429,7 +428,7 @@ public:
                 render::Device::SetUniformSamplerCube(m_PBSProgram_CubeMapLoc, 1);
 
                 // Draw
-                render::Device::Draw(render::PT_TRIANGLES, 0, render::mesh::Mgr::GetMeshById(m_Sphere->GetMeshId())->GetVertexNum());
+                render::Device::Draw(render::PT_TRIANGLES, 0, m_Sphere->GetVertexNum());
             }
         }
     }
@@ -444,7 +443,7 @@ protected:
     render::shader::UserProgram*    m_PBSProgram;
     render::shader::UserProgram*    m_TestCubeMapProgram;
     render::texture::Texture*       m_ERMap;
-    scene::Model*                   m_Sphere;
+    render::mesh::MeshBase*         m_Sphere;
     render::mesh::ScreenMesh*       m_ScreenMesh;
     scene::CameraBase*              m_Camera;
     math::Matrix                    m_Proj;
