@@ -142,7 +142,7 @@ public:
         m_TestProgram_CubeMapLoc = m_TestCubeMapProgram->GetUniformLocation("glb_CubeMap");
 
         // Create Mesh
-        m_Sphere = scene::Model::Create("res/sphere.obj");
+        m_Sphere = render::mesh::Mgr::GetMeshById(render::mesh::Mgr::AddMesh("res/sphere.obj"));
         m_ScreenMesh = render::mesh::ScreenMesh::Create();
 
         // Create texture
@@ -239,7 +239,6 @@ public:
             GLB_SAFE_DELETE(m_MetalicMap[i]);
             GLB_SAFE_DELETE(m_NormalMap[i]);
         }
-        GLB_SAFE_DELETE(m_Sphere);
         GLB_SAFE_DELETE(m_ScreenMesh);
         GLB_SAFE_DELETE(m_Camera);
 
@@ -278,8 +277,8 @@ public:
         render::Device::SetTexture(0, m_ERMap, 0);
 
         // Setup mesh
-        render::Device::SetVertexLayout(render::mesh::Mgr::GetMeshById(m_Sphere->GetMeshId())->GetVertexLayout());
-        render::Device::SetVertexBuffer(render::mesh::Mgr::GetMeshById(m_Sphere->GetMeshId())->GetVertexBuffer());
+        render::Device::SetVertexLayout(m_Sphere->GetVertexLayout());
+        render::Device::SetVertexBuffer(m_Sphere->GetVertexBuffer());
 
         // Setup render state
         render::Device::SetDepthTestEnable(true);
@@ -310,7 +309,7 @@ public:
             render::Device::SetUniformSampler2D(m_ERMapLoc, 0);
 
             // Draw
-            render::Device::Draw(render::PT_TRIANGLES, 0, render::mesh::Mgr::GetMeshById(m_Sphere->GetMeshId())->GetVertexNum());
+            render::Device::Draw(render::PT_TRIANGLES, 0, m_Sphere->GetVertexNum());
         }
     }
 
@@ -374,7 +373,7 @@ public:
         render::Device::SetCullFaceEnable(true);
         render::Device::SetCullFaceMode(render::CULL_BACK);
 
-        int32_t miplevels = log(128) / log(2) + 1;
+        int32_t miplevels = static_cast<int32_t>(log(128) / log(2) + 1);
         float roughnessStep = 1.0f / miplevels;
         int32_t width = 128, height = 128;
         for (int32_t j = 0; j < miplevels; j++) {
@@ -464,8 +463,8 @@ public:
         //render::Device::SetTexture(0, m_SpecularCubeMap, 0);
 
         // Setup mesh
-        render::Device::SetVertexLayout(render::mesh::Mgr::GetMeshById(m_Sphere->GetMeshId())->GetVertexLayout());
-        render::Device::SetVertexBuffer(render::mesh::Mgr::GetMeshById(m_Sphere->GetMeshId())->GetVertexBuffer());
+        render::Device::SetVertexLayout(m_Sphere->GetVertexLayout());
+        render::Device::SetVertexBuffer(m_Sphere->GetVertexBuffer());
 
         // Setup render state
         render::Device::SetDepthTestEnable(true);
@@ -476,8 +475,8 @@ public:
         static float sRotX = 0.0f, sRotY = 0.0f;
         math::Matrix world;
         world.MakeIdentityMatrix();
-        float mouseMoveX = Input::GetMouseMoveX();
-        float mouseMoveY = Input::GetMouseMoveY();
+        float mouseMoveX = static_cast<float>(Input::GetMouseMoveX());
+        float mouseMoveY = static_cast<float>(Input::GetMouseMoveY());
         sRotX = sRotX + mouseMoveX * 0.1f;
         sRotY = sRotY + mouseMoveY * 0.1f;
         world.RotateY(sRotX);
@@ -495,7 +494,7 @@ public:
         render::Device::SetUniformSamplerCube(m_TestProgram_CubeMapLoc, 0);
 
         // Draw
-        render::Device::Draw(render::PT_TRIANGLES, 0, render::mesh::Mgr::GetMeshById(m_Sphere->GetMeshId())->GetVertexNum());
+        render::Device::Draw(render::PT_TRIANGLES, 0, m_Sphere->GetVertexNum());
     }
 
     void DrawScene() {
@@ -537,8 +536,8 @@ public:
         //render::Device::SetTexture(0, m_SpecularLDCubeMap, 0);
 
         // Setup mesh
-        render::Device::SetVertexLayout(render::mesh::Mgr::GetMeshById(m_Sphere->GetMeshId())->GetVertexLayout());
-        render::Device::SetVertexBuffer(render::mesh::Mgr::GetMeshById(m_Sphere->GetMeshId())->GetVertexBuffer());
+        render::Device::SetVertexLayout(m_Sphere->GetVertexLayout());
+        render::Device::SetVertexBuffer(m_Sphere->GetVertexBuffer());
 
         // Setup render state
         render::Device::SetDepthTestEnable(false);
@@ -562,7 +561,7 @@ public:
         render::Device::SetUniformSamplerCube(m_TestProgram_CubeMapLoc, 0);
 
         // Draw
-        render::Device::Draw(render::PT_TRIANGLES, 0, render::mesh::Mgr::GetMeshById(m_Sphere->GetMeshId())->GetVertexNum());
+        render::Device::Draw(render::PT_TRIANGLES, 0, m_Sphere->GetVertexNum());
     }
 
     void DrawSphere() {
@@ -571,8 +570,8 @@ public:
         render::Device::SetShaderLayout(m_PBSProgram->GetShaderLayout());
 
         // Setup mesh
-        render::Device::SetVertexLayout(render::mesh::Mgr::GetMeshById(m_Sphere->GetMeshId())->GetVertexLayout());
-        render::Device::SetVertexBuffer(render::mesh::Mgr::GetMeshById(m_Sphere->GetMeshId())->GetVertexBuffer());
+        render::Device::SetVertexLayout(m_Sphere->GetVertexLayout());
+        render::Device::SetVertexBuffer(m_Sphere->GetVertexBuffer());
 
         // Setup render state
         render::Device::SetDepthTestEnable(true);
@@ -623,7 +622,7 @@ public:
             render::Device::SetUniformSampler2D(m_PBSProgram_NormalLoc, 6);
 
             // Draw
-            render::Device::Draw(render::PT_TRIANGLES, 0, render::mesh::Mgr::GetMeshById(m_Sphere->GetMeshId())->GetVertexNum());
+            render::Device::Draw(render::PT_TRIANGLES, 0, m_Sphere->GetVertexNum());
         }
     }
 
@@ -647,7 +646,7 @@ protected:
     render::texture::Texture*       m_RoughnessMap[3];
     render::texture::Texture*       m_MetalicMap[3];
     render::texture::Texture*       m_NormalMap[3];
-    scene::Model*                   m_Sphere;
+    render::mesh::MeshBase*         m_Sphere;
     render::mesh::ScreenMesh*       m_ScreenMesh;
     scene::CameraBase*              m_Camera;
     math::Matrix                    m_Proj;

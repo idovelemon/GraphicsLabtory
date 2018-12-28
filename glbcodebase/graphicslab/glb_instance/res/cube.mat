@@ -4,6 +4,7 @@ parameter glb_unif_RoughnessTex res/streakedmarble_roughness.dds
 parameter glb_unif_MetallicTex res/streakedmarble_metallic.dds
 parameter glb_unif_NormalTex res/streakedmarble_normal.dds
 parameter glb_unif_EmissionTex res/streakedmarble_emission.bmp
+parameter glb_unif_SpecularPFCLOD 7.0
 parameter glb_unif_DiffusePFCTex res/diffuse.pfc
 parameter glb_unif_SpecularPFCTex res/specular.pfc
 parameter glb_unif_EmissionIntensity 10.0 10.0 1.0

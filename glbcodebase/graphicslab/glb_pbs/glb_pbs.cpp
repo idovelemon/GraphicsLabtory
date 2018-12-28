@@ -43,7 +43,7 @@ public:
         m_MetalicLoc = m_Program->GetUniformLocation("glb_Metalic");
 
         // Create Sphere
-        m_Sphere = scene::Model::Create("res/sphere.obj");
+        m_Sphere = render::mesh::Mgr::GetMeshById(render::mesh::Mgr::AddMesh("res/sphere.obj"));
 
         // Create Camera
         m_Camera = scene::ModelCamera::Create(math::Vector(0.0f, 0.0f, 200.0f), math::Vector(0.0f, 0.0f, 0.0f));
@@ -82,7 +82,6 @@ public:
 
     void Destroy() {
         GLB_SAFE_DELETE(m_Program);
-        GLB_SAFE_DELETE(m_Sphere);
         GLB_SAFE_DELETE(m_Camera);
     }
 
@@ -95,8 +94,8 @@ public:
         //render::Device::SetTexture(0, m_EnvTex, 0);
 
         // Setup mesh
-        render::Device::SetVertexLayout(render::mesh::Mgr::GetMeshById(m_Sphere->GetMeshId())->GetVertexLayout());
-        render::Device::SetVertexBuffer(render::mesh::Mgr::GetMeshById(m_Sphere->GetMeshId())->GetVertexBuffer());
+        render::Device::SetVertexLayout(m_Sphere->GetVertexLayout());
+        render::Device::SetVertexBuffer(m_Sphere->GetVertexBuffer());
 
         // Setup render state
         render::Device::SetDepthTestEnable(true);
@@ -126,14 +125,14 @@ public:
                 render::Device::SetUniform1f(m_MetalicLoc, j * 0.2f);
 
                 // Draw
-                render::Device::Draw(render::PT_TRIANGLES, 0, render::mesh::Mgr::GetMeshById(m_Sphere->GetMeshId())->GetVertexNum());
+                render::Device::Draw(render::PT_TRIANGLES, 0, m_Sphere->GetVertexNum());
             }
         }
     }
 
 protected:
     render::shader::UserProgram*    m_Program;
-    scene::Model*                   m_Sphere;
+    render::mesh::MeshBase*         m_Sphere;
     scene::CameraBase*              m_Camera;
     math::Matrix                    m_Proj;
     math::Matrix                    m_View;

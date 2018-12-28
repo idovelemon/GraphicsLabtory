@@ -92,15 +92,15 @@ public:
         std::vector<Face> faces;
         faces.clear();
 
-        scene::ModelEffectParam effectParam;
-        scene::ModelMaterialParam materialParam;
         float* vertexBuf = NULL;
         float* texBuf = NULL;
         float* lightMapTexBuf = NULL;
         float* normalBuf = NULL;
         float* tangentBuf = NULL;
         float* binormalBuf = NULL;
-        int32_t faceNum = scene::ModelFile::ExtractModelData(kSceneModelFile, effectParam, materialParam, &vertexBuf, &texBuf, &lightMapTexBuf, &normalBuf, &tangentBuf, &binormalBuf);
+        math::Vector boundBoxMax(0.0f, 0.0f, 0.0f);
+        math::Vector boundBoxMin(0.0f, 0.0f, 0.0f);
+        int32_t faceNum = util::MeshReader::ExtractModelData(kSceneModelFile, boundBoxMin, boundBoxMax, &vertexBuf, &texBuf, &lightMapTexBuf, &normalBuf, &tangentBuf, &binormalBuf);
 
         int32_t vertexOffset = 0, uvOffset = 0, normalOffset = 0, tangentOffset = 0, binormalOffset = 0;
         for (int32_t i = 0; i < faceNum; i++) {
@@ -132,7 +132,7 @@ public:
             faces.push_back(face);
         }
 
-        scene::ModelFile::RelaseBuf(&vertexBuf, &texBuf, &normalBuf, &tangentBuf, &binormalBuf);
+        util::MeshReader::RelaseBuf(&vertexBuf, &texBuf, &normalBuf, &tangentBuf, &binormalBuf);
 
         // Calculate data for every patch
         for (int32_t h = 0; h < kLightMapHeight; h++) {
@@ -210,7 +210,7 @@ public:
         bool result = true;
 
         m_CurValidPatchIndex = m_CurValidPatchIndex + 1;
-        if (m_CurValidPatchIndex >= m_ValidPatch.size()) {
+        if (m_CurValidPatchIndex >= static_cast<int32_t>(m_ValidPatch.size())) {
             m_CurValidPatchIndex = 0;
             result = false;
         }
@@ -281,9 +281,9 @@ public:
         m_DrawNormalMapLoc = m_DrawProgram->GetUniformLocation("glb_NormalMap");
 
         // Create Mesh
-        m_SceneMesh = scene::Model::Create(kSceneModelFile);
-        m_EnvLightBallMesh = scene::Model::Create("res/envBall.obj");
-        m_InDoorLightBallMesh = scene::Model::Create("res/sphereLight.obj");
+        m_SceneMesh = render::mesh::Mgr::GetMeshById(render::mesh::Mgr::AddMesh(kSceneModelFile));
+        m_EnvLightBallMesh = render::mesh::Mgr::GetMeshById(render::mesh::Mgr::AddMesh("res/envBall.obj"));
+        m_InDoorLightBallMesh = render::mesh::Mgr::GetMeshById(render::mesh::Mgr::AddMesh("res/sphereLight.obj"));
         m_ScreenMesh = render::mesh::ScreenMesh::Create();
 
         // Create Light Map
@@ -378,9 +378,6 @@ public:
     void Destroy() {
         GLB_SAFE_DELETE(m_Camera);
         GLB_SAFE_DELETE(m_NormalMap);
-        GLB_SAFE_DELETE(m_SceneMesh);
-        GLB_SAFE_DELETE(m_EnvLightBallMesh);
-        GLB_SAFE_DELETE(m_InDoorLightBallMesh);
         GLB_SAFE_DELETE(m_ScreenMesh);
 
         GLB_SAFE_DELETE(m_WeightRT);
@@ -585,8 +582,8 @@ public:
 
                 {  // Draw Scene
                     // Setup Vertex
-                    render::Device::SetVertexLayout(render::mesh::Mgr::GetMeshById(m_SceneMesh->GetMeshId())->GetVertexLayout());
-                    render::Device::SetVertexBuffer(render::mesh::Mgr::GetMeshById(m_SceneMesh->GetMeshId())->GetVertexBuffer());
+                    render::Device::SetVertexLayout(m_SceneMesh->GetVertexLayout());
+                    render::Device::SetVertexBuffer(m_SceneMesh->GetVertexBuffer());
 
                     // Setup Uniform
                     math::Matrix world;
@@ -603,7 +600,7 @@ public:
                     render::Device::SetUniform1i(m_LightPatchFaceLoc, j);
 
                     // Draw
-                    render::Device::Draw(render::PT_TRIANGLES, 0, render::mesh::Mgr::GetMeshById(m_SceneMesh->GetMeshId())->GetVertexNum());
+                    render::Device::Draw(render::PT_TRIANGLES, 0, m_SceneMesh->GetVertexNum());
                 }
 
                 //{  // Draw Env ball
@@ -630,8 +627,8 @@ public:
                 {  // Draw InDoor ball
                     // Right Light Ball
                     // Setup Vertex
-                    render::Device::SetVertexLayout(render::mesh::Mgr::GetMeshById(m_InDoorLightBallMesh->GetMeshId())->GetVertexLayout());
-                    render::Device::SetVertexBuffer(render::mesh::Mgr::GetMeshById(m_InDoorLightBallMesh->GetMeshId())->GetVertexBuffer());
+                    render::Device::SetVertexLayout(m_InDoorLightBallMesh->GetVertexLayout());
+                    render::Device::SetVertexBuffer(m_InDoorLightBallMesh->GetVertexBuffer());
 
                     // Setup Uniform
                     math::Matrix world;
@@ -647,7 +644,7 @@ public:
                     render::Device::SetUniform1i(m_LightPatchFaceLoc, j);
 
                     // Draw
-                    render::Device::Draw(render::PT_TRIANGLES, 0, render::mesh::Mgr::GetMeshById(m_InDoorLightBallMesh->GetMeshId())->GetVertexNum());
+                    render::Device::Draw(render::PT_TRIANGLES, 0, m_InDoorLightBallMesh->GetVertexNum());
 
                     //// Front Light Ball
                     //// Setup Vertex
@@ -710,7 +707,7 @@ public:
             math::Vector color(0.0f, 0.0f, 0.0f);
             float* pixelData = new float[4];
 
-            int32_t maxLevel = log(max(kLightPatchSize, kLightPatchSize)) / log(2);
+            int32_t maxLevel = static_cast<int32_t>(log(max(kLightPatchSize, kLightPatchSize)) / log(2));
 
             for (int32_t j = 0; j < 5; j++) {
                 m_LightPatchMap[i][j]->GenerateMipmap();
@@ -779,8 +776,8 @@ public:
 
         {  // Draw Scene
             // Setup Vertex
-            render::Device::SetVertexLayout(render::mesh::Mgr::GetMeshById(m_SceneMesh->GetMeshId())->GetVertexLayout());
-            render::Device::SetVertexBuffer(render::mesh::Mgr::GetMeshById(m_SceneMesh->GetMeshId())->GetVertexBuffer());
+            render::Device::SetVertexLayout(m_SceneMesh->GetVertexLayout());
+            render::Device::SetVertexBuffer(m_SceneMesh->GetVertexBuffer());
 
             // Setup Uniform
             math::Matrix proj;
@@ -792,7 +789,7 @@ public:
             render::Device::SetUniformSampler2D(m_DrawNormalMapLoc, 3);
 
             // Draw
-            render::Device::Draw(render::PT_TRIANGLES, 0, render::mesh::Mgr::GetMeshById(m_SceneMesh->GetMeshId())->GetVertexNum());
+            render::Device::Draw(render::PT_TRIANGLES, 0, m_SceneMesh->GetVertexNum());
         }
     }
 
@@ -819,9 +816,9 @@ protected:
     scene::CameraBase*              m_Camera;
     math::Matrix                    m_Proj;
     math::Matrix                    m_View;
-    scene::Model*                   m_SceneMesh;
-    scene::Model*                   m_EnvLightBallMesh;
-    scene::Model*                   m_InDoorLightBallMesh;
+    render::mesh::MeshBase*         m_SceneMesh;
+    render::mesh::MeshBase*         m_EnvLightBallMesh;
+    render::mesh::MeshBase*         m_InDoorLightBallMesh;
     render::mesh::ScreenMesh*       m_ScreenMesh;
 
     int32_t                         m_CurLightMapW;

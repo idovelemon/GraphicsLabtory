@@ -63,12 +63,6 @@
     <ClCompile Include="..\glb\scene\glbcamera.cpp">
       <Filter>Source Files\glb\scene</Filter>
     </ClCompile>
-    <ClCompile Include="..\glb\scene\glbmodel.cpp">
-      <Filter>Source Files\glb\scene</Filter>
-    </ClCompile>
-    <ClCompile Include="..\glb\scene\glbmodelfile.cpp">
-      <Filter>Source Files\glb\scene</Filter>
-    </ClCompile>
     <ClCompile Include="..\glb\scene\glbobject.cpp">
       <Filter>Source Files\glb\scene</Filter>
     </ClCompile>
@@ -156,6 +150,9 @@
     <ClCompile Include="..\glb\glbdebugmenu.cpp">
       <Filter>Source Files\glb</Filter>
     </ClCompile>
+    <ClCompile Include="..\glb\util\glbmeshreader.cpp">
+      <Filter>Source Files\glb\util</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\glb\glb.h">
@@ -186,12 +183,6 @@
       <Filter>Source Files\glb\scene</Filter>
     </ClInclude>
     <ClInclude Include="..\glb\scene\glblight.h">
-      <Filter>Source Files\glb\scene</Filter>
-    </ClInclude>
-    <ClInclude Include="..\glb\scene\glbmodel.h">
-      <Filter>Source Files\glb\scene</Filter>
-    </ClInclude>
-    <ClInclude Include="..\glb\scene\glbmodelfile.h">
       <Filter>Source Files\glb\scene</Filter>
     </ClInclude>
     <ClInclude Include="..\glb\scene\glbobject.h">
@@ -298,6 +289,9 @@
     </ClInclude>
     <ClInclude Include="..\glb\glbdebugmenu.h">
       <Filter>Source Files\glb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\glb\util\glbmeshreader.h">
+      <Filter>Source Files\glb\util</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
