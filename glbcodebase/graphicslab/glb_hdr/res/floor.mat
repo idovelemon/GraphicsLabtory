@@ -5,3 +5,4 @@ parameter glb_unif_MetallicTex res/bathroomtile_roughness.dds
 parameter glb_unif_NormalTex res/bathroomtile_normal.dds
 parameter glb_unif_DiffusePFCTex res/diffuse.pfc
 parameter glb_unif_SpecularPFCTex res/specular.pfc
+parameter glb_unif_SpecularPFCLOD 7.0

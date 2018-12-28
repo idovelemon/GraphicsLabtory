@@ -190,12 +190,11 @@
     <ClCompile Include="..\glb\render\imp\gl\glbshaderimp.cpp" />
     <ClCompile Include="..\glb\render\imp\gl\glbtextureimp.cpp" />
     <ClCompile Include="..\glb\scene\glbcamera.cpp" />
-    <ClCompile Include="..\glb\scene\glbmodel.cpp" />
-    <ClCompile Include="..\glb\scene\glbmodelfile.cpp" />
     <ClCompile Include="..\glb\scene\glbobject.cpp" />
     <ClCompile Include="..\glb\scene\glbscene.cpp" />
     <ClCompile Include="..\glb\thirdparty\rgbe\rgbe.cpp" />
     <ClCompile Include="..\glb\util\glblog.cpp" />
+    <ClCompile Include="..\glb\util\glbmeshreader.cpp" />
     <ClCompile Include="..\glb\util\glbprofile.cpp" />
     <ClCompile Include="..\glb\util\glbtexturereader.cpp" />
     <ClCompile Include="..\glb\util\glbtexturewriter.cpp" />
@@ -234,8 +233,6 @@
     <ClInclude Include="..\glb\render\imp\gl\glbtextureimp.h" />
     <ClInclude Include="..\glb\scene\glbcamera.h" />
     <ClInclude Include="..\glb\scene\glblight.h" />
-    <ClInclude Include="..\glb\scene\glbmodel.h" />
-    <ClInclude Include="..\glb\scene\glbmodelfile.h" />
     <ClInclude Include="..\glb\scene\glbobject.h" />
     <ClInclude Include="..\glb\scene\glbscene.h" />
     <ClInclude Include="..\glb\thirdparty\rgbe\rgbe.h" />
@@ -243,6 +240,7 @@
     <ClInclude Include="..\glb\util\glbddsformat.h" />
     <ClInclude Include="..\glb\util\glblog.h" />
     <ClInclude Include="..\glb\util\glbmacro.h" />
+    <ClInclude Include="..\glb\util\glbmeshreader.h" />
     <ClInclude Include="..\glb\util\glbprofile.h" />
     <ClInclude Include="..\glb\util\glbtextureinfo.h" />
     <ClInclude Include="..\glb\util\glbtexturereader.h" />
