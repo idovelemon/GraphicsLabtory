@@ -28,22 +28,6 @@ public:
     bool AddModel(const char* name);
     bool SaveModel(const char* name);
     bool Preview(const char* name);
-    bool SetModelAlbedoTexture(const char* name);
-    bool SetModelMetallicTexture(const char* name);
-    bool SetModelRoughnessTexture(const char* name);
-    bool SetModelNormalTexture(const char* name);
-    bool SetModelAlphaTexture(const char* name);
-    bool SetModelEmissionTexture(const char* name);
-    bool SetModelLightTexture(int index, const char* name);
-    const char* GetModelAlbedoTextureName();
-    const char* GetModelMetallicTextureName();
-    const char* GetModelRoughnessTextureName();
-    const char* GetModelNormalTextureName();
-    const char* GetModelAlphaTextureName();
-    const char* GetModelEmissionTextureName();
-    const char* GetModelDiffusePFCTextureName();
-    const char* GetModelSpecularPFCTextureName();
-    const char* GetModelLightTextureName(int32_t index);
 
 protected:
     void UpdateCamera();

@@ -266,6 +266,8 @@ void Cglb_modeleditorDlg::OnFileImport()
         config.screen_height = rect.bottom - rect.top;
         config.shadow_map_width = 32;
         config.shadow_map_height = 32;
+        config.decalMapWidth = 32;
+        config.decalMapHeight = 32;
         if (!glb::app::Application::Initialize(ApplicationCore::Create, AfxGetInstanceHandle(), config))
         {
             ::MessageBox(NULL, L"Initialize GLB library failed", L"ERROR", MB_OK);
@@ -284,8 +286,8 @@ void Cglb_modeleditorDlg::OnFileImport()
         }
 
         // Display default diffuse and specular prefilter cube map
-        m_DiffusePFCTexName = ApplicationCore::GetInstance()->GetModelDiffusePFCTextureName();
-        m_SpecularPFCTexName = ApplicationCore::GetInstance()->GetModelSpecularPFCTextureName();
+        m_DiffusePFCTexName = CString("N/A");
+        m_SpecularPFCTexName = CString("N/A");
         UpdateData(false);
 
         delete[] pcstr;
@@ -343,6 +345,8 @@ void Cglb_modeleditorDlg::OnFilePreview()
         config.screen_height = rect.bottom - rect.top;
         config.shadow_map_width = 32;
         config.shadow_map_height = 32;
+        config.decalMapWidth = 32;
+        config.decalMapHeight = 32;
         if (!glb::app::Application::Initialize(ApplicationCore::Create, AfxGetInstanceHandle(), config))
         {
             ::MessageBox(NULL, L"Initialize GLB library failed", L"ERROR", MB_OK);
@@ -363,17 +367,17 @@ void Cglb_modeleditorDlg::OnFilePreview()
         delete[] pcstr;
         pcstr = NULL;
 
-        m_AlbedoTexName = ApplicationCore::GetInstance()->GetModelAlbedoTextureName();
-        m_RoughnessTexName = ApplicationCore::GetInstance()->GetModelRoughnessTextureName();
-        m_MetallicTexName = ApplicationCore::GetInstance()->GetModelMetallicTextureName();
-        m_NormalTexName = ApplicationCore::GetInstance()->GetModelNormalTextureName();
-        m_AlphaTexName = ApplicationCore::GetInstance()->GetModelAlphaTextureName();
-        m_EmissionTexName = ApplicationCore::GetInstance()->GetModelEmissionTextureName();
-        m_DiffusePFCTexName = ApplicationCore::GetInstance()->GetModelDiffusePFCTextureName();
-        m_SpecularPFCTexName = ApplicationCore::GetInstance()->GetModelSpecularPFCTextureName();
-        m_LightTex0Name = ApplicationCore::GetInstance()->GetModelLightTextureName(0);
-        m_LightTex1Name = ApplicationCore::GetInstance()->GetModelLightTextureName(1);
-        m_LightTex2Name = ApplicationCore::GetInstance()->GetModelLightTextureName(2);
+        m_AlbedoTexName = CString("N/A");
+        m_RoughnessTexName = CString("N/A");
+        m_MetallicTexName = CString("N/A");
+        m_NormalTexName = CString("N/A");
+        m_AlphaTexName = CString("N/A");
+        m_EmissionTexName = CString("N/A");
+        m_DiffusePFCTexName = CString("N/A");
+        m_SpecularPFCTexName = CString("N/A");
+        m_LightTex0Name = CString("N/A");
+        m_LightTex1Name = CString("N/A");
+        m_LightTex2Name = CString("N/A");
         UpdateData(false);
     }
 }
@@ -382,162 +386,36 @@ void Cglb_modeleditorDlg::OnFilePreview()
 void Cglb_modeleditorDlg::OnBnClickedAlbedoFileButton()
 {
     // TODO: Add your control notification handler code here
-    TCHAR szFilter[] = L"DDS File(*.dds)|*.dds|BMP File(*.bmp)|*.bmp||";
-    CFileDialog fileDlg(TRUE, L"", L"", OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, szFilter, this);
-    if (IDOK == fileDlg.DoModal())
-    {
-        m_AlbedoTexName = fileDlg.GetPathName();
-        UpdateData(false);
-
-        // Try add model
-        char *pcstr = (char *)new char[2 * wcslen(m_AlbedoTexName.GetBuffer(0))+1] ;
-        memset(pcstr , 0 , 2 * wcslen(m_AlbedoTexName.GetBuffer(0))+1 );
-        wcstombs(pcstr, m_AlbedoTexName.GetBuffer(0), wcslen(m_AlbedoTexName.GetBuffer(0))) ;
-
-        if (!ApplicationCore::GetInstance()->SetModelAlbedoTexture(pcstr))
-        {
-            ::MessageBox(NULL, L"Invalid file format", L"ERROR", MB_OK);
-            exit(0);
-        }
-
-        delete[] pcstr;
-        pcstr = NULL;
-    }
 }
 
 
 void Cglb_modeleditorDlg::OnBnClickedRoughnessFileButton()
 {
     // TODO: Add your control notification handler code here
-    TCHAR szFilter[] = L"DDS File(*.dds)|*.dds|BMP File(*.bmp)|*.bmp||";
-    CFileDialog fileDlg(TRUE, L"", L"", OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, szFilter, this);
-    if (IDOK == fileDlg.DoModal())
-    {
-        m_RoughnessTexName = fileDlg.GetPathName();
-        UpdateData(false);
-
-        // Try add model
-        char *pcstr = (char *)new char[2 * wcslen(m_RoughnessTexName.GetBuffer(0))+1] ;
-        memset(pcstr , 0 , 2 * wcslen(m_RoughnessTexName.GetBuffer(0))+1 );
-        wcstombs(pcstr, m_RoughnessTexName.GetBuffer(0), wcslen(m_RoughnessTexName.GetBuffer(0))) ;
-
-        if (!ApplicationCore::GetInstance()->SetModelRoughnessTexture(pcstr))
-        {
-            ::MessageBox(NULL, L"Invalid file format", L"ERROR", MB_OK);
-            exit(0);
-        }
-
-        delete[] pcstr;
-        pcstr = NULL;
-    }
 }
 
 
 void Cglb_modeleditorDlg::OnBnClickedMetallicFileButton()
 {
     // TODO: Add your control notification handler code here
-    TCHAR szFilter[] = L"DDS File(*.dds)|*.dds|BMP File(*.bmp)|*.bmp||";
-    CFileDialog fileDlg(TRUE, L"", L"", OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, szFilter, this);
-    if (IDOK == fileDlg.DoModal())
-    {
-        m_MetallicTexName = fileDlg.GetPathName();
-        UpdateData(false);
-
-        // Try add model
-        char *pcstr = (char *)new char[2 * wcslen(m_MetallicTexName.GetBuffer(0))+1] ;
-        memset(pcstr , 0 , 2 * wcslen(m_MetallicTexName.GetBuffer(0))+1 );
-        wcstombs(pcstr, m_MetallicTexName.GetBuffer(0), wcslen(m_MetallicTexName.GetBuffer(0))) ;
-
-        if (!ApplicationCore::GetInstance()->SetModelMetallicTexture(pcstr))
-        {
-            ::MessageBox(NULL, L"Invalid file format", L"ERROR", MB_OK);
-            exit(0);
-        }
-
-        delete[] pcstr;
-        pcstr = NULL;
-    }
 }
 
 
 void Cglb_modeleditorDlg::OnBnClickedNormalFileButton()
 {
     // TODO: Add your control notification handler code here
-    TCHAR szFilter[] = L"DDS File(*.dds)|*.dds|BMP File(*.bmp)|*.bmp||";
-    CFileDialog fileDlg(TRUE, L"", L"", OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, szFilter, this);
-    if (IDOK == fileDlg.DoModal())
-    {
-        m_NormalTexName = fileDlg.GetPathName();
-        UpdateData(false);
-
-        // Try add model
-        char *pcstr = (char *)new char[2 * wcslen(m_NormalTexName.GetBuffer(0))+1] ;
-        memset(pcstr , 0 , 2 * wcslen(m_NormalTexName.GetBuffer(0))+1 );
-        wcstombs(pcstr, m_NormalTexName.GetBuffer(0), wcslen(m_NormalTexName.GetBuffer(0))) ;
-
-        if (!ApplicationCore::GetInstance()->SetModelNormalTexture(pcstr))
-        {
-            ::MessageBox(NULL, L"Invalid file format", L"ERROR", MB_OK);
-            exit(0);
-        }
-
-        delete[] pcstr;
-        pcstr = NULL;
-    }
 }
 
 
 void Cglb_modeleditorDlg::OnBnClickedAlphaFileButton()
 {
     // TODO: Add your control notification handler code here
-    TCHAR szFilter[] = L"DDS File(*.dds)|*.dds|BMP File(*.bmp)|*.bmp||";
-    CFileDialog fileDlg(TRUE, L"", L"", OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, szFilter, this);
-    if (IDOK == fileDlg.DoModal())
-    {
-        m_AlphaTexName = fileDlg.GetPathName();
-        UpdateData(false);
-
-        // Try add model
-        char *pcstr = (char *)new char[2 * wcslen(m_AlphaTexName.GetBuffer(0))+1] ;
-        memset(pcstr , 0 , 2 * wcslen(m_AlphaTexName.GetBuffer(0))+1 );
-        wcstombs(pcstr, m_AlphaTexName.GetBuffer(0), wcslen(m_AlphaTexName.GetBuffer(0))) ;
-
-        if (!ApplicationCore::GetInstance()->SetModelAlphaTexture(pcstr))
-        {
-            ::MessageBox(NULL, L"Invalid file format", L"ERROR", MB_OK);
-            exit(0);
-        }
-
-        delete[] pcstr;
-        pcstr = NULL;
-    }
 }
 
 
 void Cglb_modeleditorDlg::OnBnClickedEmissionFileButton()
 {
     // TODO: Add your control notification handler code here
-    TCHAR szFilter[] = L"DDS File(*.dds)|*.dds|BMP File(*.bmp)|*.bmp||";
-    CFileDialog fileDlg(TRUE, L"", L"", OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, szFilter, this);
-    if (IDOK == fileDlg.DoModal())
-    {
-        m_EmissionTexName = fileDlg.GetPathName();
-        UpdateData(false);
-
-        // Try add emission
-        char *pcstr = (char *)new char[2 * wcslen(m_EmissionTexName.GetBuffer(0))+1] ;
-        memset(pcstr , 0 , 2 * wcslen(m_EmissionTexName.GetBuffer(0))+1 );
-        wcstombs(pcstr, m_EmissionTexName.GetBuffer(0), wcslen(m_EmissionTexName.GetBuffer(0))) ;
-
-        if (!ApplicationCore::GetInstance()->SetModelEmissionTexture(pcstr))
-        {
-            ::MessageBox(NULL, L"Invalid file format", L"ERROR", MB_OK);
-            exit(0);
-        }
-
-        delete[] pcstr;
-        pcstr = NULL;
-    }
 }
 
 
@@ -556,81 +434,18 @@ void Cglb_modeleditorDlg::OnBnClickedSpecularPFCFileButton()
 void Cglb_modeleditorDlg::OnBnClickedLight0FileButton()
 {
     // TODO: Add your control notification handler code here
-    TCHAR szFilter[] = L"HDR File(*.hdr)|*.hdr||";
-    CFileDialog fileDlg(TRUE, L"", L"", OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, szFilter, this);
-    if (IDOK == fileDlg.DoModal())
-    {
-        m_LightTex0Name = fileDlg.GetPathName();
-        UpdateData(false);
-
-        // Try add light 0 map
-        char *pcstr = (char *)new char[2 * wcslen(m_LightTex0Name.GetBuffer(0))+1] ;
-        memset(pcstr , 0 , 2 * wcslen(m_LightTex0Name.GetBuffer(0))+1 );
-        wcstombs(pcstr, m_LightTex0Name.GetBuffer(0), wcslen(m_LightTex0Name.GetBuffer(0))) ;
-
-        if (!ApplicationCore::GetInstance()->SetModelLightTexture(0, pcstr))
-        {
-            ::MessageBox(NULL, L"Invalid file format", L"ERROR", MB_OK);
-            exit(0);
-        }
-
-        delete[] pcstr;
-        pcstr = NULL;
-    }
 }
 
 
 void Cglb_modeleditorDlg::OnBnClickedLight1FileButton()
 {
     // TODO: Add your control notification handler code here
-    TCHAR szFilter[] = L"HDR File(*.hdr)|*.hdr||";
-    CFileDialog fileDlg(TRUE, L"", L"", OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, szFilter, this);
-    if (IDOK == fileDlg.DoModal())
-    {
-        m_LightTex1Name = fileDlg.GetPathName();
-        UpdateData(false);
-
-        // Try add light 0 map
-        char *pcstr = (char *)new char[2 * wcslen(m_LightTex1Name.GetBuffer(0))+1] ;
-        memset(pcstr , 0 , 2 * wcslen(m_LightTex1Name.GetBuffer(0))+1 );
-        wcstombs(pcstr, m_LightTex1Name.GetBuffer(0), wcslen(m_LightTex1Name.GetBuffer(0))) ;
-
-        if (!ApplicationCore::GetInstance()->SetModelLightTexture(1, pcstr))
-        {
-            ::MessageBox(NULL, L"Invalid file format", L"ERROR", MB_OK);
-            exit(0);
-        }
-
-        delete[] pcstr;
-        pcstr = NULL;
-    }
 }
 
 
 void Cglb_modeleditorDlg::OnBnClickedLight2FileButton()
 {
     // TODO: Add your control notification handler code here
-    TCHAR szFilter[] = L"HDR File(*.hdr)|*.hdr||";
-    CFileDialog fileDlg(TRUE, L"", L"", OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, szFilter, this);
-    if (IDOK == fileDlg.DoModal())
-    {
-        m_LightTex2Name = fileDlg.GetPathName();
-        UpdateData(false);
-
-        // Try add light 0 map
-        char *pcstr = (char *)new char[2 * wcslen(m_LightTex2Name.GetBuffer(0))+1] ;
-        memset(pcstr , 0 , 2 * wcslen(m_LightTex2Name.GetBuffer(0))+1 );
-        wcstombs(pcstr, m_LightTex2Name.GetBuffer(0), wcslen(m_LightTex2Name.GetBuffer(0))) ;
-
-        if (!ApplicationCore::GetInstance()->SetModelLightTexture(2, pcstr))
-        {
-            ::MessageBox(NULL, L"Invalid file format", L"ERROR", MB_OK);
-            exit(0);
-        }
-
-        delete[] pcstr;
-        pcstr = NULL;
-    }
 }
 
 

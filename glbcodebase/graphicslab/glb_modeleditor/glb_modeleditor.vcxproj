@@ -119,12 +119,14 @@ dxguid.lib;assimp-vc110-mt.lib;zlibstatic.lib;%(AdditionalDependencies)</Additio
   <ItemGroup>
     <ClInclude Include="..\glb\glb.h" />
     <ClInclude Include="..\glb\glbapplication.h" />
+    <ClInclude Include="..\glb\glbdebugmenu.h" />
     <ClInclude Include="..\glb\glbinput.h" />
     <ClInclude Include="..\glb\math\glbbv.h" />
     <ClInclude Include="..\glb\math\glbmath.h" />
     <ClInclude Include="..\glb\math\glbmatrix.cpp.h" />
     <ClInclude Include="..\glb\math\glbmatrix.h" />
     <ClInclude Include="..\glb\math\glbvector.h" />
+    <ClInclude Include="..\glb\render\glbfont.h" />
     <ClInclude Include="..\glb\render\glbmaterial.h" />
     <ClInclude Include="..\glb\render\glbmesh.h" />
     <ClInclude Include="..\glb\render\glbrender.h" />
@@ -146,8 +148,6 @@ dxguid.lib;assimp-vc110-mt.lib;zlibstatic.lib;%(AdditionalDependencies)</Additio
     <ClInclude Include="..\glb\render\imp\gl\glbtextureimp.h" />
     <ClInclude Include="..\glb\scene\glbcamera.h" />
     <ClInclude Include="..\glb\scene\glblight.h" />
-    <ClInclude Include="..\glb\scene\glbmodel.h" />
-    <ClInclude Include="..\glb\scene\glbmodelfile.h" />
     <ClInclude Include="..\glb\scene\glbobject.h" />
     <ClInclude Include="..\glb\scene\glbscene.h" />
     <ClInclude Include="..\glb\thirdparty\rgbe\rgbe.h" />
@@ -155,6 +155,7 @@ dxguid.lib;assimp-vc110-mt.lib;zlibstatic.lib;%(AdditionalDependencies)</Additio
     <ClInclude Include="..\glb\util\glbddsformat.h" />
     <ClInclude Include="..\glb\util\glblog.h" />
     <ClInclude Include="..\glb\util\glbmacro.h" />
+    <ClInclude Include="..\glb\util\glbmeshreader.h" />
     <ClInclude Include="..\glb\util\glbprofile.h" />
     <ClInclude Include="..\glb\util\glbtextureinfo.h" />
     <ClInclude Include="..\glb\util\glbtexturereader.h" />
@@ -171,9 +172,11 @@ dxguid.lib;assimp-vc110-mt.lib;zlibstatic.lib;%(AdditionalDependencies)</Additio
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\glb\glbapplication.cpp" />
+    <ClCompile Include="..\glb\glbdebugmenu.cpp" />
     <ClCompile Include="..\glb\glbinput.cpp" />
     <ClCompile Include="..\glb\math\glbbv.cpp" />
     <ClCompile Include="..\glb\math\glbmath.cpp" />
+    <ClCompile Include="..\glb\render\glbfont.cpp" />
     <ClCompile Include="..\glb\render\glbmaterial.cpp" />
     <ClCompile Include="..\glb\render\glbmesh.cpp" />
     <ClCompile Include="..\glb\render\glbrender.cpp" />
@@ -193,12 +196,11 @@ dxguid.lib;assimp-vc110-mt.lib;zlibstatic.lib;%(AdditionalDependencies)</Additio
     <ClCompile Include="..\glb\render\imp\gl\glbshaderimp.cpp" />
     <ClCompile Include="..\glb\render\imp\gl\glbtextureimp.cpp" />
     <ClCompile Include="..\glb\scene\glbcamera.cpp" />
-    <ClCompile Include="..\glb\scene\glbmodel.cpp" />
-    <ClCompile Include="..\glb\scene\glbmodelfile.cpp" />
     <ClCompile Include="..\glb\scene\glbobject.cpp" />
     <ClCompile Include="..\glb\scene\glbscene.cpp" />
     <ClCompile Include="..\glb\thirdparty\rgbe\rgbe.cpp" />
     <ClCompile Include="..\glb\util\glblog.cpp" />
+    <ClCompile Include="..\glb\util\glbmeshreader.cpp" />
     <ClCompile Include="..\glb\util\glbprofile.cpp" />
     <ClCompile Include="..\glb\util\glbtexturereader.cpp" />
     <ClCompile Include="..\glb\util\glbtexturewriter.cpp" />

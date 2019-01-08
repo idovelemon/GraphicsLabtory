@@ -112,6 +112,25 @@ Object* Object::Create(render::mesh::MeshBase* mesh, math::Vector pos, math::Vec
     return obj;
 }
 
+Object* Object::Create(render::mesh::MeshBase* mesh, render::material::Material* mat, math::Vector pos, math::Vector scale, math::Vector rotation) {
+    Object* obj = nullptr;
+
+    if (mesh) {
+        obj = new Object();
+        if (obj) {
+            obj->m_Mesh = mesh;
+            obj->m_Material = mat;
+            obj->m_WorldMatrix.MakeIdentityMatrix();
+        } else {
+            GLB_SAFE_ASSERT(false);
+        }
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return obj;
+}
+
 int32_t Object::GetObjectType() const {
     return m_ObjectType;
 }

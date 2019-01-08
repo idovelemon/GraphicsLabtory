@@ -158,6 +158,7 @@ class Mgr {
      // Otherwise, return -1.
      //-------------------------------------------------------------------
      static int32_t AddMaterial(const char* materialName);
+     static int32_t AddMaterial(Material* material);
 
      //-------------------------------------------------------------------
      // @brief: Get the material from manager

@@ -50,6 +50,7 @@ public:
     void Destroy();
 
     int32_t AddMaterial(const char* name);
+    int32_t AddMaterial(Material* material);
     Material* GetMaterial(int32_t id);
     int32_t GetMaterialCount();
 
@@ -470,6 +471,18 @@ int32_t MgrImp::AddMaterial(const char* name) {
     return m_IDGen;
 }
 
+int32_t MgrImp::AddMaterial(Material* material) {
+    if (material) {
+        m_IDGen++;
+        material->SetMaterialID(m_IDGen);
+        m_MaterialDataBase.insert(std::make_pair(m_IDGen, material));
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return m_IDGen;
+}
+
 Material* MgrImp::GetMaterial(int32_t id) {
     Material* result = nullptr;
 
@@ -529,6 +542,18 @@ int32_t Mgr::AddMaterial(const char* materialName) {
 
     if (s_MgrImp != nullptr) {
         result = s_MgrImp->AddMaterial(materialName);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return result;
+}
+
+int32_t Mgr::AddMaterial(Material* material) {
+    int32_t result = -1;
+
+    if (s_MgrImp != nullptr) {
+        result = s_MgrImp->AddMaterial(material);
     } else {
         GLB_SAFE_ASSERT(false);
     }

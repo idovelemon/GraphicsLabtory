@@ -56,6 +56,7 @@ public:
     int32_t AddInstanceRenderObject(const char* meshFile, const char* materialFile, int32_t maxInstance);
     int32_t AddInstanceObject(int32_t instanceRenderObject, math::Vector pos, math::Vector scale, math::Vector rotate);
     int32_t AddObject(render::mesh::MeshBase* mesh);
+    int32_t AddObject(render::mesh::MeshBase* mesh, render::material::Material* mat);
     int32_t AddSkyObject(const char* objectFile);
     Object* GetObjectById(int32_t id);
     Object* GetSkyObject();
@@ -369,6 +370,28 @@ int32_t SceneImp::AddObject(render::mesh::MeshBase* mesh) {
     return id;
 }
 
+int32_t SceneImp::AddObject(render::mesh::MeshBase* mesh, render::material::Material* mat) {
+    int32_t id = -1;
+
+    if (mesh != nullptr && mat != nullptr) {
+        Object* obj = Object::Create(mesh, mat);
+        if (obj != nullptr) {
+            id = FindEmptyID();
+            if (id != -1) {
+                m_ObjectDataBase[id] = obj;
+            } else {
+                GLB_SAFE_ASSERT(false);
+            }
+        } else {
+            GLB_SAFE_ASSERT(false);
+        }
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return id;
+}
+
 int32_t SceneImp::AddSkyObject(const char* object_file) {
     int32_t id = -1;
 
@@ -666,6 +689,18 @@ int32_t Scene::AddObject(render::mesh::MeshBase* mesh) {
 
     if (s_SceneImp != nullptr) {
         result = s_SceneImp->AddObject(mesh);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return result;
+}
+
+int32_t Scene::AddObject(render::mesh::MeshBase* mesh, render::material::Material* mat) {
+    int32_t result = -1;
+
+    if (s_SceneImp != nullptr) {
+        result = s_SceneImp->AddObject(mesh, mat);
     } else {
         GLB_SAFE_ASSERT(false);
     }

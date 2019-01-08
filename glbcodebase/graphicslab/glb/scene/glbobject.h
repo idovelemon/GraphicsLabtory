@@ -56,6 +56,8 @@ public:
         math::Vector scale = math::Vector(1.0f, 1.0f, 1.0f), math::Vector rotation = math::Vector(0.0f, 0.0f, 0.0f));
     static Object* Create(render::mesh::MeshBase* mesh, math::Vector pos = math::Vector(0.0f, 0.0f, 0.0f),
         math::Vector scale = math::Vector(1.0f, 1.0f, 1.0f), math::Vector rotation = math::Vector(0.0f, 0.0f, 0.0f));
+    static Object* Create(render::mesh::MeshBase* mesh, render::material::Material* mat, math::Vector pos = math::Vector(0.0f, 0.0f, 0.0f),
+        math::Vector scale = math::Vector(1.0f, 1.0f, 1.0f), math::Vector rotation = math::Vector(0.0f, 0.0f, 0.0f));
 
 public:
     virtual int32_t GetObjectType() const;

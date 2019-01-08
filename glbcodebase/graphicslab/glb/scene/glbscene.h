@@ -20,6 +20,10 @@ namespace render {
 namespace mesh {
 class MeshBase;
 };
+
+namespace material {
+class Material;
+};
 };
 
 namespace scene {
@@ -67,6 +71,7 @@ public:
     static int32_t AddDecalObject(const char* decalObjectFile);
     static int32_t AddDecalObject(const char* meshFile, const char* materialFile);
     static int32_t AddObject(render::mesh::MeshBase* mesh);
+    static int32_t AddObject(render::mesh::MeshBase* mesh, render::material::Material* mat);
     static int32_t AddSkyObject(const char* objectFile);
     static Object* GetObjectById(int32_t objectId);
     static Object* GetSkyObject();
