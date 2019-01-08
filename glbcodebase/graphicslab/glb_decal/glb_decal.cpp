@@ -352,7 +352,7 @@ public:
         glb::render::Render::SetHighLightBase(1.5f);
 
         // Setup world
-        int32_t floor = scene::Scene::AddObject("res/floor.obj", "res/floor.mg");
+        int32_t floor = scene::Scene::AddObject("res/floor.obj", "res/floor.mat");
         scene::Scene::GetObjectById(floor)->SetCullFaceEnable(true);
         scene::Scene::GetObjectById(floor)->SetCullFaceMode(glb::render::CULL_BACK);
         scene::Scene::GetObjectById(floor)->SetDepthTestEnable(true);
@@ -363,7 +363,7 @@ public:
         };
 
         for (int32_t i = 0; i < 5; i++) {
-            int32_t decal = scene::Scene::AddDecalObject("res/decal.obj", "res/decal.mg");
+            int32_t decal = scene::Scene::AddDecalObject("res/decal.obj", "res/decal.mat");
             scene::Scene::GetObjectById(decal)->SetCullFaceEnable(false);
             scene::Scene::GetObjectById(decal)->SetCullFaceMode(glb::render::CULL_FRONT);
             scene::Scene::GetObjectById(decal)->SetDepthTestEnable(true);

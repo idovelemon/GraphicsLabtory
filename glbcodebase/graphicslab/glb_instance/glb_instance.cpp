@@ -44,7 +44,7 @@ public:
         // HDR
         glb::render::Render::SetHighLightBase(1.5f);
 
-        int32_t level = glb::scene::Scene::AddObject("res/level0.obj", "res/level0.mg");
+        int32_t level = glb::scene::Scene::AddObject("res/level0.obj", "res/level0.mat");
         glb::scene::Scene::GetObjectById(level)->SetCullFaceEnable(true);
         glb::scene::Scene::GetObjectById(level)->SetCullFaceMode(glb::render::CULL_BACK);
         glb::scene::Scene::GetObjectById(level)->SetDepthTestEnable(true);
@@ -58,7 +58,7 @@ public:
 
 #if ENABLE_INSTANCE_RENDERING
         {  // Using Geometry Instance Rendering
-            int32_t cube = glb::scene::Scene::AddInstanceRenderObject("res/cube.obj", "res/cube.mg", kInstanceNum * kInstanceNum);
+            int32_t cube = glb::scene::Scene::AddInstanceRenderObject("res/cube.obj", "res/cube.mat", kInstanceNum * kInstanceNum);
             glb::scene::Scene::GetObjectById(cube)->SetCullFaceEnable(true);
             glb::scene::Scene::GetObjectById(cube)->SetCullFaceMode(glb::render::CULL_BACK);
             glb::scene::Scene::GetObjectById(cube)->SetDepthTestEnable(true);

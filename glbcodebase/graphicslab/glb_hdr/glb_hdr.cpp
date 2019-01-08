@@ -42,19 +42,19 @@ public:
 
         //glb::scene::Scene::AddSkyObject("sky.obj");
 
-        int32_t floor = glb::scene::Scene::AddObject("res/floor.obj", "res/floor.mg");
+        int32_t floor = glb::scene::Scene::AddObject("res/floor.obj", "res/floor.mat");
         glb::scene::Scene::GetObjectById(floor)->SetCullFaceEnable(true);
         glb::scene::Scene::GetObjectById(floor)->SetCullFaceMode(glb::render::CULL_BACK);
         glb::scene::Scene::GetObjectById(floor)->SetDepthTestEnable(true);
         glb::scene::Scene::GetObjectById(floor)->SetWorldMatrix(math::Matrix::CreateIdentityMatrix());
 
-        int32_t cube = glb::scene::Scene::AddObject("res/cube.obj", "res/cube.mg");
+        int32_t cube = glb::scene::Scene::AddObject("res/cube.obj", "res/cube.mat");
         glb::scene::Scene::GetObjectById(cube)->SetCullFaceEnable(true);
         glb::scene::Scene::GetObjectById(cube)->SetCullFaceMode(glb::render::CULL_BACK);
         glb::scene::Scene::GetObjectById(cube)->SetDepthTestEnable(true);
         glb::scene::Scene::GetObjectById(cube)->SetWorldMatrix(math::Matrix::CreateTranslateMatrix(70.0f, 50.0f, 0.0f));
 
-        cube = glb::scene::Scene::AddObject("res/cube.obj", "res/cube.mg");
+        cube = glb::scene::Scene::AddObject("res/cube.obj", "res/cube.mat");
         glb::scene::Scene::GetObjectById(cube)->SetCullFaceEnable(true);
         glb::scene::Scene::GetObjectById(cube)->SetCullFaceMode(glb::render::CULL_BACK);
         glb::scene::Scene::GetObjectById(cube)->SetDepthTestEnable(true);

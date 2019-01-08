@@ -48,7 +48,7 @@ public:
         render::Render::SetHighLightBase(0.95f);
 
         // Add ground
-        int32_t ground = scene::Scene::AddObject("res/level0.obj", "res/level0.mg");
+        int32_t ground = scene::Scene::AddObject("res/level0.obj", "res/level0.mat");
         scene::Object* obj = scene::Scene::GetObjectById(ground);
         obj->SetCullFaceEnable(true);
         obj->SetCullFaceMode(render::CULL_BACK);
@@ -59,7 +59,7 @@ public:
         for (int32_t i = 0; i < num; i++) {
             for (int32_t j = 0; j < num; j++) {
                 // Add object
-                int32_t tree_header = scene::Scene::AddObject("res/coreRot.obj", "res/coreRot.mg");
+                int32_t tree_header = scene::Scene::AddObject("res/coreRot.obj", "res/coreRot.mat");
                 scene::Object* obj = scene::Scene::GetObjectById(tree_header);
                 obj->SetCullFaceEnable(true);
                 obj->SetCullFaceMode(render::CULL_BACK);

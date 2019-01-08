@@ -41,7 +41,7 @@ public:
         render::Render::SetHighLightBase(0.9f);
 
         // Objects
-        int32_t cube = scene::Scene::AddObject("res/cube.obj", "res/cube.mg");
+        int32_t cube = scene::Scene::AddObject("res/cube.obj", "res/cube.mat");
         scene::Scene::GetObjectById(cube)->SetCullFaceEnable(true);
         scene::Scene::GetObjectById(cube)->SetCullFaceMode(glb::render::CULL_BACK);
         scene::Scene::GetObjectById(cube)->SetDepthTestEnable(true);

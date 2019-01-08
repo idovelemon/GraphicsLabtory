@@ -1,8 +1,10 @@
+beginpass lightloop
 shader res/normal.vs res/glb_normal.fs
-parameter glb_unif_AlbedoTex res/bathroomtile_basecolor.dds
-parameter glb_unif_RoughnessTex res/bathroomtile_roughness.dds
-parameter glb_unif_MetallicTex res/bathroomtile_metallic.dds
-parameter glb_unif_NormalTex res/bathroomtile_normal.dds
-parameter glb_unif_SpecularPFCLOD 7.0
-parameter glb_unif_DiffusePFCTex res/diffuse.pfc
-parameter glb_unif_SpecularPFCTex res/specular.pfc
+passparameter glb_unif_AlbedoTex res/bathroomtile_basecolor.dds
+passparameter glb_unif_RoughnessTex res/bathroomtile_roughness.dds
+passparameter glb_unif_MetallicTex res/bathroomtile_metallic.dds
+passparameter glb_unif_NormalTex res/bathroomtile_normal.dds
+passparameter glb_unif_SpecularPFCLOD 7.0
+passparameter glb_unif_DiffusePFCTex res/diffuse.pfc
+passparameter glb_unif_SpecularPFCTex res/specular.pfc
+endpass
