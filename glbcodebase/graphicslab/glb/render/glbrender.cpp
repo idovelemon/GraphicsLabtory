@@ -1093,17 +1093,15 @@ void RenderImp::SetupInternalMaterialParameters() {
             if (obj->GetObjectType() == scene::Object::OBJECT_TYPE_NORMAL
                 || obj->GetObjectType() == scene::Object::OBJECT_TYPE_INSTANCE_RENDER
                 || obj->GetObjectType() == scene::Object::OBJECT_TYPE_DECAL) {
-                material::MaterialGroup group = obj->GetMaterialGroup();
+                material::Material* material = obj->GetMaterial();
 
                 // Loop every pass material
-                std::vector<material::MaterialGroup::Entry> allPassMaterials = group.GetAllPassMaterial();
+                std::vector<material::PassMaterial*> allPassMaterials = material->GetAllPassMaterial();
                 for (auto& pass : allPassMaterials) {
-                    material::Material* mat = material::Mgr::GetMaterial(pass.materialID);
-
                     // Loop every internal parameters
-                    std::vector<material::Material::ParameterEntry>& parameters = mat->GetAllParameters();
+                    std::vector<material::PassMaterial::ParameterEntry>& parameters = pass->GetAllParameters();
                     for (auto& entry : parameters) {
-                        if (entry.type == material::Material::PARAMETER_TYPE_INTERNAL) {
+                        if (entry.type == material::PassMaterial::PARAMETER_TYPE_INTERNAL) {
                             // Find match picker
                             for (auto& pick : uniform::kEngineUniforms) {
                                 if (!strcmp(entry.name, pick.name)) {
@@ -1177,7 +1175,7 @@ void RenderImp::SplitShadowReceivers() {
     std::vector<scene::Object*>::iterator it = objs.begin();
     for (; it != objs.end();) {
         scene::Object* obj = *it;
-        if (!obj->GetMaterialGroup().IsReceiveShadowEnable() || !obj->IsDrawEnable()) {
+        if (!obj->GetMaterial()->IsReceiveShadowEnable() || !obj->IsDrawEnable()) {
             it = objs.erase(it);
         } else {
             ++it;
@@ -1280,7 +1278,7 @@ void RenderImp::SplitShadowCasters(math::Matrix light_space_to_world_space) {
     std::vector<scene::Object*>::iterator it = objs.begin();
     for (; it != objs.end();) {
         scene::Object* obj = *it;
-        if (!obj->GetMaterialGroup().IsCastShadowEnable() || !obj->IsDrawEnable() || obj->GetObjectType() == scene::Object::OBJECT_TYPE_INSTANCE_RENDER) {
+        if (!obj->GetMaterial()->IsCastShadowEnable() || !obj->IsDrawEnable() || obj->GetObjectType() == scene::Object::OBJECT_TYPE_INSTANCE_RENDER) {
             it = objs.erase(it);
         } else {
             ++it;
@@ -1454,26 +1452,23 @@ void RenderImp::PreDrawShadowMapCore() {
         if (objs[i]->GetObjectType() == scene::Object::OBJECT_TYPE_INSTANCE) continue;
         if (objs[i]->GetObjectType() == scene::Object::OBJECT_TYPE_DECAL) continue;
 
-        material::MaterialGroup group = objs[i]->GetMaterialGroup();
-        if (!group.IsCastShadowEnable()) continue;
+        material::Material* material = objs[i]->GetMaterial();
+        if (!material->IsCastShadowEnable()) continue;
 
         // Only deal with light loop material
-        int32_t materialID = group.GetPassMaterial(kShadowPassName);
-        if (materialID != -1) {
-            material::Material* material = material::Mgr::GetMaterial(materialID);
-            if (material) {
-                int32_t shaderID = material->GetShaderID();
-                std::map<int32_t, ShaderGroup>::iterator it = opaqueGroup.find(shaderID);
-                if (it != opaqueGroup.end()) {
-                    it->second.AddObject(objs[i]);
-                } else {
-                    ShaderGroup newGroup(shader::Mgr::GetShader(shaderID));
-                    newGroup.AddObject(objs[i]);
-                    opaqueGroup.insert(std::pair<int32_t, ShaderGroup>(shaderID, newGroup));
-                }
+        material::PassMaterial* passMaterial = material->GetPassMaterial(kShadowPassName);
+        if (passMaterial != nullptr) {
+            int32_t shaderID = passMaterial->GetShaderID();
+            std::map<int32_t, ShaderGroup>::iterator it = opaqueGroup.find(shaderID);
+            if (it != opaqueGroup.end()) {
+                it->second.AddObject(objs[i]);
             } else {
-                GLB_SAFE_ASSERT(false);
+                ShaderGroup newGroup(shader::Mgr::GetShader(shaderID));
+                newGroup.AddObject(objs[i]);
+                opaqueGroup.insert(std::pair<int32_t, ShaderGroup>(shaderID, newGroup));
             }
+        } else {
+            GLB_SAFE_ASSERT(false);
         }
     }
 
@@ -1690,7 +1685,7 @@ void RenderImp::DrawShadowMapNormal() {
             }
 
             // Material Parameters
-            material::Material* material = material::Mgr::GetMaterial(obj->GetMaterialGroup().GetPassMaterial(kShadowPassName));
+            material::PassMaterial* material = obj->GetMaterial()->GetPassMaterial(kShadowPassName);
             int32_t texUnit = 0;
             for (auto& param : material->GetAllParameters()) {
                 // Special case: glb_unif_ShadowMIndex
@@ -1773,26 +1768,23 @@ void RenderImp::PreDrawDecalMap() {
     for (int32_t i = 0; i < static_cast<int32_t>(objs.size()); i++) {
         if (objs[i]->GetObjectType() != scene::Object::OBJECT_TYPE_DECAL) continue;
 
-        material::MaterialGroup group = objs[i]->GetMaterialGroup();
+        material::Material* material = objs[i]->GetMaterial();
 
         // Only deal with light loop material
-        int32_t materialID = group.GetPassMaterial(kDecalPassName);
-        if (materialID != -1) {
-            material::Material* material = material::Mgr::GetMaterial(materialID);
-            if (material) {
-                int32_t shaderID = material->GetShaderID();
-                std::map<int32_t, ShaderGroup>::iterator it = opaqueGroup.find(shaderID);
-                if (it != opaqueGroup.end()) {
-                    it->second.AddObject(objs[i]);
-                } else {
-                    ShaderGroup newGroup(shader::Mgr::GetShader(shaderID));
-                    newGroup.AddObject(objs[i]);
-                    opaqueGroup.insert(std::pair<int32_t, ShaderGroup>(shaderID, newGroup));
-                }
+        material::PassMaterial* passMaterial = material->GetPassMaterial(kDecalPassName);
+        if (passMaterial != nullptr) {
+            int32_t shaderID = passMaterial->GetShaderID();
+            std::map<int32_t, ShaderGroup>::iterator it = opaqueGroup.find(shaderID);
+            if (it != opaqueGroup.end()) {
+                it->second.AddObject(objs[i]);
             } else {
+                ShaderGroup newGroup(shader::Mgr::GetShader(shaderID));
+                newGroup.AddObject(objs[i]);
+                opaqueGroup.insert(std::pair<int32_t, ShaderGroup>(shaderID, newGroup));
+            }
+        } else {
                 GLB_SAFE_ASSERT(false);
             }
-        }
     }
 
     // Copy shader group
@@ -1868,7 +1860,7 @@ void RenderImp::DrawDecalMapCore() {
             }
 
             // Material Parameters
-            material::Material* material = material::Mgr::GetMaterial(obj->GetMaterialGroup().GetPassMaterial(kDecalPassName));
+            material::PassMaterial* material = obj->GetMaterial()->GetPassMaterial(kDecalPassName);
             int32_t texUnit = 0;
             for (auto& param : material->GetAllParameters()) {
                 // Special case: glb_unif_ProjM
@@ -1958,25 +1950,22 @@ void RenderImp::PreDrawLightLoop() {
         if (objs[i]->GetObjectType() == scene::Object::OBJECT_TYPE_INSTANCE) continue;
         if (objs[i]->GetObjectType() == scene::Object::OBJECT_TYPE_DECAL) continue;
 
-        material::MaterialGroup group = objs[i]->GetMaterialGroup();
+        material::Material* material = objs[i]->GetMaterial();
 
         // Only deal with light loop material
-        int32_t materialID = group.GetPassMaterial(kLightLoopPassName);
-        if (materialID != -1) {
-            material::Material* material = material::Mgr::GetMaterial(materialID);
-            if (material) {
-                int32_t shaderID = material->GetShaderID();
-                std::map<int32_t, ShaderGroup>::iterator it = opaqueGroup.find(shaderID);
-                if (it != opaqueGroup.end()) {
-                    it->second.AddObject(objs[i]);
-                } else {
-                    ShaderGroup newGroup(shader::Mgr::GetShader(shaderID));
-                    newGroup.AddObject(objs[i]);
-                    opaqueGroup.insert(std::pair<int32_t, ShaderGroup>(shaderID, newGroup));
-                }
+        material::PassMaterial* passMaterial = material->GetPassMaterial(kLightLoopPassName);
+        if (passMaterial) {
+            int32_t shaderID = passMaterial->GetShaderID();
+            std::map<int32_t, ShaderGroup>::iterator it = opaqueGroup.find(shaderID);
+            if (it != opaqueGroup.end()) {
+                it->second.AddObject(objs[i]);
             } else {
-                GLB_SAFE_ASSERT(false);
+                ShaderGroup newGroup(shader::Mgr::GetShader(shaderID));
+                newGroup.AddObject(objs[i]);
+                opaqueGroup.insert(std::pair<int32_t, ShaderGroup>(shaderID, newGroup));
             }
+        } else {
+            GLB_SAFE_ASSERT(false);
         }
     }
 
@@ -2017,7 +2006,7 @@ void RenderImp::DrawLightLoopCore() {
             }
 
             // Material Parameters
-            material::Material* material = material::Mgr::GetMaterial(obj->GetMaterialGroup().GetPassMaterial(kLightLoopPassName));
+            material::PassMaterial* material = obj->GetMaterial()->GetPassMaterial(kLightLoopPassName);
             int32_t texUnit = 0;
             for (auto& param : material->GetAllParameters()) {
                 if (param.format == PARAMETER_FORMAT_FLOAT) {

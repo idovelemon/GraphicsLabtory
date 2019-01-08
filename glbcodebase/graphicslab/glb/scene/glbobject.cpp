@@ -22,6 +22,7 @@ Object::Object()
 , m_IsDead(false)
 , m_ObjectId(-1)
 , m_Mesh(nullptr)
+, m_Material(nullptr)
 , m_WorldMatrix()
 , m_EnableDraw(true)
 , m_EnableCullFace(false)
@@ -32,6 +33,7 @@ Object::Object()
 
 Object::~Object() {
     m_Mesh = nullptr;
+    m_Material = nullptr;
 }
 
 Object* Object::Create(const char* fileName, math::Vector pos, math::Vector scale, math::Vector rotation) {
@@ -69,9 +71,9 @@ Object* Object::Create(const char* meshFile, const char* materialGroupFile, math
         mesh = render::mesh::Mgr::GetMeshById(render::mesh::Mgr::AddMesh(meshFile));
     }
 
-    render::material::MaterialGroup group;
+    render::material::Material* material;
     if (materialGroupFile) {
-        group = render::material::Mgr::AddMaterialGroup(materialGroupFile);
+        material = render::material::Mgr::GetMaterial(render::material::Mgr::AddMaterial(materialGroupFile));
     } else {
         GLB_SAFE_ASSERT(false);
     }
@@ -80,7 +82,7 @@ Object* Object::Create(const char* meshFile, const char* materialGroupFile, math
         obj = new Object();
         if (obj) {
             obj->m_Mesh = mesh;
-            obj->m_MaterialGroup = group;
+            obj->m_Material = material;
             obj->m_WorldMatrix.MakeIdentityMatrix();
         } else {
             GLB_SAFE_ASSERT(false);
@@ -164,8 +166,8 @@ void Object::SetWorldMatrix(math::Matrix worldMatrix) {
     m_WorldMatrix = worldMatrix;
 }
 
-render::material::MaterialGroup Object::GetMaterialGroup() {
-    return m_MaterialGroup;
+render::material::Material* Object::GetMaterial() {
+    return m_Material;
 }
 
 void Object::SetDrawEnable(bool enable) {
@@ -276,13 +278,13 @@ DecalObject* DecalObject::Create(const char* meshFile, const char* materialFile,
             mesh = render::mesh::Mgr::GetMeshById(render::mesh::Mgr::AddMesh(meshFile));
         }
 
-        render::material::MaterialGroup group = render::material::MaterialGroup::Create(materialFile);
+        render::material::Material* material = render::material::Material::Create(materialFile);
 
-        if (mesh && group.GetPassMaterial(render::kDecalPassName) != -1) {
+        if (mesh && material->GetPassMaterial(render::kDecalPassName) != nullptr) {
             obj = new DecalObject();
             if (obj) {
                 obj->m_Mesh = mesh;
-                obj->m_MaterialGroup = group;
+                obj->m_Material = material;
                 obj->m_WorldMatrix.MakeIdentityMatrix();
             } else {
                 GLB_SAFE_ASSERT(false);
@@ -342,12 +344,12 @@ InstanceRenderObject* InstanceRenderObject::Create(const char* meshFile, const c
             mesh = render::mesh::Mgr::GetMeshById(render::mesh::Mgr::AddInstanceMesh(meshFile, maxInstance));
         }
 
-        render::material::MaterialGroup group = render::material::MaterialGroup::Create(materialFile);
+        render::material::Material* material = render::material::Material::Create(materialFile);
 
         if (mesh) {
             obj = new InstanceRenderObject();
             obj->m_Mesh = mesh;
-            obj->m_MaterialGroup = group;
+            obj->m_Material = material;
             obj->m_MaxInstanceNum = maxInstance;
             obj->m_MatrixBuf = new float[maxInstance * 16 * 2];  // WorldMatrix and TransInvWorldMatrix
         } else {
@@ -486,14 +488,14 @@ math::Vector InstanceObject::GetBoundBoxMin() {
     return boxMin;
 }
 
-render::material::MaterialGroup InstanceObject::GetMaterialGroup() {
-    render::material::MaterialGroup group;
+render::material::Material* InstanceObject::GetMaterial() {
+    render::material::Material* material = nullptr;
 
     if (m_InstanceRenderObject) {
-        group = m_InstanceRenderObject->GetMaterialGroup();
+        material = m_InstanceRenderObject->GetMaterial();
     }
 
-    return group;
+    return material;
 }
 
 void InstanceObject::Update() {

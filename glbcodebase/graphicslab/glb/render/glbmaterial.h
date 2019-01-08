@@ -42,9 +42,9 @@ static const int32_t kMaxPassNameLength = 64;
 //----------------------------------------------------------------------------------
 
 //-----------------------------------------------------------------------------------
-// Material DECLARATION
+// PassMaterial DECLARATION
 //----------------------------------------------------------------------------------
-class Material {
+class PassMaterial {
 public:
     enum {
         PARAMETER_TYPE_INTERNAL = 0,  // Internal parameter is setted by GLB itself, user can not set it directly
@@ -72,18 +72,10 @@ public:
     };
 
 public:
-    static Material* Create(const char* materialName);
-
-public:
-    Material(int32_t shaderID);
-    virtual~ Material();
-
-    virtual void SetMaterialID(int32_t id);
-    virtual int32_t GetMaterialID() const;
+    PassMaterial();
+    virtual~ PassMaterial();
 
     virtual int32_t GetShaderID() const;
-
-    virtual const char* GetMaterialName() const;
 
     virtual void SetFloatParameterByName(const char* name, float value);
     virtual float GetFloatParameterByName(const char* name) const;
@@ -114,42 +106,41 @@ protected:
     void CollectParameter();
 
 protected:
-    int32_t                             m_ID;
     int32_t                             m_ShaderID;
-    char                                m_MaterialName[kMaterialFileNameMaxLength];
+    char                                m_PassName[kMaxPassNameLength];
     std::vector<ParameterEntry>         m_Parameters;
+
+    friend class Material;
 };
 
 //-----------------------------------------------------------------------------------
-// MaterialGroup DECLARATION
-// note: MaterialGroup store all material that will be used in all pass rendering
+// Material DECLARATION
 //----------------------------------------------------------------------------------
-class MaterialGroup {
+class Material {
 public:
-    struct Entry {
-        char name[kMaxPassNameLength];
-        int32_t materialID;
-    };
+    static Material* Create(const char* materialFile);
 
 public:
-    static MaterialGroup Create(const char* groupFile);
+    Material();
+    virtual ~Material();
 
-public:
-    MaterialGroup();
-    MaterialGroup(const MaterialGroup& group);
-    virtual ~MaterialGroup();
+    virtual void SetMaterialID(int32_t id);
+    virtual int32_t GetMaterialID() const;
 
-    void AddPassMaterial(const char* passName, int32_t materialID);
-    int32_t GetPassMaterial(const char* passName);
-    std::vector<Entry> GetAllPassMaterial();
+    virtual const char* GetMaterialName() const;
 
-    bool IsCastShadowEnable() const;
-    bool IsReceiveShadowEnable() const;
+    virtual PassMaterial* GetPassMaterial(const char* passName);
+    virtual std::vector<PassMaterial*>& GetAllPassMaterial();
+
+    virtual bool IsCastShadowEnable() const;
+    virtual bool IsReceiveShadowEnable() const;
 
 protected:
-    std::vector<Entry>      m_AllPassMaterial;
-    bool                    m_EnableCastShadow;
-    bool                    m_EnableReceiveShadow;
+    int32_t                         m_ID;
+    char                            m_MaterialName[kMaterialFileNameMaxLength];
+    std::vector<PassMaterial*>      m_AllPassMaterial;
+    bool                            m_EnableCastShadow;
+    bool                            m_EnableReceiveShadow;
 };
 
 //-----------------------------------------------------------------------------------
@@ -167,7 +158,6 @@ class Mgr {
      // Otherwise, return -1.
      //-------------------------------------------------------------------
      static int32_t AddMaterial(const char* materialName);
-     static MaterialGroup AddMaterialGroup(const char* materialGroupName);
 
      //-------------------------------------------------------------------
      // @brief: Get the material from manager

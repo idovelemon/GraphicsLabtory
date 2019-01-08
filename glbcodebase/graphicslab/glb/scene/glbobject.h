@@ -75,7 +75,7 @@ public:
     virtual math::Matrix GetWorldMatrix() const;
     virtual void SetWorldMatrix(math::Matrix worldMatrix);
 
-    virtual render::material::MaterialGroup GetMaterialGroup();
+    virtual render::material::Material* GetMaterial();
 
     virtual void SetDrawEnable(bool enable);
     virtual bool IsDrawEnable();
@@ -100,7 +100,7 @@ protected:
     int32_t                         m_ObjectId;
     bool                            m_IsDead;
     render::mesh::MeshBase*         m_Mesh;
-    render::material::MaterialGroup m_MaterialGroup;
+    render::material::Material*     m_Material;
     math::Matrix                    m_WorldMatrix;
 
     bool                            m_EnableDraw;
@@ -163,7 +163,7 @@ public:
     virtual math::Vector GetBoundBoxMax();
     virtual math::Vector GetBoundBoxMin();
 
-    virtual render::material::MaterialGroup GetMaterialGroup();
+    virtual render::material::Material* GetMaterial() override;
 
     virtual void Update();
     virtual void ClearInstanceRenderObject();

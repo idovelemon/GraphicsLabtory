@@ -50,7 +50,6 @@ public:
     void Destroy();
 
     int32_t AddMaterial(const char* name);
-    MaterialGroup AddMaterialGroup(const char* name);
     Material* GetMaterial(int32_t id);
     int32_t GetMaterialCount();
 
@@ -69,33 +68,255 @@ protected:
 //-----------------------------------------------------------------------------------
 // MgrImp DEFINITION
 //-----------------------------------------------------------------------------------
-Material* Material::Create(const char* materialName) {
-    Material* result = nullptr;
+PassMaterial::PassMaterial()
+: m_ShaderID(-1) {
+    memset(m_PassName, 0, sizeof(m_PassName));
+    m_Parameters.clear();
+}
+
+PassMaterial::~PassMaterial() {
+}
+
+int32_t PassMaterial::GetShaderID() const {
+    return m_ShaderID;
+}
+
+void PassMaterial::SetFloatParameterByName(const char* name, float value) {
+    for (auto& Entry : m_Parameters) {
+        if (!strcmp(Entry.name, name) && Entry.type == PARAMETER_TYPE_USER) {
+            Entry.floatValue = value;
+            break;
+        }
+    }
+}
+
+float PassMaterial::GetFloatParameterByName(const char* name) const {
+    float result = 0.0f;
+
+    for (auto& Entry : m_Parameters) {
+        if (!strcmp(Entry.name, name)) {
+            result = Entry.floatValue;
+            break;
+        }
+    }
+
+    return result;
+}
+
+void PassMaterial::SetIntParameterByName(const char* name, int32_t value) {
+    for (auto& Entry : m_Parameters) {
+        if (!strcmp(Entry.name, name) && Entry.type == PARAMETER_TYPE_USER) {
+            Entry.intValue = value;
+            break;
+        }
+    }
+}
+
+int32_t PassMaterial::GetIntParameterByName(const char* name) const {
+    int32_t result = 0;
+
+    for (auto& Entry : m_Parameters) {
+        if (!strcmp(Entry.name, name)) {
+            result = Entry.intValue;
+            break;
+        }
+    }
+
+    return result;
+}
+
+void PassMaterial::SetVectorParameterByName(const char* name, math::Vector value) {
+    for (auto& Entry : m_Parameters) {
+        if (!strcmp(Entry.name, name) && Entry.type == PARAMETER_TYPE_USER) {
+            Entry.vecValue = value;
+            break;
+        }
+    }
+}
+
+math::Vector PassMaterial::GetVectorParameterByName(const char* name) const {
+    math::Vector result(0.0f, 0.0f, 0.0f);
+
+    for (auto& Entry : m_Parameters) {
+        if (!strcmp(Entry.name, name)) {
+            result = Entry.vecValue;
+            break;
+        }
+    }
+
+    return result;
+}
+
+void PassMaterial::SetTextureParameterByName(const char* name, int32_t textureID) {
+    for (auto& Entry : m_Parameters) {
+        if (!strcmp(Entry.name, name) && Entry.type == PARAMETER_TYPE_USER) {
+            Entry.intValue = textureID;
+            break;
+        }
+    }
+}
+
+int32_t PassMaterial::GetTextureParameterByName(const char* name) const {
+    int32_t result = 0;
+
+    for (auto& Entry : m_Parameters) {
+        if (!strcmp(Entry.name, name)) {
+            result = Entry.intValue;
+            break;
+        }
+    }
+
+    return result;
+}
+
+void PassMaterial::SetMatrixParameterByName(const char* name, math::Matrix value) {
+    for (auto& Entry : m_Parameters) {
+        if (!strcmp(Entry.name, name) && Entry.type == PARAMETER_TYPE_USER) {
+            Entry.matValue = value;
+            break;
+        }
+    }
+}
+
+math::Matrix PassMaterial::GetMatrixParameterByName(const char* name) const {
+    math::Matrix result = math::Matrix::CreateIdentityMatrix();
+
+    for (auto& Entry : m_Parameters) {
+        if (!strcmp(Entry.name, name)) {
+            result = Entry.matValue;
+            break;
+        }
+    }
+
+    return result;
+}
+
+PassMaterial::ParameterEntry& PassMaterial::GetParameterByName(const char* name) {
+    static ParameterEntry emptyParameter;
+
+    for (auto& Entry : m_Parameters) {
+        if (!strcmp(name, Entry.name)) {
+            return Entry;
+        }
+    }
+
+    return emptyParameter;
+}
+
+std::vector<PassMaterial::ParameterEntry>& PassMaterial::GetAllParameters() {
+    return m_Parameters;
+}
+
+void PassMaterial::SetInternalFloatParameterByName(const char* name, float value) {
+    for (auto& Entry : m_Parameters) {
+        if (!strcmp(Entry.name, name) && Entry.type == PARAMETER_TYPE_INTERNAL) {
+            Entry.floatValue = value;
+            break;
+        }
+    }
+}
+
+void PassMaterial::SetInternalIntParameterByName(const char* name, int32_t value) {
+    for (auto& Entry : m_Parameters) {
+        if (!strcmp(Entry.name, name) && Entry.type == PARAMETER_TYPE_INTERNAL) {
+            Entry.intValue = value;
+            break;
+        }
+    }
+}
+
+void PassMaterial::SetInternalVectorParameterByName(const char* name, math::Vector value) {
+    for (auto& Entry : m_Parameters) {
+        if (!strcmp(Entry.name, name) && Entry.type == PARAMETER_TYPE_INTERNAL) {
+            Entry.vecValue = value;
+            break;
+        }
+    }
+}
+
+void PassMaterial::SetInternalTextureParameterByName(const char* name, int32_t textureID) {
+    for (auto& Entry : m_Parameters) {
+        if (!strcmp(Entry.name, name) && Entry.type == PARAMETER_TYPE_INTERNAL) {
+            Entry.intValue = textureID;
+            break;
+        }
+    }
+}
+
+void PassMaterial::SetInternalMatrixParameterByName(const char* name, math::Matrix value) {
+    for (auto& Entry : m_Parameters) {
+        if (!strcmp(Entry.name, name) && Entry.type == PARAMETER_TYPE_INTERNAL) {
+            Entry.matValue = value;
+            break;
+        }
+    }
+}
+
+void PassMaterial::CollectParameter() {
+    shader::Program* shader = shader::Mgr::GetShader(m_ShaderID);
+    if (shader) {
+        std::vector<ShaderParameter> parameters = shader->GetProgramParameter();
+        for (auto& param : parameters) {
+            ParameterEntry entry;
+            entry.type = uniform::IsInternalParameter(param.name) ? PARAMETER_TYPE_INTERNAL : PARAMETER_TYPE_USER;
+            entry.format = param.format;
+            memcpy(entry.name, param.name, strlen(param.name));
+            entry.name[strlen(param.name)] = '\0';
+
+            // TEST
+            if (!strcmp(entry.name, "glb_unif_AlbedoTex")
+                || !strcmp(entry.name, "glb_unif_RoughnessTex")
+                || !strcmp(entry.name, "glb_unif_MetallicTex")
+                || !strcmp(entry.name, "glb_unif_NormalTex")
+                || !strcmp(entry.name, "glb_unif_EmissionTex")
+                || !strcmp(entry.name, "glb_unif_DiffusePFCTex")
+                || !strcmp(entry.name, "glb_unif_SpecularPFCTex")
+                || !strcmp(entry.name, "glb_unif_SpecularPFCLOD")) {
+                entry.type = PARAMETER_TYPE_USER;
+            }
+            m_Parameters.push_back(entry);
+        }
+    }
+}
+
+//-----------------------------------------------------------------------------------
+// Material DEFINITION
+//----------------------------------------------------------------------------------
+Material* Material::Create(const char* materialFile) {
+    Material* result = new Material;
 
     std::ifstream input;
-    input.open(materialName);
+    input.open(materialFile);
 
     if (!input.fail()) {
-        result = new Material(-1);
-        memcpy(result->m_MaterialName, materialName, strlen(materialName));
-        result->m_MaterialName[strlen(materialName)] = '\0';
+        PassMaterial* newPassMaterial = nullptr;
 
         while (!input.eof()) {
             char buffer[kMaterialKeywordMaxLength];
             input >> buffer;
 
-            // "shader" must be in head line of file
-            if (!strcmp(buffer, "shader")) {
+            // beginpass passname
+            if (!strcmp(buffer, "beginpass")) {
+                newPassMaterial = new PassMaterial;
+
+                // Pass Name
+                input >> newPassMaterial->m_PassName;
+
+            } else if (!strcmp(buffer, "endpass")) {
+                // Save pass material
+                result->m_AllPassMaterial.push_back(newPassMaterial);
+                newPassMaterial = nullptr;
+            } else if (!strcmp(buffer, "shader")) {
                 char vertexShaderFile[kShaderFileNameMaxLength];
                 char fragmentShaderFile[kShaderFileNameMaxLength];
                 input >> vertexShaderFile >> fragmentShaderFile;
 
-                result->m_ShaderID = shader::Mgr::AddUberShader(vertexShaderFile, fragmentShaderFile);
-                result->CollectParameter();
-            } else if (!strcmp(buffer, "parameter")) {
+                newPassMaterial->m_ShaderID = shader::Mgr::AddUberShader(vertexShaderFile, fragmentShaderFile);
+                newPassMaterial->CollectParameter();
+            } else if (!strcmp(buffer, "passparameter")) {
                 // Parameter Name
                 input >> buffer;
-                ParameterEntry& entry = result->GetParameterByName(buffer);
+                PassMaterial::ParameterEntry& entry = newPassMaterial->GetParameterByName(buffer);
 
                 if (entry.format == PARAMETER_FORMAT_FLOAT) {
                     input >> entry.floatValue;
@@ -126,8 +347,28 @@ Material* Material::Create(const char* materialName) {
                 } else {
                     GLB_SAFE_ASSERT(false);
                 }
+            } else if (!strcmp(buffer, "materialparameter")) {
+                // Parameter Name
+                input >> buffer;
+                if (!strcmp(buffer, "castshadow")) {
+                    int32_t enable = 0;
+                    input >> enable;
+                    if (enable == 0) {
+                        result->m_EnableCastShadow = false;
+                    } else {
+                        result->m_EnableCastShadow = true;
+                    }
+                } else if (!strcmp(buffer, "receiveshadow")) {
+                    int32_t enable = 0;
+                    input >> enable;
+                    if (enable == 0) {
+                        result->m_EnableReceiveShadow = false;
+                    } else {
+                        result->m_EnableReceiveShadow = true;
+                    }
+                }
             } else {
-                std::string msg = materialName;
+                std::string msg = materialFile;
                 msg += " invalid keyword [";
                 msg += buffer;
                 msg += "]";
@@ -135,7 +376,7 @@ Material* Material::Create(const char* materialName) {
             }
         }
     } else {
-        GLB_SAFE_ASSERT_LOG(false, materialName);
+        GLB_SAFE_ASSERT_LOG(false, materialFile);
     }
 
     input.close();
@@ -143,14 +384,20 @@ Material* Material::Create(const char* materialName) {
     return result;
 }
 
-Material::Material(int32_t shaderID)
+Material::Material()
 : m_ID(-1)
-, m_ShaderID(shaderID) {
-    m_Parameters.clear();
+, m_EnableCastShadow(false)
+, m_EnableReceiveShadow(false) {
     memset(m_MaterialName, 0, sizeof(m_MaterialName));
+    m_AllPassMaterial.clear();
 }
 
 Material::~Material() {
+    for (auto passMaterial : m_AllPassMaterial) {
+        GLB_SAFE_DELETE(passMaterial);
+    }
+
+    m_AllPassMaterial.clear();
 }
 
 void Material::SetMaterialID(int32_t id) {
@@ -161,29 +408,16 @@ int32_t Material::GetMaterialID() const {
     return m_ID;
 }
 
-int32_t Material::GetShaderID() const {
-    return m_ShaderID;
-}
-
 const char* Material::GetMaterialName() const {
     return m_MaterialName;
 }
 
-void Material::SetFloatParameterByName(const char* name, float value) {
-    for (auto& Entry : m_Parameters) {
-        if (!strcmp(Entry.name, name) && Entry.type == PARAMETER_TYPE_USER) {
-            Entry.floatValue = value;
-            break;
-        }
-    }
-}
+PassMaterial* Material::GetPassMaterial(const char* passName) {
+    PassMaterial* result = nullptr;
 
-float Material::GetFloatParameterByName(const char* name) const {
-    float result = 0.0f;
-
-    for (auto& Entry : m_Parameters) {
-        if (!strcmp(Entry.name, name)) {
-            result = Entry.floatValue;
+    for (auto& material : m_AllPassMaterial) {
+        if (!strcmp(material->m_PassName, passName)) {
+            result = material;
             break;
         }
     }
@@ -191,292 +425,15 @@ float Material::GetFloatParameterByName(const char* name) const {
     return result;
 }
 
-void Material::SetIntParameterByName(const char* name, int32_t value) {
-    for (auto& Entry : m_Parameters) {
-        if (!strcmp(Entry.name, name) && Entry.type == PARAMETER_TYPE_USER) {
-            Entry.intValue = value;
-            break;
-        }
-    }
-}
-
-int32_t Material::GetIntParameterByName(const char* name) const {
-    int32_t result = 0;
-
-    for (auto& Entry : m_Parameters) {
-        if (!strcmp(Entry.name, name)) {
-            result = Entry.intValue;
-            break;
-        }
-    }
-
-    return result;
-}
-
-void Material::SetVectorParameterByName(const char* name, math::Vector value) {
-    for (auto& Entry : m_Parameters) {
-        if (!strcmp(Entry.name, name) && Entry.type == PARAMETER_TYPE_USER) {
-            Entry.vecValue = value;
-            break;
-        }
-    }
-}
-
-math::Vector Material::GetVectorParameterByName(const char* name) const {
-    math::Vector result(0.0f, 0.0f, 0.0f);
-
-    for (auto& Entry : m_Parameters) {
-        if (!strcmp(Entry.name, name)) {
-            result = Entry.vecValue;
-            break;
-        }
-    }
-
-    return result;
-}
-
-void Material::SetTextureParameterByName(const char* name, int32_t textureID) {
-    for (auto& Entry : m_Parameters) {
-        if (!strcmp(Entry.name, name) && Entry.type == PARAMETER_TYPE_USER) {
-            Entry.intValue = textureID;
-            break;
-        }
-    }
-}
-
-int32_t Material::GetTextureParameterByName(const char* name) const {
-    int32_t result = 0;
-
-    for (auto& Entry : m_Parameters) {
-        if (!strcmp(Entry.name, name)) {
-            result = Entry.intValue;
-            break;
-        }
-    }
-
-    return result;
-}
-
-void Material::SetMatrixParameterByName(const char* name, math::Matrix value) {
-    for (auto& Entry : m_Parameters) {
-        if (!strcmp(Entry.name, name) && Entry.type == PARAMETER_TYPE_USER) {
-            Entry.matValue = value;
-            break;
-        }
-    }
-}
-
-math::Matrix Material::GetMatrixParameterByName(const char* name) const {
-    math::Matrix result = math::Matrix::CreateIdentityMatrix();
-
-    for (auto& Entry : m_Parameters) {
-        if (!strcmp(Entry.name, name)) {
-            result = Entry.matValue;
-            break;
-        }
-    }
-
-    return result;
-}
-
-Material::ParameterEntry& Material::GetParameterByName(const char* name) {
-    static ParameterEntry emptyParameter;
-
-    for (auto& Entry : m_Parameters) {
-        if (!strcmp(name, Entry.name)) {
-            return Entry;
-        }
-    }
-
-    return emptyParameter;
-}
-
-std::vector<Material::ParameterEntry>& Material::GetAllParameters() {
-    return m_Parameters;
-}
-
-void Material::SetInternalFloatParameterByName(const char* name, float value) {
-    for (auto& Entry : m_Parameters) {
-        if (!strcmp(Entry.name, name) && Entry.type == PARAMETER_TYPE_INTERNAL) {
-            Entry.floatValue = value;
-            break;
-        }
-    }
-}
-
-void Material::SetInternalIntParameterByName(const char* name, int32_t value) {
-    for (auto& Entry : m_Parameters) {
-        if (!strcmp(Entry.name, name) && Entry.type == PARAMETER_TYPE_INTERNAL) {
-            Entry.intValue = value;
-            break;
-        }
-    }
-}
-
-void Material::SetInternalVectorParameterByName(const char* name, math::Vector value) {
-    for (auto& Entry : m_Parameters) {
-        if (!strcmp(Entry.name, name) && Entry.type == PARAMETER_TYPE_INTERNAL) {
-            Entry.vecValue = value;
-            break;
-        }
-    }
-}
-
-void Material::SetInternalTextureParameterByName(const char* name, int32_t textureID) {
-    for (auto& Entry : m_Parameters) {
-        if (!strcmp(Entry.name, name) && Entry.type == PARAMETER_TYPE_INTERNAL) {
-            Entry.intValue = textureID;
-            break;
-        }
-    }
-}
-
-void Material::SetInternalMatrixParameterByName(const char* name, math::Matrix value) {
-    for (auto& Entry : m_Parameters) {
-        if (!strcmp(Entry.name, name) && Entry.type == PARAMETER_TYPE_INTERNAL) {
-            Entry.matValue = value;
-            break;
-        }
-    }
-}
-
-void Material::CollectParameter() {
-    shader::Program* shader = shader::Mgr::GetShader(m_ShaderID);
-    if (shader) {
-        std::vector<ShaderParameter> parameters = shader->GetProgramParameter();
-        for (auto& param : parameters) {
-            ParameterEntry entry;
-            entry.type = uniform::IsInternalParameter(param.name) ? PARAMETER_TYPE_INTERNAL : PARAMETER_TYPE_USER;
-            entry.format = param.format;
-            memcpy(entry.name, param.name, strlen(param.name));
-            entry.name[strlen(param.name)] = '\0';
-
-            // TEST
-            if (!strcmp(entry.name, "glb_unif_AlbedoTex")
-                || !strcmp(entry.name, "glb_unif_RoughnessTex")
-                || !strcmp(entry.name, "glb_unif_MetallicTex")
-                || !strcmp(entry.name, "glb_unif_NormalTex")
-                || !strcmp(entry.name, "glb_unif_EmissionTex")
-                || !strcmp(entry.name, "glb_unif_DiffusePFCTex")
-                || !strcmp(entry.name, "glb_unif_SpecularPFCTex")
-                || !strcmp(entry.name, "glb_unif_SpecularPFCLOD")) {
-                entry.type = PARAMETER_TYPE_USER;
-            }
-            m_Parameters.push_back(entry);
-        }
-    }
-}
-
-//-----------------------------------------------------------------------------------
-// MaterialGroup DEFINITION
-// note: MaterialGroup store all material that will be used in all pass rendering
-//----------------------------------------------------------------------------------
-MaterialGroup MaterialGroup::Create(const char* groupFile) {
-    MaterialGroup result;
-
-    std::ifstream input;
-    input.open(groupFile);
-
-    if (!input.fail()) {
-        while (!input.eof()) {
-            char buffer[kMaterialKeywordMaxLength];
-            input >> buffer;
-
-            // pass passname materialname
-            if (!strcmp(buffer, "pass")) {
-                // Pass Name
-                Entry entry;
-                input >> entry.name;
-
-                // Material Name
-                input >> buffer;
-                entry.materialID = Mgr::AddMaterial(buffer);
-
-                result.m_AllPassMaterial.push_back(entry);
-            } else if (!strcmp(buffer, "parameter")) {
-                // Parameter Name
-                input >> buffer;
-                if (!strcmp(buffer, "castshadow")) {
-                    int32_t enable = 0;
-                    input >> enable;
-                    if (enable == 0) {
-                        result.m_EnableCastShadow = false;
-                    } else {
-                        result.m_EnableCastShadow = true;
-                    }
-                } else if (!strcmp(buffer, "receiveshadow")) {
-                    int32_t enable = 0;
-                    input >> enable;
-                    if (enable == 0) {
-                        result.m_EnableReceiveShadow = false;
-                    } else {
-                        result.m_EnableReceiveShadow = true;
-                    }
-                }
-            } else {
-                std::string msg = groupFile;
-                msg += " invalid keyword [";
-                msg += buffer;
-                msg += "]";
-                GLB_SAFE_ASSERT_LOG(false, msg.c_str());
-            }
-        }
-    } else {
-        GLB_SAFE_ASSERT_LOG(false, groupFile);
-    }
-
-    input.close();
-
-    return result;
-}
-
-MaterialGroup::MaterialGroup()
-: m_EnableCastShadow(false)
-, m_EnableReceiveShadow(false) {
-    m_AllPassMaterial.clear();
-}
-
-MaterialGroup::MaterialGroup(const MaterialGroup& group) {
-    for (auto& entry : group.m_AllPassMaterial) {
-        m_AllPassMaterial.push_back(entry);
-    }
-    m_EnableCastShadow = group.m_EnableCastShadow;
-    m_EnableReceiveShadow = group.m_EnableReceiveShadow;
-}
-
-MaterialGroup::~MaterialGroup() {
-}
-
-void MaterialGroup::AddPassMaterial(const char* passName, int32_t materialID) {
-    Entry entry;
-    memcpy(entry.name, passName, strlen(passName));
-    entry.name[strlen(passName)] = '\0';
-    entry.materialID = materialID;
-    m_AllPassMaterial.push_back(entry);
-}
-
-int32_t MaterialGroup::GetPassMaterial(const char* passName) {
-    int32_t result = -1;
-
-    for (auto& entry : m_AllPassMaterial) {
-        if (!strcmp(entry.name, passName)) {
-            result = entry.materialID;
-            break;
-        }
-    }
-
-    return result;
-}
-
-std::vector<MaterialGroup::Entry> MaterialGroup::GetAllPassMaterial() {
+std::vector<PassMaterial*>& Material::GetAllPassMaterial() {
     return m_AllPassMaterial;
 }
 
-bool MaterialGroup::IsCastShadowEnable() const {
+bool Material::IsCastShadowEnable() const {
     return m_EnableCastShadow;
 }
 
-bool MaterialGroup::IsReceiveShadowEnable() const {
+bool Material::IsReceiveShadowEnable() const {
     return m_EnableReceiveShadow;
 }
 
@@ -511,10 +468,6 @@ int32_t MgrImp::AddMaterial(const char* name) {
     }
 
     return m_IDGen;
-}
-
-MaterialGroup MgrImp::AddMaterialGroup(const char* name) {
-    return MaterialGroup::Create(name);
 }
 
 Material* MgrImp::GetMaterial(int32_t id) {
@@ -576,18 +529,6 @@ int32_t Mgr::AddMaterial(const char* materialName) {
 
     if (s_MgrImp != nullptr) {
         result = s_MgrImp->AddMaterial(materialName);
-    } else {
-        GLB_SAFE_ASSERT(false);
-    }
-
-    return result;
-}
-
-MaterialGroup Mgr::AddMaterialGroup(const char* materialGroupName) {
-    MaterialGroup result;
-
-    if (s_MgrImp != nullptr) {
-        result = s_MgrImp->AddMaterialGroup(materialGroupName);
     } else {
         GLB_SAFE_ASSERT(false);
     }
