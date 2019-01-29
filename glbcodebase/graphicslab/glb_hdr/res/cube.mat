@@ -1,12 +1,12 @@
 beginpass lightloop
-shader res/normal.vs res/glb_normal_emission.fs
-passparameter glb_unif_AlbedoTex res/streakedmarble_basecolor.dds
-passparameter glb_unif_RoughnessTex res/streakedmarble_roughness.dds
-passparameter glb_unif_MetallicTex res/streakedmarble_metallic.dds
-passparameter glb_unif_NormalTex res/streakedmarble_normal.dds
-passparameter glb_unif_EmissionTex res/streakedmarble_emission.bmp
-passparameter glb_unif_DiffusePFCTex res/diffuse.pfc
-passparameter glb_unif_SpecularPFCTex res/specular.pfc
+shader normal.vs glb_normal_emission.fs
+passparameter glb_unif_AlbedoTex streakedmarble_basecolor.dds
+passparameter glb_unif_RoughnessTex streakedmarble_roughness.dds
+passparameter glb_unif_MetallicTex streakedmarble_metallic.dds
+passparameter glb_unif_NormalTex streakedmarble_normal.dds
+passparameter glb_unif_EmissionTex streakedmarble_emission.bmp
+passparameter glb_unif_DiffusePFCTex diffuse.pfc
+passparameter glb_unif_SpecularPFCTex specular.pfc
 passparameter glb_unif_SpecularPFCLOD 7.0
 passparameter glb_unif_EmissionIntensity 10.0 10.0 1.0
 endpass
