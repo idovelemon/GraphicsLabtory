@@ -19,7 +19,10 @@ using namespace glb;
 ApplicationCore* ApplicationCore::s_Instance = NULL;
 
 ApplicationCore::ApplicationCore()
-: m_SceneMesh(-1) {
+: m_SceneMesh(-1)
+, m_Material(-1)
+, m_DefaultTexture2D(-1)
+, m_DefaultTextureCube(-1) {
     s_Instance = this;
     memset(m_SceneMeshName, 0, sizeof(m_SceneMeshName));
 }
@@ -58,6 +61,10 @@ bool ApplicationCore::Initialize() {
 
     // HDR
     glb::render::Render::SetHighLightBase(1.5f);
+
+    // Default texture
+    m_DefaultTexture2D = render::texture::Mgr::LoadTexture("res/default2d.bmp");
+    m_DefaultTextureCube = render::texture::Mgr::LoadPFCTexture("res/defaultcube.pfc");
 
     return true;
 }
@@ -201,12 +208,10 @@ bool ApplicationCore::SaveModel(const char* filePath) {
     const aiScene* scene = importer.ReadFile(m_SceneMeshName, aiProcess_CalcTangentSpace | aiProcess_Triangulate | aiProcess_FixInfacingNormals);
 
     bool result = false;
-    if (scene && scene->HasMeshes())
-    {
+    if (scene && scene->HasMeshes()) {
         std::ofstream output;
         output.open(filePath);
-        if (!output.fail())
-        {
+        if (!output.fail()) {
             // Only deal with mesh 0 now
             aiMesh* mesh = scene->mMeshes[0];
             int32_t trianglesNum = scene->mMeshes[0]->mNumFaces;
@@ -315,6 +320,271 @@ bool ApplicationCore::Preview(const char* name) {
     }
 
     return m_SceneMesh != -1;
+}
+
+bool ApplicationCore::AddEmptyMaterial(const char* name) {
+    bool result = false;
+
+    render::material::Material* mat = new glb::render::material::Material;
+    if (mat) {
+        mat->SetMaterialName(name);
+        m_Material = render::material::Mgr::AddMaterial(mat);
+        result = true;
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return result;
+}
+
+bool ApplicationCore::AddMaterial(const char* name) {
+    bool result = false;
+
+    m_Material = render::material::Mgr::AddMaterial(name);
+    if (m_Material >= 0) {
+        scene::Scene::GetObjectById(m_SceneMesh)->SetMaterial(render::material::Mgr::GetMaterial(m_Material));
+        result = true;
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return result;
+}
+
+bool ApplicationCore::SaveMaterial(const char* name) {
+    bool result = false;
+
+    glb::render::material::Material* mat = glb::render::material::Mgr::GetMaterial(m_Material);
+    if (mat) {
+        std::string destDir = util::path_get_dir(name);
+
+        std::ofstream output;
+        output.open(name);
+
+        std::vector<glb::render::material::PassMaterial*>& passMaterial = mat->GetAllPassMaterial();
+
+        for (auto& pass : passMaterial) {
+            output << "beginpass " << pass->GetPassName() << "\n";
+
+            const char* vertexShaderName = glb::render::shader::Mgr::GetShader(pass->GetShaderID())->GetVertexShaderName();
+            const char* fragmentShaderName = glb::render::shader::Mgr::GetShader(pass->GetShaderID())->GetFragmentShaderName();
+            output << "shader " << util::path_get_name(vertexShaderName).c_str() << " " << util::path_get_name(fragmentShaderName).c_str() << "\n";
+
+            // Copy shader file
+            std::string destVertexShaderName = destDir.empty() ? util::path_get_name(vertexShaderName) : (destDir + '\\' + util::path_get_name(vertexShaderName));
+            std::string destFragmentShaderName = destDir.empty() ? util::path_get_name(fragmentShaderName) : (destDir + '\\' + util::path_get_name(fragmentShaderName));
+            CopyFileA(vertexShaderName, destVertexShaderName.c_str(), TRUE);
+            CopyFileA(fragmentShaderName, destFragmentShaderName.c_str(), TRUE);
+
+            for (auto& param : pass->GetAllParameters()) {
+                if (param.type == glb::render::material::PassMaterial::PARAMETER_TYPE_USER) {
+                    switch (param.format) {
+                    case glb::render::PARAMETER_FORMAT_INT:
+                        output << "passparameter " << param.name << " " << param.intValue << "\n";
+                        break;
+                    case glb::render::PARAMETER_FORMAT_FLOAT:
+                        output << "passparameter " << param.name << " " << param.floatValue << "\n";
+                        break;
+                    case glb::render::PARAMETER_FORMAT_FLOAT3:
+                        output << "passparameter " << param.name << " "
+                               << param.vecValue.x << " "
+                               << param.vecValue.y << " "
+                               << param.vecValue.z << "\n";
+                        break;
+                    case glb::render::PARAMETER_FORMAT_FLOAT4:
+                        output << "passparameter " << param.name << " "
+                               << param.vecValue.x << " "
+                               << param.vecValue.y << " "
+                               << param.vecValue.z << " "
+                               << param.vecValue.w << "\n";
+                    case glb::render::PARAMETER_FORMAT_TEXTURE_2D:
+                    case glb::render::PARAMETER_FORMAT_TEXTURE_CUBE:
+                        const char* texPath = glb::render::texture::Mgr::GetTextureById(param.intValue)->GetName();
+                        std::string texName = util::path_get_name(texPath);
+                        output << "passparameter " << param.name << " " << texName.c_str() << "\n";
+
+                        std::string destTextureName = destDir.empty() ? std::string(texPath) : (destDir + '\\' + texName);
+                        CopyFileA(texPath, destTextureName.c_str(), TRUE);
+                        break;
+                    }
+                }
+            }
+
+            output << "endpass" << "\n";
+        }
+
+        if (mat->IsCastShadowEnable()) {
+            output << "materialparameter " << "castshadow " << 1 << "\n";
+        } else {
+            output << "materialparameter " << "castshadow " << 0 << "\n";
+        }
+
+        if (mat->IsReceiveShadowEnable()) {
+            output << "materialparameter " << "receiveshadow " << 1;
+        } else {
+            output << "materialparameter " << "receiveshadow " << 0;
+        }
+
+        result = true;
+        output.close();
+    }
+
+    return result;
+}
+
+bool ApplicationCore::TryCompileShader(const char* passName, const char* vertexShaderName, const char* fragmentShaderName) {
+    bool result = true;
+
+    // Try compile shader
+    glb::render::shader::UberProgram* program = glb::render::shader::UberProgram::Create(vertexShaderName, fragmentShaderName);
+
+    if (program) {
+        // Try replace old pass shader
+        int32_t shaderID = glb::render::shader::Mgr::ReplaceUberShader(program);
+
+        // If failed, create a new shader
+        if (shaderID == -1)
+        {
+            shaderID = glb::render::shader::Mgr::AddUberShader(program);
+        }
+
+        glb::render::material::Material* mat = glb::render::material::Mgr::GetMaterial(m_Material);
+        if (mat) {
+            // Try to get pass
+            glb::render::material::PassMaterial* passMaterial = mat->GetPassMaterial(passName);
+
+            // If failed, create a new pass
+            if (passMaterial == nullptr)
+            {
+                passMaterial = new glb::render::material::PassMaterial();
+                passMaterial->SetPassName(passName);
+                mat->AddPassMaterial(passMaterial);
+            }
+
+            // Setup shader and parameters
+            passMaterial->SetShaderID(shaderID);
+            passMaterial->CollectParameter();
+
+            // Setup default texture parameter
+            std::vector<render::material::PassMaterial::ParameterEntry>& parameters = passMaterial->GetAllParameters();
+            for (auto& param : parameters) {
+                if (param.type == render::material::PassMaterial::PARAMETER_TYPE_USER) {
+                    switch (param.format) {
+                    case render::PARAMETER_FORMAT_TEXTURE_2D:
+                        param.intValue = m_DefaultTexture2D;
+                        break;
+                    case render::PARAMETER_FORMAT_TEXTURE_CUBE:
+                        param.intValue = m_DefaultTextureCube;
+                        break;
+                    }
+                }
+            }
+
+            // Setup model
+            scene::Scene::GetObjectById(m_SceneMesh)->SetMaterial(mat);
+        } else {
+            GLB_SAFE_ASSERT(false);
+        }
+    } else {
+        result = false;
+    }
+
+    return result;
+}
+
+std::vector<glb::render::material::PassMaterial::ParameterEntry>& ApplicationCore::GetPassParameters(const char* passName) {
+    glb::render::material::Material* mat = glb::render::material::Mgr::GetMaterial(m_Material);
+    if (mat) {
+        glb::render::material::PassMaterial* passMaterial = mat->GetPassMaterial(passName);
+        if (passMaterial) {
+            return passMaterial->GetAllParameters();
+        } else {
+            GLB_SAFE_ASSERT(false);
+        }
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    static std::vector<glb::render::material::PassMaterial::ParameterEntry> sNonePassParameters;
+    return sNonePassParameters;
+}
+
+void ApplicationCore::SetPassParameterInt(const char* passName, const char* parameterName, int32_t value) {
+    glb::render::material::Material* mat = glb::render::material::Mgr::GetMaterial(m_Material);
+    if (mat) {
+        glb::render::material::PassMaterial* passMaterial = mat->GetPassMaterial(passName);
+        if (passMaterial) {
+            glb::render::material::PassMaterial::ParameterEntry& entry = passMaterial->GetParameterByName(parameterName);
+            if (entry.format == glb::render::PARAMETER_FORMAT_INT) {
+                entry.intValue = value;
+            } else {
+                GLB_SAFE_ASSERT(false);
+            }
+        } else {
+            GLB_SAFE_ASSERT(false);
+        }
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+}
+
+void ApplicationCore::SetPassParameterFloat(const char* passName, const char* parameterName, float value) {
+    glb::render::material::Material* mat = glb::render::material::Mgr::GetMaterial(m_Material);
+    if (mat) {
+        glb::render::material::PassMaterial* passMaterial = mat->GetPassMaterial(passName);
+        if (passMaterial) {
+            glb::render::material::PassMaterial::ParameterEntry& entry = passMaterial->GetParameterByName(parameterName);
+            if (entry.format == glb::render::PARAMETER_FORMAT_FLOAT) {
+                entry.floatValue = value;
+            } else {
+                GLB_SAFE_ASSERT(false);
+            }
+        } else {
+            GLB_SAFE_ASSERT(false);
+        }
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+}
+
+void ApplicationCore::SetPassParameterVec(const char* passName, const char* parameterName, glb::math::Vector value) {
+    glb::render::material::Material* mat = glb::render::material::Mgr::GetMaterial(m_Material);
+    if (mat) {
+        glb::render::material::PassMaterial* passMaterial = mat->GetPassMaterial(passName);
+        if (passMaterial) {
+            glb::render::material::PassMaterial::ParameterEntry& entry = passMaterial->GetParameterByName(parameterName);
+            if (entry.format == glb::render::PARAMETER_FORMAT_FLOAT3
+                || entry.format == glb::render::PARAMETER_FORMAT_FLOAT4) {
+                entry.vecValue = value;
+            } else {
+                GLB_SAFE_ASSERT(false);
+            }
+        } else {
+            GLB_SAFE_ASSERT(false);
+        }
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+}
+
+void ApplicationCore::SetPassParameterTex(const char* passName, const char* parameterName, int32_t value) {
+    glb::render::material::Material* mat = glb::render::material::Mgr::GetMaterial(m_Material);
+    if (mat) {
+        glb::render::material::PassMaterial* passMaterial = mat->GetPassMaterial(passName);
+        if (passMaterial) {
+            glb::render::material::PassMaterial::ParameterEntry& entry = passMaterial->GetParameterByName(parameterName);
+            if (entry.format == glb::render::PARAMETER_FORMAT_TEXTURE_2D
+                || entry.format == glb::render::PARAMETER_FORMAT_TEXTURE_CUBE) {
+                entry.intValue = value;
+            } else {
+                GLB_SAFE_ASSERT(false);
+            }
+        } else {
+            GLB_SAFE_ASSERT(false);
+        }
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
 }
 
 void ApplicationCore::UpdateCamera() {

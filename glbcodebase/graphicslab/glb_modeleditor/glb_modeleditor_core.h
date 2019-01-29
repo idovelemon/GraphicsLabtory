@@ -28,6 +28,15 @@ public:
     bool AddModel(const char* name);
     bool SaveModel(const char* name);
     bool Preview(const char* name);
+    bool AddEmptyMaterial(const char* name);
+    bool AddMaterial(const char* name);
+    bool SaveMaterial(const char* name);
+    bool TryCompileShader(const char* passName, const char* vertexShaderName, const char* fragmentShaderName);
+    std::vector<glb::render::material::PassMaterial::ParameterEntry>& GetPassParameters(const char* passName);
+    void SetPassParameterInt(const char* passName, const char* parameterName, int32_t value);
+    void SetPassParameterFloat(const char* passName, const char* parameterName, float value);
+    void SetPassParameterVec(const char* passName, const char* parameterName, glb::math::Vector value);
+    void SetPassParameterTex(const char* passName, const char* parameterName, int32_t value);
 
 protected:
     void UpdateCamera();
@@ -36,8 +45,12 @@ private:
     static ApplicationCore*             s_Instance;
     static int                          sIdGen;
 
+    int32_t                             m_DefaultTexture2D;
+    int32_t                             m_DefaultTextureCube;
+
     char                                m_SceneMeshName[256];
     int32_t                             m_SceneMesh;
+    int32_t                             m_Material;
 };
 
 #endif  // GLB_GLB_MODEL_EDITOR_CORE_H_

@@ -213,6 +213,12 @@
     <ClInclude Include="..\glb\render\glbfont.h">
       <Filter>glb\render</Filter>
     </ClInclude>
+    <ClInclude Include="AddMaterialDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AddPassDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="glb_modeleditor.cpp">
@@ -340,6 +346,12 @@
     </ClCompile>
     <ClCompile Include="..\glb\render\glbfont.cpp">
       <Filter>glb\render</Filter>
+    </ClCompile>
+    <ClCompile Include="AddMaterialDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AddPassDlg.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

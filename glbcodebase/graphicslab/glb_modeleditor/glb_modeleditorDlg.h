@@ -3,7 +3,26 @@
 //
 
 #pragma once
+#include "afxcmn.h"
+#include <map>
+#include <vector>
+#include "glb.h"
+#include "afxpropertygridctrl.h"
 
+// Material struct
+struct SMaterial
+{
+    CString materialName;
+    CArray<CString> passName;
+    CArray<CString> vertexShaderName;
+    CArray<CString> fragmentShaderName;
+    std::vector<std::vector<glb::render::material::PassMaterial::ParameterEntry>> passParameters;
+
+    SMaterial()
+        : materialName(TEXT(""))
+    {
+    }
+};
 
 // Cglb_modeleditorDlg dialog
 class Cglb_modeleditorDlg : public CDialog
@@ -18,6 +37,8 @@ public:
 	protected:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV support
 
+public:
+    void OnPassParamFloatUpdate(int passIndex, int paramIndex, float value);
 
 // Implementation
 protected:
@@ -32,44 +53,21 @@ protected:
     afx_msg void OnFileImport();
     afx_msg void OnFileExport();
     afx_msg void OnFilePreview();
-    afx_msg void OnBnClickedAlbedoFileButton();
-    afx_msg void OnBnClickedRoughnessFileButton();
-    afx_msg void OnBnClickedMetallicFileButton();
-    afx_msg void OnBnClickedNormalFileButton();
-    afx_msg void OnBnClickedAlphaFileButton();
-    afx_msg void OnBnClickedEmissionFileButton();
-    afx_msg void OnBnClickedDiffusePFCFileButton();
-    afx_msg void OnBnClickedSpecularPFCFileButton();
-    afx_msg void OnBnClickedLight0FileButton();
-    afx_msg void OnBnClickedLight1FileButton();
-    afx_msg void OnBnClickedLight2FileButton();
+    afx_msg void OnMaterialAdd();
+    afx_msg void OnMaterialSave();
+    afx_msg void OnMaterialAddexsit();
     afx_msg void OnTimer(UINT_PTR nIDEvent);
+    afx_msg void OnNMRClickMattree(NMHDR *pNMHDR, LRESULT *pResult);
+    afx_msg void OnMaterialAddpass();
+    afx_msg void OnPassCompile();
+    afx_msg LRESULT OnPropertyChanged(WPARAM wparam, LPARAM lparam);
 	DECLARE_MESSAGE_MAP()
 
 private:
-    CString m_AlbedoTexName;
-    CString m_RoughnessTexName;
-    CString m_MetallicTexName;
-    CString m_NormalTexName;
-    CString m_AlphaTexName;
-    CString m_EmissionTexName;
-    CString m_EnvTexName;
-    CString m_LightTex0Name;
-    CString m_LightTex1Name;
-    CString m_LightTex2Name;
-public:
-    afx_msg void OnEnSetfocusAlbedoEdit();
-    afx_msg void OnEnSetfocusRoughnessEdit();
-    afx_msg void OnEnSetfocusMetallicEdit();
-    afx_msg void OnEnSetfocusNormalEdit();
-    afx_msg void OnEnSetfocusAlphaEdit();
-    afx_msg void OnEnSetfocusEmissionEdit();
-    afx_msg void OnEnSetfocusDiffusePFCEdit();
-    afx_msg void OnEnSetfocusSpecularPFCEdit();
-    afx_msg void OnEnSetfocusLight0Edit();
-    afx_msg void OnEnSetfocusLight1Edit();
-    afx_msg void OnEnSetfocusLight2Edit();
-private:
-    CString m_DiffusePFCTexName;
-    CString m_SpecularPFCTexName;
+    CTreeCtrl m_MatTreeCtrl;
+    CMFCPropertyGridCtrl m_PassParamGridCtrl;
+    SMaterial m_MaterialInfo;
+
+    std::map<CString, HTREEITEM>    m_TreeItemTbl;
+    int                             m_ChoosePass;
 };

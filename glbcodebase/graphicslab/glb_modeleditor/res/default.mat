@@ -1,0 +1,3 @@
+beginpass lightloop
+shader default.vs default.fs
+endpass

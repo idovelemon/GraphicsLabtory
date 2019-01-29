@@ -44,10 +44,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)$(ProjectName)\</OutDir>
+    <TargetName>$(ProjectName)_DGL</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)$(ProjectName)\</OutDir>
+    <TargetName>$(ProjectName)_RGL</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -57,7 +59,7 @@
       <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;GLB_PLATFORM_OPENGL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>$(SolutionDir)\glb;$(SolutionDir)\..\glew\include;$(DXSDK_DIR)\Include;$(SolutionDir)$(ProjectName)\assimp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <ObjectFileName>$(IntDir)/%(RelativeDir)/</ObjectFileName>
+      <ObjectFileName>$(IntDir)/Debug/%(RelativeDir)/</ObjectFileName>
       <AdditionalOptions>/D_CRT_SECURE_NO_WARNINGS %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
@@ -87,7 +89,7 @@
       <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;GLB_PLATFORM_OPENGL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>$(SolutionDir)\glb;$(SolutionDir)\..\glew\include;$(DXSDK_DIR)\Include;$(SolutionDir)$(ProjectName)\assimp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <ObjectFileName>$(IntDir)/%(RelativeDir)/</ObjectFileName>
+      <ObjectFileName>$(IntDir)/Release/%(RelativeDir)/</ObjectFileName>
       <AdditionalOptions>/D_CRT_SECURE_NO_WARNINGS %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
@@ -161,6 +163,8 @@ dxguid.lib;assimp-vc110-mt.lib;zlibstatic.lib;%(AdditionalDependencies)</Additio
     <ClInclude Include="..\glb\util\glbtexturereader.h" />
     <ClInclude Include="..\glb\util\glbtexturewriter.h" />
     <ClInclude Include="..\glb\util\glbutil.h" />
+    <ClInclude Include="AddMaterialDlg.h" />
+    <ClInclude Include="AddPassDlg.h" />
     <ClInclude Include="glb_modeleditor.h" />
     <ClInclude Include="glb_modeleditorDlg.h" />
     <ClInclude Include="glb_modeleditor_core.h" />
@@ -205,6 +209,8 @@ dxguid.lib;assimp-vc110-mt.lib;zlibstatic.lib;%(AdditionalDependencies)</Additio
     <ClCompile Include="..\glb\util\glbtexturereader.cpp" />
     <ClCompile Include="..\glb\util\glbtexturewriter.cpp" />
     <ClCompile Include="..\glb\util\glbutil.cpp" />
+    <ClCompile Include="AddMaterialDlg.cpp" />
+    <ClCompile Include="AddPassDlg.cpp" />
     <ClCompile Include="glb_modeleditor.cpp" />
     <ClCompile Include="glb_modeleditorDlg.cpp" />
     <ClCompile Include="glb_modeleditor_core.cpp" />
