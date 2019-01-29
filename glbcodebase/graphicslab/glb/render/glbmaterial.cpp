@@ -78,8 +78,27 @@ PassMaterial::PassMaterial()
 PassMaterial::~PassMaterial() {
 }
 
+void PassMaterial::SetShaderID(int32_t shaderID) {
+    m_ShaderID = shaderID;
+}
+
 int32_t PassMaterial::GetShaderID() const {
     return m_ShaderID;
+}
+
+void PassMaterial::SetPassName(const char* name) {
+    if (name) {
+        size_t len = strlen(name);
+        len = min(len, kMaxPassNameLength - 1);
+        memcpy(m_PassName, name, len);
+        m_PassName[len] = '\0';
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+}
+
+const char* PassMaterial::GetPassName() const {
+    return static_cast<const char*>(m_PassName);
 }
 
 void PassMaterial::SetFloatParameterByName(const char* name, float value) {
@@ -256,6 +275,9 @@ void PassMaterial::SetInternalMatrixParameterByName(const char* name, math::Matr
 void PassMaterial::CollectParameter() {
     shader::Program* shader = shader::Mgr::GetShader(m_ShaderID);
     if (shader) {
+        // Clear
+        m_Parameters.clear();
+
         std::vector<ShaderParameter> parameters = shader->GetProgramParameter();
         for (auto& param : parameters) {
             ParameterEntry entry;
@@ -290,6 +312,8 @@ Material* Material::Create(const char* materialFile) {
     input.open(materialFile);
 
     if (!input.fail()) {
+        std::string materialDir = util::path_get_dir(materialFile);
+
         PassMaterial* newPassMaterial = nullptr;
 
         while (!input.eof()) {
@@ -312,7 +336,10 @@ Material* Material::Create(const char* materialFile) {
                 char fragmentShaderFile[kShaderFileNameMaxLength];
                 input >> vertexShaderFile >> fragmentShaderFile;
 
-                newPassMaterial->m_ShaderID = shader::Mgr::AddUberShader(vertexShaderFile, fragmentShaderFile);
+                std::string vertexShaderPath = materialDir.empty() ? vertexShaderFile : (materialDir + vertexShaderFile);  // Assuming they are in same directory
+                std::string fragmentShaderPath = materialDir.empty() ? fragmentShaderFile : (materialDir + fragmentShaderFile);  // Assuming they are in same directory
+
+                newPassMaterial->m_ShaderID = shader::Mgr::AddUberShader(vertexShaderPath.c_str(), fragmentShaderPath.c_str());
                 newPassMaterial->CollectParameter();
             } else if (!strcmp(buffer, "passparameter")) {
                 // Parameter Name
@@ -333,17 +360,20 @@ Material* Material::Create(const char* materialFile) {
                     }
                 } else if (entry.format == PARAMETER_FORMAT_TEXTURE_2D) {
                     input >> buffer;
-                    entry.intValue = texture::Mgr::LoadTexture(buffer);
+                    std::string destTexturePath = materialDir.empty() ? buffer : (materialDir + std::string(buffer));
+                    entry.intValue = texture::Mgr::LoadTexture(destTexturePath.c_str());  // Assuming they are in same directory
                 } else if (entry.format == PARAMETER_FORMAT_TEXTURE_3D) {
                     input >> buffer;
-                    entry.intValue = texture::Mgr::LoadTexture(buffer);
+                    std::string destTexturePath = materialDir.empty() ? buffer : (materialDir + std::string(buffer));
+                    entry.intValue = texture::Mgr::LoadTexture(destTexturePath.c_str());  // Assuming they are in same directory
                 } else if (entry.format == PARAMETER_FORMAT_TEXTURE_CUBE) {
                     input >> buffer;
 
+                    std::string destTexturePath = materialDir.empty() ? buffer : (materialDir + std::string(buffer));
                     if (!strcmp(util::path_get_file_type(buffer).c_str(), ".pfc")) {
-                        entry.intValue = texture::Mgr::LoadPFCTexture(buffer);
+                        entry.intValue = texture::Mgr::LoadPFCTexture(destTexturePath.c_str());  // Assuming they are in same directory
                     } else {
-                        entry.intValue = texture::Mgr::LoadTexture(buffer);
+                        entry.intValue = texture::Mgr::LoadTexture(destTexturePath.c_str());  // Assuming they are in same directory
                     }
                 } else {
                     GLB_SAFE_ASSERT(false);
@@ -409,8 +439,27 @@ int32_t Material::GetMaterialID() const {
     return m_ID;
 }
 
+void Material::SetMaterialName(const char* name) {
+    if (name) {
+        size_t len = strlen(name);
+        len = min(len, kMaterialFileNameMaxLength - 1);
+        memcpy(m_MaterialName, name, len);
+        m_MaterialName[len] = '\0';
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+}
+
 const char* Material::GetMaterialName() const {
     return m_MaterialName;
+}
+
+void Material::AddPassMaterial(PassMaterial* passMaterial) {
+    if (passMaterial) {
+        m_AllPassMaterial.push_back(passMaterial);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
 }
 
 PassMaterial* Material::GetPassMaterial(const char* passName) {

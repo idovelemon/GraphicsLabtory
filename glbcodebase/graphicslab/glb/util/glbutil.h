@@ -17,6 +17,10 @@ std::string path_get_dir(const char* path);
 std::string path_get_name(const char* path);
 std::string path_get_file_type(const char* path);
 
+// User Error
+void user_error_pushmsg(const char* msg);
+std::string user_error_popmsg();
+
 };  // namespace util
 
 };  // namespace glb

@@ -8,9 +8,14 @@
 
 #include <stdint.h>
 
+#include <vector>
+
 namespace glb {
 
 namespace util {
+
+// User error string
+static std::vector<std::string> sUserErrorMsg;
 
 // Path
 std::string path_get_dir(const char* path) {
@@ -39,10 +44,14 @@ std::string path_get_name(const char* path) {
         int32_t offset0 = path_s.find_last_of("/");
         int32_t offset1 = path_s.find_last_of("\\");
         if (offset0 >= 0) {
-            name = path_s.substr(offset0 + 2, path_s.length());
+            name = path_s.substr(offset0 + 1, path_s.length());
         }
         if (offset1 >= 0) {
             name = path_s.substr(offset1 + 1, path_s.length());
+        }
+
+        if (offset0 < 0 && offset1 < 0) {
+            name = path;
         }
     }
 
@@ -61,6 +70,22 @@ std::string path_get_file_type(const char* path) {
     }
 
     return type;
+}
+
+// User Error
+void user_error_pushmsg(const char* msg) {
+    sUserErrorMsg.insert(sUserErrorMsg.begin(), std::string(msg));
+}
+
+std::string user_error_popmsg() {
+    std::string result = "";
+
+    if (!sUserErrorMsg.empty()) {
+        result = sUserErrorMsg.back();
+        sUserErrorMsg.pop_back();
+    }
+
+    return result;
 }
 
 };

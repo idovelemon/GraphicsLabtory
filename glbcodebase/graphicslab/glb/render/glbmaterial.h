@@ -75,7 +75,11 @@ public:
     PassMaterial();
     virtual~ PassMaterial();
 
+    virtual void SetShaderID(int32_t shaderID);
     virtual int32_t GetShaderID() const;
+
+    virtual void SetPassName(const char* name);
+    virtual const char* GetPassName() const;
 
     virtual void SetFloatParameterByName(const char* name, float value);
     virtual float GetFloatParameterByName(const char* name) const;
@@ -102,7 +106,6 @@ public:
     virtual void SetInternalTextureParameterByName(const char* name, int32_t textureID);
     virtual void SetInternalMatrixParameterByName(const char* name, math::Matrix value);
 
-protected:
     void CollectParameter();
 
 protected:
@@ -127,8 +130,10 @@ public:
     virtual void SetMaterialID(int32_t id);
     virtual int32_t GetMaterialID() const;
 
+    virtual void SetMaterialName(const char* name);
     virtual const char* GetMaterialName() const;
 
+    virtual void AddPassMaterial(PassMaterial* passMaterial);
     virtual PassMaterial* GetPassMaterial(const char* passName);
     virtual std::vector<PassMaterial*>& GetAllPassMaterial();
 

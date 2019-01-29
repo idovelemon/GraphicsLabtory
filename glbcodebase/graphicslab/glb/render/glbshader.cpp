@@ -32,12 +32,16 @@ public:
     void Destroy();
 
 public:
+    int32_t AddUberShader(UberProgram* shader);
     int32_t AddUberShader(const char* vertex_shader_file, const char* fragment_shader_file, const char* geometry_shader_file);
+    int32_t ReplaceUberShader(UberProgram* shader);
+
     Program* GetShader(int32_t shader_id);
     int32_t GetUberShaderID(Descriptor desc);
 
 protected:
     int32_t GetShaderByName(const char* vertex_shader_file, const char* fragment_shader_file, const char* geometry_shader_file);
+    int32_t GetShaderByName(const char* shaderName);
 
 private:
     std::vector<Program*> m_ShaderDataBase;
@@ -64,7 +68,7 @@ VertexShader* VertexShader::Create(const char* vertex_shader_name) {
             GLB_SAFE_ASSERT(false);
         }
     } else {
-        GLB_SAFE_ASSERT(false);
+        GLB_USER_ERROR_MSG("Failed to create VertexShader\n");
     }
 
     return result;
@@ -85,6 +89,16 @@ VertexShader* VertexShader::Create(std::vector<std::string> enable_macros, const
     }
 
     return result;
+}
+
+const char* VertexShader::GetShaderName() const {
+    if (m_Imp) {
+        return m_Imp->GetShaderName();
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return nullptr;
 }
 
 uint32_t VertexShader::GetHandle() const {
@@ -159,7 +173,7 @@ FragmentShader* FragmentShader::Create(const char* fragment_shader_name) {
             GLB_SAFE_ASSERT(false);
         }
     } else {
-        GLB_SAFE_ASSERT(false);
+        GLB_USER_ERROR_MSG("Failed to create Fragment shader\n");
     }
 
     return result;
@@ -180,6 +194,16 @@ FragmentShader* FragmentShader::Create(std::vector<std::string> enable_macros, c
     }
 
     return result;
+}
+
+const char* FragmentShader::GetShaderName() const {
+    if (m_Imp) {
+        return m_Imp->GetShaderName();
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return nullptr;
 }
 
 uint32_t FragmentShader::GetHandle() const {
@@ -215,7 +239,7 @@ UberProgram* UberProgram::Create(const char* vertex_shader_file, const char* fra
             GLB_SAFE_ASSERT(false);
         }
     } else {
-        GLB_SAFE_ASSERT(false);
+        GLB_USER_ERROR_MSG("Failed to create UberProgram\n");
     }
 
     return shader_program;
@@ -250,6 +274,26 @@ void UberProgram::SetID(int32_t shader_id) {
 const char* UberProgram::GetShaderName() const {
     if (m_Imp != nullptr) {
         return m_Imp->GetShaderName();
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return nullptr;
+}
+
+const char* UberProgram::GetVertexShaderName() const {
+    if (m_Imp != nullptr) {
+        return m_Imp->GetVertexShaderName();
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return nullptr;
+}
+
+const char* UberProgram::GetFragmentShaderName() const {
+    if (m_Imp != nullptr) {
+        return m_Imp->GetFragmentShaderName();
     } else {
         GLB_SAFE_ASSERT(false);
     }
@@ -397,6 +441,14 @@ void UserProgram::SetID(int32_t shader_id) {
 }
 
 const char* UserProgram::GetShaderName() const {
+    return "";  // TODO:
+}
+
+const char* UserProgram::GetVertexShaderName() const {
+    return "";  // TODO:
+}
+
+const char* UserProgram::GetFragmentShaderName() const {
     return "";  // TODO:
 }
 
@@ -579,6 +631,20 @@ void MgrImp::Destroy() {
     m_ShaderDataBase.clear();
 }
 
+int32_t MgrImp::AddUberShader(UberProgram* shader) {
+    int32_t result = -1;
+
+    if (shader != nullptr) {
+        result = m_ShaderDataBase.size();
+        shader->SetID(result);
+        m_ShaderDataBase.push_back(shader);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return result;
+}
+
 int32_t MgrImp::AddUberShader(const char* vertex_shader_file, const char* fragment_shader_file, const char* geometry_shader_file) {
     int32_t id = GetShaderByName(vertex_shader_file, fragment_shader_file, geometry_shader_file);
 
@@ -590,6 +656,20 @@ int32_t MgrImp::AddUberShader(const char* vertex_shader_file, const char* fragme
             m_ShaderDataBase.push_back(program);
         } else {
             GLB_SAFE_ASSERT(false);
+        }
+    }
+
+    return id;
+}
+
+int32_t MgrImp::ReplaceUberShader(UberProgram* shader) {
+    int32_t id = -1;
+
+    if (shader) {
+        id = GetShaderByName(shader->GetShaderName());
+        if (id >= 0) {
+            GLB_SAFE_DELETE(m_ShaderDataBase[id]);
+            m_ShaderDataBase[id] = shader;
         }
     }
 
@@ -644,9 +724,14 @@ int32_t MgrImp::GetShaderByName(const char* vertexShaderFile, const char* fragme
         shaderName += geometryShaderFile;
     }
 
+    return GetShaderByName(shaderName.c_str());
+}
+
+int32_t MgrImp::GetShaderByName(const char* shaderName) {
     int32_t result = -1;
+
     for (std::vector<Program*>::size_type i = 0; i < m_ShaderDataBase.size(); i++) {
-        if (!strcmp(m_ShaderDataBase[i]->GetShaderName(), shaderName.c_str())) {
+        if (!strcmp(m_ShaderDataBase[i]->GetShaderName(), shaderName)) {
             result = i;
             break;
         }
@@ -677,11 +762,35 @@ void Mgr::Destroy() {
     }
 }
 
+int32_t Mgr::AddUberShader(UberProgram* shader) {
+    int32_t result = -1;
+
+    if (s_MgrImp != nullptr) {
+        result = s_MgrImp->AddUberShader(shader);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return result;
+}
+
 int32_t Mgr::AddUberShader(const char* vertex_shader_file, const char* fragment_shader_file, const char* geometry_shader_file) {
     int32_t result = -1;
 
     if (s_MgrImp != nullptr) {
         result = s_MgrImp->AddUberShader(vertex_shader_file, fragment_shader_file, geometry_shader_file);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return result;
+}
+
+int32_t Mgr::ReplaceUberShader(UberProgram* shader) {
+    int32_t result = -1;
+
+    if (s_MgrImp != nullptr) {
+        result = s_MgrImp->ReplaceUberShader(shader);
     } else {
         GLB_SAFE_ASSERT(false);
     }

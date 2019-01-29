@@ -71,7 +71,7 @@ Object* Object::Create(const char* meshFile, const char* materialGroupFile, math
         mesh = render::mesh::Mgr::GetMeshById(render::mesh::Mgr::AddMesh(meshFile));
     }
 
-    render::material::Material* material;
+    render::material::Material* material = nullptr;
     if (materialGroupFile) {
         material = render::material::Mgr::GetMaterial(render::material::Mgr::AddMaterial(materialGroupFile));
     } else {
@@ -183,6 +183,11 @@ math::Matrix Object::GetWorldMatrix() const {
 
 void Object::SetWorldMatrix(math::Matrix worldMatrix) {
     m_WorldMatrix = worldMatrix;
+}
+
+void Object::SetMaterial(render::material::Material* material) {
+    GLB_SAFE_ASSERT(material != nullptr);
+    m_Material = material;
 }
 
 render::material::Material* Object::GetMaterial() {

@@ -12,6 +12,9 @@
 
 #include <Windows.h>
 
+#include "glblog.h"
+#include "glbutil.h"
+
 #define GLB_SAFE_DELETE(_pointer_) \
     if (_pointer_ != nullptr) {\
         delete _pointer_; \
@@ -34,7 +37,8 @@
 #define GLB_SAFE_ASSERT(_expression_) GLB_SAFE_ASSERT_D(_expression_, "Error")
 #define GLB_SAFE_ASSERT_LOG(_expression_, _error_msg_) GLB_SAFE_ASSERT_D(_expression_, _error_msg_)
 #else
-#define GLB_SAFE_ASSERT(_expression_) GLB_SAFE_ASSERT_R(_expression_)
+#define GLB_SAFE_ASSERT(_expression_) GLB_SAFE_ASSERT_R(_expression_, "Error")
+#define GLB_SAFE_ASSERT_LOG(_expression_, _error_msg_) GLB_SAFE_ASSERT_R(_expression_, _error_msg_)
 #endif
 
 #define GLB_SAFE_ASSERT_D(_expression_, _error_msg_) \
@@ -44,6 +48,7 @@
             char buffer[256];\
             sprintf_s(buffer, "%s: %s", __FUNCTION__, _error_msg_);\
             OutputDebugStringA(buffer); \
+            glb::util::log::LogPrint(buffer); \
             MessageBoxA(nullptr, buffer, "Assert-Error", MB_OK); \
         } \
         assert(result); \
@@ -51,9 +56,12 @@
 
 // #define GLB_SAFE_ASSERT_D(_expression_) (_expression_)
 
-#define GLB_SAFE_ASSERT_R(_expression_) \
+#define GLB_SAFE_ASSERT_R(_expression_, _error_msg_) \
     do {\
         bool result = _expression_; \
+        char buffer[256];\
+        sprintf_s(buffer, "%s: %s", __FUNCTION__, _error_msg_);\
+        glb::util::log::LogPrint(buffer); \
         assert(result); \
     }while(false);
 
@@ -74,5 +82,11 @@
     const _class_name_& operator=(const _class_name_&);
 
 #define GLB_ARRAY_SIZE(_array_) (sizeof(_array_) / sizeof(_array_[0]))
+
+#define GLB_USER_ERROR_MSG(_error_msg_) \
+    do {\
+        glb::util::log::LogPrint(_error_msg_); \
+        glb::util::user_error_pushmsg(_error_msg_); \
+    }while(false);
 
 #endif  // GLB_GLBMACRO_H_

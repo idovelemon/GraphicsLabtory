@@ -254,7 +254,7 @@ bool PFCWriter::Write(const char* file_name, int8_t* data, int32_t width, int32_
     fopen_s(&file, file_name, "wb");
 
     if (file) {
-        int32_t miplevels = static_cast<int32_t>(log(max(width, height)) / log(2) + 1);
+        int32_t miplevels = static_cast<int32_t>(std::log(max(width, height)) / std::log(2) + 1);
         int32_t sizeBytes = 0;
         for (int32_t i = 0; i < miplevels; i++) {
             sizeBytes = sizeBytes + static_cast<int32_t>(sizeof(int16_t) * 4 * (width * pow(2, -i)) * (height * pow(2, -i)) * 6);

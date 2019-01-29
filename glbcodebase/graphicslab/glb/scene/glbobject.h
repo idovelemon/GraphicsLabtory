@@ -77,6 +77,7 @@ public:
     virtual math::Matrix GetWorldMatrix() const;
     virtual void SetWorldMatrix(math::Matrix worldMatrix);
 
+    virtual void SetMaterial(render::material::Material* material);
     virtual render::material::Material* GetMaterial();
 
     virtual void SetDrawEnable(bool enable);

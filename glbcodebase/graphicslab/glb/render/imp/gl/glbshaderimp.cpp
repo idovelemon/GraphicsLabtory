@@ -54,8 +54,8 @@ char* glbLoadShaderBufferFromFile(const char* fileName) {
             }
         } else {
             std::string msg = fileName;
-            msg += " doesn't exsit";
-            GLB_SAFE_ASSERT_LOG(false, msg.c_str());
+            msg += " doesn't exsit\n";
+            GLB_USER_ERROR_MSG(msg.c_str());
         }
 
         if (shaderFile != nullptr) {
@@ -81,6 +81,7 @@ void glbReleaseBuffer(char** buffer) {
 
 VertexShader::Imp::Imp()
 :m_VertexShader(0) {
+    memset(m_ShaderName, 0, sizeof(m_ShaderName));
 }
 
 VertexShader::Imp::~Imp() {
@@ -90,47 +91,46 @@ VertexShader::Imp::~Imp() {
     }
 }
 
-VertexShader::Imp* VertexShader::Imp::Create(const char* vertex_shader_name) {
+VertexShader::Imp* VertexShader::Imp::Create(const char* vertexShaderName) {
     VertexShader::Imp* result = nullptr;
 
-    if (vertex_shader_name != nullptr) {
-        GLuint vertex_shader = glCreateShader(GL_VERTEX_SHADER);
+    if (vertexShaderName != nullptr) {
+        GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
 
         // Load the shader program string from file
-        char* shader_str = glbLoadShaderBufferFromFile(vertex_shader_name);
+        char* shaderStr = glbLoadShaderBufferFromFile(vertexShaderName);
 
-        if (shader_str != nullptr) {
-            GLint len = static_cast<GLint>(strlen(shader_str));
-            glShaderSource(vertex_shader, 1, const_cast<const GLchar**>(&shader_str), &len);
-            glCompileShader(vertex_shader);
+        if (shaderStr != nullptr) {
+            GLint len = static_cast<GLint>(strlen(shaderStr));
+            glShaderSource(vertexShader, 1, const_cast<const GLchar**>(&shaderStr), &len);
+            glCompileShader(vertexShader);
 
             GLint success = 0;
-            glGetShaderiv(vertex_shader, GL_COMPILE_STATUS, &success);
+            glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
             if (success == 0) {
-                GLchar info_log[256];
+                GLchar infoLog[256];
 
-                strcpy_s(info_log, vertex_shader_name);
-                int32_t vertex_shader_name_len = strlen(vertex_shader_name);
-                info_log[vertex_shader_name_len++] = ' ';
+                strcpy_s(infoLog, sizeof(infoLog), vertexShaderName);
+                int32_t vertexShaderNameLen = strlen(vertexShaderName);
+                infoLog[vertexShaderNameLen++] = ' ';
 
-                glGetShaderInfoLog(vertex_shader, sizeof(info_log) - vertex_shader_name_len, nullptr, info_log + vertex_shader_name_len);
-
-                printf(reinterpret_cast<char*>(info_log));
-                util::log::LogPrint(info_log);
-
-                GLB_SAFE_ASSERT_LOG(false, info_log);
+                glGetShaderInfoLog(vertexShader, sizeof(infoLog) - vertexShaderNameLen, nullptr, infoLog + vertexShaderNameLen);
+                infoLog[strlen(infoLog)] = '\n';
+                infoLog[strlen(infoLog) + 1] = '\0';
+                GLB_USER_ERROR_MSG(infoLog);
             } else {
                 result = new VertexShader::Imp();
                 if (result != nullptr) {
-                    result->m_VertexShader = vertex_shader;
+                    result->m_VertexShader = vertexShader;
+                    strcpy_s(result->m_ShaderName, sizeof(result->m_ShaderName), vertexShaderName);
                 } else {
                     GLB_SAFE_ASSERT(false);
                 }
             }
 
-            glbReleaseBuffer(&shader_str);
+            glbReleaseBuffer(&shaderStr);
         } else {
-            GLB_SAFE_ASSERT(false);
+            GLB_USER_ERROR_MSG("Failed to load shader string from file\n");
         }
     } else {
         GLB_SAFE_ASSERT(false);
@@ -186,6 +186,7 @@ VertexShader::Imp* VertexShader::Imp::Create(std::vector<std::string> enable_mac
                 result = new VertexShader::Imp();
                 if (result != nullptr) {
                     result->m_VertexShader = vertex_shader;
+                    strcpy_s(result->m_ShaderName, sizeof(result->m_ShaderName), uber_shader_file_name);
                 } else {
                     GLB_SAFE_ASSERT(false);
                 }
@@ -205,6 +206,10 @@ VertexShader::Imp* VertexShader::Imp::Create(std::vector<std::string> enable_mac
     }
 
     return result;
+}
+
+const char* VertexShader::Imp::GetShaderName() const {
+    return m_ShaderName;
 }
 
 uint32_t VertexShader::Imp::GetHandle() const {
@@ -275,6 +280,7 @@ uint32_t GeometryShader::Imp::GetHandle() const {
 
 FragmentShader::Imp::Imp()
 : m_FragmentShader(0) {
+    memset(m_ShaderName, 0, sizeof(m_ShaderName));
 }
 
 FragmentShader::Imp::~Imp() {
@@ -284,41 +290,41 @@ FragmentShader::Imp::~Imp() {
     }
 }
 
-FragmentShader::Imp* FragmentShader::Imp::Create(const char* fragment_shader_name) {
+FragmentShader::Imp* FragmentShader::Imp::Create(const char* fragmentShaderName) {
     FragmentShader::Imp* result = nullptr;
 
-    if (fragment_shader_name != nullptr) {
-        GLuint fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
+    if (fragmentShaderName != nullptr) {
+        GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
 
         // Load the shader program string from file
-        char* shader_str = glbLoadShaderBufferFromFile(fragment_shader_name);
+        char* shaderStr = glbLoadShaderBufferFromFile(fragmentShaderName);
 
-        if (shader_str != nullptr) {
-            GLint len = static_cast<GLint>(strlen(shader_str));
-            glShaderSource(fragment_shader, 1, const_cast<const GLchar**>(&shader_str), &len);
-            glCompileShader(fragment_shader);
+        if (shaderStr != nullptr) {
+            GLint len = static_cast<GLint>(strlen(shaderStr));
+            glShaderSource(fragmentShader, 1, const_cast<const GLchar**>(&shaderStr), &len);
+            glCompileShader(fragmentShader);
 
             GLint success = 0;
-            glGetShaderiv(fragment_shader, GL_COMPILE_STATUS, &success);
+            glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
             if (success == 0) {
-                GLchar info_log[256];
-                glGetShaderInfoLog(fragment_shader, sizeof(info_log), nullptr, info_log);
-                util::log::LogPrint("Compile fragment shader failed!");
-                util::log::LogPrint("Failed fragment shader name:%s", fragment_shader_name);
-                util::log::LogPrint("Failed fragment shader log:%s", info_log);
-                GLB_SAFE_ASSERT_LOG(false, info_log);
+                GLchar infoLog[256];
+                glGetShaderInfoLog(fragmentShader, sizeof(infoLog), nullptr, infoLog);
+                infoLog[strlen(infoLog)] = '\n';
+                infoLog[strlen(infoLog) + 1] = '\0';
+                GLB_USER_ERROR_MSG(infoLog);
             } else {
                 result = new FragmentShader::Imp();
                 if (result != nullptr) {
-                    result->m_FragmentShader = fragment_shader;
+                    result->m_FragmentShader = fragmentShader;
+                    strcpy_s(result->m_ShaderName, sizeof(result->m_ShaderName), fragmentShaderName);
                 } else {
                     GLB_SAFE_ASSERT(false);
                 }
             }
 
-            glbReleaseBuffer(&shader_str);
+            glbReleaseBuffer(&shaderStr);
         } else {
-            GLB_SAFE_ASSERT(false);
+            GLB_USER_ERROR_MSG("Failed to load shader string from file\n");
         }
     } else {
         GLB_SAFE_ASSERT(false);
@@ -400,6 +406,10 @@ FragmentShader::Imp* FragmentShader::Imp::Create(std::vector<std::string> enable
     }
 
     return result;
+}
+
+const char* FragmentShader::Imp::GetShaderName() const {
+    return m_ShaderName;
 }
 
 uint32_t FragmentShader::Imp::GetHandle() const {
@@ -538,9 +548,9 @@ UberProgram::Imp* UberProgram::Imp::Create(const char* vertex_shader_file, const
             glGetProgramiv(program, GL_LINK_STATUS, &success);
             if (success == 0) {
                 GLchar info_log[256];
+                memset(info_log, 0, sizeof(info_log));
                 glGetProgramInfoLog(program, sizeof(info_log), nullptr, info_log);
-                util::log::LogPrint("%s", info_log);
-                GLB_SAFE_ASSERT(false);
+                GLB_USER_ERROR_MSG(info_log);
             } else {
                 // Save all the valid objects
                 shader_program = new UberProgram::Imp();
@@ -562,7 +572,7 @@ UberProgram::Imp* UberProgram::Imp::Create(const char* vertex_shader_file, const
             GLB_SAFE_ASSERT(false);
         }
     } else {
-        GLB_SAFE_ASSERT(false);
+        GLB_USER_ERROR_MSG("Failed to create vertex or fragment shader!\n");
     }
 
     return shader_program;
@@ -697,6 +707,26 @@ void UberProgram::Imp::SetID(int32_t shader_id) {
 
 const char* UberProgram::Imp::GetShaderName() const {
     return m_ShaderName;
+}
+
+const char* UberProgram::Imp::GetVertexShaderName() const {
+    if (m_VertexShader) {
+        return m_VertexShader->GetShaderName();
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return nullptr;
+}
+
+const char* UberProgram::Imp::GetFragmentShaderName() const {
+    if (m_FragmentShader) {
+        return m_FragmentShader->GetShaderName();
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return nullptr;
 }
 
 void UberProgram::Imp::SetProgramType(int32_t type) {

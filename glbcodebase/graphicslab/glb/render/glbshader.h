@@ -98,6 +98,7 @@ public:
     static VertexShader* Create(std::vector<std::string> enable_macros, const char* uber_shader_file_name);
 
 public:
+    const char* GetShaderName() const;
     uint32_t GetHandle() const;
 
 protected:
@@ -135,6 +136,7 @@ public:
     static FragmentShader* Create(std::vector<std::string> enable_macros, const char* uber_shader_file_name);
 
 public:
+    const char* GetShaderName() const;
     uint32_t GetHandle() const;
 
 protected:
@@ -160,6 +162,8 @@ public:
     };
 
     virtual const char* GetShaderName() const = 0;
+    virtual const char* GetVertexShaderName() const = 0;
+    virtual const char* GetFragmentShaderName() const = 0;
     virtual void SetProgramType(int32_t type) = 0;
     virtual int32_t GetProgramType() = 0;
     virtual void SetID(int32_t id) = 0;
@@ -177,13 +181,15 @@ public:
     static UberProgram* Create(Descriptor desc);
 
 public:
-    virtual void SetID(int32_t id);
-    virtual const char* GetShaderName() const;
-    virtual void SetProgramType(int32_t type);
-    virtual int32_t GetProgramType();
-    virtual ShaderLayout GetShaderLayout();
-    virtual void* GetNativeShader();
-    virtual std::vector<ShaderParameter> GetProgramParameter();
+    virtual void SetID(int32_t id) override;
+    virtual const char* GetShaderName() const override;
+    virtual const char* GetVertexShaderName() const override;
+    virtual const char* GetFragmentShaderName() const override;
+    virtual void SetProgramType(int32_t type) override;
+    virtual int32_t GetProgramType() override;
+    virtual ShaderLayout GetShaderLayout() override;
+    virtual void* GetNativeShader() override;
+    virtual std::vector<ShaderParameter> GetProgramParameter() override;
 
     Descriptor GetShaderDescriptor();
     std::vector<uniform::UniformEntry>& GetUniforms();
@@ -210,13 +216,15 @@ public:
     static UserProgram* Create(const char* vertex_shader_file, const char* fragment_shader_file, const char* geometry_shader = nullptr);
 
 public:
-    virtual void SetID(int32_t id);
-    const char* GetShaderName() const;
-    virtual void SetProgramType(int32_t type);
-    virtual int32_t GetProgramType();
-    virtual ShaderLayout GetShaderLayout();
-    virtual void* GetNativeShader();
-    virtual std::vector<ShaderParameter> GetProgramParameter();
+    virtual void SetID(int32_t id) override;
+    virtual const char* GetShaderName() const override;
+    virtual const char* GetVertexShaderName() const override;
+    virtual const char* GetFragmentShaderName() const override;
+    virtual void SetProgramType(int32_t type) override;
+    virtual int32_t GetProgramType() override;
+    virtual ShaderLayout GetShaderLayout() override;
+    virtual void* GetNativeShader() override;
+    virtual std::vector<ShaderParameter> GetProgramParameter() override;
 
     int32_t GetUniformLocation(const char* uniform_name);
 
@@ -242,7 +250,16 @@ public:
     static void Destroy();
 
 public:
+    static int32_t AddUberShader(UberProgram* shader);
+
+    // This method will check if same shader already exists.
+    // If so, return it; otherwise create new shader
     static int32_t AddUberShader(const char* vertex_shader_file, const char* fragment_shader_file, const char* geometry_shader_file = nullptr);
+
+    // Try to replace shader which has same name.
+    // If success, return id; otherwise return -1.
+    static int32_t ReplaceUberShader(UberProgram* shader);
+
     static Program* GetShader(int32_t shader_id);
     static int32_t GetUberShaderID(Descriptor desc);
 };

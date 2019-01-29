@@ -522,7 +522,7 @@ int32_t PFCTextureReader::ReadTexture(const char* fileName, int8_t** textureData
     fread(&texWidth, sizeof(int32_t), 1, file);
     fread(&texHeight, sizeof(int32_t), 1, file);
 
-    int32_t miplevels = static_cast<int32_t>(log(max(texWidth, texHeight)) / log(2) + 1);
+    int32_t miplevels = static_cast<int32_t>(std::log(max(texWidth, texHeight)) / std::log(2) + 1);
     int32_t sizeBytes = 0;
     for (int32_t i = 0; i < miplevels; i++) {
         sizeBytes = sizeBytes + static_cast<int32_t>(sizeof(int16_t) * 4 * (texWidth * pow(2, -i)) * (texHeight * pow(2, -i)) * 6);

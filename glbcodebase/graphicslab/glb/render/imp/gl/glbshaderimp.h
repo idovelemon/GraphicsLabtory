@@ -29,6 +29,7 @@ public:
     static VertexShader::Imp* Create(std::vector<std::string> enable_macros, const char* uber_shader_file_name);
 
 public:
+    const char* GetShaderName() const;
     uint32_t GetHandle() const;
 
 protected:
@@ -36,6 +37,7 @@ protected:
 
 private:
     uint32_t m_VertexShader;
+    char m_ShaderName[kShaderNameMaxLength];
 };
 
 //----------------------------------------------------------------------------------
@@ -64,12 +66,14 @@ public:
     static FragmentShader::Imp* Create(std::vector<std::string> enable_macros, const char* uber_shader_file_name);
 
 public:
+    const char* GetShaderName() const;
     uint32_t GetHandle() const;
 
 protected:
     Imp();
 
 private:
+    char m_ShaderName[kShaderNameMaxLength];
     uint32_t m_FragmentShader;
 };
 
@@ -85,6 +89,8 @@ public:
 public:
     void SetID(int32_t id);
     const char* GetShaderName() const;
+    const char* GetVertexShaderName() const;
+    const char* GetFragmentShaderName() const;
     void SetProgramType(int32_t type);
     int32_t GetProgramType();
     ShaderLayout GetShaderLayout();
