@@ -8,10 +8,10 @@
 
 in vec2 vs_texcoord;
 
-uniform sampler2D glb_Tex;
+uniform sampler2D glb_unif_Tex;
 
 out vec3 oColor;
 
 void main() {
-    oColor = texture(glb_Tex, vs_texcoord).xyz;
+    oColor = texture(glb_unif_Tex, vs_texcoord).xyz;
 }

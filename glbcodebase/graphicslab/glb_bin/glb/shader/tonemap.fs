@@ -9,8 +9,9 @@
 in vec2 vs_texcoord;
 out vec4 color;
 
-uniform sampler2D glb_Tex;
-uniform sampler2D glb_BloomTex[4];
+uniform sampler2D glb_unif_Tex;
+uniform sampler2D glb_unif_BloomTex[4];
+uniform float glb_unif_BloomWeight[4];
 
 const float kGamma = 2.2;
 const float A = 0.22;
@@ -27,13 +28,13 @@ vec3 Uncharted2Tonemap(vec3 x)
 }
 
 void main() {
-	vec3 hdrColor = texture2D(glb_Tex, vs_texcoord).xyz;
-	vec3 bloom0Color = texture2D(glb_BloomTex[0], vs_texcoord).xyz;
-	vec3 bloom1Color = texture2D(glb_BloomTex[1], vs_texcoord).xyz;
-	vec3 bloom2Color = texture2D(glb_BloomTex[2], vs_texcoord).xyz;
-	vec3 bloom3Color = texture2D(glb_BloomTex[3], vs_texcoord).xyz;
+	vec3 hdrColor = texture2D(glb_unif_Tex, vs_texcoord).xyz;
+	vec3 bloom0Color = texture2D(glb_unif_BloomTex[0], vs_texcoord).xyz;
+	vec3 bloom1Color = texture2D(glb_unif_BloomTex[1], vs_texcoord).xyz;
+	vec3 bloom2Color = texture2D(glb_unif_BloomTex[2], vs_texcoord).xyz;
+	vec3 bloom3Color = texture2D(glb_unif_BloomTex[3], vs_texcoord).xyz;
 
-	hdrColor = hdrColor + bloom0Color * 0.05 + bloom1Color * 0.05 + bloom2Color * 0.05+ bloom3Color * 0.01;
+	hdrColor = hdrColor + bloom0Color * glb_unif_BloomWeight[0] + bloom1Color * glb_unif_BloomWeight[1] + bloom2Color * glb_unif_BloomWeight[2] + bloom3Color * glb_unif_BloomWeight[3];
 
     // base tone mapping
 	hdrColor = Uncharted2Tonemap(hdrColor);
