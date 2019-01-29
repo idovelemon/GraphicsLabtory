@@ -59,9 +59,11 @@
 #define GLB_SAFE_ASSERT_R(_expression_, _error_msg_) \
     do {\
         bool result = _expression_; \
-        char buffer[256];\
-        sprintf_s(buffer, "%s: %s", __FUNCTION__, _error_msg_);\
-        glb::util::log::LogPrint(buffer); \
+        if (result == false) {\
+            char buffer[256];\
+            sprintf_s(buffer, "%s: %s", __FUNCTION__, _error_msg_);\
+            glb::util::log::LogPrint(buffer); \
+        }\
         assert(result); \
     }while(false);
 
