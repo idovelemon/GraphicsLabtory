@@ -1,9 +1,9 @@
 materialparameter receiveshadow 1
 beginpass lightloop
-shader res/normal.vs res/glb_normal_shadow.fs
-passparameter glb_unif_AlbedoTex res/Material_Base_Color.bmp
+shader normal.vs glb_normal_shadow.fs
+passparameter glb_unif_AlbedoTex Material_Base_Color.bmp
 passparameter glb_unif_Roughness 0.75
 passparameter glb_unif_Metallic 0.0
-passparameter glb_unif_DiffusePFCTex res/diffuse.pfc
-passparameter glb_unif_SpecularPFCTex res/specular.pfc
+passparameter glb_unif_DiffusePFCTex diffuse.pfc
+passparameter glb_unif_SpecularPFCTex specular.pfc
 endpass

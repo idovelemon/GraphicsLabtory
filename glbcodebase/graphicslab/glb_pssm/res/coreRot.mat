@@ -1,13 +1,13 @@
 materialparameter castshadow 1
 beginpass shadow
-shader res/shadow.vs res/shadow.fs
+shader shadow.vs shadow.fs
 endpass
 beginpass lightloop
-shader res/normal.vs res/glb_normal.fs
-passparameter glb_unif_AlbedoTex res/Core_Rot_Base_Color.bmp
-passparameter glb_unif_RoughnessTex res/Core_Rot_Roughness.bmp
-passparameter glb_unif_MetallicTex res/Core_Rot_Metallic.bmp
-passparameter glb_unif_NormalTex res/Core_Rot_Normal_OpenGL.bmp
-passparameter glb_unif_DiffusePFCTex res/diffuse.pfc
-passparameter glb_unif_SpecularPFCTex res/specular.pfc
+shader normal.vs glb_normal.fs
+passparameter glb_unif_AlbedoTex Core_Rot_Base_Color.bmp
+passparameter glb_unif_RoughnessTex Core_Rot_Roughness.bmp
+passparameter glb_unif_MetallicTex Core_Rot_Metallic.bmp
+passparameter glb_unif_NormalTex Core_Rot_Normal_OpenGL.bmp
+passparameter glb_unif_DiffusePFCTex diffuse.pfc
+passparameter glb_unif_SpecularPFCTex specular.pfc
 endpass
