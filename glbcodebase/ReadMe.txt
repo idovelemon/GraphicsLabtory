@@ -5,6 +5,7 @@
 // Breif: Include some important information about the graphics labtory project
 // Update: 2017/01/14 File created. All project config information
 // Update: 2017/03/19 Add config for dx11
+// Update: 2019/01/28 Fix object file name
 //-----------------------------------------------------------------------------------
 
 /***************************************************************************************
@@ -25,7 +26,7 @@ Common->Addtional Include Directory:
 $(SolutionDir)\glb
 $(SolutionDir)\..\glew\include
 $(DXSDK_DIR)\Include
-输出文件->对象文件名:$(IntDir)/%(RelativeDir)/
+Output Files->Object File Names:$(IntDir)/Debug/%(RelativeDir)/
 
 Preprocessor->Preprocessor:
 GLB_PLATFORM_OPENGL (For opengl version graphics labtory)
@@ -58,6 +59,7 @@ C/C++ Setting:
 Common->Addtional Include Directory:
 $(SolutionDir)\glb
 $(DXSDK_DIR)\Include
+Output Files->Object File Names:$(IntDir)/Release/%(RelativeDir)/
 
 Preprocessor->Preprocessor:
 GLB_PLATFORM_DX11 (For directx11 version graphics labtory)
