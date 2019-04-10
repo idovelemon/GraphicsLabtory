@@ -307,10 +307,12 @@ FragmentShader::Imp* FragmentShader::Imp::Create(const char* fragmentShaderName)
             GLint success = 0;
             glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
             if (success == 0) {
-                GLchar infoLog[256];
-                glGetShaderInfoLog(fragmentShader, sizeof(infoLog), nullptr, infoLog);
-                infoLog[strlen(infoLog)] = '\n';
-                infoLog[strlen(infoLog) + 1] = '\0';
+                int32_t infoLogLength = 0;
+                GLchar infoLog[1024];
+                glGetShaderInfoLog(fragmentShader, sizeof(infoLog), &infoLogLength, infoLog);
+                infoLogLength = min(1024 - 2, infoLogLength);
+                infoLog[infoLogLength] = '\n';
+                infoLog[infoLogLength + 1] = '\0';
                 GLB_USER_ERROR_MSG(infoLog);
             } else {
                 result = new FragmentShader::Imp();
