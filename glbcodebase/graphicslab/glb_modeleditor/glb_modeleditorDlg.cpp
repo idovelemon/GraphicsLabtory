@@ -528,13 +528,13 @@ void Cglb_modeleditorDlg::OnMaterialAddpass()
         };
 
         // Create vertex and fragment shader file
-        if (INVALID_HANDLE_VALUE == CreateFile(addPassDlg.GetVertexShaderName(), 0, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr))
+        if (INVALID_HANDLE_VALUE == CreateFile(addPassDlg.GetVertexShaderName(), 0, 0, nullptr, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr))
         {
             cleanUp();
             return;
         }
 
-        if (INVALID_HANDLE_VALUE == CreateFile(addPassDlg.GetFragmentShaderName(), 0, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr))
+        if (INVALID_HANDLE_VALUE == CreateFile(addPassDlg.GetFragmentShaderName(), 0, 0, nullptr, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr))
         {
             cleanUp();
             return;
