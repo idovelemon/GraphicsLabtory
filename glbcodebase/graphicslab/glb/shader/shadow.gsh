@@ -76,6 +76,9 @@ float glbCalculateShadowFactor(vec3 pos, vec3 eyePos, vec3 lookAt,
 	if (shadowFactor < lightSpacePos.z) {
 		// In shadow
 		shadowFactor = 0.2;
+	} else {
+		// Out of shadow
+		shadowFactor = 1.0;
 	}
 	if (lightSpacePos.x < 0.0 || 
 		lightSpacePos.x > 1.0 ||
