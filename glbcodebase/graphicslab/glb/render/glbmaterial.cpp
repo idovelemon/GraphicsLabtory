@@ -286,17 +286,6 @@ void PassMaterial::CollectParameter() {
             memcpy(entry.name, param.name, strlen(param.name));
             entry.name[strlen(param.name)] = '\0';
 
-            // TEST
-            if (!strcmp(entry.name, "glb_unif_AlbedoTex")
-                || !strcmp(entry.name, "glb_unif_RoughnessTex")
-                || !strcmp(entry.name, "glb_unif_MetallicTex")
-                || !strcmp(entry.name, "glb_unif_NormalTex")
-                || !strcmp(entry.name, "glb_unif_EmissionTex")
-                || !strcmp(entry.name, "glb_unif_DiffusePFCTex")
-                || !strcmp(entry.name, "glb_unif_SpecularPFCTex")
-                || !strcmp(entry.name, "glb_unif_SpecularPFCLOD")) {
-                entry.type = PARAMETER_TYPE_USER;
-            }
             m_Parameters.push_back(entry);
         }
     }

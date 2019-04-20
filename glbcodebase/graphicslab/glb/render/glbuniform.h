@@ -38,33 +38,15 @@ enum {
     GLB_TRANS_INV_WORLDM,
     GLB_DECAL_VIEWM,
     GLB_DECAL_PROJM,
-    GLB_ALBEDOTEX,
-    GLB_ROUGHNESSTEX,
-    GLB_METALLICTEX,
-    GLB_ALPHATEX,
-    GLB_NORMALTEX,
-    GLB_EMISSIONTEX,
-    GLB_REFLECT_TEX,
     GLB_SHADOWTEX0,
     GLB_SHADOWTEX1,
     GLB_SHADOWTEX2,
     GLB_SHADOWTEX3,
-    GLB_DIFFUSEPFCTEX,
-    GLB_SPECULARPFCTEX,
     GLB_BRDFPFTTEX,
-    GLB_SPECULARPFCLOD,
     GLB_LIGHT0TEX,
     GLB_LIGHT1TEX,
     GLB_LIGHT2TEX,
     GLB_DECALTEX,
-    GLB_MATERIAL_AMBIENT,
-    GLB_MATERIAL_DIFFUSE,
-    GLB_MATERIAL_SPECULAR,
-    GLB_MATERIAL_EMISSION,
-    GLB_MATERIAL_POW,
-    GLB_MATERIAL_ALBEDO,
-    GLB_MATERIAL_ROUGHNESS,
-    GLB_MATERIAL_METALLIC,
     GLB_EYEPOS,
     GLB_LOOKAT,
     GLB_GLOBALLIGHT_AMBIENT,
@@ -96,33 +78,15 @@ static const struct {
     {"glb_unif_Trans_Inv_WorldM",                GLB_TRANS_INV_WORLDM,               0},
     {"glb_unif_DecalViewM",                     GLB_DECAL_VIEWM,                    1},
     {"glb_unif_DecalProjM",                     GLB_DECAL_PROJM,                    1},
-    {"glb_unif_AlbedoTex",                       GLB_ALBEDOTEX,                      0},
-    {"glb_unif_RoughnessTex",                    GLB_ROUGHNESSTEX,                   0},
-    {"glb_unif_MetallicTex",                     GLB_METALLICTEX,                    0},
-    {"glb_unif_AlphaTex",                        GLB_ALPHATEX,                       0},
-    {"glb_unif_NormalTex",                       GLB_NORMALTEX,                      0},
-    {"glb_unif_EmissionTex",                     GLB_EMISSIONTEX,                    0},
-    {"glb_unif_ReflectTex",                      GLB_REFLECT_TEX,                    0},
     {"glb_unif_ShadowTex0",                      GLB_SHADOWTEX0,                     0},
     {"glb_unif_ShadowTex1",                      GLB_SHADOWTEX1,                     0},
     {"glb_unif_ShadowTex2",                      GLB_SHADOWTEX2,                     0},
     {"glb_unif_ShadowTex3",                      GLB_SHADOWTEX3,                     0},
-    {"glb_unif_DiffusePFCTex",                   GLB_DIFFUSEPFCTEX,                  0},
-    {"glb_unif_SpecularPFCTex",                  GLB_SPECULARPFCTEX,                 0},
     {"glb_unif_BRDFPFTTex",                      GLB_BRDFPFTTEX,                     1},
-    {"glb_unif_SpecularPFCLOD",                  GLB_SPECULARPFCLOD,                 0},
     {"glb_unif_Light0Tex",                       GLB_LIGHT0TEX,                      0},
     {"glb_unif_Light1Tex",                       GLB_LIGHT1TEX,                      0},
     {"glb_unif_Light2Tex",                       GLB_LIGHT2TEX,                      0},
     {"glb_unif_DecalTex",                        GLB_DECALTEX,                       1},
-    {"glb_unif_Material_Ambient",                GLB_MATERIAL_AMBIENT,               0},
-    {"glb_unif_Material_Diffuse",                GLB_MATERIAL_DIFFUSE,               0},
-    {"glb_unif_Material_Specular",               GLB_MATERIAL_SPECULAR,              0},
-    {"glb_unif_Material_Emission",               GLB_MATERIAL_EMISSION,              0},
-    {"glb_unif_Material_Pow",                    GLB_MATERIAL_POW,                   0},
-    {"glb_unif_Material_Albedo",                 GLB_MATERIAL_ALBEDO   ,             0},
-    {"glb_unif_Material_Roughness",              GLB_MATERIAL_ROUGHNESS,             0},
-    {"glb_unif_Material_Metallic",               GLB_MATERIAL_METALLIC,              0},
     {"glb_unif_EyePos",                          GLB_EYEPOS,                         1},
     {"glb_unif_LookAt",                          GLB_LOOKAT,                         1},
     {"glb_unif_GlobalLight_Ambient",             GLB_GLOBALLIGHT_AMBIENT,            1},
@@ -205,33 +169,15 @@ Wrapper uniform_shadowmindex_picker(scene::Object*);              // Pick glb_Sh
 Wrapper uniform_trans_inv_worldm_picker(scene::Object*);          // Pick glb_Trans_Inv_WorldM
 Wrapper uniform_decal_viewm_picker(scene::Object*);               // Pick glb_DecalViewM
 Wrapper uniform_decal_projm_picker(scene::Object*);               // Pick glb_DecalProjM
-Wrapper uniform_albedo_texslot_picker(scene::Object*);            // Pick glb_AlbedoTex
-Wrapper uniform_roughness_texslot_picker(scene::Object*);         // Pick glb_RoughnessTex
-Wrapper uniform_metallic_texslot_picker(scene::Object*);          // Pick glb_MetallicTex
-Wrapper uniform_alpha_texslot_picker(scene::Object*);             // Pick glb_AlphaTex
-Wrapper uniform_normal_texslot_picker(scene::Object*);            // Pick glb_NormalTex
-Wrapper uniform_emission_texslot_picker(scene::Object*);          // Pick glb_EmissionTex
-Wrapper uniform_reflect_texslot_picker(scene::Object*);           // Pick glb_ReflectTex
 Wrapper uniform_shadow0_texslot_picker(scene::Object*);           // Pick glb_ShadowTex0
 Wrapper uniform_shadow1_texslot_picker(scene::Object*);           // Pick glb_ShadowTex1
 Wrapper uniform_shadow2_texslot_picker(scene::Object*);           // Pick glb_ShadowTex2
 Wrapper uniform_shadow3_texslot_picker(scene::Object*);           // Pick glb_ShadowTex3
-Wrapper uniform_diffuse_pfc_texslot_picker(scene::Object* obj);   // Pick glb_DiffusePFC
-Wrapper uniform_specular_pfc_texslot_picker(scene::Object* obj);  // Pick glb_SpecularPFC
 Wrapper uniform_brdf_pft_texslot_picker(scene::Object* obj);      // Pick glb_BRDFPFT
-Wrapper uniform_specular_pfc_lod_pciker(scene::Object* obj);      // Pick glb_SpecularPFCLOD
 Wrapper uniform_light0_texslot_picker(scene::Object* obj);        // Pick glb_Light0Tex
 Wrapper uniform_light1_texslot_picker(scene::Object* obj);        // Pick glb_Light1Tex
 Wrapper uniform_light2_texslot_picker(scene::Object* obj);        // Pick glb_Light2Tex
 Wrapper uniform_decal_texslot_picker(scene::Object* obj);         // Pick glb_DecalTex
-Wrapper uniform_material_ambient_picker(scene::Object*);          // Pick glb_Material_Ambient
-Wrapper uniform_material_diffuse_picker(scene::Object*);          // Pick glb_Material_Diffuse
-Wrapper uniform_material_specular_picker(scene::Object*);         // Pick glb_Material_Specular
-Wrapper uniform_material_emission_picker(scene::Object*);         // Pick glb_Material_Emission
-Wrapper uniform_material_pow_picker(scene::Object*);              // Pick glb_Material_Pow
-Wrapper uniform_material_albedo_picker(scene::Object*);           // Pick glb_Material_Albedo
-Wrapper uniform_material_roughness_picker(scene::Object*);        // Pick glb_Material_Roughness
-Wrapper uniform_material_metallic_picker(scene::Object*);         // Pick glb_Material_Metallic
 Wrapper uniform_eye_pos_picker(scene::Object*);                   // Pick glb_EyePos
 Wrapper uniform_look_at_picker(scene::Object*);                   // Pick glb_LookAt
 Wrapper uniform_global_light_ambient_picker(scene::Object*);      // Pick glb_GlobalLight_Ambient
@@ -260,33 +206,15 @@ static const struct {
     {uniform_trans_inv_worldm_picker,           GLB_TRANS_INV_WORLDM},
     {uniform_decal_viewm_picker,                GLB_DECAL_VIEWM},
     {uniform_decal_projm_picker,                GLB_DECAL_PROJM},
-    {uniform_albedo_texslot_picker,             GLB_ALBEDOTEX},
-    {uniform_roughness_texslot_picker,          GLB_ROUGHNESSTEX},
-    {uniform_metallic_texslot_picker,           GLB_METALLICTEX},
-    {uniform_alpha_texslot_picker,              GLB_ALPHATEX},
-    {uniform_normal_texslot_picker,             GLB_NORMALTEX},
-    {uniform_emission_texslot_picker,           GLB_EMISSIONTEX},
-    {uniform_reflect_texslot_picker,            GLB_REFLECT_TEX},
     {uniform_shadow0_texslot_picker,            GLB_SHADOWTEX0},
     {uniform_shadow1_texslot_picker,            GLB_SHADOWTEX1},
     {uniform_shadow2_texslot_picker,            GLB_SHADOWTEX2},
     {uniform_shadow3_texslot_picker,            GLB_SHADOWTEX3},
-    {uniform_diffuse_pfc_texslot_picker,        GLB_DIFFUSEPFCTEX},
-    {uniform_specular_pfc_texslot_picker,       GLB_SPECULARPFCTEX},
     {uniform_brdf_pft_texslot_picker,           GLB_BRDFPFTTEX},
-    {uniform_specular_pfc_lod_pciker,           GLB_SPECULARPFCLOD},
     {uniform_light0_texslot_picker,             GLB_LIGHT0TEX},
     {uniform_light1_texslot_picker,             GLB_LIGHT1TEX},
     {uniform_light2_texslot_picker,             GLB_LIGHT2TEX},
     {uniform_decal_texslot_picker,              GLB_DECALTEX},
-    {uniform_material_ambient_picker,           GLB_MATERIAL_AMBIENT},
-    {uniform_material_diffuse_picker,           GLB_MATERIAL_DIFFUSE},
-    {uniform_material_specular_picker,          GLB_MATERIAL_SPECULAR},
-    {uniform_material_emission_picker,          GLB_MATERIAL_EMISSION},
-    {uniform_material_pow_picker,               GLB_MATERIAL_POW},
-    {uniform_material_albedo_picker,            GLB_MATERIAL_ALBEDO},
-    {uniform_material_roughness_picker,         GLB_MATERIAL_ROUGHNESS},
-    {uniform_material_metallic_picker,          GLB_MATERIAL_METALLIC},
     {uniform_eye_pos_picker,                    GLB_EYEPOS},
     {uniform_look_at_picker,                    GLB_LOOKAT},
     {uniform_global_light_ambient_picker,       GLB_GLOBALLIGHT_AMBIENT},
