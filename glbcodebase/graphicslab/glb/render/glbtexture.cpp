@@ -380,6 +380,14 @@ void* Texture::GetNativeTex() {
     return result;
 }
 
+void Texture::SetSampler(SamplerType samplerType, SamplerValue samplerValue) {
+    if (m_Imp != nullptr) {
+        m_Imp->SetSampler(samplerType, samplerValue);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+}
+
 //--------------------------------------------------------------------------------------
 // MgrImp DEFINITION
 //---------------------------------------------------------------------------------------

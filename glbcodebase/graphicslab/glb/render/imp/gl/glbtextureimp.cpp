@@ -70,7 +70,8 @@ Texture::Imp::Imp()
 , m_Height(0)
 , m_Depth(0)
 , m_BPP(0)
-, m_TexObj(-1) {
+, m_TexObj(-1)
+, m_EnableMipmapping(false) {
     memset(m_TexName, 0, sizeof(m_TexName));
 }
 
@@ -113,6 +114,7 @@ Texture::Imp* Texture::Imp::Create(const char* texture_name, bool enableMipmappi
             tex->m_TexObj = tex_obj;
             memcpy(tex->m_TexName, texture_name, strlen(texture_name));
             tex->m_TexName[strlen(texture_name)] = 0;
+            tex->m_EnableMipmapping = enableMipmapping;
 
             if (texture_type == util::TT_2D) {
                 tex->m_Type = TEX_2D;
@@ -195,6 +197,7 @@ Texture::Imp* Texture::Imp::CreatePrefilterCubeMap(const char* fileName) {
             tex->m_Width = texture_width;
             tex->m_Height = texture_height;
             tex->m_Depth = 0;
+            tex->m_EnableMipmapping = true;
             SetTexturePixelFormat(tex, texture_pixel_format);
         } else {
             GLB_SAFE_ASSERT(false);
@@ -235,6 +238,7 @@ Texture::Imp* Texture::Imp::CreatePrefilterTableMap(const char* fileName) {
             tex->m_Width = texture_width;
             tex->m_Height = texture_height;
             tex->m_Depth = 0;
+            tex->m_EnableMipmapping = false;
             SetTexturePixelFormat(tex, texture_pixel_format);
         } else {
             GLB_SAFE_ASSERT(false);
@@ -274,6 +278,7 @@ Texture::Imp* Texture::Imp::Create(int32_t width, int32_t height, bool enableMip
             tex->m_Height = height;
             tex->m_Format = FMT_R8G8B8A8;
             tex->m_BPP = 4;
+            tex->m_EnableMipmapping = enableMipmapping;
         } else {
             GLB_SAFE_ASSERT(false);
         }
@@ -312,6 +317,7 @@ Texture::Imp* Texture::Imp::CreateFloat32Texture(int32_t width, int32_t height, 
             tex->m_Height = height;
             tex->m_Format = FMT_R32G32B32A32F;
             tex->m_BPP = 16;
+            tex->m_EnableMipmapping = enableMipmapping;
         } else {
             GLB_SAFE_ASSERT(false);
         }
@@ -351,6 +357,7 @@ Texture::Imp* Texture::Imp::CreateFloat32DepthTexture(int32_t width, int32_t hei
             tex->m_Width = width;
             tex->m_Format = FMT_DEPTH32F;
             tex->m_BPP = 4;
+            tex->m_EnableMipmapping = enableMipmapping;
         } else {
             GLB_SAFE_ASSERT(false);
         }
@@ -396,6 +403,7 @@ Texture::Imp* Texture::Imp::CreateFloat32CubeTexture(int32_t width, int32_t heig
             tex->m_Width = width;
             tex->m_Format = FMT_R32G32B32A32F;
             tex->m_BPP = 16;
+            tex->m_EnableMipmapping = enableMipmapping;
         } else {
             GLB_SAFE_ASSERT(false);
         }
@@ -441,6 +449,7 @@ Texture::Imp* Texture::Imp::CreateFloat16CubeTexture(int32_t width, int32_t heig
             tex->m_Width = width;
             tex->m_Format = FMT_R16G16B16A16F;
             tex->m_BPP = 8;
+            tex->m_EnableMipmapping = enableMipmapping;
         } else {
             GLB_SAFE_ASSERT(false);
         }
@@ -483,6 +492,7 @@ Texture::Imp* Texture::Imp::CreateFloat323DTexture(int32_t width, int32_t height
             tex->m_Width = width;
             tex->m_Format = FMT_R32G32B32A32F;
             tex->m_BPP = 16;
+            tex->m_EnableMipmapping = enableMipmapping;
         } else {
             GLB_SAFE_ASSERT(false);
         }
@@ -806,6 +816,49 @@ const char* Texture::Imp::GetName() {
 
 int32_t Texture::Imp::GetNativeTex() {
     return m_TexObj;
+}
+
+void Texture::Imp::SetSampler(SamplerType samplerType, SamplerValue samplerValue) {
+    GLenum textureTarget = GL_TEXTURE_2D;
+    GLenum textureSamplerType = GL_TEXTURE_MAG_FILTER;
+    GLint textureSamplerValue = GL_NEAREST;
+    GLuint textureObject = m_TexObj;
+
+    if (m_Type == TEX_2D) {
+        textureTarget = GL_TEXTURE_2D;
+    } else if (m_Type == TEX_3D) {
+        textureTarget = GL_TEXTURE_3D;
+    } else if (m_Type == TEX_CUBE) {
+        textureTarget = GL_TEXTURE_CUBE_MAP;
+    }
+
+    if (samplerType == ST_MAX) {
+        textureSamplerType = GL_TEXTURE_MAG_FILTER;
+        if (samplerValue == SV_POINT) {
+            textureSamplerValue = GL_NEAREST;
+        } else if (samplerValue == SV_LINEAR) {
+            textureSamplerValue = GL_LINEAR;
+        }
+    } else if (samplerType == ST_MIN) {
+        textureSamplerType = GL_TEXTURE_MIN_FILTER;
+        if (samplerValue == SV_POINT) {
+            if (m_EnableMipmapping) {
+                textureSamplerValue = GL_NEAREST_MIPMAP_NEAREST;
+            } else {
+                textureSamplerValue = GL_NEAREST;
+            }
+        } else if (samplerValue == SV_LINEAR) {
+            if (m_EnableMipmapping) {
+                textureSamplerValue = GL_LINEAR_MIPMAP_LINEAR;
+            } else {
+                textureSamplerValue = GL_LINEAR;
+            }
+        }
+    }
+
+    glEnable(textureTarget);
+    glBindTexture(textureTarget, textureObject);
+    glTexParameteri(textureTarget, textureSamplerType, textureSamplerValue);
 }
 
 };  // namespace texture

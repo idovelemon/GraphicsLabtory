@@ -52,6 +52,16 @@ public:
         FMT_DEPTH32F,
     };
 
+    enum SamplerType {
+        ST_MAX = 0,
+        ST_MIN,
+    };
+
+    enum SamplerValue {
+        SV_POINT = 0,
+        SV_LINEAR,
+    };
+
 public:
     Texture();
     virtual ~Texture();
@@ -75,6 +85,8 @@ public:
     const char* GetName();
     int32_t GetType();
     void* GetNativeTex();
+
+    void SetSampler(SamplerType samplerType, SamplerValue samplerValue);
 
     void Destroy();
     void UpdateTextureData(const void* pixel, int32_t miplevel = 0);

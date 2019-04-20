@@ -64,6 +64,8 @@ public:
     const char* GetName();
     int32_t GetNativeTex();
 
+    void SetSampler(SamplerType samplerType, SamplerValue samplerValue);
+
     void Destroy();
     void UpdateTextureData(const void* pixel, int32_t miplevel);
     void GetTextureData(void* pixel, int32_t miplevel);
@@ -83,6 +85,7 @@ private:
     int32_t m_BPP;                     // The Bytes per pixel of the texture
     char    m_TexName[kMaxTexNameLen]; // The name of the texture
     int32_t m_TexObj;                  // The texture object in opengl
+    bool    m_EnableMipmapping;        // If texture enable mipmapping
 };
 
 };  // namespace texture
