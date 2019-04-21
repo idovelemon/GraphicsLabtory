@@ -12,6 +12,7 @@
 #include "glb_modeleditor_core.h"
 
 #include <fstream>
+#include <wtypes.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -56,6 +57,7 @@ END_MESSAGE_MAP()
 Cglb_modeleditorDlg::Cglb_modeleditorDlg(CWnd* pParent /*=NULL*/)
 	: CDialog(Cglb_modeleditorDlg::IDD, pParent)
     , m_ChoosePass(-1)
+    , m_CurSelProperty(nullptr)
 {
 	//m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
     m_hIcon = AfxGetApp()->LoadIcon(IDI_ICON1);
@@ -84,6 +86,7 @@ BEGIN_MESSAGE_MAP(Cglb_modeleditorDlg, CDialog)
     ON_REGISTERED_MESSAGE(AFX_WM_PROPERTY_CHANGED, &Cglb_modeleditorDlg::OnPropertyChanged)
     ON_COMMAND(ID_MATERIAL_SAVE, &Cglb_modeleditorDlg::OnMaterialSave)
     ON_COMMAND(ID_MATERIAL_ADDEXSIT, &Cglb_modeleditorDlg::OnMaterialAddexsit)
+    ON_WM_MOUSEWHEEL()
 END_MESSAGE_MAP()
 
 
@@ -152,6 +155,9 @@ BOOL Cglb_modeleditorDlg::OnInitDialog()
     item.cxy = 120;
     item.mask = HDI_WIDTH;
     m_PassParamGridCtrl.GetHeaderCtrl().SetItem(0, &item);
+
+    // Set current window has focus
+    SetFocus();
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
@@ -1021,4 +1027,20 @@ void Cglb_modeleditorDlg::BuildMaterial(CString fileName, const char* filePath)
 
     // Get all pass parameters
     m_MaterialInfo.passParameters = ApplicationCore::GetInstance()->GetAllPassParameters();
+}
+
+
+BOOL Cglb_modeleditorDlg::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
+{
+    // TODO: Add your message handler code here and/or call default
+    m_CurSelProperty = m_PassParamGridCtrl.GetCurSel();
+    if (m_CurSelProperty)
+    {
+        if (m_CurSelProperty->GetValue().vt == VT_R4)
+        {
+            m_CurSelProperty->SetValue(COleVariant(m_CurSelProperty->GetValue().fltVal + 0.005f * abs(zDelta) / zDelta));
+            SendMessage(AFX_WM_PROPERTY_CHANGED, 0, LPARAM(m_CurSelProperty));
+        }
+    }
+    return CDialog::OnMouseWheel(nFlags, zDelta, pt);
 }
