@@ -9,15 +9,20 @@ GLB(GraphicsLabtory) library is a light-weight 3D rendering library.
 |-|-|-|-|
 |Resource System problem:When destroy an object, how to deal with the mesh and texture resource associated with it? |2018-06-09 10:10||<font color="Blue">New</font>|
 |Model Editor|2018-06-10 22:40|2018-07-01 17:25|<font color="Green">Finish</font>|
-|Rename build-in attribute and uniform with glb_attr_xxx and glb_uni_xxx|2018-07-01 17:25||<font color="Blue">New</font>|
-|Using fixed layout (location = n) for uber shader|2018-07-01 17:25||<font color="Blue">New</font>|
-|Font rendering|2018-07-01 17:25||<font color="Blue">New</font>|
-|Build-in debug menu|2018-07-01 17:25||<font color="Blue">New</font>|
+|Rename build-in attribute and uniform with glb_attr_xxx and glb_uni_xxx|2018-07-01 17:25|2019-01-01|<font color="Green">Finish</font>|
+|Using fixed layout (location = n) for uber shader|2018-07-01 17:25|2019-01-01|<font color="Green">Finish</font>|
+|Font rendering|2018-07-01 17:25|2019-01-01|<font color="Green">Finish</font>|
+|Build-in debug menu|2018-07-01 17:25|2019-01-01|<font color="Green">Finish</font>|
+|How to merge same material with same shader|2019-03-15 21:47||<font color="Blue">New</font>|
+|One material instance can only be used in one object, need a way to avoid multiple objects using same material instance|2019-04-10 07:42||<font color="Blue">New</font>|
 
 |Bug|Begin Time|Fnish Time|Status|
 |-|-|-|-|
 |Missing shader type when create shader|2018-06-11 15:20|2018-06-07-01|<font color="Green">Finish</font>|
 |Calculate boundbox with rotation|2018-07-01 17:25||<font color="Blue">New</font>|
+|Remove debug menu item|2019-03-14 22:18||<font color="Blue">New</font>|
+|Fix mesh do not save resource file name's problem|2019-04-09 8:33||<font color="Blue">New</font>|
+|Add alpha dithering shader code|2019-04-10 22:53||<font color="Blue">New</font>|
 
 ## GLB LightStudio
 Light studio is used for baking Lightmap with Radiosity Normal Mapping(RNM) and precompute LightProbe for image based lighting
@@ -90,11 +95,16 @@ GLB ModelEditor is used for convert DCC tool's export file format to GLB library
 |Support for second uv|2018-06-11 22:35|2018-06-11 23:05|<font color="Green">Finish</font>|
 |Support for alpha texture|2018-06-11 22:35|2018-06-12 10:35|<font color="Green">Finish</font>|
 |Support for emission texture|2018-06-11 22:35|2018-06-12 11:05|<font color="Green">Finish</font>|
-|Support for diffuse and specular environment texture|2018-06-11 22:35||<font color="Blue">New</font>|
+|Support for diffuse and specular environment texture|2018-06-11 22:35||<font color="Red">Discard</font>|
 |Support for light map texture|2018-06-11 22:35|2018-06-15 07:50|<font color="Green">Finish</font>|
 |Copy texture when export model|2018-06-11 23:10|2018-06-12 11:15|<font color="Green">Finish</font>|
-|Clear texture in editor mode|2018-06-12 12:35||<font color="Blue">New</font>|
-|Edit emission intensity at editor mode|2018-06-21 20:00||<font color="Blue">New</font>|
+|Clear texture in editor mode|2018-06-12 12:35||<font color="Red">Discard</font>|
+|Edit emission intensity at editor mode|2018-06-21 20:00||<font color="Red">Discard</font>|
+|Support for reopen material file and edit it again|2019-03-10 16:22|2019-04-21 21:37|<font color="Green">Finish</font>|
+|Support for edit general post-processing parameter|2019-03-10 16:22||<font color="Blue">New</font>|
+|Support for slide edit control for material parameters|2019-03-14 22:21|2019-04-21 23:11|<font color="Green">Finish</font>|
+|Support add exist shader when adding pass material|2019-04-10 21:33|2019-04-10 22:23|<font color="Green">Finish</font>|
+|Support add default shadow pass material, just because most of the object has the same shadow pass material|2019-04-18 08:26||<font color="Blue">New</font>|
 
 |Bug|Begin Time|Fnish Time|Status|
 |-|-|-|-|
@@ -103,5 +113,8 @@ GLB ModelEditor is used for convert DCC tool's export file format to GLB library
 |Disabled preview after import a model|2018-06-11 22:30|2018-06-12 11:55|<font color="Green">Finish</font>|
 |Do not enable texture file browser button after preview a model|2018-06-12 11:05|2018-06-12 11:55|<font color="Green">Finish</font>|
 |Display default environment cube map|2018-06-12 11:15|2018-06-12 12:20|<font color="Green">Finish</font>|
-|Import a model again : GLB init failed|2018-06-20 8:00||<font color="Blue">New</font>|
-|Check if has texcoord when set albedo/roughness/metallic/normal/alpha/emission texture|2018-06-23 18:15||<font color="Blue">New</font>|
+|Import a model again : GLB init failed|2018-06-20 8:00||<font color="Red">Discard</font>|
+|Check if has texcoord when set albedo/roughness/metallic/normal/alpha/emission texture|2018-06-23 18:15||<font color="Red">Discard</font>|
+|Check only has emission material|2018-08-19 17:35||<font color="Red">Discard</font>|
+|Fix space key closing window problem|2019-04-10 22:03||<font color="Blue">New</font>|
+|Hasn't copy shader file when save material|2019-04-10 23:00||<font color="Blue">New</font>|
