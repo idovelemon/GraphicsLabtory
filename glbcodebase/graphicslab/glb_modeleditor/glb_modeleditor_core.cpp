@@ -370,11 +370,15 @@ bool ApplicationCore::SaveMaterial(const char* name) {
             const char* fragmentShaderName = glb::render::shader::Mgr::GetShader(pass->GetShaderID())->GetFragmentShaderName();
             output << "shader " << util::path_get_name(vertexShaderName).c_str() << " " << util::path_get_name(fragmentShaderName).c_str() << "\n";
 
+            std::string srcFragmentShaderName = util::path_get_dir(vertexShaderName) + util::path_get_name(fragmentShaderName).substr(4);
+
             // Copy shader file
             std::string destVertexShaderName = destDir.empty() ? util::path_get_name(vertexShaderName) : (destDir + '\\' + util::path_get_name(vertexShaderName));
             std::string destFragmentShaderName = destDir.empty() ? util::path_get_name(fragmentShaderName) : (destDir + '\\' + util::path_get_name(fragmentShaderName));
+            std::string destSrcFragmentShaderName = destDir.empty() ? util::path_get_name(srcFragmentShaderName.c_str()) : (destDir + '\\' + util::path_get_name(srcFragmentShaderName.c_str()));
             CopyFileA(vertexShaderName, destVertexShaderName.c_str(), TRUE);
             CopyFileA(fragmentShaderName, destFragmentShaderName.c_str(), TRUE);
+            CopyFileA(srcFragmentShaderName.c_str(), destSrcFragmentShaderName.c_str(), TRUE);
 
             for (auto& param : pass->GetAllParameters()) {
                 if (param.type == glb::render::material::PassMaterial::PARAMETER_TYPE_USER) {
@@ -506,6 +510,25 @@ std::vector<glb::render::material::PassMaterial::ParameterEntry>& ApplicationCor
     }
 
     static std::vector<glb::render::material::PassMaterial::ParameterEntry> sNonePassParameters;
+    return sNonePassParameters;
+}
+
+std::vector<std::vector<glb::render::material::PassMaterial::ParameterEntry>> ApplicationCore::GetAllPassParameters() {
+    std::vector<std::vector<glb::render::material::PassMaterial::ParameterEntry>> result;
+    glb::render::material::Material* mat = glb::render::material::Mgr::GetMaterial(m_Material);
+    if (mat) {
+        std::vector<glb::render::material::PassMaterial*>& allPassMaterial = mat->GetAllPassMaterial();
+        for (glb::render::material::PassMaterial* pass : allPassMaterial) {
+            if (pass) {
+                result.push_back(pass->GetAllParameters());
+            }
+        }
+        return result;
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    static std::vector<std::vector<glb::render::material::PassMaterial::ParameterEntry>> sNonePassParameters;
     return sNonePassParameters;
 }
 

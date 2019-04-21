@@ -11,6 +11,8 @@
 #include "glb.h"
 #include "glb_modeleditor_core.h"
 
+#include <fstream>
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -383,6 +385,7 @@ void Cglb_modeleditorDlg::OnMaterialAdd()
 
         // Save material name
         m_MaterialInfo.materialName = addMaterialDlg.GetMaterialName();
+        m_WorkSpaceDirectory = m_MaterialInfo.materialName + L'\\';
 
         // Add Material Node to tree
         m_TreeItemTbl[CString(TEXT("MaterialName"))] = m_MatTreeCtrl.InsertItem(m_MaterialInfo.materialName, TVI_ROOT);
@@ -433,6 +436,7 @@ void Cglb_modeleditorDlg::OnMaterialAddexsit()
     if (IDOK == fileDlg.DoModal())
     {
         CString filePath = fileDlg.GetPathName();
+        CString fileName = fileDlg.GetFileName();
 
         // Disable menu
         GetMenu()->EnableMenuItem(ID_FILE_IMPORT, MF_DISABLED);
@@ -440,15 +444,31 @@ void Cglb_modeleditorDlg::OnMaterialAddexsit()
         GetMenu()->EnableMenuItem(ID_FILE_PREVIEW, MF_DISABLED);
         GetMenu()->EnableMenuItem(1, MF_DISABLED | MF_BYPOSITION);
 
-        // Load material
         char *pcstr = (char *)new char[2 * wcslen(filePath.GetBuffer(0)) + 1] ;
         memset(pcstr, 0, 2 * wcslen(filePath.GetBuffer(0)) + 1);
         wcstombs(pcstr, filePath.GetBuffer(0), wcslen(filePath.GetBuffer(0)));
-        if (!ApplicationCore::GetInstance()->AddMaterial(pcstr))
+
+        if (!LoadFileToRender(pcstr))
         {
             ::MessageBox(NULL, L"Add material failed", L"ERROR", MB_OK);
             exit(0);
         }
+
+        BuildMaterial(fileName, pcstr);
+
+        bool bReady = CheckIsAllFileReady(filePath);
+        if (bReady)
+        {
+            CopyFileToWorkSpace(filePath);
+            LoadFileToEditor();
+
+            // Enable Material|Save
+            GetMenu()->EnableMenuItem(1, MF_ENABLED | MF_BYPOSITION);
+            GetMenu()->EnableMenuItem(ID_MATERIAL_SAVE, MF_ENABLED);
+            GetMenu()->EnableMenuItem(ID_MATERIAL_ADD, MF_DISABLED);
+            GetMenu()->EnableMenuItem(ID_MATERIAL_ADDEXSIT, MF_DISABLED);
+        }
+
         delete[] pcstr;
         pcstr = nullptr;
     }
@@ -528,13 +548,14 @@ void Cglb_modeleditorDlg::OnMaterialAddpass()
         };
 
         // Create vertex and fragment shader file
-        if (INVALID_HANDLE_VALUE == CreateFile(addPassDlg.GetVertexShaderName(), 0, 0, nullptr, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr))
+        CreateDirectory(m_WorkSpaceDirectory, nullptr);
+        if (INVALID_HANDLE_VALUE == CreateFile(m_WorkSpaceDirectory + addPassDlg.GetVertexShaderName(), 0, 0, nullptr, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr))
         {
             cleanUp();
             return;
         }
 
-        if (INVALID_HANDLE_VALUE == CreateFile(addPassDlg.GetFragmentShaderName(), 0, 0, nullptr, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr))
+        if (INVALID_HANDLE_VALUE == CreateFile(m_WorkSpaceDirectory + addPassDlg.GetFragmentShaderName(), 0, 0, nullptr, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr))
         {
             cleanUp();
             return;
@@ -565,20 +586,17 @@ void Cglb_modeleditorDlg::OnPassCompile()
         (*src) = nullptr;
     };
 
-    // Get shader name
-    char* vertexName = WideToMultiByte(m_MaterialInfo.vertexShaderName[m_ChoosePass].GetString());
-    char* fragmentName = WideToMultiByte(m_MaterialInfo.fragmentShaderName[m_ChoosePass].GetString());
-
     // Get pass name
     char* passName = WideToMultiByte(m_MaterialInfo.passName[m_ChoosePass].GetString());
 
-    // GLB_SRP generate file name
-    char glbFragmentShaderName[128];
-    sprintf_s(glbFragmentShaderName, "glb_%s", fragmentName);
+    // Get shader name
+    char* vertexName = WideToMultiByte(m_WorkSpaceDirectory + m_MaterialInfo.vertexShaderName[m_ChoosePass].GetString());
+    char* fragmentName = WideToMultiByte(m_WorkSpaceDirectory + m_MaterialInfo.fragmentShaderName[m_ChoosePass].GetString());
+    char* glbFragmentShaderName = WideToMultiByte(m_WorkSpaceDirectory + L"glb_" + m_MaterialInfo.fragmentShaderName[m_ChoosePass].GetString());
 
     // Python command line
     char commandLine[128];
-    sprintf_s(commandLine, "python GLB_SRP.py %s %s", fragmentName, glbFragmentShaderName);
+    sprintf_s(commandLine, "python GLB_SRP.py ..\\glb\\shader\\ %s %s", fragmentName, glbFragmentShaderName);
 
     // Run GLB_SRP python script
     system(commandLine);
@@ -697,6 +715,7 @@ void Cglb_modeleditorDlg::OnPassCompile()
     DestroyMultiByte(&passName);
     DestroyMultiByte(&fragmentName);
     DestroyMultiByte(&vertexName);
+    DestroyMultiByte(&glbFragmentShaderName);
 }
 
 
@@ -802,4 +821,204 @@ LRESULT Cglb_modeleditorDlg::OnPropertyChanged(WPARAM wparam, LPARAM lparam)
     }
 
     return 0;
+}
+
+bool Cglb_modeleditorDlg::LoadFileToRender(const char* materialFilePath)
+{
+    return ApplicationCore::GetInstance()->AddMaterial(materialFilePath);
+}
+
+bool Cglb_modeleditorDlg::CheckIsAllFileReady(CString filePath)
+{
+    // Assume all file in the same directory
+    CString fileDirectory = filePath.Left(filePath.ReverseFind(L'\\') + 1);
+
+    {
+        DWORD attri = GetFileAttributes(filePath);
+        if (INVALID_FILE_ATTRIBUTES == attri || (attri & FILE_ATTRIBUTE_DIRECTORY))
+        {
+            return false;
+        }
+    }
+
+    {
+        for (int32_t i = 0; i < m_MaterialInfo.vertexShaderName.GetSize(); i++)
+        {
+            filePath = fileDirectory + m_MaterialInfo.vertexShaderName[i];
+            DWORD attri = GetFileAttributes(filePath);
+            if (INVALID_FILE_ATTRIBUTES == attri || (attri & FILE_ATTRIBUTE_DIRECTORY))
+            {
+                return false;
+            }
+        }
+    }
+
+    {
+        for (int32_t i = 0; i < m_MaterialInfo.vertexShaderName.GetSize(); i++)
+        {
+            filePath = fileDirectory + m_MaterialInfo.fragmentShaderName[i];
+            DWORD attri = GetFileAttributes(filePath);
+            if (INVALID_FILE_ATTRIBUTES == attri || (attri & FILE_ATTRIBUTE_DIRECTORY))
+            {
+                return false;
+            }
+        }
+    }
+
+    {
+        for (int32_t i = 0; i < m_MaterialInfo.vertexShaderName.GetSize(); i++)
+        {
+            filePath = fileDirectory + CString(L"glb_") + (m_MaterialInfo.fragmentShaderName[i]);
+            DWORD attri = GetFileAttributes(filePath);
+            if (INVALID_FILE_ATTRIBUTES == attri || (attri & FILE_ATTRIBUTE_DIRECTORY))
+            {
+                return false;
+            }
+        }
+    }
+
+    {
+        for (int32_t i = 0; i < static_cast<int32_t>(m_MaterialInfo.passParameters.size()); i++)
+        {
+            for (int32_t j = 0; j < static_cast<int32_t>(m_MaterialInfo.passParameters[i].size()); j++)
+            {
+                if (m_MaterialInfo.passParameters[i][j].type == glb::render::material::PassMaterial::PARAMETER_TYPE_USER
+                    && (m_MaterialInfo.passParameters[i][j].format == glb::render::PARAMETER_FORMAT_TEXTURE_2D
+                    || m_MaterialInfo.passParameters[i][j].format == glb::render::PARAMETER_FORMAT_TEXTURE_3D
+                    || m_MaterialInfo.passParameters[i][j].format == glb::render::PARAMETER_FORMAT_TEXTURE_CUBE))
+                {
+                    filePath = fileDirectory + CString(m_MaterialInfo.passParameters[i][j].name);
+                    DWORD attri = GetFileAttributes(filePath);
+                    if (INVALID_FILE_ATTRIBUTES == attri || (attri & FILE_ATTRIBUTE_DIRECTORY))
+                    {
+                        return false;
+                    }
+                }
+            }
+        }
+    }
+
+    return true;
+}
+
+void Cglb_modeleditorDlg::CopyFileToWorkSpace(CString filePath)
+{
+    // Assume all file in the same directory
+    CString srcFileDirectory = filePath.Left(filePath.ReverseFind(L'\\')) + L'\\';
+    CString destFileDirectory = filePath.Mid(filePath.ReverseFind(L'\\') + 1);
+    destFileDirectory = destFileDirectory.Left(destFileDirectory.ReverseFind(L'.')) + L'\\';
+    CreateDirectory(destFileDirectory, nullptr);
+
+    {
+        for (int32_t i = 0; i < m_MaterialInfo.vertexShaderName.GetSize(); i++)
+        {
+            CString srcfilePath = srcFileDirectory + m_MaterialInfo.vertexShaderName[i];
+            CString destFilePath = destFileDirectory + m_MaterialInfo.vertexShaderName[i];
+            CopyFile(srcfilePath, destFilePath, FALSE);
+        }
+    }
+
+    {
+        for (int32_t i = 0; i < m_MaterialInfo.vertexShaderName.GetSize(); i++)
+        {
+            CString srcfilePath = srcFileDirectory + m_MaterialInfo.fragmentShaderName[i];
+            CString destFilePath = destFileDirectory + m_MaterialInfo.fragmentShaderName[i];
+            CopyFile(srcfilePath, destFilePath, FALSE);
+        }
+    }
+
+    //{
+    //    for (int32_t i = 0; i < m_MaterialInfo.vertexShaderName.GetSize(); i++)
+    //    {
+    //        CString srcfilePath = srcFileDirectory + CString(L"glb_") + m_MaterialInfo.fragmentShaderName[i];
+    //        CString destFilePath = destFileDirectory + CString(L"glb_") + m_MaterialInfo.fragmentShaderName[i];
+    //        CopyFile(srcfilePath, destFilePath, FALSE);
+    //    }
+    //}
+
+    {
+        for (int32_t i = 0; i < static_cast<int32_t>(m_MaterialInfo.passParameters.size()); i++)
+        {
+            for (int32_t j = 0; j < static_cast<int32_t>(m_MaterialInfo.passParameters[i].size()); j++)
+            {
+                if (m_MaterialInfo.passParameters[i][j].type == glb::render::material::PassMaterial::PARAMETER_TYPE_USER
+                    && (m_MaterialInfo.passParameters[i][j].format == glb::render::PARAMETER_FORMAT_TEXTURE_2D
+                    || m_MaterialInfo.passParameters[i][j].format == glb::render::PARAMETER_FORMAT_TEXTURE_3D
+                    || m_MaterialInfo.passParameters[i][j].format == glb::render::PARAMETER_FORMAT_TEXTURE_CUBE))
+                {
+                    CString srcfilePath = srcFileDirectory + CString(m_MaterialInfo.passParameters[i][j].name);
+                    CString destFilePath = destFileDirectory + CString(m_MaterialInfo.passParameters[i][j].name);
+                    CopyFile(srcfilePath, destFilePath, FALSE);
+                }
+            }
+        }
+    }
+
+    m_WorkSpaceDirectory = destFileDirectory;
+}
+
+void Cglb_modeleditorDlg::LoadFileToEditor()
+{
+    // Add Material Node to tree
+    m_TreeItemTbl[CString(TEXT("MaterialName"))] = m_MatTreeCtrl.InsertItem(m_MaterialInfo.materialName, TVI_ROOT);
+
+    // Add Pass node to tree
+    for (int32_t i = 0; i < m_MaterialInfo.passName.GetCount(); i++)
+    {
+        CString name(TEXT(""));
+        name.Format(TEXT("Pass:%s VertexShader:%s FragmentShader:%s"), m_MaterialInfo.passName[i], m_MaterialInfo.vertexShaderName[i], m_MaterialInfo.fragmentShaderName[i]);
+
+        CString keyName(TEXT(""));
+        keyName.Format(TEXT("Pass:%s"), m_MaterialInfo.passName[i]);
+
+        m_TreeItemTbl[keyName] = m_MatTreeCtrl.InsertItem(name, m_TreeItemTbl[CString(TEXT("MaterialName"))]);
+    }
+
+    // Add pass parameter to property grid
+}
+
+void Cglb_modeleditorDlg::BuildMaterial(CString fileName, const char* filePath)
+{
+    // Save material name
+    m_MaterialInfo.materialName = fileName.Left(fileName.ReverseFind(L'.'));
+
+    // Read material file
+    std::ifstream input;
+    input.open(filePath);
+
+    m_MaterialInfo.fragmentShaderName.RemoveAll();
+    m_MaterialInfo.passName.RemoveAll();
+    m_MaterialInfo.passParameters.clear();
+    m_MaterialInfo.vertexShaderName.RemoveAll();
+
+    if (!input.fail())
+    {
+        while (!input.eof()) {
+            char buffer[1024];
+            input >> buffer;
+
+            // beginpass passname
+            if (!strcmp(buffer, "beginpass")) {
+                // Pass Name
+                input >> buffer;
+                m_MaterialInfo.passName.Add(CString(buffer));
+                m_MaterialInfo.passParameters.push_back(std::vector<glb::render::material::PassMaterial::ParameterEntry>());
+            } else if (!strcmp(buffer, "endpass")) {
+                // Save pass material
+            } else if (!strcmp(buffer, "shader")) {
+                char vertexShaderFile[1024];
+                char fragmentShaderFile[1024];
+                input >> vertexShaderFile >> fragmentShaderFile;
+                m_MaterialInfo.vertexShaderName.Add(CString(vertexShaderFile));
+                m_MaterialInfo.fragmentShaderName.Add(CString(fragmentShaderFile).Mid(4));
+            } else if (!strcmp(buffer, "passparameter")) {
+
+            }
+        }
+    }
+
+    input.close();
+
+    // Get all pass parameters
+    m_MaterialInfo.passParameters = ApplicationCore::GetInstance()->GetAllPassParameters();
 }

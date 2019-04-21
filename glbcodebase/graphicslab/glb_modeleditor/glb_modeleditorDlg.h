@@ -63,10 +63,18 @@ protected:
     afx_msg LRESULT OnPropertyChanged(WPARAM wparam, LPARAM lparam);
 	DECLARE_MESSAGE_MAP()
 
+protected:
+    bool LoadFileToRender(const char* materialFilePath);
+    void BuildMaterial(CString fileName, const char* filePath);
+    bool CheckIsAllFileReady(CString filePath);
+    void CopyFileToWorkSpace(CString filePath);
+    void LoadFileToEditor();
+
 private:
     CTreeCtrl m_MatTreeCtrl;
     CMFCPropertyGridCtrl m_PassParamGridCtrl;
     SMaterial m_MaterialInfo;
+    CString m_WorkSpaceDirectory;
 
     std::map<CString, HTREEITEM>    m_TreeItemTbl;
     int                             m_ChoosePass;

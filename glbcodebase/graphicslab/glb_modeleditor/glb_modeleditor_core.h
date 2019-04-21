@@ -33,6 +33,7 @@ public:
     bool SaveMaterial(const char* name);
     bool TryCompileShader(const char* passName, const char* vertexShaderName, const char* fragmentShaderName);
     std::vector<glb::render::material::PassMaterial::ParameterEntry>& GetPassParameters(const char* passName);
+    std::vector<std::vector<glb::render::material::PassMaterial::ParameterEntry>> GetAllPassParameters();
     void SetPassParameterInt(const char* passName, const char* parameterName, int32_t value);
     void SetPassParameterFloat(const char* passName, const char* parameterName, float value);
     void SetPassParameterVec(const char* passName, const char* parameterName, glb::math::Vector value);
