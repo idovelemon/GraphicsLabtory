@@ -610,6 +610,50 @@ void ApplicationCore::SetPassParameterTex(const char* passName, const char* para
     }
 }
 
+bool ApplicationCore::IsCastShadow() {
+    bool result = false;
+
+    glb::render::material::Material* mat = glb::render::material::Mgr::GetMaterial(m_Material);
+    if (mat) {
+        result = mat->IsCastShadowEnable();
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return result;
+}
+
+void ApplicationCore::SetCastShadow(bool bCastShadow) {
+    glb::render::material::Material* mat = glb::render::material::Mgr::GetMaterial(m_Material);
+    if (mat) {
+        mat->SetCastShadowEnable(bCastShadow);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+}
+
+bool ApplicationCore::IsReceiveShadow() {
+    bool result = false;
+
+    glb::render::material::Material* mat = glb::render::material::Mgr::GetMaterial(m_Material);
+    if (mat) {
+        result = mat->IsReceiveShadowEnable();
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return result;
+}
+
+void ApplicationCore::SetRecieveShadow(bool bRecieveShadow) {
+    glb::render::material::Material* mat = glb::render::material::Mgr::GetMaterial(m_Material);
+    if (mat) {
+        mat->SetReceiveShadowEnable(bRecieveShadow);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+}
+
 void ApplicationCore::UpdateCamera() {
     if (Input::IsKeyboardButtonPressed(BK_LCONTROL) && Input::IsMouseButtonPressed(BM_LEFT)) {
         static float sRot = 0.0f;

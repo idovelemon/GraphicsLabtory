@@ -38,6 +38,10 @@ public:
     void SetPassParameterFloat(const char* passName, const char* parameterName, float value);
     void SetPassParameterVec(const char* passName, const char* parameterName, glb::math::Vector value);
     void SetPassParameterTex(const char* passName, const char* parameterName, int32_t value);
+    bool IsCastShadow();
+    void SetCastShadow(bool bCastShadow);
+    bool IsReceiveShadow();
+    void SetRecieveShadow(bool bRecieveShadow);
 
 protected:
     void UpdateCamera();

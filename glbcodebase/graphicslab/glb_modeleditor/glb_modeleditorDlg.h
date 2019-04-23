@@ -58,6 +58,7 @@ protected:
     afx_msg void OnMaterialAddexsit();
     afx_msg void OnTimer(UINT_PTR nIDEvent);
     afx_msg void OnNMRClickMattree(NMHDR *pNMHDR, LRESULT *pResult);
+    afx_msg void OnNMClickMattree(NMHDR *pNMHDR, LRESULT *pResult);
     afx_msg void OnMaterialAddpass();
     afx_msg void OnPassCompile();
     afx_msg LRESULT OnPropertyChanged(WPARAM wparam, LPARAM lparam);
@@ -70,6 +71,9 @@ protected:
     bool CheckIsAllFileReady(CString filePath);
     void CopyFileToWorkSpace(CString filePath);
     void LoadFileToEditor();
+
+    void RefreshMaterialParameters();
+    void RefreshPassParameters();
 
 private:
     CTreeCtrl m_MatTreeCtrl;

@@ -81,6 +81,7 @@ BEGIN_MESSAGE_MAP(Cglb_modeleditorDlg, CDialog)
     ON_COMMAND(ID_FILE_PREVIEW, &Cglb_modeleditorDlg::OnFilePreview)
     ON_COMMAND(ID_MATERIAL_ADD, &Cglb_modeleditorDlg::OnMaterialAdd)
     ON_NOTIFY(NM_RCLICK, IDC_MATTREE, &Cglb_modeleditorDlg::OnNMRClickMattree)
+    ON_NOTIFY(NM_CLICK, IDC_MATTREE, &Cglb_modeleditorDlg::OnNMClickMattree)
     ON_COMMAND(ID_MATERIAL_ADDPASS, &Cglb_modeleditorDlg::OnMaterialAddpass)
     ON_COMMAND(ID_PASS_COMPILE, &Cglb_modeleditorDlg::OnPassCompile)
     ON_REGISTERED_MESSAGE(AFX_WM_PROPERTY_CHANGED, &Cglb_modeleditorDlg::OnPropertyChanged)
@@ -396,6 +397,9 @@ void Cglb_modeleditorDlg::OnMaterialAdd()
         // Add Material Node to tree
         m_TreeItemTbl[CString(TEXT("MaterialName"))] = m_MatTreeCtrl.InsertItem(m_MaterialInfo.materialName, TVI_ROOT);
 
+        // Add material parameter node to tree
+        m_TreeItemTbl[CString(TEXT("MaterialParameter"))] = m_MatTreeCtrl.InsertItem(TEXT("MaterialParameter"), m_TreeItemTbl[CString(TEXT("MaterialName"))]);
+
         // Get material name
         char* materialName = WideToMultiByte(m_MaterialInfo.materialName.GetString());
 
@@ -523,6 +527,66 @@ void Cglb_modeleditorDlg::OnNMRClickMattree(NMHDR *pNMHDR, LRESULT *pResult)
 }
 
 
+void Cglb_modeleditorDlg::OnNMClickMattree(NMHDR *pNMHDR, LRESULT *pResult)
+{
+    // TODO: Add your control notification handler code here
+    *pResult = 0;
+
+    CPoint screenClickPt, clientClickPt;
+    GetCursorPos(&screenClickPt);
+
+    clientClickPt = screenClickPt;
+    m_MatTreeCtrl.ScreenToClient(&clientClickPt);
+
+    UINT uFlag = 0;
+    HTREEITEM hTreeItem = m_MatTreeCtrl.HitTest(clientClickPt, &uFlag);
+    if ((hTreeItem != nullptr) && (TVHT_ONITEM & uFlag))
+    {
+        if (m_TreeItemTbl[CString(TEXT("MaterialParameter"))] == hTreeItem)
+        {
+            RefreshMaterialParameters();
+        }
+        else
+        {
+            for (int i = 0; i < m_MaterialInfo.passName.GetCount(); i++)
+            {
+                CString keyName(TEXT(""));
+                keyName.Format(TEXT("Pass:%s"), m_MaterialInfo.passName[i]);
+                if (m_TreeItemTbl[keyName] == hTreeItem)
+                {
+                    auto WideToMultiByte = [](const wchar_t* src)
+                    {
+                        int len = WideCharToMultiByte(CP_ACP, 0, src, -1, nullptr, 0, nullptr, nullptr);
+                        if (len == 0)
+                        {
+                            return (char*)(nullptr);
+                        }
+
+                        char* pResult = new char[len];
+                        WideCharToMultiByte(CP_ACP, 0, src, -1, pResult, len, nullptr, nullptr);
+                        return pResult;
+                    };
+
+                    auto DestroyMultiByte = [](char** src)
+                    {
+                        delete[] (*src);
+                        (*src) = nullptr;
+                    };
+
+                    char* passName = WideToMultiByte(m_MaterialInfo.passName[i]);
+
+                    m_ChoosePass = i;
+                    RefreshPassParameters();
+
+                    DestroyMultiByte(&passName);
+                    break;
+                }
+            }
+        }
+    }
+}
+
+
 void Cglb_modeleditorDlg::OnMaterialAddpass()
 {
     // TODO: Add your command handler code here
@@ -621,87 +685,7 @@ void Cglb_modeleditorDlg::OnPassCompile()
             m_MaterialInfo.passParameters[m_ChoosePass] = passParameters;
         }
 
-        // Clear all pass parameters of property grid
-        m_PassParamGridCtrl.RemoveAll();
-
-        // Add pass parameter to property grid
-        CMFCPropertyGridProperty* intParamGroupProperty = nullptr;
-        CMFCPropertyGridProperty* floatParamGroupProperty = nullptr;
-        CMFCPropertyGridProperty* vec3ParamGroupProperty = nullptr;
-        CMFCPropertyGridProperty* vec4ParamGroupProperty = nullptr;
-        CMFCPropertyGridProperty* texParamGroupProperty = nullptr;
-
-        for (auto& param : passParameters)
-        {
-            if (param.type == glb::render::material::PassMaterial::PARAMETER_TYPE_USER)
-            {
-                switch (param.format)
-                {
-                case glb::render::PARAMETER_FORMAT_INT:
-                    {
-                        if (!intParamGroupProperty) intParamGroupProperty = new CMFCPropertyGridProperty(TEXT("Int Pass Parameter"));
-                        CMFCPropertyGridProperty* intProperty = new CMFCPropertyGridProperty(CString(param.name), COleVariant(static_cast<long>(param.intValue)));
-                        intParamGroupProperty->AddSubItem(intProperty);
-                    }
-                    break;
-                case glb::render::PARAMETER_FORMAT_FLOAT:
-                    {
-                        if (!floatParamGroupProperty) floatParamGroupProperty = new CMFCPropertyGridProperty(TEXT("Float Pass Parameter"));
-                        CMFCPropertyGridProperty* floatProperty = new CMFCPropertyGridProperty(CString(param.name), COleVariant(param.floatValue));
-                        floatParamGroupProperty->AddSubItem(floatProperty);
-                    }
-                    break;
-                case glb::render::PARAMETER_FORMAT_FLOAT3:
-                    {
-                        if (!vec3ParamGroupProperty) vec3ParamGroupProperty = new CMFCPropertyGridProperty(TEXT("Vec3 Pass Parameter"));
-                        CMFCPropertyGridProperty* float3Property = new CMFCPropertyGridProperty(CString(param.name));
-                        CMFCPropertyGridProperty* xProperty = new CMFCPropertyGridProperty(CString("X"), COleVariant(param.vecValue.x));
-                        CMFCPropertyGridProperty* yProperty = new CMFCPropertyGridProperty(CString("Y"), COleVariant(param.vecValue.y));
-                        CMFCPropertyGridProperty* zProperty = new CMFCPropertyGridProperty(CString("Z"), COleVariant(param.vecValue.z));
-                        float3Property->AddSubItem(xProperty);
-                        float3Property->AddSubItem(yProperty);
-                        float3Property->AddSubItem(zProperty);
-                        vec3ParamGroupProperty->AddSubItem(float3Property);
-                    }
-                    break;
-                case glb::render::PARAMETER_FORMAT_FLOAT4:
-                    {
-                        if (!vec4ParamGroupProperty) vec4ParamGroupProperty = new CMFCPropertyGridProperty(TEXT("Vec4 Pass Parameter"));
-                        CMFCPropertyGridProperty* float4Property = new CMFCPropertyGridProperty(CString(param.name));
-                        CMFCPropertyGridProperty* xProperty = new CMFCPropertyGridProperty(CString("X"), COleVariant(param.vecValue.x));
-                        CMFCPropertyGridProperty* yProperty = new CMFCPropertyGridProperty(CString("Y"), COleVariant(param.vecValue.y));
-                        CMFCPropertyGridProperty* zProperty = new CMFCPropertyGridProperty(CString("Z"), COleVariant(param.vecValue.z));
-                        CMFCPropertyGridProperty* wProperty = new CMFCPropertyGridProperty(CString("W"), COleVariant(param.vecValue.w));
-                        float4Property->AddSubItem(xProperty);
-                        float4Property->AddSubItem(yProperty);
-                        float4Property->AddSubItem(zProperty);
-                        float4Property->AddSubItem(wProperty);
-                        vec4ParamGroupProperty->AddSubItem(float4Property);
-                    }
-                    break;
-                case glb::render::PARAMETER_FORMAT_TEXTURE_2D:
-                    {
-                        if (!texParamGroupProperty) texParamGroupProperty = new CMFCPropertyGridProperty(TEXT("Texture Pass Parameter"));
-                        CMFCPropertyGridFileProperty* tex2DProperty = new CMFCPropertyGridFileProperty(CString(param.name), TRUE, CString(glb::render::texture::Mgr::GetTextureById(param.intValue)->GetName()));
-                        texParamGroupProperty->AddSubItem(tex2DProperty);
-                    }
-                    break;
-                case glb::render::PARAMETER_FORMAT_TEXTURE_CUBE:
-                    {
-                        if (!texParamGroupProperty) texParamGroupProperty = new CMFCPropertyGridProperty(TEXT("Texture Pass Parameter"));
-                        CMFCPropertyGridFileProperty* texCubeProperty = new CMFCPropertyGridFileProperty(CString(param.name), TRUE, CString(glb::render::texture::Mgr::GetTextureById(param.intValue)->GetName()));
-                        texParamGroupProperty->AddSubItem(texCubeProperty);
-                    }
-                    break;
-                }
-            }
-        }
-
-        if (intParamGroupProperty) m_PassParamGridCtrl.AddProperty(intParamGroupProperty);
-        if (floatParamGroupProperty) m_PassParamGridCtrl.AddProperty(floatParamGroupProperty);
-        if (vec3ParamGroupProperty) m_PassParamGridCtrl.AddProperty(vec3ParamGroupProperty);
-        if (vec4ParamGroupProperty) m_PassParamGridCtrl.AddProperty(vec4ParamGroupProperty);
-        if (texParamGroupProperty) m_PassParamGridCtrl.AddProperty(texParamGroupProperty);
+        RefreshPassParameters();
     }
     else
     {
@@ -746,84 +730,114 @@ LRESULT Cglb_modeleditorDlg::OnPropertyChanged(WPARAM wparam, LPARAM lparam)
         (*src) = nullptr;
     };
 
-    char* passName = WideToMultiByte(m_MaterialInfo.passName[m_ChoosePass]);
 
     CMFCPropertyGridProperty* property = reinterpret_cast<CMFCPropertyGridProperty*>(lparam);
-    char* parameterName = WideToMultiByte(property->GetName());
-    char* valueWiseName = nullptr;
-    if (!strcmp(parameterName, "X") || !strcmp(parameterName, "Y") || !strcmp(parameterName, "Z") || !strcmp(parameterName, "W"))
+    if (!CString(property->GetParent()->GetName()).Compare(TEXT("MaterialParameter")))
     {
-        valueWiseName = parameterName;
-        parameterName = WideToMultiByte(property->GetParent()->GetName());
-    }
-
-    for (auto& param : m_MaterialInfo.passParameters[m_ChoosePass])
-    {
-        if (!strcmp(param.name, parameterName))
+        if (!CString(property->GetName()).Compare(TEXT("castshadow")))
         {
-            switch (param.format)
+            CString option = CString(property->GetValue().bstrVal);
+            if (!option.Compare(TEXT("TRUE")))
             {
-            case glb::render::PARAMETER_FORMAT_INT:
+                ApplicationCore::GetInstance()->SetCastShadow(true);
+            }
+            else if (!option.Compare(TEXT("FALSE")))
+            {
+                ApplicationCore::GetInstance()->SetCastShadow(false);
+            }
+        }
+        else if (!CString(property->GetName()).Compare(TEXT("receiveshadow")))
+        {
+            CString option = CString(property->GetValue().bstrVal);
+            if (!option.Compare(TEXT("TRUE")))
+            {
+                ApplicationCore::GetInstance()->SetRecieveShadow(true);
+            }
+            else if (!option.Compare(TEXT("FALSE")))
+            {
+                ApplicationCore::GetInstance()->SetRecieveShadow(false);
+            }
+        }
+    }
+    else
+    {
+        char* passName = WideToMultiByte(m_MaterialInfo.passName[m_ChoosePass]);
+        char* parameterName = WideToMultiByte(property->GetName());
+        char* valueWiseName = nullptr;
+        if (!strcmp(parameterName, "X") || !strcmp(parameterName, "Y") || !strcmp(parameterName, "Z") || !strcmp(parameterName, "W"))
+        {
+            valueWiseName = parameterName;
+            parameterName = WideToMultiByte(property->GetParent()->GetName());
+        }
+
+        for (auto& param : m_MaterialInfo.passParameters[m_ChoosePass])
+        {
+            if (!strcmp(param.name, parameterName))
+            {
+                switch (param.format)
                 {
-                    param.intValue = property->GetValue().intVal;
-                    ApplicationCore::GetInstance()->SetPassParameterInt(passName, param.name, param.intValue);
-                }
-                break;
-            case glb::render::PARAMETER_FORMAT_FLOAT:
-                {
-                    param.floatValue = property->GetValue().fltVal;
-                    ApplicationCore::GetInstance()->SetPassParameterFloat(passName, param.name, param.floatValue);
-                }
-                break;
-            case glb::render::PARAMETER_FORMAT_FLOAT3:
-            case glb::render::PARAMETER_FORMAT_FLOAT4:
-                {
-                    if (!strcmp(valueWiseName, "X"))
+                case glb::render::PARAMETER_FORMAT_INT:
                     {
-                        param.vecValue.x = property->GetValue().fltVal;
+                        param.intValue = property->GetValue().intVal;
+                        ApplicationCore::GetInstance()->SetPassParameterInt(passName, param.name, param.intValue);
                     }
-                    else if (!strcmp(valueWiseName, "Y"))
+                    break;
+                case glb::render::PARAMETER_FORMAT_FLOAT:
                     {
-                        param.vecValue.y = property->GetValue().fltVal;
+                        param.floatValue = property->GetValue().fltVal;
+                        ApplicationCore::GetInstance()->SetPassParameterFloat(passName, param.name, param.floatValue);
                     }
-                    else if (!strcmp(valueWiseName, "Z"))
+                    break;
+                case glb::render::PARAMETER_FORMAT_FLOAT3:
+                case glb::render::PARAMETER_FORMAT_FLOAT4:
                     {
-                        param.vecValue.z = property->GetValue().fltVal;
+                        if (!strcmp(valueWiseName, "X"))
+                        {
+                            param.vecValue.x = property->GetValue().fltVal;
+                        }
+                        else if (!strcmp(valueWiseName, "Y"))
+                        {
+                            param.vecValue.y = property->GetValue().fltVal;
+                        }
+                        else if (!strcmp(valueWiseName, "Z"))
+                        {
+                            param.vecValue.z = property->GetValue().fltVal;
+                        }
+                        else if (!strcmp(valueWiseName, "W"))
+                        {
+                            param.vecValue.w = property->GetValue().fltVal;
+                        }
+                        ApplicationCore::GetInstance()->SetPassParameterVec(passName, param.name, param.vecValue);
                     }
-                    else if (!strcmp(valueWiseName, "W"))
+                    break;
+                case glb::render::PARAMETER_FORMAT_TEXTURE_2D:
                     {
-                        param.vecValue.w = property->GetValue().fltVal;
+                        char* textureName = WideToMultiByte(property->GetValue().bstrVal);
+                        param.intValue = glb::render::texture::Mgr::LoadTexture(textureName);
+                        ApplicationCore::GetInstance()->SetPassParameterTex(passName, param.name, param.intValue);
+                        DestroyMultiByte(&textureName);
                     }
-                    ApplicationCore::GetInstance()->SetPassParameterVec(passName, param.name, param.vecValue);
-                }
-                break;
-            case glb::render::PARAMETER_FORMAT_TEXTURE_2D:
-                {
-                    char* textureName = WideToMultiByte(property->GetValue().bstrVal);
-                    param.intValue = glb::render::texture::Mgr::LoadTexture(textureName);
-                    ApplicationCore::GetInstance()->SetPassParameterTex(passName, param.name, param.intValue);
-                    DestroyMultiByte(&textureName);
-                }
-                break;
-            case glb::render::PARAMETER_FORMAT_TEXTURE_CUBE:
-                {
-                    char* textureName = WideToMultiByte(property->GetValue().bstrVal);
-                    param.intValue = glb::render::texture::Mgr::LoadPFCTexture(textureName);
-                    ApplicationCore::GetInstance()->SetPassParameterTex(passName, param.name, param.intValue);
-                    DestroyMultiByte(&textureName);
+                    break;
+                case glb::render::PARAMETER_FORMAT_TEXTURE_CUBE:
+                    {
+                        char* textureName = WideToMultiByte(property->GetValue().bstrVal);
+                        param.intValue = glb::render::texture::Mgr::LoadPFCTexture(textureName);
+                        ApplicationCore::GetInstance()->SetPassParameterTex(passName, param.name, param.intValue);
+                        DestroyMultiByte(&textureName);
+                    }
+                    break;
                 }
                 break;
             }
-            break;
         }
-    }
 
-    // Cleanup
-    DestroyMultiByte(&passName);
-    DestroyMultiByte(&parameterName);
-    if (valueWiseName)
-    {
-        DestroyMultiByte(&valueWiseName);
+        // Cleanup
+        DestroyMultiByte(&passName);
+        DestroyMultiByte(&parameterName);
+        if (valueWiseName)
+        {
+            DestroyMultiByte(&valueWiseName);
+        }
     }
 
     return 0;
@@ -933,15 +947,6 @@ void Cglb_modeleditorDlg::CopyFileToWorkSpace(CString filePath)
         }
     }
 
-    //{
-    //    for (int32_t i = 0; i < m_MaterialInfo.vertexShaderName.GetSize(); i++)
-    //    {
-    //        CString srcfilePath = srcFileDirectory + CString(L"glb_") + m_MaterialInfo.fragmentShaderName[i];
-    //        CString destFilePath = destFileDirectory + CString(L"glb_") + m_MaterialInfo.fragmentShaderName[i];
-    //        CopyFile(srcfilePath, destFilePath, FALSE);
-    //    }
-    //}
-
     {
         for (int32_t i = 0; i < static_cast<int32_t>(m_MaterialInfo.passParameters.size()); i++)
         {
@@ -968,6 +973,9 @@ void Cglb_modeleditorDlg::LoadFileToEditor()
     // Add Material Node to tree
     m_TreeItemTbl[CString(TEXT("MaterialName"))] = m_MatTreeCtrl.InsertItem(m_MaterialInfo.materialName, TVI_ROOT);
 
+    // Add material parameter node to tree
+    m_TreeItemTbl[CString(TEXT("MaterialParameter"))] = m_MatTreeCtrl.InsertItem(TEXT("MaterialParameter"), m_TreeItemTbl[CString(TEXT("MaterialName"))]);
+
     // Add Pass node to tree
     for (int32_t i = 0; i < m_MaterialInfo.passName.GetCount(); i++)
     {
@@ -982,6 +990,133 @@ void Cglb_modeleditorDlg::LoadFileToEditor()
 
     // Add pass parameter to property grid
 }
+
+
+void Cglb_modeleditorDlg::RefreshMaterialParameters()
+{
+    // Remove all properties
+    m_PassParamGridCtrl.RemoveAll();
+
+    CMFCPropertyGridProperty* materialProperty = new CMFCPropertyGridProperty(TEXT("MaterialParameter"));
+
+    {
+        CString defaultOption = TEXT("TRUE");
+        if (!ApplicationCore::GetInstance()->IsCastShadow())
+        {
+            defaultOption = TEXT("FALSE");
+        }
+        CMFCPropertyGridProperty* property = new CMFCPropertyGridProperty(TEXT("castshadow"), defaultOption);
+        property->AddOption(TEXT("TRUE"));
+        property->AddOption(TEXT("FALSE"));
+        materialProperty->AddSubItem(property);
+    }
+
+    {
+        CString defaultOption = TEXT("TRUE");
+        if (!ApplicationCore::GetInstance()->IsReceiveShadow())
+        {
+            defaultOption = TEXT("FALSE");
+        }
+        CMFCPropertyGridProperty* property = new CMFCPropertyGridProperty(TEXT("recieveshadow"), defaultOption);
+        property->AddOption(TEXT("TRUE"));
+        property->AddOption(TEXT("FALSE"));
+        materialProperty->AddSubItem(property);
+    }
+
+    m_PassParamGridCtrl.AddProperty(materialProperty);
+}
+
+
+void Cglb_modeleditorDlg::RefreshPassParameters()
+{
+    if (m_ChoosePass < 0 || m_MaterialInfo.passParameters.size() <= m_ChoosePass) return;
+
+    // Collect all parameters
+    std::vector<glb::render::material::PassMaterial::ParameterEntry>& passParameters = m_MaterialInfo.passParameters[m_ChoosePass];
+
+    // Clear all pass parameters of property grid
+    m_PassParamGridCtrl.RemoveAll();
+
+    // Add pass parameter to property grid
+    CMFCPropertyGridProperty* intParamGroupProperty = nullptr;
+    CMFCPropertyGridProperty* floatParamGroupProperty = nullptr;
+    CMFCPropertyGridProperty* vec3ParamGroupProperty = nullptr;
+    CMFCPropertyGridProperty* vec4ParamGroupProperty = nullptr;
+    CMFCPropertyGridProperty* texParamGroupProperty = nullptr;
+
+    for (auto& param : passParameters)
+    {
+        if (param.type == glb::render::material::PassMaterial::PARAMETER_TYPE_USER)
+        {
+            switch (param.format)
+            {
+            case glb::render::PARAMETER_FORMAT_INT:
+                {
+                    if (!intParamGroupProperty) intParamGroupProperty = new CMFCPropertyGridProperty(TEXT("Int Pass Parameter"));
+                    CMFCPropertyGridProperty* intProperty = new CMFCPropertyGridProperty(CString(param.name), COleVariant(static_cast<long>(param.intValue)));
+                    intParamGroupProperty->AddSubItem(intProperty);
+                }
+                break;
+            case glb::render::PARAMETER_FORMAT_FLOAT:
+                {
+                    if (!floatParamGroupProperty) floatParamGroupProperty = new CMFCPropertyGridProperty(TEXT("Float Pass Parameter"));
+                    CMFCPropertyGridProperty* floatProperty = new CMFCPropertyGridProperty(CString(param.name), COleVariant(param.floatValue));
+                    floatParamGroupProperty->AddSubItem(floatProperty);
+                }
+                break;
+            case glb::render::PARAMETER_FORMAT_FLOAT3:
+                {
+                    if (!vec3ParamGroupProperty) vec3ParamGroupProperty = new CMFCPropertyGridProperty(TEXT("Vec3 Pass Parameter"));
+                    CMFCPropertyGridProperty* float3Property = new CMFCPropertyGridProperty(CString(param.name));
+                    CMFCPropertyGridProperty* xProperty = new CMFCPropertyGridProperty(CString("X"), COleVariant(param.vecValue.x));
+                    CMFCPropertyGridProperty* yProperty = new CMFCPropertyGridProperty(CString("Y"), COleVariant(param.vecValue.y));
+                    CMFCPropertyGridProperty* zProperty = new CMFCPropertyGridProperty(CString("Z"), COleVariant(param.vecValue.z));
+                    float3Property->AddSubItem(xProperty);
+                    float3Property->AddSubItem(yProperty);
+                    float3Property->AddSubItem(zProperty);
+                    vec3ParamGroupProperty->AddSubItem(float3Property);
+                }
+                break;
+            case glb::render::PARAMETER_FORMAT_FLOAT4:
+                {
+                    if (!vec4ParamGroupProperty) vec4ParamGroupProperty = new CMFCPropertyGridProperty(TEXT("Vec4 Pass Parameter"));
+                    CMFCPropertyGridProperty* float4Property = new CMFCPropertyGridProperty(CString(param.name));
+                    CMFCPropertyGridProperty* xProperty = new CMFCPropertyGridProperty(CString("X"), COleVariant(param.vecValue.x));
+                    CMFCPropertyGridProperty* yProperty = new CMFCPropertyGridProperty(CString("Y"), COleVariant(param.vecValue.y));
+                    CMFCPropertyGridProperty* zProperty = new CMFCPropertyGridProperty(CString("Z"), COleVariant(param.vecValue.z));
+                    CMFCPropertyGridProperty* wProperty = new CMFCPropertyGridProperty(CString("W"), COleVariant(param.vecValue.w));
+                    float4Property->AddSubItem(xProperty);
+                    float4Property->AddSubItem(yProperty);
+                    float4Property->AddSubItem(zProperty);
+                    float4Property->AddSubItem(wProperty);
+                    vec4ParamGroupProperty->AddSubItem(float4Property);
+                }
+                break;
+            case glb::render::PARAMETER_FORMAT_TEXTURE_2D:
+                {
+                    if (!texParamGroupProperty) texParamGroupProperty = new CMFCPropertyGridProperty(TEXT("Texture Pass Parameter"));
+                    CMFCPropertyGridFileProperty* tex2DProperty = new CMFCPropertyGridFileProperty(CString(param.name), TRUE, CString(glb::render::texture::Mgr::GetTextureById(param.intValue)->GetName()));
+                    texParamGroupProperty->AddSubItem(tex2DProperty);
+                }
+                break;
+            case glb::render::PARAMETER_FORMAT_TEXTURE_CUBE:
+                {
+                    if (!texParamGroupProperty) texParamGroupProperty = new CMFCPropertyGridProperty(TEXT("Texture Pass Parameter"));
+                    CMFCPropertyGridFileProperty* texCubeProperty = new CMFCPropertyGridFileProperty(CString(param.name), TRUE, CString(glb::render::texture::Mgr::GetTextureById(param.intValue)->GetName()));
+                    texParamGroupProperty->AddSubItem(texCubeProperty);
+                }
+                break;
+            }
+        }
+    }
+
+    if (intParamGroupProperty) m_PassParamGridCtrl.AddProperty(intParamGroupProperty);
+    if (floatParamGroupProperty) m_PassParamGridCtrl.AddProperty(floatParamGroupProperty);
+    if (vec3ParamGroupProperty) m_PassParamGridCtrl.AddProperty(vec3ParamGroupProperty);
+    if (vec4ParamGroupProperty) m_PassParamGridCtrl.AddProperty(vec4ParamGroupProperty);
+    if (texParamGroupProperty) m_PassParamGridCtrl.AddProperty(texParamGroupProperty);
+}
+
 
 void Cglb_modeleditorDlg::BuildMaterial(CString fileName, const char* filePath)
 {
