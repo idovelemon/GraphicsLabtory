@@ -105,6 +105,8 @@ GLB ModelEditor is used for convert DCC tool's export file format to GLB library
 |Support for slide edit control for material parameters|2019-03-14 22:21|2019-04-21 23:11|<font color="Green">Finish</font>|
 |Support add exist shader when adding pass material|2019-04-10 21:33|2019-04-10 22:23|<font color="Green">Finish</font>|
 |Support add default shadow pass material, just because most of the object has the same shadow pass material|2019-04-18 08:26||<font color="Blue">New</font>|
+|Add a plane, so that we can see shadow effect of object|2019-04-23 08:36||<font color="Blue">New</font>|
+|Optimize camera effect|2019-04-23 08:36||<font color="Blue">New</font>|
 
 |Bug|Begin Time|Fnish Time|Status|
 |-|-|-|-|
@@ -116,5 +118,5 @@ GLB ModelEditor is used for convert DCC tool's export file format to GLB library
 |Import a model again : GLB init failed|2018-06-20 8:00||<font color="Red">Discard</font>|
 |Check if has texcoord when set albedo/roughness/metallic/normal/alpha/emission texture|2018-06-23 18:15||<font color="Red">Discard</font>|
 |Check only has emission material|2018-08-19 17:35||<font color="Red">Discard</font>|
-|Fix space key closing window problem|2019-04-10 22:03||<font color="Blue">New</font>|
-|Hasn't copy shader file when save material|2019-04-10 23:00||<font color="Blue">New</font>|
+|Fix space key closing window problem|2019-04-10 22:03|2019-04-23 08:35|<font color="Green">Finish</font>|
+|Hasn't copy shader file when save material|2019-04-10 23:00|2019-04-23 08：20|<font color="Green">Finish</font>|
