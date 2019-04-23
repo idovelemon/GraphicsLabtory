@@ -5,6 +5,7 @@
 import os
 import sys
 
+IncludeShaderResourceDirectory = ""
 SourceShaderResourceFileName = "glb.gsh"
 DestinationShaderResourceFileName = "test.gsr"
 
@@ -31,7 +32,7 @@ def srp_core(source):
             left_quot_index = line.find('\"')
             right_quot_index = line.rfind('\"')
             new_source_file = line[left_quot_index + 1:right_quot_index]
-            new_source_string = srp_core(source_directory_path_name + new_source_file)
+            new_source_string = srp_core(IncludeShaderResourceDirectory + new_source_file)
             if len(new_source_string) is 0:
                 return []
             source_string = source_string + ["\n",] + new_source_string + ["\n",]
@@ -61,8 +62,9 @@ def srp(source, dest):
 #     pass
 
 if __name__ == "__main__":
-    SourceShaderResourceFileName = sys.argv[1]
-    DestinationShaderResourceFileName = sys.argv[2]
+    IncludeShaderResourceDirectory = sys.argv[1]
+    SourceShaderResourceFileName = sys.argv[2]
+    DestinationShaderResourceFileName = sys.argv[3]
     srp(SourceShaderResourceFileName, DestinationShaderResourceFileName)
     print("=====finish======")
     pass
