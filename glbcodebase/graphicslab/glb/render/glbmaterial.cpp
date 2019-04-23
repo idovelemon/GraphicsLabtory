@@ -476,6 +476,14 @@ bool Material::IsReceiveShadowEnable() const {
     return m_EnableReceiveShadow;
 }
 
+void Material::SetCastShadowEnable(bool bEnable) {
+    m_EnableCastShadow = bEnable;
+}
+
+void Material::SetReceiveShadowEnable(bool bEnable) {
+    m_EnableReceiveShadow = bEnable;
+}
+
 //-----------------------------------------------------------------------------------
 // MgrImp DEFINITION
 //-----------------------------------------------------------------------------------

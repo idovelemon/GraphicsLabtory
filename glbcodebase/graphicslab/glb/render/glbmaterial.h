@@ -139,6 +139,8 @@ public:
 
     virtual bool IsCastShadowEnable() const;
     virtual bool IsReceiveShadowEnable() const;
+    virtual void SetCastShadowEnable(bool bEnable);
+    virtual void SetReceiveShadowEnable(bool bEnable);
 
 protected:
     int32_t                         m_ID;
