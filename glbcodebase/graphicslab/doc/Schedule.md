@@ -53,6 +53,7 @@ Light studio is used for baking Lightmap with Radiosity Normal Mapping(RNM) and 
 |Release a beta version|2018-06-09 16:00|2018-06-09 16:15|<font color="Green">Finish</font>|
 |Sperate lightmap uv from albedo/roughness/metallic/normal uv|2018-06-09 20:37|2018-06-14 21:35|<font color="Green">Finish</font>|
 |Add support for Directional light|2018-06-19 20:00|2018-06-20 8:10|<font color="Green">Finish</font>|
+|Optimize PSSM algorithm with MRT and GS|2019-04-23 20:35||<font color="Blue">New</font>|
 
 <br>
 
@@ -107,6 +108,7 @@ GLB ModelEditor is used for convert DCC tool's export file format to GLB library
 |Support add default shadow pass material, just because most of the object has the same shadow pass material|2019-04-18 08:26||<font color="Blue">New</font>|
 |Add a plane, so that we can see shadow effect of object|2019-04-23 08:36||<font color="Blue">New</font>|
 |Optimize camera effect|2019-04-23 08:36||<font color="Blue">New</font>|
+|Auto rotate mesh vertex around X -90 degree, so that we do not rotate it at blender|2019-04-23 20:35||<font color="Blue">New</font>|
 
 |Bug|Begin Time|Fnish Time|Status|
 |-|-|-|-|
