@@ -74,7 +74,6 @@ BEGIN_MESSAGE_MAP(Cglb_modeleditorDlg, CDialog)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
-    ON_BN_CLICKED(IDOK, &Cglb_modeleditorDlg::OnBnClickedOk)
     ON_COMMAND(ID_FILE_IMPORT, &Cglb_modeleditorDlg::OnFileImport)
     ON_COMMAND(ID_FILE_EXPORT, &Cglb_modeleditorDlg::OnFileExport)
     ON_WM_TIMER()
@@ -163,6 +162,23 @@ BOOL Cglb_modeleditorDlg::OnInitDialog()
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
 
+
+void Cglb_modeleditorDlg::OnOK()
+{
+    // TODO: Add your specialized code here and/or call the base class
+
+    //CDialog::OnOK();
+}
+
+
+void Cglb_modeleditorDlg::OnCancel()
+{
+    // TODO: Add your specialized code here and/or call the base class
+
+    CDialog::OnCancel();
+}
+
+
 void Cglb_modeleditorDlg::OnSysCommand(UINT nID, LPARAM lParam)
 {
 	if ((nID & 0xFFF0) == IDM_ABOUTBOX)
@@ -210,14 +226,6 @@ void Cglb_modeleditorDlg::OnPaint()
 HCURSOR Cglb_modeleditorDlg::OnQueryDragIcon()
 {
 	return static_cast<HCURSOR>(m_hIcon);
-}
-
-
-
-void Cglb_modeleditorDlg::OnBnClickedOk()
-{
-    // TODO: Add your control notification handler code here
-    CDialog::OnOK();
 }
 
 
