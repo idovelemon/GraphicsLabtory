@@ -42,7 +42,7 @@ ApplicationCore* ApplicationCore::GetInstance() {
 
 bool ApplicationCore::Initialize() {
     // Camera
-    scene::ModelCamera* cam = scene::ModelCamera::Create(math::Vector(10.0f, 10.0f, 0.0), math::Vector(0.0f, 0.0f, 0.0));
+    scene::ModelCamera* cam = scene::ModelCamera::Create(math::Vector(0.0f, 10.0f, 10.0), math::Vector(0.0f, 0.0f, 0.0));
     scene::Scene::SetCamera(glb::scene::PRIMIAY_CAM, cam);
 
     // Light
@@ -98,6 +98,11 @@ bool ApplicationCore::AddModel(const char* name) {
     bool result = false;
     if (scene && scene->HasMeshes())
     {
+        // Transform vertex, normal, tangent and binormal
+        math::Matrix vertexTrans = math::Matrix::CreateRotateXMatrix(-90.0f);
+        math::Matrix normalTrans = math::Matrix::Inverse(vertexTrans);
+        normalTrans.Transpose();
+
         // Only deal with mesh 0 now
         aiMesh* mesh = scene->mMeshes[0];
         int32_t trianglesNum = scene->mMeshes[0]->mNumFaces;
@@ -113,9 +118,11 @@ bool ApplicationCore::AddModel(const char* name) {
             if (face.mNumIndices == 3) {
                 // Vertex Position
                 for (int32_t j = 0; j < 3; j++) {
-                    vertexBuf[i * 3 * 3 + j * 3 + 0] = mesh->mVertices[face.mIndices[j]].x;
-                    vertexBuf[i * 3 * 3 + j * 3 + 1] = mesh->mVertices[face.mIndices[j]].y;
-                    vertexBuf[i * 3 * 3 + j * 3 + 2] = mesh->mVertices[face.mIndices[j]].z;
+                    math::Vector pos(mesh->mVertices[face.mIndices[j]].x, mesh->mVertices[face.mIndices[j]].y, mesh->mVertices[face.mIndices[j]].z);
+                    pos = vertexTrans * pos;
+                    vertexBuf[i * 3 * 3 + j * 3 + 0] = pos.x;
+                    vertexBuf[i * 3 * 3 + j * 3 + 1] = pos.y;
+                    vertexBuf[i * 3 * 3 + j * 3 + 2] = pos.z;
                 }
 
                 // Vertex UV
@@ -137,21 +144,28 @@ bool ApplicationCore::AddModel(const char* name) {
                 // Vertex Normal
                 if (mesh->HasNormals()) {
                     for (int32_t j = 0; j < 3; j++) {
-                        normalBuf[i * 3 * 3 + j * 3 + 0] = mesh->mNormals[face.mIndices[j]].x;
-                        normalBuf[i * 3 * 3 + j * 3 + 1] = mesh->mNormals[face.mIndices[j]].y;
-                        normalBuf[i * 3 * 3 + j * 3 + 2] = mesh->mNormals[face.mIndices[j]].z;
+                        math::Vector normal(mesh->mNormals[face.mIndices[j]].x, mesh->mNormals[face.mIndices[j]].y, mesh->mNormals[face.mIndices[j]].z);
+                        normal = normalTrans * normal;
+                        normalBuf[i * 3 * 3 + j * 3 + 0] = normal.x;
+                        normalBuf[i * 3 * 3 + j * 3 + 1] = normal.y;
+                        normalBuf[i * 3 * 3 + j * 3 + 2] = normal.z;
                     }
                 }
 
                 // Vertex Tangent and Binormal
                 if (mesh->HasTangentsAndBitangents()) {
                     for (int32_t j = 0; j < 3; j++) {
-                        tangentBuf[i * 3 * 3 + j * 3 + 0] = mesh->mTangents[face.mIndices[j]].x;
-                        tangentBuf[i * 3 * 3 + j * 3 + 1] = mesh->mTangents[face.mIndices[j]].y;
-                        tangentBuf[i * 3 * 3 + j * 3 + 2] = mesh->mTangents[face.mIndices[j]].z;
-                        binormalBuf[i * 3 * 3 + j * 3 + 0] = mesh->mBitangents[face.mIndices[j]].x;
-                        binormalBuf[i * 3 * 3 + j * 3 + 1] = mesh->mBitangents[face.mIndices[j]].y;
-                        binormalBuf[i * 3 * 3 + j * 3 + 2] = mesh->mBitangents[face.mIndices[j]].z;
+                        math::Vector tangent(mesh->mTangents[face.mIndices[j]].x, mesh->mTangents[face.mIndices[j]].y, mesh->mTangents[face.mIndices[j]].z);
+                        tangent = normalTrans * tangent;
+                        tangentBuf[i * 3 * 3 + j * 3 + 0] = tangent.x;
+                        tangentBuf[i * 3 * 3 + j * 3 + 1] = tangent.y;
+                        tangentBuf[i * 3 * 3 + j * 3 + 2] = tangent.z;
+
+                        math::Vector biTangent(mesh->mBitangents[face.mIndices[j]].x, mesh->mBitangents[face.mIndices[j]].y, mesh->mBitangents[face.mIndices[j]].z);
+                        biTangent = normalTrans * biTangent;
+                        binormalBuf[i * 3 * 3 + j * 3 + 0] = biTangent.x;
+                        binormalBuf[i * 3 * 3 + j * 3 + 1] = biTangent.y;
+                        binormalBuf[i * 3 * 3 + j * 3 + 2] = biTangent.z;
                     }
                 }
             } else {
@@ -660,7 +674,7 @@ void ApplicationCore::UpdateCamera() {
         sRot = sRot + Input::GetMouseMoveX() * 0.1f;
         static float sDist = 0.0f;
         sDist = sDist + Input::GetMouseMoveY() * 0.05f;
-        math::Vector pos = math::Vector(10.0f, 10.0f, 0.0) + math::Vector(1.0f, 1.0f, 0.0f) * sDist;
+        math::Vector pos = math::Vector(0.0f, 10.0f, 10.0) + math::Vector(0.0f, 1.0f, 1.0f) * sDist;
         math::Matrix rotY;
         rotY.MakeRotateYMatrix(sRot);
         pos = rotY * pos;
