@@ -1,0 +1,6 @@
+beginpass lightloop
+shader planeL.vs glb_planeL.fs
+passparameter glb_unif_Albedo 0.6 0.6 0.6
+endpass
+materialparameter castshadow 0
+materialparameter receiveshadow 1
