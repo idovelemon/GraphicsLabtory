@@ -66,6 +66,13 @@ bool ApplicationCore::Initialize() {
     m_DefaultTexture2D = render::texture::Mgr::LoadTexture("res/default2d.bmp");
     m_DefaultTextureCube = render::texture::Mgr::LoadPFCTexture("res/defaultcube.pfc");
 
+    // Default plane
+    m_DefaultPlane = scene::Scene::AddObject("res/plane.obj", "res/plane.mat");
+    scene::Scene::GetObjectById(m_DefaultPlane)->SetDepthTestEnable(true);
+    scene::Scene::GetObjectById(m_DefaultPlane)->SetCullFaceEnable(true);
+    scene::Scene::GetObjectById(m_DefaultPlane)->SetCullFaceMode(glb::render::CULL_BACK);
+    scene::Scene::GetObjectById(m_DefaultPlane)->SetWorldMatrix(math::Matrix::CreateIdentityMatrix());
+
     return true;
 }
 
@@ -226,6 +233,11 @@ bool ApplicationCore::SaveModel(const char* filePath) {
         std::ofstream output;
         output.open(filePath);
         if (!output.fail()) {
+            // Transform vertex, normal, tangent and binormal
+            math::Matrix vertexTrans = math::Matrix::CreateRotateXMatrix(-90.0f);
+            math::Matrix normalTrans = math::Matrix::Inverse(vertexTrans);
+            normalTrans.Transpose();
+
             // Only deal with mesh 0 now
             aiMesh* mesh = scene->mMeshes[0];
             int32_t trianglesNum = scene->mMeshes[0]->mNumFaces;
@@ -238,9 +250,12 @@ bool ApplicationCore::SaveModel(const char* filePath) {
                     // Vertex Position
                     for (int32_t j = 0; j < 3; j++) {
                         output << "v ";
-                        output << mesh->mVertices[face.mIndices[j]].x << " ";
-                        output << mesh->mVertices[face.mIndices[j]].y << " ";
-                        output << mesh->mVertices[face.mIndices[j]].z << "\n";
+
+                        math::Vector pos(mesh->mVertices[face.mIndices[j]].x, mesh->mVertices[face.mIndices[j]].y, mesh->mVertices[face.mIndices[j]].z);
+                        pos = vertexTrans * pos;
+                        output << pos.x << " ";
+                        output << pos.y << " ";
+                        output << pos.z << "\n";
 
                         char temp[64];
                         sprintf_s(temp, "%d", i * 3 + j + 1);
@@ -277,9 +292,12 @@ bool ApplicationCore::SaveModel(const char* filePath) {
                     if (mesh->HasNormals()) {
                         for (int32_t j = 0; j < 3; j++) {
                             output << "vn ";
-                            output << mesh->mNormals[face.mIndices[j]].x << " ";
-                            output << mesh->mNormals[face.mIndices[j]].y << " ";
-                            output << mesh->mNormals[face.mIndices[j]].z << "\n";
+
+                            math::Vector normal(mesh->mNormals[face.mIndices[j]].x, mesh->mNormals[face.mIndices[j]].y, mesh->mNormals[face.mIndices[j]].z);
+                            normal = normalTrans * normal;
+                            output << normal.x << " ";
+                            output << normal.y << " ";
+                            output << normal.z << "\n";
 
                             char temp[64];
                             sprintf_s(temp, "%d", i * 3 + j + 1);
@@ -291,18 +309,23 @@ bool ApplicationCore::SaveModel(const char* filePath) {
                     if (mesh->HasTangentsAndBitangents()) {
                         for (int32_t j = 0; j < 3; j++) {
                             output << "vtan ";
-                            output << mesh->mTangents[face.mIndices[j]].x << " ";
-                            output << mesh->mTangents[face.mIndices[j]].y << " ";
-                            output << mesh->mTangents[face.mIndices[j]].z << "\n";
+
+                            math::Vector tangent(mesh->mTangents[face.mIndices[j]].x, mesh->mTangents[face.mIndices[j]].y, mesh->mTangents[face.mIndices[j]].z);
+                            tangent = normalTrans * tangent;
+                            output << tangent.x << " ";
+                            output << tangent.y << " ";
+                            output << tangent.z << "\n";
 
                             char temp[64];
                             sprintf_s(temp, "%d", i * 3 + j + 1);
                             faceStr[j] = faceStr[j] + "/" + temp;
 
                             output << "vbi ";
-                            output << mesh->mBitangents[face.mIndices[j]].x << " ";
-                            output << mesh->mBitangents[face.mIndices[j]].y << " ";
-                            output << mesh->mBitangents[face.mIndices[j]].z << "\n";
+                            math::Vector biTangent(mesh->mBitangents[face.mIndices[j]].x, mesh->mBitangents[face.mIndices[j]].y, mesh->mBitangents[face.mIndices[j]].z);
+                            biTangent = normalTrans * biTangent;
+                            output << biTangent.x << " ";
+                            output << biTangent.y << " ";
+                            output << biTangent.z << "\n";
 
                             sprintf_s(temp, "%d", i * 3 + j + 1);
                             faceStr[j] = faceStr[j] + "/" + temp;
@@ -659,10 +682,10 @@ bool ApplicationCore::IsReceiveShadow() {
     return result;
 }
 
-void ApplicationCore::SetRecieveShadow(bool bRecieveShadow) {
+void ApplicationCore::SetReceiveShadow(bool bReceiveShadow) {
     glb::render::material::Material* mat = glb::render::material::Mgr::GetMaterial(m_Material);
     if (mat) {
-        mat->SetReceiveShadowEnable(bRecieveShadow);
+        mat->SetReceiveShadowEnable(bReceiveShadow);
     } else {
         GLB_SAFE_ASSERT(false);
     }

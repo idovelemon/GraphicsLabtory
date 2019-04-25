@@ -41,7 +41,7 @@ public:
     bool IsCastShadow();
     void SetCastShadow(bool bCastShadow);
     bool IsReceiveShadow();
-    void SetRecieveShadow(bool bRecieveShadow);
+    void SetReceiveShadow(bool bReceiveShadow);
 
 protected:
     void UpdateCamera();
@@ -52,6 +52,8 @@ private:
 
     int32_t                             m_DefaultTexture2D;
     int32_t                             m_DefaultTextureCube;
+
+    int32_t                             m_DefaultPlane;
 
     char                                m_SceneMeshName[256];
     int32_t                             m_SceneMesh;

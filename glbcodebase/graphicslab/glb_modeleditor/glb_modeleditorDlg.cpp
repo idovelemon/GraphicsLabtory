@@ -759,11 +759,11 @@ LRESULT Cglb_modeleditorDlg::OnPropertyChanged(WPARAM wparam, LPARAM lparam)
             CString option = CString(property->GetValue().bstrVal);
             if (!option.Compare(TEXT("TRUE")))
             {
-                ApplicationCore::GetInstance()->SetRecieveShadow(true);
+                ApplicationCore::GetInstance()->SetReceiveShadow(true);
             }
             else if (!option.Compare(TEXT("FALSE")))
             {
-                ApplicationCore::GetInstance()->SetRecieveShadow(false);
+                ApplicationCore::GetInstance()->SetReceiveShadow(false);
             }
         }
     }
@@ -1025,7 +1025,7 @@ void Cglb_modeleditorDlg::RefreshMaterialParameters()
         {
             defaultOption = TEXT("FALSE");
         }
-        CMFCPropertyGridProperty* property = new CMFCPropertyGridProperty(TEXT("recieveshadow"), defaultOption);
+        CMFCPropertyGridProperty* property = new CMFCPropertyGridProperty(TEXT("receiveshadow"), defaultOption);
         property->AddOption(TEXT("TRUE"));
         property->AddOption(TEXT("FALSE"));
         materialProperty->AddSubItem(property);
