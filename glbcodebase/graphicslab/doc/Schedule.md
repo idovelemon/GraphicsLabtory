@@ -105,10 +105,11 @@ GLB ModelEditor is used for convert DCC tool's export file format to GLB library
 |Support for edit general post-processing parameter|2019-03-10 16:22||<font color="Blue">New</font>|
 |Support for slide edit control for material parameters|2019-03-14 22:21|2019-04-21 23:11|<font color="Green">Finish</font>|
 |Support add exist shader when adding pass material|2019-04-10 21:33|2019-04-10 22:23|<font color="Green">Finish</font>|
-|Support add default shadow pass material, just because most of the object has the same shadow pass material|2019-04-18 08:26||<font color="Blue">New</font>|
-|Add a plane, so that we can see shadow effect of object|2019-04-23 08:36||<font color="Blue">New</font>|
+|Support add default shadow pass material, just because most of the object has the same shadow pass material|2019-04-18 08:26|2019-04-26 08:42|<font color="Green">Finish</font>|
+|Add a plane, so that we can see shadow effect of object|2019-04-23 08:36|2019-04-26 08:42|<font color="Green">Finish</font>|
 |Optimize camera effect|2019-04-23 08:36||<font color="Blue">New</font>|
-|Auto rotate mesh vertex around X -90 degree, so that we do not rotate it at blender|2019-04-23 20:35||<font color="Blue">New</font>|
+|Auto rotate mesh vertex around X -90 degree, so that we do not rotate it at blender|2019-04-23 20:35|2019-04-25 07:39|<font color="Green">Finish</font>|
+|Add a XYZ axis indicator layer|2019-04-25 07:39||<font color="Blue">New</font>|
 
 |Bug|Begin Time|Fnish Time|Status|
 |-|-|-|-|
