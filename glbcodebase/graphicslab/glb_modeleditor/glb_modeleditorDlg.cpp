@@ -251,8 +251,8 @@ void Cglb_modeleditorDlg::OnFileImport()
         GetDlgItem(IDC_VIEW)->GetClientRect(&rect);
         config.screen_width = rect.right - rect.left;
         config.screen_height = rect.bottom - rect.top;
-        config.shadow_map_width = 32;
-        config.shadow_map_height = 32;
+        config.shadow_map_width = 1024;
+        config.shadow_map_height = 1024;
         config.decalMapWidth = 32;
         config.decalMapHeight = 32;
         if (!glb::app::Application::Initialize(ApplicationCore::Create, AfxGetInstanceHandle(), config))
@@ -625,21 +625,35 @@ void Cglb_modeleditorDlg::OnMaterialAddpass()
             m_TreeItemTbl.erase(m_TreeItemTbl.find(keyName));
         };
 
-        // Create vertex and fragment shader file
+        // Create vertex and fragment shader file using template shader file
         CreateDirectory(m_WorkSpaceDirectory, nullptr);
-        if (INVALID_HANDLE_VALUE == CreateFile(m_WorkSpaceDirectory + addPassDlg.GetVertexShaderName(), 0, 0, nullptr, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr))
+        CString templateVertexShaderFile = L"";
+        CString templateFragmentShaderFile = L"";
+        if (!addPassDlg.GetPassName().Compare(L"lightloop"))
+        {
+            templateVertexShaderFile = L"res/templateL.vs";
+            templateFragmentShaderFile = L"res/templateL.fs";
+        }
+        else if (!addPassDlg.GetPassName().Compare(L"shadow"))
+        {
+            templateVertexShaderFile = L"res/templateSD.vs";
+            templateFragmentShaderFile = L"res/templateSD.fs";
+        }
+
+        if (!CopyFile(templateVertexShaderFile, m_WorkSpaceDirectory + addPassDlg.GetVertexShaderName(),TRUE))
         {
             cleanUp();
             return;
         }
 
-        if (INVALID_HANDLE_VALUE == CreateFile(m_WorkSpaceDirectory + addPassDlg.GetFragmentShaderName(), 0, 0, nullptr, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr))
+        if (!CopyFile(templateFragmentShaderFile, m_WorkSpaceDirectory + addPassDlg.GetFragmentShaderName(), TRUE))
         {
             cleanUp();
             return;
         }
     }
 }
+
 
 
 void Cglb_modeleditorDlg::OnPassCompile()

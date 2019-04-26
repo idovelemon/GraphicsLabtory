@@ -119,6 +119,8 @@ bool ApplicationCore::AddModel(const char* name) {
         float* normalBuf = mesh->HasNormals() ? new float[trianglesNum * 3 * 3] : NULL;
         float* tangentBuf = mesh->HasTangentsAndBitangents() ? new float[trianglesNum * 3 * 3] : NULL;
         float* binormalBuf = mesh->HasTangentsAndBitangents() ? new float[trianglesNum * 3 * 3] : NULL;
+        math::Vector boundBoxMax(-FLT_MAX, -FLT_MAX, -FLT_MAX);
+        math::Vector boundBoxMin(FLT_MAX, FLT_MAX, FLT_MAX);
 
         for (int32_t i = 0; i < trianglesNum; i++) {
             aiFace face = scene->mMeshes[0]->mFaces[i];
@@ -130,6 +132,13 @@ bool ApplicationCore::AddModel(const char* name) {
                     vertexBuf[i * 3 * 3 + j * 3 + 0] = pos.x;
                     vertexBuf[i * 3 * 3 + j * 3 + 1] = pos.y;
                     vertexBuf[i * 3 * 3 + j * 3 + 2] = pos.z;
+
+                    if (boundBoxMax.x < pos.x) boundBoxMax.x = pos.x;
+                    if (boundBoxMax.y < pos.y) boundBoxMax.y = pos.y;
+                    if (boundBoxMax.z < pos.z) boundBoxMax.z = pos.z;
+                    if (boundBoxMin.x > pos.x) boundBoxMin.x = pos.x;
+                    if (boundBoxMin.y > pos.y) boundBoxMin.y = pos.y;
+                    if (boundBoxMin.z > pos.z) boundBoxMin.z = pos.z;
                 }
 
                 // Vertex UV
@@ -181,6 +190,7 @@ bool ApplicationCore::AddModel(const char* name) {
         }
 
         render::mesh::MeshBase* model = render::mesh::TriangleMesh::Create(trianglesNum, vertexBuf, texcoordBuf, lightMapTexCoordBuf, normalBuf, tangentBuf, binormalBuf);
+        model->SetBoundBox(boundBoxMin, boundBoxMax);
         render::mesh::Mgr::AddMesh(model);
 
         render::material::Material* material = render::material::Material::Create("res/default.mat");
@@ -397,6 +407,7 @@ bool ApplicationCore::SaveMaterial(const char* name) {
 
         std::ofstream output;
         output.open(name);
+        output.setf(std::ios::fixed, std::ios::floatfield);
 
         std::vector<glb::render::material::PassMaterial*>& passMaterial = mat->GetAllPassMaterial();
 
@@ -413,9 +424,9 @@ bool ApplicationCore::SaveMaterial(const char* name) {
             std::string destVertexShaderName = destDir.empty() ? util::path_get_name(vertexShaderName) : (destDir + '\\' + util::path_get_name(vertexShaderName));
             std::string destFragmentShaderName = destDir.empty() ? util::path_get_name(fragmentShaderName) : (destDir + '\\' + util::path_get_name(fragmentShaderName));
             std::string destSrcFragmentShaderName = destDir.empty() ? util::path_get_name(srcFragmentShaderName.c_str()) : (destDir + '\\' + util::path_get_name(srcFragmentShaderName.c_str()));
-            CopyFileA(vertexShaderName, destVertexShaderName.c_str(), TRUE);
-            CopyFileA(fragmentShaderName, destFragmentShaderName.c_str(), TRUE);
-            CopyFileA(srcFragmentShaderName.c_str(), destSrcFragmentShaderName.c_str(), TRUE);
+            CopyFileA(vertexShaderName, destVertexShaderName.c_str(), FALSE);
+            CopyFileA(fragmentShaderName, destFragmentShaderName.c_str(), FALSE);
+            CopyFileA(srcFragmentShaderName.c_str(), destSrcFragmentShaderName.c_str(), FALSE);
 
             for (auto& param : pass->GetAllParameters()) {
                 if (param.type == glb::render::material::PassMaterial::PARAMETER_TYPE_USER) {
