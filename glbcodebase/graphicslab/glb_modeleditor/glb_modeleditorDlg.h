@@ -16,6 +16,7 @@ struct SMaterial
     CArray<CString> passName;
     CArray<CString> vertexShaderName;
     CArray<CString> fragmentShaderName;
+    CArray<CString> textureName;
     std::vector<std::vector<glb::render::material::PassMaterial::ParameterEntry>> passParameters;
 
     SMaterial()

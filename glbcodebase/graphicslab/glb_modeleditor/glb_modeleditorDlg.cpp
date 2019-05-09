@@ -920,22 +920,13 @@ bool Cglb_modeleditorDlg::CheckIsAllFileReady(CString filePath)
     }
 
     {
-        for (int32_t i = 0; i < static_cast<int32_t>(m_MaterialInfo.passParameters.size()); i++)
+        for (int32_t i = 0; i < static_cast<int32_t>(m_MaterialInfo.textureName.GetCount()); i++)
         {
-            for (int32_t j = 0; j < static_cast<int32_t>(m_MaterialInfo.passParameters[i].size()); j++)
+            filePath = fileDirectory + m_MaterialInfo.textureName[i];
+            DWORD attri = GetFileAttributes(filePath);
+            if (INVALID_FILE_ATTRIBUTES == attri || (attri & FILE_ATTRIBUTE_DIRECTORY))
             {
-                if (m_MaterialInfo.passParameters[i][j].type == glb::render::material::PassMaterial::PARAMETER_TYPE_USER
-                    && (m_MaterialInfo.passParameters[i][j].format == glb::render::PARAMETER_FORMAT_TEXTURE_2D
-                    || m_MaterialInfo.passParameters[i][j].format == glb::render::PARAMETER_FORMAT_TEXTURE_3D
-                    || m_MaterialInfo.passParameters[i][j].format == glb::render::PARAMETER_FORMAT_TEXTURE_CUBE))
-                {
-                    filePath = fileDirectory + CString(m_MaterialInfo.passParameters[i][j].name);
-                    DWORD attri = GetFileAttributes(filePath);
-                    if (INVALID_FILE_ATTRIBUTES == attri || (attri & FILE_ATTRIBUTE_DIRECTORY))
-                    {
-                        return false;
-                    }
-                }
+                return false;
             }
         }
     }
@@ -970,20 +961,11 @@ void Cglb_modeleditorDlg::CopyFileToWorkSpace(CString filePath)
     }
 
     {
-        for (int32_t i = 0; i < static_cast<int32_t>(m_MaterialInfo.passParameters.size()); i++)
+        for (int32_t i = 0; i < static_cast<int32_t>(m_MaterialInfo.textureName.GetCount()); i++)
         {
-            for (int32_t j = 0; j < static_cast<int32_t>(m_MaterialInfo.passParameters[i].size()); j++)
-            {
-                if (m_MaterialInfo.passParameters[i][j].type == glb::render::material::PassMaterial::PARAMETER_TYPE_USER
-                    && (m_MaterialInfo.passParameters[i][j].format == glb::render::PARAMETER_FORMAT_TEXTURE_2D
-                    || m_MaterialInfo.passParameters[i][j].format == glb::render::PARAMETER_FORMAT_TEXTURE_3D
-                    || m_MaterialInfo.passParameters[i][j].format == glb::render::PARAMETER_FORMAT_TEXTURE_CUBE))
-                {
-                    CString srcfilePath = srcFileDirectory + CString(m_MaterialInfo.passParameters[i][j].name);
-                    CString destFilePath = destFileDirectory + CString(m_MaterialInfo.passParameters[i][j].name);
-                    CopyFile(srcfilePath, destFilePath, FALSE);
-                }
-            }
+            CString srcfilePath = srcFileDirectory + m_MaterialInfo.textureName[i];
+            CString destFilePath = destFileDirectory + m_MaterialInfo.textureName[i];
+            CopyFile(srcfilePath, destFilePath, FALSE);
         }
     }
 
@@ -1154,6 +1136,9 @@ void Cglb_modeleditorDlg::BuildMaterial(CString fileName, const char* filePath)
     m_MaterialInfo.passParameters.clear();
     m_MaterialInfo.vertexShaderName.RemoveAll();
 
+    // Get all pass parameters
+    m_MaterialInfo.passParameters = ApplicationCore::GetInstance()->GetAllPassParameters();
+
     if (!input.fail())
     {
         while (!input.eof()) {
@@ -1175,15 +1160,32 @@ void Cglb_modeleditorDlg::BuildMaterial(CString fileName, const char* filePath)
                 m_MaterialInfo.vertexShaderName.Add(CString(vertexShaderFile));
                 m_MaterialInfo.fragmentShaderName.Add(CString(fragmentShaderFile).Mid(4));
             } else if (!strcmp(buffer, "passparameter")) {
+                char parameterName[1024];
+                input >> parameterName;
 
+                for (int32_t i = 0; i < static_cast<int32_t>(m_MaterialInfo.passParameters.size()); i++)
+                {
+                    for (int32_t j = 0; j < static_cast<int32_t>(m_MaterialInfo.passParameters[i].size()); j++)
+                    {
+                        if (m_MaterialInfo.passParameters[i][j].type == glb::render::material::PassMaterial::PARAMETER_TYPE_USER
+                            && (m_MaterialInfo.passParameters[i][j].format == glb::render::PARAMETER_FORMAT_TEXTURE_2D
+                            || m_MaterialInfo.passParameters[i][j].format == glb::render::PARAMETER_FORMAT_TEXTURE_3D
+                            || m_MaterialInfo.passParameters[i][j].format == glb::render::PARAMETER_FORMAT_TEXTURE_CUBE))
+                        {
+                            if (!strcmp(m_MaterialInfo.passParameters[i][j].name, parameterName))
+                            {
+                                char textureName[1024];
+                                input >> textureName;
+                                m_MaterialInfo.textureName.Add(CString(textureName));
+                            }
+                        }
+                    }
+                }
             }
         }
     }
 
     input.close();
-
-    // Get all pass parameters
-    m_MaterialInfo.passParameters = ApplicationCore::GetInstance()->GetAllPassParameters();
 }
 
 
