@@ -46,13 +46,14 @@ def srp(source, dest):
     source_string = srp_core(source)
     if len(source_string) is 0:
         print("Error:No source shader string!")
-        return
+        return -1
     
     dest_file = open(dest, "w")
     for str in source_string:
         print(str)
         dest_file.write(str)
     dest_file.close()
+    return 0
 
 # if __name__ == "__main__":
 #     SourceShaderResourceFileName = input("SourceFileName:")
@@ -65,6 +66,9 @@ if __name__ == "__main__":
     IncludeShaderResourceDirectory = sys.argv[1]
     SourceShaderResourceFileName = sys.argv[2]
     DestinationShaderResourceFileName = sys.argv[3]
-    srp(SourceShaderResourceFileName, DestinationShaderResourceFileName)
+    err = srp(SourceShaderResourceFileName, DestinationShaderResourceFileName)
+
+    if err is not 0:
+        input()
     print("=====finish======")
     pass
