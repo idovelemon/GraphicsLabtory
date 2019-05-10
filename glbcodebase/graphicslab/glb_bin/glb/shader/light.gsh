@@ -167,5 +167,39 @@ vec3 glbCalcIBLColor(vec3 n, vec3 v, vec3 albedo, float roughness, float metalic
 }
 
 //----------------------------------------------------
+// Calculate pixel's sky light color
+// n: Normal vector
+// v: View vector
+// albedo: Material base color
+// roughness: Material roughness value
+// metallic: Material metallic value
+// return: sky light color
+//----------------------------------------------------
+vec3 glbCalcSkyLightColor(vec3 n, vec3 v, vec3 albedo, float roughness, float metalic) {
+	vec3 result = vec3(0.0, 0.0, 0.0);	
+
+    vec3 F0 = mix(vec3(0.04, 0.04, 0.04), albedo, metalic);
+    vec3 F = glbCalculateFresnelRoughness(n, v, F0, roughness);
+
+    // Diffuse part
+    vec3 T = vec3(1.0, 1.0, 1.0) - F;
+    vec3 kD = T * (1.0 - metalic);
+
+    vec3 irradiance = glbFetechCubeMap(glb_unif_DiffuseSkyCubeMap, n);
+    vec3 diffuse = kD * albedo * irradiance;
+
+    // Specular part
+    float ndotv = max(0.0, dot(n, v));
+    vec3 r = 2.0 * ndotv * n - v;
+    vec3 ld = glbFetechCubeMapLOD(glb_unif_SpecularSkyCubeMap, r, roughness * glb_unif_SpecularSkyPFCLOD);
+    vec2 dfg = textureLod(glb_unif_BRDFPFTTex, vec2(ndotv, roughness), 0.0).xy;
+    vec3 specular = ld * (F0 * dfg.x + dfg.y);
+
+    result = (diffuse + specular) * glb_unif_SkyLight;
+
+	return result;
+}
+
+//----------------------------------------------------
 // end: Method about light calculating
 //----------------------------------------------------

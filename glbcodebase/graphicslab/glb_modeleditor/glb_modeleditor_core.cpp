@@ -56,6 +56,10 @@ bool ApplicationCore::Initialize() {
     light.dir.Normalize();
     scene::Scene::SetLight(light, 1);
 
+    scene::Light skyLight(scene::SKY_LIGHT);
+    skyLight.color = math::Vector(1.0f, 1.0f, 1.0f);
+    scene::Scene::SetLight(skyLight, 2);
+
     // Perspective
     render::Render::SetPerspective(glb::render::Render::PRIMARY_PERS, 69.0f, 800 * 1.0f / 600, 0.1f, 500.0f);
 

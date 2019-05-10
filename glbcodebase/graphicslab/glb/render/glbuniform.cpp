@@ -390,6 +390,56 @@ Wrapper uniform_parallel_light_picker(scene::Object*) {
     return wrapper;
 }
 
+Wrapper uniform_skylight_diffuse_picker(scene::Object*) {
+    Wrapper wrapper;
+    wrapper.SetFormat(Wrapper::FMT_SAMPLERCUBE);
+
+    wrapper.SetSamplerCube(render::Render::GetDiffuseSkyLightCubeMap());
+
+    return wrapper;
+}
+
+Wrapper uniform_skylight_specular_picker(scene::Object*) {
+    Wrapper wrapper;
+    wrapper.SetFormat(Wrapper::FMT_SAMPLERCUBE);
+
+    wrapper.SetSamplerCube(render::Render::GetSpecularSkyLightCubeMap());
+
+    return wrapper;
+}
+
+Wrapper uniform_skylight_picker(scene::Object*) {
+    Wrapper wrapper;
+    wrapper.SetFormat(Wrapper::FMT_FLOAT3);
+
+    // Only support one sky light now
+    bool bFound = false;
+    for (int32_t i = 0; i < scene::kMaxLight; i++) {
+        scene::Light lit = scene::Scene::GetLight(i);
+        if (lit.type == scene::SKY_LIGHT) {
+            wrapper.SetVector(lit.color);
+            bFound = true;
+            break;
+        }
+    }
+
+    if (!bFound) {
+        GLB_SAFE_ASSERT(false);
+        wrapper.SetVector(math::Vector(1.0f, 1.0f, 1.0f));
+    }
+
+    return wrapper;
+}
+
+Wrapper uniform_skylight_lod_picker(scene::Object*) {
+    Wrapper wrapper;
+    wrapper.SetFormat(Wrapper::FMT_FLOAT);
+
+    wrapper.SetFloat(render::Render::GetSpecularSkyPFCLOD());
+
+    return wrapper;
+}
+
 Wrapper uniform_far_clip_picker(scene::Object*) {
     Wrapper wrapper;
     wrapper.SetFormat(Wrapper::FMT_FLOAT);

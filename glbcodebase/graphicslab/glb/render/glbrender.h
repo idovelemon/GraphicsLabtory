@@ -46,6 +46,10 @@ public:
 
     // Texture
     static int32_t GetBRDFMap();
+    static void SetSkyLightCubeMap(const char* diffuseSkyCubeMap, const char* specularSkyCubeMap, int32_t specularPFCLOD);
+    static int32_t GetDiffuseSkyLightCubeMap();
+    static int32_t GetSpecularSkyLightCubeMap();
+    static int32_t GetSpecularSkyPFCLOD();
 
     // Perspective
     static void SetPerspective(int32_t type, float fov, float aspect, float znear, float zfar);

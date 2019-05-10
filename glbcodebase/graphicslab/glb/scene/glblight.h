@@ -18,6 +18,7 @@ enum {
     AMBIENT_LIGHT,
     PARALLEL_LIGHT,
     POINT_LIGHT,
+    SKY_LIGHT,
 };
 
 class Light {

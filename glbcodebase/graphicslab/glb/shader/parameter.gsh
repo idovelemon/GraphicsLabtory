@@ -13,6 +13,12 @@ uniform vec3 glb_unif_GlobalLight_Ambient;
 uniform vec3 glb_unif_ParallelLight_Dir;
 uniform vec3 glb_unif_ParallelLight;
 
+// Sky light setting
+uniform samplerCube glb_unif_DiffuseSkyCubeMap;
+uniform samplerCube glb_unif_SpecularSkyCubeMap;
+uniform float glb_unif_SpecularSkyPFCLOD;
+uniform vec3 glb_unif_SkyLight;
+
 // Image based light settting
 uniform sampler2D glb_unif_BRDFPFTTex;
 uniform float glb_unif_SpecularPFCLOD;

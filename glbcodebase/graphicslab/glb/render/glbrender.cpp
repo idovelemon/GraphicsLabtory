@@ -131,6 +131,10 @@ public:
     void Draw();
 
     int32_t GetBRDFMap();
+    void SetSkyLightCubeMap(const char* diffuseSkyCubeMap, const char* specularSkyCubeMap, int32_t specularPFCLOD);
+    int32_t GetDiffuseSkyLightCubeMap();
+    int32_t GetSpecularSkyLightCubeMap();
+    int32_t GetSpecularSkyPFCLOD();
 
     void SetPerspective(int32_t type, float fov, float aspect, float znear, float zfar);
     math::Matrix& GetPerspective(int32_t type);
@@ -226,6 +230,11 @@ private:
 
     // Image based Lighting
     int32_t                                 m_BRDFPFTMap;
+
+    // Sky Light
+    int32_t                                 m_DiffuseSkyCubeMap;
+    int32_t                                 m_SpecularSkyCubeMap;
+    int32_t                                 m_SpecularSkyPFCLOD;
 
     // Perspective
     int32_t                                 m_PerspectiveType;
@@ -396,6 +405,11 @@ RenderImp::RenderImp()
 // Image based Lighting
 , m_BRDFPFTMap(-1)
 
+// Sky Light
+, m_DiffuseSkyCubeMap(-1)
+, m_SpecularSkyCubeMap(-1)
+, m_SpecularSkyPFCLOD(-1)
+
 // Shadow
 , m_ShadowShader(-1)
 , m_InstanceShadowShader(-1)
@@ -555,6 +569,24 @@ void RenderImp::Draw() {
 
 int32_t RenderImp::GetBRDFMap() {
     return m_BRDFPFTMap;
+}
+
+void RenderImp::SetSkyLightCubeMap(const char* diffuseSkyCubeMap, const char* specularSkyCubeMap, int32_t specularPFCLOD) {
+    m_DiffuseSkyCubeMap = texture::Mgr::LoadPFCTexture(diffuseSkyCubeMap);
+    m_SpecularSkyCubeMap = texture::Mgr::LoadPFCTexture(specularSkyCubeMap);
+    m_SpecularSkyPFCLOD = specularPFCLOD;
+}
+
+int32_t RenderImp::GetDiffuseSkyLightCubeMap() {
+    return m_DiffuseSkyCubeMap;
+}
+
+int32_t RenderImp::GetSpecularSkyLightCubeMap() {
+    return m_SpecularSkyCubeMap;
+}
+
+int32_t RenderImp::GetSpecularSkyPFCLOD() {
+    return m_SpecularSkyPFCLOD;
 }
 
 void RenderImp::SetPerspective(int32_t type, float fov, float aspect, float znear, float zfar) {
@@ -1072,6 +1104,9 @@ void RenderImp::PrepareHDR() {
 
 void RenderImp::PrepareEnvMap() {
     m_BRDFPFTMap = texture::Mgr::LoadPFTTexture("..\\glb\\resource\\texture\\dfg.pft");
+    m_DiffuseSkyCubeMap = texture::Mgr::LoadPFCTexture("..\\glb\\resource\\texture\\defaultDiffuseSky.pfc");
+    m_SpecularSkyCubeMap = texture::Mgr::LoadPFCTexture("..\\glb\\resource\\texture\\defaultSpecularSky.pfc");
+    m_SpecularSkyPFCLOD = 8;
 }
 
 void RenderImp::SetupShadowMatrix() {
@@ -2393,6 +2428,50 @@ int32_t Render::GetBRDFMap() {
 
     if (s_RenderImp != nullptr) {
         result = s_RenderImp->GetBRDFMap();
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return result;
+}
+
+void Render::SetSkyLightCubeMap(const char* diffuseSkyCubeMap, const char* specularSkyCubeMap, int32_t specularPFCLOD) {
+    if (s_RenderImp != nullptr) {
+        s_RenderImp->SetSkyLightCubeMap(diffuseSkyCubeMap, specularSkyCubeMap, specularPFCLOD);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+}
+
+int32_t Render::GetDiffuseSkyLightCubeMap() {
+    int32_t result = -1;
+
+    if (s_RenderImp != nullptr) {
+        result = s_RenderImp->GetDiffuseSkyLightCubeMap();
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return result;
+}
+
+int32_t Render::GetSpecularSkyLightCubeMap() {
+    int32_t result = -1;
+
+    if (s_RenderImp != nullptr) {
+        result = s_RenderImp->GetSpecularSkyLightCubeMap();
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return result;
+}
+
+int32_t Render::GetSpecularSkyPFCLOD() {
+    int32_t result = -1;
+
+    if (s_RenderImp != nullptr) {
+        result = s_RenderImp->GetSpecularSkyPFCLOD();
     } else {
         GLB_SAFE_ASSERT(false);
     }

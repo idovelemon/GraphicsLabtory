@@ -52,6 +52,10 @@ enum {
     GLB_GLOBALLIGHT_AMBIENT,
     GLB_PARALLELLIGHT_DIR,
     GLB_PARALLELLIGHT,
+    GLB_SKYLIGHT_DIFFUSE,
+    GLB_SKYLIGHT_SPECULAR,
+    GLB_SKYLIGHT,
+    GLB_SKYLIGHT_SPECULAR_LOD,
     GLB_FAR_CLIP,
     GLB_SCREEN_WIDTH,
     GLB_SCREEN_HEIGHT,
@@ -92,6 +96,10 @@ static const struct {
     {"glb_unif_GlobalLight_Ambient",             GLB_GLOBALLIGHT_AMBIENT,            1},
     {"glb_unif_ParallelLight_Dir",               GLB_PARALLELLIGHT_DIR,              1},
     {"glb_unif_ParallelLight",                   GLB_PARALLELLIGHT,                  1},
+    {"glb_unif_DiffuseSkyCubeMap",               GLB_SKYLIGHT_DIFFUSE,               1},
+    {"glb_unif_SpecularSkyCubeMap",              GLB_SKYLIGHT_SPECULAR,              1},
+    {"glb_unif_SkyLight",                        GLB_SKYLIGHT,                       1},
+    {"glb_unif_SpecularSkyPFCLOD",               GLB_SKYLIGHT_SPECULAR_LOD,          1},
     {"glb_unif_FarClip",                         GLB_FAR_CLIP,                       1},
     {"glb_unif_ScreenWidth",                     GLB_SCREEN_WIDTH,                   1},
     {"glb_unif_ScreenHeight",                    GLB_SCREEN_HEIGHT,                  1},
@@ -183,6 +191,10 @@ Wrapper uniform_look_at_picker(scene::Object*);                   // Pick glb_Lo
 Wrapper uniform_global_light_ambient_picker(scene::Object*);      // Pick glb_GlobalLight_Ambient
 Wrapper uniform_parallel_light_dir_picker(scene::Object*);        // Pick glb_ParallelLight_Dir
 Wrapper uniform_parallel_light_picker(scene::Object*);            // Pick glb_ParallelLight
+Wrapper uniform_skylight_diffuse_picker(scene::Object*);          // Pick glb_unif_DiffuseSkyCubeMap
+Wrapper uniform_skylight_specular_picker(scene::Object*);         // Pick glb_unif_SpecularSkyCubeMap
+Wrapper uniform_skylight_picker(scene::Object*);                  // Pick glb_unif_SkyLight
+Wrapper uniform_skylight_lod_picker(scene::Object*);              // Pick glb_unif_SpecularSkyPFCLOD
 Wrapper uniform_far_clip_picker(scene::Object*);                  // Pick glb_FarClip
 Wrapper uniform_screen_width_picker(scene::Object*);              // Pick glb_ScreenWidth
 Wrapper uniform_screen_height_picker(scene::Object*);             // Pick glb_ScreenHeight
@@ -220,6 +232,10 @@ static const struct {
     {uniform_global_light_ambient_picker,       GLB_GLOBALLIGHT_AMBIENT},
     {uniform_parallel_light_dir_picker,         GLB_PARALLELLIGHT_DIR},
     {uniform_parallel_light_picker,             GLB_PARALLELLIGHT},
+    {uniform_skylight_diffuse_picker,           GLB_SKYLIGHT_DIFFUSE},
+    {uniform_skylight_specular_picker,          GLB_SKYLIGHT_SPECULAR},
+    {uniform_skylight_picker,                   GLB_SKYLIGHT},
+    {uniform_skylight_lod_picker,               GLB_SKYLIGHT_SPECULAR_LOD},
     {uniform_far_clip_picker,                   GLB_FAR_CLIP},
     {uniform_screen_width_picker,               GLB_SCREEN_WIDTH},
     {uniform_screen_height_picker,              GLB_SCREEN_HEIGHT},

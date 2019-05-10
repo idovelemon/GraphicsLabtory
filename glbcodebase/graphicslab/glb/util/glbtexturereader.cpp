@@ -611,6 +611,8 @@ int32_t TextureReader::ReadTexture(const char* fileName, int8_t** data, int32_t&
         } else {
             GLB_SAFE_ASSERT(false);
         }
+
+        if (result == TPFT_UNKOWN) result = 0;
     }
 
     return result;

@@ -39,6 +39,10 @@
 |glb_unif_GlobalLight_Ambient|vec3|Ambient light|
 |glb_unif_ParallelLight_Dir|vec3|Direction of parallel light|
 |glb_unif_ParallelLight|vec3|Color of parallel light|
+|glb_unif_DiffuseSkyCubeMap|samplerCube|Diffuse sky prefilter cube map|
+|glb_unif_SpecularSkyCubeMap|samplerCube|Specular sky prefilter cube map|
+|glb_unif_SkyLight|vec3|Sky light color or intensity|
+|glb_unif_SpecularSkyPFCLOD|float|Specular sky prefileter cube map lod|
 |glb_unif_FarClip|float|Far clip plane value of frustum|
 |glb_unif_ScreenWidth|float|Width of screen|
 |glb_unif_ScreenHeight|float|Height of screen|
