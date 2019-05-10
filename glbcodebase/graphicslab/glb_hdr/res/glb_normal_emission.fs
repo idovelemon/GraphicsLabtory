@@ -25,9 +25,33 @@ uniform vec3 glb_unif_GlobalLight_Ambient;
 uniform vec3 glb_unif_ParallelLight_Dir;
 uniform vec3 glb_unif_ParallelLight;
 
+// Sky light setting
+uniform samplerCube glb_unif_DiffuseSkyCubeMap;
+uniform samplerCube glb_unif_SpecularSkyCubeMap;
+uniform float glb_unif_SpecularSkyPFCLOD;
+uniform vec3 glb_unif_SkyLight;
+
 // Image based light settting
 uniform sampler2D glb_unif_BRDFPFTTex;
 uniform float glb_unif_SpecularPFCLOD;
+
+// Shadow map setting
+uniform sampler2D glb_unif_ShadowTex0;
+uniform sampler2D glb_unif_ShadowTex1;
+uniform sampler2D glb_unif_ShadowTex2;
+uniform sampler2D glb_unif_ShadowTex3;
+uniform mat4 glb_unif_ShadowM0;
+uniform mat4 glb_unif_ShadowM1;
+uniform mat4 glb_unif_ShadowM2;
+uniform mat4 glb_unif_ShadowM3;
+uniform float glb_unif_ShadowSplit0;
+uniform float glb_unif_ShadowSplit1;
+uniform float glb_unif_ShadowSplit2;
+
+// Decal map setting
+uniform mat4 glb_unif_DecalViewM;
+uniform mat4 glb_unif_DecalProjM;
+uniform sampler2D glb_unif_DecalTex;
 
 //----------------------------------------------------
 // end: Build-in parameter uniforms
@@ -243,7 +267,163 @@ vec3 glbCalcIBLColor(vec3 n, vec3 v, vec3 albedo, float roughness, float metalic
 }
 
 //----------------------------------------------------
+// Calculate pixel's sky light color
+// n: Normal vector
+// v: View vector
+// albedo: Material base color
+// roughness: Material roughness value
+// metallic: Material metallic value
+// return: sky light color
+//----------------------------------------------------
+vec3 glbCalcSkyLightColor(vec3 n, vec3 v, vec3 albedo, float roughness, float metalic) {
+	vec3 result = vec3(0.0, 0.0, 0.0);	
+
+    vec3 F0 = mix(vec3(0.04, 0.04, 0.04), albedo, metalic);
+    vec3 F = glbCalculateFresnelRoughness(n, v, F0, roughness);
+
+    // Diffuse part
+    vec3 T = vec3(1.0, 1.0, 1.0) - F;
+    vec3 kD = T * (1.0 - metalic);
+
+    vec3 irradiance = glbFetechCubeMap(glb_unif_DiffuseSkyCubeMap, n);
+    vec3 diffuse = kD * albedo * irradiance;
+
+    // Specular part
+    float ndotv = max(0.0, dot(n, v));
+    vec3 r = 2.0 * ndotv * n - v;
+    vec3 ld = glbFetechCubeMapLOD(glb_unif_SpecularSkyCubeMap, r, roughness * glb_unif_SpecularSkyPFCLOD);
+    vec2 dfg = textureLod(glb_unif_BRDFPFTTex, vec2(ndotv, roughness), 0.0).xy;
+    vec3 specular = ld * (F0 * dfg.x + dfg.y);
+
+    result = (diffuse + specular) * glb_unif_SkyLight;
+
+	return result;
+}
+
+//----------------------------------------------------
 // end: Method about light calculating
+//----------------------------------------------------
+
+//----------------------------------------------------
+// begin: Method about shadow calculating
+//----------------------------------------------------
+
+//----------------------------------------------------
+// Calculate shadow map index
+// pos: The vertex position
+// eyePos: Camera position
+// lookAt: Camera look at vector
+// split0-2: PSSM split value 0,1,2
+// return: Shadow map index
+//----------------------------------------------------
+int glbCalculateShadowIndex(vec3 pos, vec3 eyePos, vec3 lookAt, float sp0, float sp1, float sp2) {
+    int index = -1;
+
+    vec3 toVtx = eyePos - pos;
+    float z = dot(toVtx, lookAt);
+    if (z < sp0) {
+        index = 0;
+    } else if (sp0 < z && z < sp1) {
+        index = 1;
+    } else if (sp1 < z && z < sp2) {
+        index = 2;
+    } else if (z > sp2) {
+        index = 3;
+    }
+
+    return index;
+}
+
+//----------------------------------------------------
+// Calculate pixel shadow factor
+// pos: The vertex position
+// eyePos: Camera position
+// lookAt: Camera look at vector
+// split0-2: PSSM split value 0,1,2
+// shadowM0-3: PSSM shadow matrix 0,1,2,3
+// shadowMap0-3: PSSM shadow map 0,1,2,3
+// return: Pixel shadow factor
+//----------------------------------------------------
+float glbCalculateShadowFactor(vec3 pos, vec3 eyePos, vec3 lookAt, 
+                            float split0, float split1, float split2,
+                            mat4 shadowM0, mat4 shadowM1, mat4 shadow2, mat4 shadow3,
+                            sampler2D shadowMap0, sampler2D shadowMap1, sampler2D shadowMap2, sampler2D shadowMap3) {
+	float shadowFactor = 1.0;
+
+	int index = glbCalculateShadowIndex(pos, eyePos, lookAt, split0, split1, split2);
+	vec4 lightSpacePos;
+
+	if (index == 0) {
+		lightSpacePos = shadowM0 * vec4(pos, 1.0);
+		lightSpacePos.xyz /= 2.0f;
+		lightSpacePos.xyz += 0.5f;
+		lightSpacePos.xyz /= lightSpacePos.w;
+		shadowFactor = texture2D(shadowMap0, lightSpacePos.xy).z;
+	} else if (index == 1) {
+		lightSpacePos = shadowM1 * vec4(pos, 1.0);
+		lightSpacePos.xyz /= 2.0f;
+		lightSpacePos.xyz += 0.5f;
+		lightSpacePos.xyz /= lightSpacePos.w;	
+		shadowFactor = texture2D(shadowMap1, lightSpacePos.xy).z;
+	} else if (index == 2) {
+		lightSpacePos = shadow2 * vec4(pos, 1.0);
+		lightSpacePos.xyz /= 2.0f;
+		lightSpacePos.xyz += 0.5f;
+		lightSpacePos.xyz /= lightSpacePos.w;				
+		shadowFactor = texture2D(shadowMap2, lightSpacePos.xy).z;
+	} else {
+		lightSpacePos = shadow3 * vec4(pos, 1.0);
+		lightSpacePos.xyz /= 2.0f;
+		lightSpacePos.xyz += 0.5f;
+		lightSpacePos.xyz /= lightSpacePos.w;
+		shadowFactor = texture2D(shadowMap3, lightSpacePos.xy).z;
+	}
+
+	if (shadowFactor < lightSpacePos.z) {
+		// In shadow
+		shadowFactor = 0.2;
+	} else {
+		// Out of shadow
+		shadowFactor = 1.0;
+	}
+	if (lightSpacePos.x < 0.0 || 
+		lightSpacePos.x > 1.0 ||
+		lightSpacePos.y < 0.0 ||
+		lightSpacePos.y > 1.0) {
+		// Out of shadow
+		shadowFactor = 1.0;
+	}
+
+	return shadowFactor;
+}
+
+//----------------------------------------------------
+// end: Method about shadow calculating
+//----------------------------------------------------
+
+//----------------------------------------------------
+// begin: Method about decal
+//----------------------------------------------------
+
+//----------------------------------------------------
+// Calculate pixel's decal color
+// decalProj: Decal pass projection matrix
+// decalView: Decal pass view matrix
+// pos: The world position
+// decalTex: The texture hold all decals already
+// return: Pixel's decal color with alpha
+//----------------------------------------------------
+vec4 glbCalculateDecalColor(mat4 decalProj, mat4 decalView, vec4 pos, sampler2D decalTex) {
+  	vec4 decalTexcoord = decalProj * decalView * pos;
+    decalTexcoord.xyz /= 2.0;
+    decalTexcoord.xyz += 0.5;
+    decalTexcoord.xyz /= decalTexcoord.w;
+
+    return texture(decalTex, decalTexcoord.xy);
+}
+
+//----------------------------------------------------
+// end: Method about decal
 //----------------------------------------------------
 
 
@@ -258,7 +438,6 @@ in vec2 vs_TexCoord;
 out vec4 oColor;
 
 // Uniform
-uniform vec3 glb_unif_EmissionIntensity;
 uniform sampler2D glb_unif_AlbedoTex;
 uniform sampler2D glb_unif_RoughnessTex;
 uniform sampler2D glb_unif_MetallicTex;
@@ -266,6 +445,8 @@ uniform sampler2D glb_unif_NormalTex;
 uniform sampler2D glb_unif_EmissionTex;
 uniform samplerCube glb_unif_DiffusePFCTex;
 uniform samplerCube glb_unif_SpecularPFCTex;
+
+uniform vec3 glb_unif_EmissionIntensity;
 
 vec3 calc_view() {
 	vec3 view = vec3(0.0, 0.0, 0.0);
@@ -283,7 +464,7 @@ void calc_material(out vec3 albedo, out float roughness, out float metallic, out
 	albedo = texture(glb_unif_AlbedoTex, vs_TexCoord).xyz;
 	roughness = texture(glb_unif_RoughnessTex, vs_TexCoord).x;
 	metallic = texture(glb_unif_MetallicTex, vs_TexCoord).x;
-	emission = texture(glb_unif_EmissionTex, vs_TexCoord).xyz;
+	emission = texture(glb_unif_EmissionTex, vs_TexCoord).xyz * glb_unif_EmissionIntensity;
 }
 
 vec3 calc_direct_light_color() {
@@ -319,9 +500,9 @@ void main() {
 
 	vec3 direct_color = glbCalculateDirectLightColor(normalInWorld, view, light, h, albedo, roughness, metallic, direct_light_color);
 
-	vec3 ibl_color = glbCalcIBLColor(normalInWorld, view, albedo, roughness, metallic, glb_unif_DiffusePFCTex, glb_unif_SpecularPFCTex, glb_unif_BRDFPFTTex, glb_unif_SpecularPFCLOD);
+	vec3 sky_light_color = glbCalcSkyLightColor(normalInWorld, view, albedo, roughness, metallic);
 
-	oColor.xyz = (direct_color + ibl_color) * shadow_factor + glb_unif_EmissionIntensity * emission;
+	oColor.xyz = (direct_color + sky_light_color) * shadow_factor + emission;
 
 	float alpha = 1.0;
 	oColor.w = alpha;

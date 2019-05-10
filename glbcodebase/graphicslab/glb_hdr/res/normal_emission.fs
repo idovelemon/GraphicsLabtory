@@ -75,9 +75,9 @@ void main() {
 
 	vec3 direct_color = glbCalculateDirectLightColor(normalInWorld, view, light, h, albedo, roughness, metallic, direct_light_color);
 
-	vec3 ibl_color = glbCalcIBLColor(normalInWorld, view, albedo, roughness, metallic, glb_unif_DiffusePFCTex, glb_unif_SpecularPFCTex, glb_unif_BRDFPFTTex, glb_unif_SpecularPFCLOD);
+	vec3 sky_light_color = glbCalcSkyLightColor(normalInWorld, view, albedo, roughness, metallic);
 
-	oColor.xyz = (direct_color + ibl_color) * shadow_factor + emission;
+	oColor.xyz = (direct_color + sky_light_color) * shadow_factor + emission;
 
 	float alpha = 1.0;
 	oColor.w = alpha;
