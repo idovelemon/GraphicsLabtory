@@ -110,6 +110,7 @@ GLB ModelEditor is used for convert DCC tool's export file format to GLB library
 |Optimize camera effect|2019-04-23 08:36||<font color="Blue">New</font>|
 |Auto rotate mesh vertex around X -90 degree, so that we do not rotate it at blender|2019-04-23 20:35|2019-04-25 07:39|<font color="Green">Finish</font>|
 |Add a XYZ axis indicator layer|2019-04-25 07:39||<font color="Blue">New</font>|
+|Add bat to copy bin file to tool bin directory|2019-05-11 08:30||<font color="Blue">New</font>|
 
 |Bug|Begin Time|Fnish Time|Status|
 |-|-|-|-|
