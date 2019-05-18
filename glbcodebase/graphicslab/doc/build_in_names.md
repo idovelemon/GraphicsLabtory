@@ -25,6 +25,8 @@
 |glb_unif_ShadowSplit2|float|Frustum split value with shadow map 2|
 |glb_unif_ShadowSplit3|float|Frustum split value with shadow map 3|
 |glb_unif_ShadowMIndex|int|Current using shadow map index|
+|glb_unif_ShadowMapWidth|int|Current using shadow map's width|
+|glb_unif_ShadowMapHeight|int|Current using shadow map's height|
 |glb_unif_Trans_Inv_WorldM|mat4|World matrix's inverse-transpose matrix for normal mapping|
 |glb_unif_BRDFPFTTex|sampler2D|Precompute brdf table texture for IBL|
 |glb_unif_Light0Tex|sampler2D|Precompute Radiosity Light Map 0|
