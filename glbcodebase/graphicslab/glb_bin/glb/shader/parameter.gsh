@@ -35,6 +35,8 @@ uniform mat4 glb_unif_ShadowM3;
 uniform float glb_unif_ShadowSplit0;
 uniform float glb_unif_ShadowSplit1;
 uniform float glb_unif_ShadowSplit2;
+uniform int glb_unif_ShadowMapWidth;
+uniform int glb_unif_ShadowMapHeight;
 
 // Decal map setting
 uniform mat4 glb_unif_DecalViewM;

@@ -113,6 +113,9 @@ dxguid.lib;assimp-vc110-mt.lib;zlibstatic.lib;%(AdditionalDependencies)</Additio
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
+    <PostBuildEvent>
+      <Command>CopyToBin.bat</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <Text Include="..\glb\thirdparty\rgbe\rgbe.txt" />
