@@ -36,7 +36,7 @@ public:
 
         scene::Light light(scene::PARALLEL_LIGHT);
         light.color = math::Vector(1.2f, 1.2f, 1.2f);
-        light.dir = math::Vector(-1.0f, -1.0f, 0.0f);
+        light.dir = math::Vector(-1.0f, -1.0f, 1.0f);
         light.dir.Normalize();
         scene::Scene::SetLight(light, 1);
 
@@ -132,8 +132,8 @@ int _stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPreInstance, LPSTR cmdLine,
     memcpy(config.caption, L"glb_pssm", sizeof(L"glb_pssm"));
     config.screen_width = 800;
     config.screen_height = 600;
-    config.shadow_map_width = 2048;
-    config.shadow_map_height = 2048;
+    config.shadow_map_width = 1024;
+    config.shadow_map_height = 1024;
     config.decalMapWidth = 1024;
     config.decalMapHeight = 1024;
     config.icon = IDI_ICON1;
