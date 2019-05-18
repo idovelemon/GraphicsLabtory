@@ -330,8 +330,8 @@ void Cglb_modeleditorDlg::OnFilePreview()
         GetDlgItem(IDC_VIEW)->GetClientRect(&rect);
         config.screen_width = rect.right - rect.left;
         config.screen_height = rect.bottom - rect.top;
-        config.shadow_map_width = 32;
-        config.shadow_map_height = 32;
+        config.shadow_map_width = 1024;
+        config.shadow_map_height = 1024;
         config.decalMapWidth = 32;
         config.decalMapHeight = 32;
         if (!glb::app::Application::Initialize(ApplicationCore::Create, AfxGetInstanceHandle(), config))
