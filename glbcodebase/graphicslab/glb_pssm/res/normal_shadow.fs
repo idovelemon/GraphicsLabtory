@@ -1,6 +1,6 @@
 #version 330
 
-#include "../../glb/shader/glb.gsh"
+#include "glb.gsh"
 
 // Input attributes
 in vec4 vs_Vertex;
@@ -48,7 +48,7 @@ void main() {
 
 	vec3 normalInWorld = normalize(vs_Normal);
 
-	float shadow_factor = glbCalculateShadowFactor(vs_Vertex, glb_unif_EyePos, glb_unif_LookAt,
+	float shadow_factor = glbCalculatePCFShadowFactor(vs_Vertex.xyz, glb_unif_EyePos, glb_unif_LookAt,
                                                 glb_unif_ShadowSplit0, glb_unif_ShadowSplit1, glb_unif_ShadowSplit2,
                                                 glb_unif_ShadowM0, glb_unif_ShadowM1, glb_unif_ShadowM2, glb_unif_ShadowM3,
                                                 glb_unif_ShadowTex0, glb_unif_ShadowTex1, glb_unif_ShadowTex2, glb_unif_ShadowTex3);

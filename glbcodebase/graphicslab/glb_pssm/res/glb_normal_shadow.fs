@@ -25,6 +25,12 @@ uniform vec3 glb_unif_GlobalLight_Ambient;
 uniform vec3 glb_unif_ParallelLight_Dir;
 uniform vec3 glb_unif_ParallelLight;
 
+// Sky light setting
+uniform samplerCube glb_unif_DiffuseSkyCubeMap;
+uniform samplerCube glb_unif_SpecularSkyCubeMap;
+uniform float glb_unif_SpecularSkyPFCLOD;
+uniform vec3 glb_unif_SkyLight;
+
 // Image based light settting
 uniform sampler2D glb_unif_BRDFPFTTex;
 uniform float glb_unif_SpecularPFCLOD;
@@ -41,6 +47,13 @@ uniform mat4 glb_unif_ShadowM3;
 uniform float glb_unif_ShadowSplit0;
 uniform float glb_unif_ShadowSplit1;
 uniform float glb_unif_ShadowSplit2;
+uniform int glb_unif_ShadowMapWidth;
+uniform int glb_unif_ShadowMapHeight;
+
+// Decal map setting
+uniform mat4 glb_unif_DecalViewM;
+uniform mat4 glb_unif_DecalProjM;
+uniform sampler2D glb_unif_DecalTex;
 
 //----------------------------------------------------
 // end: Build-in parameter uniforms
@@ -256,6 +269,40 @@ vec3 glbCalcIBLColor(vec3 n, vec3 v, vec3 albedo, float roughness, float metalic
 }
 
 //----------------------------------------------------
+// Calculate pixel's sky light color
+// n: Normal vector
+// v: View vector
+// albedo: Material base color
+// roughness: Material roughness value
+// metallic: Material metallic value
+// return: sky light color
+//----------------------------------------------------
+vec3 glbCalcSkyLightColor(vec3 n, vec3 v, vec3 albedo, float roughness, float metalic) {
+	vec3 result = vec3(0.0, 0.0, 0.0);	
+
+    vec3 F0 = mix(vec3(0.04, 0.04, 0.04), albedo, metalic);
+    vec3 F = glbCalculateFresnelRoughness(n, v, F0, roughness);
+
+    // Diffuse part
+    vec3 T = vec3(1.0, 1.0, 1.0) - F;
+    vec3 kD = T * (1.0 - metalic);
+
+    vec3 irradiance = glbFetechCubeMap(glb_unif_DiffuseSkyCubeMap, n);
+    vec3 diffuse = kD * albedo * irradiance;
+
+    // Specular part
+    float ndotv = max(0.0, dot(n, v));
+    vec3 r = 2.0 * ndotv * n - v;
+    vec3 ld = glbFetechCubeMapLOD(glb_unif_SpecularSkyCubeMap, r, roughness * glb_unif_SpecularSkyPFCLOD);
+    vec2 dfg = textureLod(glb_unif_BRDFPFTTex, vec2(ndotv, roughness), 0.0).xy;
+    vec3 specular = ld * (F0 * dfg.x + dfg.y);
+
+    result = (diffuse + specular) * glb_unif_SkyLight;
+
+	return result;
+}
+
+//----------------------------------------------------
 // end: Method about light calculating
 //----------------------------------------------------
 
@@ -297,7 +344,7 @@ int glbCalculateShadowIndex(vec3 pos, vec3 eyePos, vec3 lookAt, float sp0, float
 // split0-2: PSSM split value 0,1,2
 // shadowM0-3: PSSM shadow matrix 0,1,2,3
 // shadowMap0-3: PSSM shadow map 0,1,2,3
-// return: Pixel shadow factor
+// return: Pixel shadow factor [0 or 1]
 //----------------------------------------------------
 float glbCalculateShadowFactor(vec3 pos, vec3 eyePos, vec3 lookAt, 
                             float split0, float split1, float split2,
@@ -310,33 +357,36 @@ float glbCalculateShadowFactor(vec3 pos, vec3 eyePos, vec3 lookAt,
 
 	if (index == 0) {
 		lightSpacePos = shadowM0 * vec4(pos, 1.0);
+		lightSpacePos.xyz /= lightSpacePos.w;
 		lightSpacePos.xyz /= 2.0f;
 		lightSpacePos.xyz += 0.5f;
-		lightSpacePos.xyz /= lightSpacePos.w;
 		shadowFactor = texture2D(shadowMap0, lightSpacePos.xy).z;
 	} else if (index == 1) {
 		lightSpacePos = shadowM1 * vec4(pos, 1.0);
+		lightSpacePos.xyz /= lightSpacePos.w;
 		lightSpacePos.xyz /= 2.0f;
-		lightSpacePos.xyz += 0.5f;
-		lightSpacePos.xyz /= lightSpacePos.w;	
+		lightSpacePos.xyz += 0.5f;	
 		shadowFactor = texture2D(shadowMap1, lightSpacePos.xy).z;
 	} else if (index == 2) {
 		lightSpacePos = shadow2 * vec4(pos, 1.0);
+		lightSpacePos.xyz /= lightSpacePos.w;
 		lightSpacePos.xyz /= 2.0f;
-		lightSpacePos.xyz += 0.5f;
-		lightSpacePos.xyz /= lightSpacePos.w;				
+		lightSpacePos.xyz += 0.5f;				
 		shadowFactor = texture2D(shadowMap2, lightSpacePos.xy).z;
 	} else {
 		lightSpacePos = shadow3 * vec4(pos, 1.0);
+		lightSpacePos.xyz /= lightSpacePos.w;
 		lightSpacePos.xyz /= 2.0f;
 		lightSpacePos.xyz += 0.5f;
-		lightSpacePos.xyz /= lightSpacePos.w;
 		shadowFactor = texture2D(shadowMap3, lightSpacePos.xy).z;
 	}
 
 	if (shadowFactor < lightSpacePos.z) {
 		// In shadow
-		shadowFactor = 0.2;
+		shadowFactor = 0.0;
+	} else {
+		// Out of shadow
+		shadowFactor = 1.0;
 	}
 	if (lightSpacePos.x < 0.0 || 
 		lightSpacePos.x > 1.0 ||
@@ -350,7 +400,157 @@ float glbCalculateShadowFactor(vec3 pos, vec3 eyePos, vec3 lookAt,
 }
 
 //----------------------------------------------------
+// Calculate pixel shadow factor using PCF(Percent Closet Filter)
+// pos: The vertex position
+// eyePos: Camera position
+// lookAt: Camera look at vector
+// split0-2: PSSM split value 0,1,2
+// shadowM0-3: PSSM shadow matrix 0,1,2,3
+// shadowMap0-3: PSSM shadow map 0,1,2,3
+// return: Pixel shadow factor [0 - 1]
+//----------------------------------------------------
+float glbCalculatePCFShadowFactor(vec3 pos, vec3 eyePos, vec3 lookAt, 
+                            float split0, float split1, float split2,
+                            mat4 shadowM0, mat4 shadowM1, mat4 shadow2, mat4 shadow3,
+                            sampler2D shadowMap0, sampler2D shadowMap1, sampler2D shadowMap2, sampler2D shadowMap3) {
+	float shadowFactor = 1.0;
+
+	int index = glbCalculateShadowIndex(pos, eyePos, lookAt, split0, split1, split2);
+	vec4 lightSpacePos;
+	vec2 offset = vec2(1.0 / glb_unif_ShadowMapWidth, 1.0 / glb_unif_ShadowMapHeight);
+
+	if (index == 0) {
+		lightSpacePos = shadowM0 * vec4(pos, 1.0);
+		lightSpacePos.xyz /= lightSpacePos.w;
+		lightSpacePos.xyz /= 2.0f;
+		lightSpacePos.xyz += 0.5f;
+		float singleShadowFactor = 0.0;
+		for (float i = -1.5; i <= 1.5; i = i + 1.0) {
+			for (float j = -1.5; j <= 1.5; j = j + 1.0) {
+				vec2 newLightSpacePos = lightSpacePos.xy + vec2(offset.x * i, offset.y * j);
+				if (newLightSpacePos.x < 0.0 || 
+					newLightSpacePos.x > 1.0 ||
+					newLightSpacePos.y < 0.0 ||
+					newLightSpacePos.y > 1.0) {
+					// Out of shadow
+					continue;
+				}
+
+				float shadowDepth = texture2D(shadowMap0, newLightSpacePos).z;
+				if (shadowDepth < lightSpacePos.z) {
+					// In shadow
+					singleShadowFactor = singleShadowFactor + 1.0;
+				}				
+			}
+		}
+		shadowFactor = 1.0 - singleShadowFactor / 16.0;
+	} else if (index == 1) {
+		lightSpacePos = shadowM1 * vec4(pos, 1.0);
+		lightSpacePos.xyz /= lightSpacePos.w;
+		lightSpacePos.xyz /= 2.0f;
+		lightSpacePos.xyz += 0.5f;
+		float singleShadowFactor = 0.0;
+		for (float i = -1.5; i <= 1.5; i = i + 1.0) {
+			for (float j = -1.5; j <= 1.5; j = j + 1.0) {
+				vec2 newLightSpacePos = lightSpacePos.xy + vec2(offset.x * i, offset.y * j);
+				if (newLightSpacePos.x < 0.0 || 
+					newLightSpacePos.x > 1.0 ||
+					newLightSpacePos.y < 0.0 ||
+					newLightSpacePos.y > 1.0) {
+					// Out of shadow
+					continue;
+				}
+
+				float shadowDepth = texture2D(shadowMap1, newLightSpacePos).z;
+				if (shadowDepth < lightSpacePos.z) {
+					// In shadow
+					singleShadowFactor = singleShadowFactor + 1.0;
+				}				
+			}
+		}
+		shadowFactor = 1.0 - singleShadowFactor / 16.0;
+	} else if (index == 2) {
+		lightSpacePos = shadow2 * vec4(pos, 1.0);
+		lightSpacePos.xyz /= lightSpacePos.w;
+		lightSpacePos.xyz /= 2.0f;
+		lightSpacePos.xyz += 0.5f;
+		float singleShadowFactor = 0.0;
+		for (float i = -1.5; i <= 1.5; i = i + 1.0) {
+			for (float j = -1.5; j <= 1.5; j = j + 1.0) {
+				vec2 newLightSpacePos = lightSpacePos.xy + vec2(offset.x * i, offset.y * j);
+				if (newLightSpacePos.x < 0.0 || 
+					newLightSpacePos.x > 1.0 ||
+					newLightSpacePos.y < 0.0 ||
+					newLightSpacePos.y > 1.0) {
+					// Out of shadow
+					continue;
+				}
+
+				float shadowDepth = texture2D(shadowMap2, newLightSpacePos).z;
+				if (shadowDepth < lightSpacePos.z) {
+					// In shadow
+					singleShadowFactor = singleShadowFactor + 1.0;
+				}				
+			}
+		}
+		shadowFactor = 1.0 - singleShadowFactor / 16.0;
+	} else {
+		lightSpacePos = shadow3 * vec4(pos, 1.0);
+		lightSpacePos.xyz /= lightSpacePos.w;
+		lightSpacePos.xyz /= 2.0f;
+		lightSpacePos.xyz += 0.5f;
+		float singleShadowFactor = 0.0;
+		for (float i = -1.5; i <= 1.5; i = i + 1.0) {
+			for (float j = -1.5; j <= 1.5; j = j + 1.0) {
+				vec2 newLightSpacePos = lightSpacePos.xy + vec2(offset.x * i, offset.y * j);
+				if (newLightSpacePos.x < 0.0 || 
+					newLightSpacePos.x > 1.0 ||
+					newLightSpacePos.y < 0.0 ||
+					newLightSpacePos.y > 1.0) {
+					// Out of shadow
+					continue;
+				}
+
+				float shadowDepth = texture2D(shadowMap3, newLightSpacePos).z;
+				if (shadowDepth < lightSpacePos.z) {
+					// In shadow
+					singleShadowFactor = singleShadowFactor + 1.0;
+				}				
+			}
+		}
+		shadowFactor = 1.0 - singleShadowFactor / 16.0;
+	}
+
+	return shadowFactor;
+}
+
+//----------------------------------------------------
 // end: Method about shadow calculating
+//----------------------------------------------------
+
+//----------------------------------------------------
+// begin: Method about decal
+//----------------------------------------------------
+
+//----------------------------------------------------
+// Calculate pixel's decal color
+// decalProj: Decal pass projection matrix
+// decalView: Decal pass view matrix
+// pos: The world position
+// decalTex: The texture hold all decals already
+// return: Pixel's decal color with alpha
+//----------------------------------------------------
+vec4 glbCalculateDecalColor(mat4 decalProj, mat4 decalView, vec4 pos, sampler2D decalTex) {
+  	vec4 decalTexcoord = decalProj * decalView * pos;
+    decalTexcoord.xyz /= 2.0;
+    decalTexcoord.xyz += 0.5;
+    decalTexcoord.xyz /= decalTexcoord.w;
+
+    return texture(decalTex, decalTexcoord.xy);
+}
+
+//----------------------------------------------------
+// end: Method about decal
 //----------------------------------------------------
 
 
@@ -400,7 +600,7 @@ void main() {
 
 	vec3 normalInWorld = normalize(vs_Normal);
 
-	float shadow_factor = glbCalculateShadowFactor(vs_Vertex.xyz, glb_unif_EyePos, glb_unif_LookAt,
+	float shadow_factor = glbCalculatePCFShadowFactor(vs_Vertex.xyz, glb_unif_EyePos, glb_unif_LookAt,
                                                 glb_unif_ShadowSplit0, glb_unif_ShadowSplit1, glb_unif_ShadowSplit2,
                                                 glb_unif_ShadowM0, glb_unif_ShadowM1, glb_unif_ShadowM2, glb_unif_ShadowM3,
                                                 glb_unif_ShadowTex0, glb_unif_ShadowTex1, glb_unif_ShadowTex2, glb_unif_ShadowTex3);
