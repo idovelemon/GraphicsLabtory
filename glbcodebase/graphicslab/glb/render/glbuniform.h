@@ -35,6 +35,8 @@ enum {
     GLB_SHADOWSPLIT1,
     GLB_SHADOWSPLIT2,
     GLB_SHADOWMINDEX,
+    GLB_SHADOWMAP_WIDTH,
+    GLB_SHADOWMAP_HEIGHT,
     GLB_TRANS_INV_WORLDM,
     GLB_DECAL_VIEWM,
     GLB_DECAL_PROJM,
@@ -79,9 +81,11 @@ static const struct {
     {"glb_unif_ShadowSplit1",                    GLB_SHADOWSPLIT1,                   1},
     {"glb_unif_ShadowSplit2",                    GLB_SHADOWSPLIT2,                   1},
     {"glb_unif_ShadowMIndex",                    GLB_SHADOWMINDEX,                   1},
+    {"glb_unif_ShadowMapWidth",                  GLB_SHADOWMAP_WIDTH,                1},
+    {"glb_unif_ShadowMapHeight",                 GLB_SHADOWMAP_HEIGHT,               1},
     {"glb_unif_Trans_Inv_WorldM",                GLB_TRANS_INV_WORLDM,               0},
-    {"glb_unif_DecalViewM",                     GLB_DECAL_VIEWM,                    1},
-    {"glb_unif_DecalProjM",                     GLB_DECAL_PROJM,                    1},
+    {"glb_unif_DecalViewM",                      GLB_DECAL_VIEWM,                    1},
+    {"glb_unif_DecalProjM",                      GLB_DECAL_PROJM,                    1},
     {"glb_unif_ShadowTex0",                      GLB_SHADOWTEX0,                     0},
     {"glb_unif_ShadowTex1",                      GLB_SHADOWTEX1,                     0},
     {"glb_unif_ShadowTex2",                      GLB_SHADOWTEX2,                     0},
@@ -174,6 +178,8 @@ Wrapper uniform_shadowsplit0_picker(scene::Object*);              // Pick glb_Sh
 Wrapper uniform_shadowsplit1_picker(scene::Object*);              // Pick glb_ShadowSplit1
 Wrapper uniform_shadowsplit2_picker(scene::Object*);              // Pick glb_ShadowSplit2
 Wrapper uniform_shadowmindex_picker(scene::Object*);              // Pick glb_ShadowMIndex
+Wrapper uniform_shadowmap_width_picker(scene::Object*);           // Pick glb_ShadowMapWidth
+Wrapper uniform_shadowmap_height_picker(scene::Object*);          // Pick glb_ShadowMapHeight
 Wrapper uniform_trans_inv_worldm_picker(scene::Object*);          // Pick glb_Trans_Inv_WorldM
 Wrapper uniform_decal_viewm_picker(scene::Object*);               // Pick glb_DecalViewM
 Wrapper uniform_decal_projm_picker(scene::Object*);               // Pick glb_DecalProjM
@@ -215,6 +221,8 @@ static const struct {
     {uniform_shadowsplit1_picker,               GLB_SHADOWSPLIT1},
     {uniform_shadowsplit2_picker,               GLB_SHADOWSPLIT2},
     {uniform_shadowmindex_picker,               GLB_SHADOWMINDEX},
+    {uniform_shadowmap_width_picker,            GLB_SHADOWMAP_WIDTH},
+    {uniform_shadowmap_height_picker,           GLB_SHADOWMAP_HEIGHT},
     {uniform_trans_inv_worldm_picker,           GLB_TRANS_INV_WORLDM},
     {uniform_decal_viewm_picker,                GLB_DECAL_VIEWM},
     {uniform_decal_projm_picker,                GLB_DECAL_PROJM},

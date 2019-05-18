@@ -6,6 +6,7 @@
 //-----------------------------------------------------------
 #include "glbuniform.h"
 
+#include "glbapplication.h"
 #include "glbmaterial.h"
 #include "glbrender.h"
 #include "glbrenderdevice.h"
@@ -207,6 +208,20 @@ Wrapper uniform_shadowmindex_picker(scene::Object* obj) {
     Wrapper wrapper;
     wrapper.SetFormat(Wrapper::FMT_INT);
     wrapper.SetInt(render::Render::GetCurShadowMapIndex());
+    return wrapper;
+}
+
+Wrapper uniform_shadowmap_width_picker(scene::Object*) {
+    Wrapper wrapper;
+    wrapper.SetFormat(Wrapper::FMT_INT);
+    wrapper.SetInt(app::Application::GetShadowMapWidth());
+    return wrapper;
+}
+
+Wrapper uniform_shadowmap_height_picker(scene::Object*) {
+    Wrapper wrapper;
+    wrapper.SetFormat(Wrapper::FMT_INT);
+    wrapper.SetInt(app::Application::GetShadowMapHeight());
     return wrapper;
 }
 
