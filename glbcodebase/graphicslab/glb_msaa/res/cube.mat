@@ -1,0 +1,10 @@
+beginpass lightloop
+shader normal.vs glb_normal.fs
+passparameter glb_unif_AlbedoTex bathroomtile_basecolor.dds
+passparameter glb_unif_RoughnessTex bathroomtile_roughness.dds
+passparameter glb_unif_MetallicTex bathroomtile_metallic.dds
+passparameter glb_unif_NormalTex bathroomtile_normal.dds
+passparameter glb_unif_SpecularPFCLOD 7.0
+passparameter glb_unif_DiffusePFCTex diffuse.pfc
+passparameter glb_unif_SpecularPFCTex specular.pfc
+endpass
