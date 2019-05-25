@@ -96,11 +96,34 @@ RenderTarget::Imp* RenderTarget::Imp::Create(int32_t width, int32_t height) {
     return target;
 }
 
+void RenderTarget::Imp::AttachDepthTextureMS(texture::Texture* depthTex) {
+    if (depthTex != nullptr) {
+        glBindFramebuffer(GL_FRAMEBUFFER, m_FBO);
+        glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, reinterpret_cast<GLuint>(depthTex->GetNativeTex()));
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D_MULTISAMPLE, reinterpret_cast<GLuint>(depthTex->GetNativeTex()), 0);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+}
+
 void RenderTarget::Imp::AttachDepthTexture(texture::Texture* depth_tex) {
     if (depth_tex != nullptr) {
         glBindFramebuffer(GL_FRAMEBUFFER, m_FBO);
         glBindTexture(GL_TEXTURE_2D, reinterpret_cast<GLuint>(depth_tex->GetNativeTex()));
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, reinterpret_cast<GLuint>(depth_tex->GetNativeTex()), 0);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+}
+
+void RenderTarget::Imp::AttachColorTextureMS(render::DrawColorBuffer index, texture::Texture* colorTex) {
+    if (render::COLORBUF_COLOR_ATTACHMENT0 <= index && index <= render::COLORBUF_COLOR_ATTACHMENT7
+        && colorTex != nullptr) {
+        glBindFramebuffer(GL_FRAMEBUFFER, m_FBO);
+        glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, reinterpret_cast<GLuint>(colorTex->GetNativeTex()));
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index - render::COLORBUF_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, reinterpret_cast<GLuint>(colorTex->GetNativeTex()), 0);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     } else {
         GLB_SAFE_ASSERT(false);

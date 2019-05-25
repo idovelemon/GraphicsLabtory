@@ -44,9 +44,25 @@ RenderTarget* RenderTarget::DefaultRenderTarget() {
     return nullptr;
 }
 
+void RenderTarget::AttachDepthTextureMS(texture::Texture* depthTex) {
+    if (m_Imp != nullptr) {
+        m_Imp->AttachDepthTextureMS(depthTex);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+}
+
 void RenderTarget::AttachDepthTexture(texture::Texture* depth_tex) {
     if (m_Imp != nullptr) {
         m_Imp->AttachDepthTexture(depth_tex);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+}
+
+void RenderTarget::AttachColorTextureMS(render::DrawColorBuffer index, texture::Texture* colorTex) {
+    if (m_Imp != nullptr) {
+        m_Imp->AttachColorTextureMS(index, colorTex);
     } else {
         GLB_SAFE_ASSERT(false);
     }

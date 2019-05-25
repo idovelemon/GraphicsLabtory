@@ -43,7 +43,9 @@ public:
     static Imp* CreatePrefilterCubeMap(const char* textureName);
     static Imp* CreatePrefilterTableMap(const char* textureName);
     static Imp* Create(int32_t width, int32_t height, bool enableMipmapping = true);
+    static Imp* CreateFloat32TextureMS(int32_t width, int32_t height, int32_t samplers);
     static Imp* CreateFloat32Texture(int32_t width, int32_t height, bool enableMipmapping = true);
+    static Imp* CreateFloat32DepthTextureMS(int32_t width, int32_t height, int32_t samplers);
     static Imp* CreateFloat32DepthTexture(int32_t width, int32_t height, bool enableMipmapping = true);
     static Imp* CreateFloat32CubeTexture(int32_t width, int32_t height, bool enableMipmapping = true);
     static Imp* CreateFloat16CubeTexture(int32_t width, int32_t height, bool enableMipmapping = true);

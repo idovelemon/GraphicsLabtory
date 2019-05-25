@@ -20,7 +20,7 @@ public:
 public:
     bool Initialize() {
         // Camera
-        scene::FreeCamera* cam = scene::FreeCamera::Create(math::Vector(0.0f, 0.0f, 2.0f), math::Vector(0.0f, 0.0f, 0.0f));
+        scene::FreeCamera* cam = scene::FreeCamera::Create(math::Vector(0.0f, 0.5f, 0.5f), math::Vector(0.0f, 0.0f, 0.0f));
         scene::Scene::SetCamera(glb::scene::PRIMIAY_CAM, cam);
 
         // Light
@@ -65,10 +65,8 @@ public:
         lit.dir = rotLight * lit.dir;
         glb::scene::Scene::SetLight(lit, 1);
 
-        // Randomly Rotate the sphere
-        static float sRot = 0.0f;
-        //sRot = sRot + 0.5f;
-        glb::scene::Scene::GetObjectById(m_Cube)->SetWorldMatrix(math::Matrix::CreateRotateXYZMatrix(sRot, sRot, sRot));
+        // Rotate the model
+        glb::scene::Scene::GetObjectById(m_Cube)->SetWorldMatrix(math::Matrix::CreateRotateXYZMatrix(-90.0f, 45.0f, 0.0f));
 
         glb::scene::Scene::Update();
 
@@ -105,6 +103,7 @@ int _stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPreInstance, LPSTR cmdLine,
     config.shadow_map_height = 1024;
     config.decalMapWidth = 1024;
     config.decalMapHeight = 1024;
+    config.msaaSamplerNum = 16;  // Change MSAA quality
     config.icon = IDI_ICON1;
     if (!glb::app::Application::Initialize(ApplicationMSAA::Create, hInstance, config)) {
         return 0;

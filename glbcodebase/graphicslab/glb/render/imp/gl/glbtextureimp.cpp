@@ -289,6 +289,36 @@ Texture::Imp* Texture::Imp::Create(int32_t width, int32_t height, bool enableMip
     return tex;
 }
 
+Texture::Imp* Texture::Imp::CreateFloat32TextureMS(int32_t width, int32_t height, int32_t samplers) {
+    Texture::Imp* tex = nullptr;
+
+    if (width > 0 && height > 0) {
+        int32_t texID = 0;
+        glGenTextures(1, reinterpret_cast<GLuint*>(&texID));
+        glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, texID);
+        glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samplers, GL_RGBA32F, width, height, GL_TRUE);
+
+        tex = new Texture::Imp;
+        if (tex != nullptr) {
+            tex->m_Type = TEX_2D_MS;
+            static char default_name[] = "DefaultEmpty";
+            memcpy(tex->m_TexName, default_name, sizeof(default_name));
+            tex->m_TexObj = texID;
+            tex->m_Width = width;
+            tex->m_Height = height;
+            tex->m_Format = FMT_R32G32B32A32F;
+            tex->m_BPP = 16;
+            tex->m_EnableMipmapping = false;
+        } else {
+            GLB_SAFE_ASSERT(false);
+        }
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return tex;
+}
+
 Texture::Imp* Texture::Imp::CreateFloat32Texture(int32_t width, int32_t height, bool enableMipmapping) {
     Texture::Imp* tex = nullptr;
 
@@ -323,6 +353,35 @@ Texture::Imp* Texture::Imp::CreateFloat32Texture(int32_t width, int32_t height, 
         }
     } else {
         GLB_SAFE_ASSERT(false);
+    }
+
+    return tex;
+}
+
+Texture::Imp* Texture::Imp::CreateFloat32DepthTextureMS(int32_t width, int32_t height, int32_t samplers) {
+    Texture::Imp* tex = nullptr;
+
+    if (width > 0 && height > 0) {
+        int32_t texID = 0;
+        glGenTextures(1, reinterpret_cast<GLuint*>(&texID));
+        glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, texID);
+        glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samplers, GL_DEPTH_COMPONENT32, width, height, GL_TRUE);
+
+        tex = new Texture::Imp;
+        if (tex != nullptr) {
+            tex->m_Type = TEX_2D_MS;
+            tex->m_Depth = 0;
+            tex->m_Height = height;
+            static char default_name[] = "DefaultEmpty";
+            memcpy(tex->m_TexName, default_name, sizeof(default_name));
+            tex->m_TexObj = texID;
+            tex->m_Width = width;
+            tex->m_Format = FMT_DEPTH32F;
+            tex->m_BPP = 4;
+            tex->m_EnableMipmapping = false;
+        } else {
+            GLB_SAFE_ASSERT(false);
+        }
     }
 
     return tex;

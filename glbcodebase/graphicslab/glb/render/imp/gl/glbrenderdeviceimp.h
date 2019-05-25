@@ -67,6 +67,7 @@ public:
     void SetUniform3f(int32_t location, const math::Vector& v);
     void SetUniform4f(int32_t location, const math::Vector& v);
     void SetUniformMatrix(int32_t location, math::Matrix& m);
+    void SetUniformSampler2DMS(int32_t location, int32_t slot);
     void SetUniformSampler2D(int32_t location, int32_t slot);
     void SetUniformSampler3D(int32_t location, int32_t slot);
     void SetUniformSamplerCube(int32_t location, int32_t slot);

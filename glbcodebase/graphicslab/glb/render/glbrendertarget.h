@@ -32,7 +32,9 @@ public:
     static RenderTarget* DefaultRenderTarget();
 
 public:
+    void AttachDepthTextureMS(texture::Texture* depth_tex);
     void AttachDepthTexture(texture::Texture* depth_tex);
+    void AttachColorTextureMS(render::DrawColorBuffer index, texture::Texture* colorTex);
     void AttachColorTexture(render::DrawColorBuffer index, texture::Texture* color_tex, int32_t level = 0);
     void AttachCubeTexture(render::DrawColorBuffer* index, texture::Texture* cube_tex, int32_t level = 0);
     void Attach3DColorTexture(render::DrawColorBuffer index, texture::Texture* color_tex_3d, int32_t layer, int32_t level = 0);

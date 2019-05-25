@@ -125,6 +125,7 @@ public:
     static void SetUniform3f(int32_t location, const math::Vector& v);
     static void SetUniform4f(int32_t location, const math::Vector& v);
     static void SetUniformMatrix(int32_t location, const math::Matrix& m);
+    static void SetUniformSampler2DMS(int32_t location, int32_t slot);
     static void SetUniformSampler2D(int32_t location, int32_t slot);
     static void SetUniformSampler3D(int32_t location, int32_t slot);
     static void SetUniformSamplerCube(int32_t location, int32_t slot);

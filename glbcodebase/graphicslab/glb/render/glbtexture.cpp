@@ -145,9 +145,45 @@ Texture* Texture::Create(int32_t width, int32_t height, bool enableMipmapping) {
     return tex;
 }
 
+Texture* Texture::CreateFloat32TextureMS(int32_t width, int32_t height, int32_t samplers) {
+    Texture* tex = nullptr;
+    Texture::Imp* imp = Texture::Imp::CreateFloat32TextureMS(width, height, samplers);
+
+    if (imp != nullptr) {
+        tex = new Texture;
+        if (tex != nullptr) {
+            tex->m_Imp = imp;
+        } else {
+            GLB_SAFE_ASSERT(false);
+        }
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return tex;
+}
+
 Texture* Texture::CreateFloat32Texture(int32_t width, int32_t height, bool enableMipmapping) {
     Texture* tex = nullptr;
     Texture::Imp* imp = Texture::Imp::CreateFloat32Texture(width, height, enableMipmapping);
+
+    if (imp != nullptr) {
+        tex = new Texture;
+        if (tex != nullptr) {
+            tex->m_Imp = imp;
+        } else {
+            GLB_SAFE_ASSERT(false);
+        }
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return tex;
+}
+
+Texture* Texture::CreateFloat32DepthTextureMS(int32_t width, int32_t height, int32_t samplers) {
+    Texture* tex = nullptr;
+    Texture::Imp* imp = Texture::Imp::CreateFloat32DepthTextureMS(width, height, samplers);
 
     if (imp != nullptr) {
         tex = new Texture;

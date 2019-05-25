@@ -60,6 +60,7 @@ public:
     int32_t GetShadowMapHeight();
     int32_t GetDecalMapWidth();
     int32_t GetDecalMapHeight();
+    int32_t GetMSAASamplers();
 
 protected:
     bool CreateWnd(HINSTANCE hInstance, HWND hWnd, int32_t width, int32_t height, const wchar_t* caption, int32_t icon);
@@ -220,6 +221,10 @@ int32_t ApplicationImp::GetDecalMapWidth() {
 
 int32_t ApplicationImp::GetDecalMapHeight() {
     return m_Config.decalMapHeight;
+}
+
+int32_t ApplicationImp::GetMSAASamplers() {
+    return m_Config.msaaSamplerNum;
 }
 
 bool ApplicationImp::CreateWnd(HINSTANCE hInstance, HWND hWnd, int32_t width, int32_t height, const wchar_t* caption, int32_t icon) {
@@ -407,6 +412,18 @@ int32_t Application::GetDecalMapHeight() {
 
     if (s_ApplicationImp != nullptr) {
         result = s_ApplicationImp->GetDecalMapHeight();
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return result;
+}
+
+int32_t Application::GetMSAASamplers() {
+    int32_t result = 0;
+
+    if (s_ApplicationImp != nullptr) {
+        result = s_ApplicationImp->GetMSAASamplers();
     } else {
         GLB_SAFE_ASSERT(false);
     }

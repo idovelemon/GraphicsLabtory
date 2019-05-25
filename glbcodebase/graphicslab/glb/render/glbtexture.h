@@ -40,6 +40,7 @@ public:
         TEX_2D,
         TEX_3D,
         TEX_CUBE,
+        TEX_2D_MS,
     };
 
     enum Format {
@@ -70,7 +71,9 @@ public:
     static Texture* CreatePrefilterCubeMap(const char* textureName);
     static Texture* CreatePrefilterTableMap(const char* textureName);
     static Texture* Create(int32_t width, int32_t height, bool enableMipmapping = true);
+    static Texture* CreateFloat32TextureMS(int32_t width, int32_t height, int32_t samplers);
     static Texture* CreateFloat32Texture(int32_t width, int32_t height, bool enableMipmapping = true);
+    static Texture* CreateFloat32DepthTextureMS(int32_t width, int32_t height, int32_t samplers);
     static Texture* CreateFloat32DepthTexture(int32_t width, int32_t height, bool enableMipmapping = true);
     static Texture* CreateFloat32CubeTexture(int32_t width, int32_t height, bool enableMipmapping = true);
     static Texture* CreateFloat16CubeTexture(int32_t width, int32_t height, bool enableMipmapping = true);

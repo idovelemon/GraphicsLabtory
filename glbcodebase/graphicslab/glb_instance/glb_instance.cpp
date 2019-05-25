@@ -154,6 +154,7 @@ int _stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPreInstance, LPSTR cmdLine,
     config.shadow_map_height = 1024;
     config.decalMapWidth = 1024;
     config.decalMapHeight = 1024;
+    config.msaaSamplerNum = 1;
     config.icon = IDI_ICON1;
     if (!glb::app::Application::Initialize(ApplicationDemo::Create, hInstance, config)) {
         return 0;

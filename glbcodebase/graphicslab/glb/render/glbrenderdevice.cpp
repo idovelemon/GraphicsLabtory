@@ -135,6 +135,14 @@ void Device::SetUniformMatrix(int32_t location, const math::Matrix& m) {
     }
 }
 
+void Device::SetUniformSampler2DMS(int32_t location, int32_t slot) {
+    if (s_DeviceImp != nullptr) {
+        s_DeviceImp->SetUniformSampler2DMS(location, slot);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+}
+
 void Device::SetUniformSampler2D(int32_t location, int32_t sampler) {
     if (s_DeviceImp != nullptr) {
         s_DeviceImp->SetUniformSampler2D(location, sampler);

@@ -234,6 +234,17 @@ void DeviceImp::SetUniformMatrix(int32_t location, math::Matrix& m) {
     }
 }
 
+void DeviceImp::SetUniformSampler2DMS(int32_t location, int32_t slot) {
+    if (location > -1) {
+        glEnable(GL_TEXTURE_2D);
+        glActiveTexture(GL_TEXTURE0 + m_Texture[slot].tex_unit);
+        glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, m_Texture[slot].tex_obj);
+        glUniform1i(location, m_Texture[slot].tex_unit);
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+}
+
 void DeviceImp::SetUniformSampler2D(int32_t location, int32_t slot) {
     if (location > -1 && 0 <= slot && slot < TS_MAX) {
         glEnable(GL_TEXTURE_2D);

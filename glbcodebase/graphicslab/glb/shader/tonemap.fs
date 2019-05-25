@@ -3,13 +3,14 @@
 // Author: i_dovelemon[1322600812@qq.com]
 // Date: 2016 / 07 / 24
 // Brief: Tone mapping the HDR scene
+// Update[2019-5-25]: Support sampler2DMS
 //--------------------------------------------------------
-#version 330
+#version 450
 
 in vec2 vs_texcoord;
 out vec4 color;
 
-uniform sampler2D glb_unif_Tex;
+uniform sampler2DMS glb_unif_Tex;
 uniform sampler2D glb_unif_BloomTex[4];
 uniform float glb_unif_BloomWeight[4];
 
@@ -27,8 +28,23 @@ vec3 Uncharted2Tonemap(vec3 x)
    return ((x*(A*x+C*B)+D*E)/(x*(A*x+B)+D*F))-E/F;
 }
 
+vec4 msaaResolve(sampler2DMS msTex, vec2 uv) {
+	ivec2 texSize = textureSize(msTex);
+	int samplers = textureSamples(msTex);
+    ivec2 coord = ivec2(texSize * uv);
+
+	vec4 color = vec4(0.0, 0.0, 0.0, 0.0);
+	for (int i = 0; i < samplers; i++) {
+		color = color + texelFetch(msTex, coord, i);
+	}
+
+	color /= samplers;
+
+	return color;
+}
+
 void main() {
-	vec3 hdrColor = texture2D(glb_unif_Tex, vs_texcoord).xyz;
+	vec3 hdrColor = msaaResolve(glb_unif_Tex, vs_texcoord).xyz;
 	vec3 bloom0Color = texture2D(glb_unif_BloomTex[0], vs_texcoord).xyz;
 	vec3 bloom1Color = texture2D(glb_unif_BloomTex[1], vs_texcoord).xyz;
 	vec3 bloom2Color = texture2D(glb_unif_BloomTex[2], vs_texcoord).xyz;

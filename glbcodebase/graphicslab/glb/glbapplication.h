@@ -38,6 +38,7 @@ struct AppConfig {
     int32_t decalMapHeight;
     int32_t platform_api;
     int32_t icon;
+    int32_t msaaSamplerNum;
     wchar_t caption[128];
     HWND    wnd;
     char    fontImg[128];
@@ -52,6 +53,7 @@ struct AppConfig {
     , decalMapHeight(0)
     , platform_api(0)
     , icon(0)
+    , msaaSamplerNum(1)
     , wnd(nullptr) {
         memset(caption, 0, sizeof(caption));
 
@@ -78,6 +80,7 @@ public:
     static int32_t GetShadowMapHeight();
     static int32_t GetDecalMapWidth();
     static int32_t GetDecalMapHeight();
+    static int32_t GetMSAASamplers();
 };
 
 class ApplicationBase {

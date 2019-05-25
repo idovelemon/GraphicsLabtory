@@ -881,7 +881,7 @@ void RenderImp::DrawDebugLine() {
     math::Matrix view = cam->GetViewMatrix();
 
     render::Device::SetUniformMatrix(m_DebugLineShader->GetUniformLocation("glb_unif_WVP"), proj * view);
-    render::Device::SetUniformSampler2D(m_DebugLineShader->GetUniformLocation("glb_unif_DepthMap"), 0);
+    render::Device::SetUniformSampler2DMS(m_DebugLineShader->GetUniformLocation("glb_unif_DepthMap"), 0);
 
     // Vertex Buffer
     VertexLayout layout = m_DebugMesh->GetVertexLayout();
@@ -1030,7 +1030,7 @@ void RenderImp::PrepareDecalMap() {
 
 void RenderImp::PrepareDebugLine() {
     // Create depth map
-    texture::Texture* depth_map = texture::Texture::CreateFloat32DepthTexture(static_cast<int32_t>(m_Width), static_cast<int32_t>(m_Height), false);
+    texture::Texture* depth_map = texture::Texture::CreateFloat32DepthTextureMS(static_cast<int32_t>(m_Width), static_cast<int32_t>(m_Height), app::Application::GetMSAASamplers());
     if (depth_map != nullptr) {
         m_DepthMap = texture::Mgr::AddTexture(depth_map);
     } else {
@@ -1052,9 +1052,9 @@ void RenderImp::PrepareDebugMenu() {
 void RenderImp::PrepareHDR() {
     // Create Render Target
     m_HDRRenderTarget = RenderTarget::Create(m_Width, m_Height);
-    m_HDRTex = texture::Mgr::AddTexture(texture::Texture::CreateFloat32Texture(m_Width, m_Height, false));
-    m_HDRRenderTarget->AttachColorTexture(render::COLORBUF_COLOR_ATTACHMENT0, texture::Mgr::GetTextureById(m_HDRTex));
-    m_HDRRenderTarget->AttachDepthTexture(texture::Mgr::GetTextureById(m_DepthMap));
+    m_HDRTex = texture::Mgr::AddTexture(texture::Texture::CreateFloat32TextureMS(m_Width, m_Height, app::Application::GetMSAASamplers()));
+    m_HDRRenderTarget->AttachColorTextureMS(render::COLORBUF_COLOR_ATTACHMENT0, texture::Mgr::GetTextureById(m_HDRTex));
+    m_HDRRenderTarget->AttachDepthTextureMS(texture::Mgr::GetTextureById(m_DepthMap));
 
     m_FilterBrightnessRT = RenderTarget::Create(m_Width, m_Height);
     m_FilterBrightnessTex = texture::Mgr::AddTexture(texture::Texture::CreateFloat32Texture(m_Width, m_Height, false));
@@ -2132,7 +2132,7 @@ void RenderImp::FilterBrightness() {
     render::Device::SetTexture(0, texture::Mgr::GetTextureById(m_HDRTex), 0);
 
     // Uniform
-    render::Device::SetUniformSampler2D(m_FBTexLoc, 0);
+    render::Device::SetUniformSampler2DMS(m_FBTexLoc, 0);
     render::Device::SetUniform1f(m_FBHighBaseLoc, m_HightLightBase);
 
     // Draw
@@ -2296,7 +2296,7 @@ void RenderImp::Tonemapping() {
     render::Device::SetTexture(4, texture::Mgr::GetTextureById(m_DownsamplerTex[3]), 4);
 
     // Uniform
-    render::Device::SetUniformSampler2D(m_TonemapTexLoc, 0);
+    render::Device::SetUniformSampler2DMS(m_TonemapTexLoc, 0);
     render::Device::SetUniformSampler2D(m_Bloom0TexLoc, 1);
     render::Device::SetUniformSampler2D(m_Bloom1TexLoc, 2);
     render::Device::SetUniformSampler2D(m_Bloom2TexLoc, 3);
