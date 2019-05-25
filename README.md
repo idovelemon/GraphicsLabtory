@@ -11,7 +11,9 @@ This project is for computer graphics learning.More information in my dev blog [
 - Gamma Correction
 - Bloom
 - Parallel-Split Shadow Map(PSSM)
+- Percetage Closer Filtering(PCF)
 - Geometry Instance Rendering
+- Multisampling Anti Aliasing(MSAA)
 
 ## Gallery
 ![Image based Lighting for Physical based Shading](https://github.com/idovelemon/GraphicsLabtory/raw/master/glbcodebase/graphicslab/doc/gallery/1.jpg)
@@ -21,3 +23,5 @@ This project is for computer graphics learning.More information in my dev blog [
 ![GLB ModelEditor](https://github.com/idovelemon/GraphicsLabtory/raw/master/glbcodebase/graphicslab/doc/gallery/5.jpg)
 ![Parallel-Split Shadow Map](https://github.com/idovelemon/GraphicsLabtory/raw/master/glbcodebase/graphicslab/doc/gallery/6.jpg)
 ![Geometry Instance](https://github.com/idovelemon/GraphicsLabtory/raw/master/glbcodebase/graphicslab/doc/gallery/7.jpg)
+![MSAA Off](https://github.com/idovelemon/GraphicsLabtory/raw/master/glbcodebase/graphicslab/doc/gallery/8.jpg)
+![MSAA On](https://github.com/idovelemon/GraphicsLabtory/raw/master/glbcodebase/graphicslab/doc/gallery/9.jpg)
