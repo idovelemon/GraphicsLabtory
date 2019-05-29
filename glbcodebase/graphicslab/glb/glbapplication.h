@@ -81,6 +81,7 @@ public:
     static int32_t GetDecalMapWidth();
     static int32_t GetDecalMapHeight();
     static int32_t GetMSAASamplers();
+    static float GetTimer();
 };
 
 class ApplicationBase {

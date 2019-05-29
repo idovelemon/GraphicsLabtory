@@ -255,6 +255,7 @@ void Cglb_modeleditorDlg::OnFileImport()
         config.shadow_map_height = 1024;
         config.decalMapWidth = 32;
         config.decalMapHeight = 32;
+        config.msaaSamplerNum = 32;
         if (!glb::app::Application::Initialize(ApplicationCore::Create, AfxGetInstanceHandle(), config))
         {
             ::MessageBox(NULL, L"Initialize GLB library failed", L"ERROR", MB_OK);
@@ -334,6 +335,7 @@ void Cglb_modeleditorDlg::OnFilePreview()
         config.shadow_map_height = 1024;
         config.decalMapWidth = 32;
         config.decalMapHeight = 32;
+        config.msaaSamplerNum = 32;
         if (!glb::app::Application::Initialize(ApplicationCore::Create, AfxGetInstanceHandle(), config))
         {
             ::MessageBox(NULL, L"Initialize GLB library failed", L"ERROR", MB_OK);

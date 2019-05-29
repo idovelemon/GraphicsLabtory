@@ -476,6 +476,13 @@ Wrapper uniform_screen_height_picker(scene::Object*) {
     return wrapper;
 }
 
+Wrapper uniform_timer_picker(scene::Object*) {
+    Wrapper wrapper;
+    wrapper.SetFormat(Wrapper::FMT_FLOAT);
+    wrapper.SetFloat(app::Application::GetTimer());
+    return wrapper;
+}
+
 //---------------------------------------------------------------------
 
 bool IsInternalParameter(const char* name) {

@@ -3,6 +3,7 @@
 // Author: i_dovelemon[1322600812@qq.com]
 // Date: 2016 / 10 / 24
 // Brief: Manage uniforms
+// Update[2019-05-29]: Add build-in time
 //-----------------------------------------------------------
 #ifndef GLB_GLBUNIFORM_H_
 #define GLB_GLBUNIFORM_H_
@@ -61,6 +62,7 @@ enum {
     GLB_FAR_CLIP,
     GLB_SCREEN_WIDTH,
     GLB_SCREEN_HEIGHT,
+    GLB_TIMER,
     GLB_MAX,
 };
 
@@ -107,6 +109,7 @@ static const struct {
     {"glb_unif_FarClip",                         GLB_FAR_CLIP,                       1},
     {"glb_unif_ScreenWidth",                     GLB_SCREEN_WIDTH,                   1},
     {"glb_unif_ScreenHeight",                    GLB_SCREEN_HEIGHT,                  1},
+    {"glb_unif_Timer",                           GLB_TIMER,                          1},
 };
 
 static_assert(sizeof(kEngineUniforms) / sizeof(kEngineUniforms[0]) == GLB_MAX, "Must match");
@@ -204,6 +207,7 @@ Wrapper uniform_skylight_lod_picker(scene::Object*);              // Pick glb_un
 Wrapper uniform_far_clip_picker(scene::Object*);                  // Pick glb_FarClip
 Wrapper uniform_screen_width_picker(scene::Object*);              // Pick glb_ScreenWidth
 Wrapper uniform_screen_height_picker(scene::Object*);             // Pick glb_ScreenHeight
+Wrapper uniform_timer_picker(scene::Object*);                     // Pick glb_unif_Timer;
 
 // Uniform picker table
 static const struct {
@@ -247,6 +251,7 @@ static const struct {
     {uniform_far_clip_picker,                   GLB_FAR_CLIP},
     {uniform_screen_width_picker,               GLB_SCREEN_WIDTH},
     {uniform_screen_height_picker,              GLB_SCREEN_HEIGHT},
+    {uniform_timer_picker,                      GLB_TIMER},
 };
 static_assert(sizeof(kUniformPickers) / sizeof(kUniformPickers[0]) == GLB_MAX, "Must match");
 

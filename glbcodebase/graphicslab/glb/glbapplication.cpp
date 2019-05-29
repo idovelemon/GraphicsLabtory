@@ -61,6 +61,7 @@ public:
     int32_t GetDecalMapWidth();
     int32_t GetDecalMapHeight();
     int32_t GetMSAASamplers();
+    float GetTimer();
 
 protected:
     bool CreateWnd(HINSTANCE hInstance, HWND hWnd, int32_t width, int32_t height, const wchar_t* caption, int32_t icon);
@@ -72,6 +73,7 @@ private:
     HWND                            m_WndHandle;
     HINSTANCE                       m_WndInstance;
     AppConfig                       m_Config;
+    float                           m_Timer;
 };
 
 //----------------------------------------------------------------------------------
@@ -101,7 +103,8 @@ ApplicationImp::ApplicationImp()
 : m_Application(nullptr)
 , m_WndHandle(nullptr)
 , m_WndInstance(nullptr)
-, m_Config() {
+, m_Config()
+, m_Timer(0.0f) {
 }
 
 ApplicationImp::~ApplicationImp() {
@@ -162,12 +165,16 @@ void ApplicationImp::Update() {
             } else {
                 if (m_Application) {
                     m_Application->Update(1.0f);
+                    m_Timer = m_Timer + 0.01f;
+                    if (m_Timer > 1000000.0f) m_Timer = 0.0f;
                 }
             }
         }
     } else {
         if (m_Application) {
             m_Application->Update(1.0f);
+            m_Timer = m_Timer + 0.01f;
+            if (m_Timer > 1000000.0f) m_Timer = 0.0f;
         }
     }
 }
@@ -225,6 +232,10 @@ int32_t ApplicationImp::GetDecalMapHeight() {
 
 int32_t ApplicationImp::GetMSAASamplers() {
     return m_Config.msaaSamplerNum;
+}
+
+float ApplicationImp::GetTimer() {
+    return m_Timer;
 }
 
 bool ApplicationImp::CreateWnd(HINSTANCE hInstance, HWND hWnd, int32_t width, int32_t height, const wchar_t* caption, int32_t icon) {
@@ -424,6 +435,18 @@ int32_t Application::GetMSAASamplers() {
 
     if (s_ApplicationImp != nullptr) {
         result = s_ApplicationImp->GetMSAASamplers();
+    } else {
+        GLB_SAFE_ASSERT(false);
+    }
+
+    return result;
+}
+
+float Application::GetTimer() {
+    float result = 0.0f;
+
+    if (s_ApplicationImp != nullptr) {
+        result = s_ApplicationImp->GetTimer();
     } else {
         GLB_SAFE_ASSERT(false);
     }
