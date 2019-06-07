@@ -1,0 +1,21 @@
+beginpass lightloop
+shader sceneGrassL.vs glb_sceneGrassL.fs
+passparameter glb_unif_Albedo 0.000000 1.000000 0.000000
+passparameter glb_unif_HeightPower 2.000000
+passparameter glb_unif_MaskMap GrassMask.bmp
+passparameter glb_unif_Metallic 0.000000
+passparameter glb_unif_Roughness 1.000000
+passparameter glb_unif_WindDir 1.000000 0.000000 0.000000
+passparameter glb_unif_WindPower 0.005000
+passparameter glb_unif_WindSpeed 20.000000
+endpass
+beginpass shadow
+shader sceneGrassSD.vs glb_sceneGrassVSMSD.fs
+passparameter glb_unif_HeightPower 2.000000
+passparameter glb_unif_MaskMap GrassMask.bmp
+passparameter glb_unif_WindDir 1.000000 0.000000 0.000000
+passparameter glb_unif_WindPower 0.005000
+passparameter glb_unif_WindSpeed 20.000000
+endpass
+materialparameter castshadow 1
+materialparameter receiveshadow 1

@@ -1,0 +1,8 @@
+beginpass lightloop
+shader floorL.vs glb_floorVSML.fs
+passparameter glb_unif_Albedo 1.000000 1.000000 1.000000
+passparameter glb_unif_Metallic 0.000000
+passparameter glb_unif_Roughness 1.000000
+endpass
+materialparameter castshadow 0
+materialparameter receiveshadow 1
