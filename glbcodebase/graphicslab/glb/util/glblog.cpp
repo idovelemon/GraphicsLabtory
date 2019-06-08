@@ -46,13 +46,6 @@ void LogPrint(const char* fmt, ...) {
     vsprintf_s(log, kLogMaxChar, fmt, va);
     va_end(va);
 
-    int32_t len = strlen(log);
-    if (len < kLogMaxChar) {
-        log[len] = '\n';
-    } else {
-        log[kLogMaxChar - 1] = '\n';
-    }
-
     if (s_LogFile) {
         fwrite(log, sizeof(char), strlen(log), s_LogFile);
         fflush(s_LogFile);

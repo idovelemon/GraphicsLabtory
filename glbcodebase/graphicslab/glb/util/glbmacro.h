@@ -46,7 +46,7 @@
         bool result = _expression_; \
         if (result == false) {\
             char buffer[256];\
-            sprintf_s(buffer, "%s: %s", __FUNCTION__, _error_msg_);\
+            sprintf_s(buffer, "%s: %s\n", __FUNCTION__, _error_msg_);\
             OutputDebugStringA(buffer); \
             glb::util::log::LogPrint(buffer); \
             MessageBoxA(nullptr, buffer, "Assert-Error", MB_OK); \
@@ -61,7 +61,7 @@
         bool result = _expression_; \
         if (result == false) {\
             char buffer[256];\
-            sprintf_s(buffer, "%s: %s", __FUNCTION__, _error_msg_);\
+            sprintf_s(buffer, "%s: %s\n", __FUNCTION__, _error_msg_);\
             glb::util::log::LogPrint(buffer); \
         }\
         assert(result); \
@@ -73,7 +73,7 @@
         if (err != GL_NO_ERROR) {\
             const GLubyte* err_str = glewGetErrorString(err);\
             char buffer[128];\
-            sprintf_s(buffer, "ERR:%d Desc:%s", err, reinterpret_cast<LPCSTR>(const_cast<GLubyte*>(err_str)));\
+            sprintf_s(buffer, "ERR:%d Desc:%s\n", err, reinterpret_cast<LPCSTR>(const_cast<GLubyte*>(err_str)));\
             OutputDebugStringA(buffer);\
             MessageBoxA(nullptr, buffer, "GL-Error", MB_OKCANCEL);\
         }\

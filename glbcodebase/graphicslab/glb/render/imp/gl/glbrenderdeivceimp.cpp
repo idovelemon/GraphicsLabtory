@@ -130,16 +130,16 @@ void DeviceImp::Initialize() {
 
     // Log some version information
     const GLubyte* version = glGetString(GL_VERSION);
-    util::log::LogPrint("OpenGL Version: %s", reinterpret_cast<LPCSTR>(version));
+    util::log::LogPrint("OpenGL Version: %s\n", reinterpret_cast<LPCSTR>(version));
 
     const GLubyte* vendor = glGetString(GL_VENDOR);
-    util::log::LogPrint("OpenGL Vendor: %s", reinterpret_cast<LPCSTR>(vendor));
+    util::log::LogPrint("OpenGL Vendor: %s\n", reinterpret_cast<LPCSTR>(vendor));
 
     const GLubyte* render = glGetString(GL_RENDERER);
-    util::log::LogPrint("OpenGL Render: %s", reinterpret_cast<LPCSTR>(render));
+    util::log::LogPrint("OpenGL Render: %s\n", reinterpret_cast<LPCSTR>(render));
 
     const GLubyte* glew_version = glewGetString(GLEW_VERSION);
-    util::log::LogPrint("GLEW Version: %s", reinterpret_cast<LPCSTR>(glew_version));
+    util::log::LogPrint("GLEW Version: %s\n", reinterpret_cast<LPCSTR>(glew_version));
 }
 
 void DeviceImp::Destroy() {

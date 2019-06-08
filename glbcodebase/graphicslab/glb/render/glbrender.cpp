@@ -175,6 +175,7 @@ protected:
     void DrawHDR();
     void AfterDraw();
 
+    void PrepareCommon();
     void PrepareFont();
     void PrepareShadowMap();
     void PrepareDecalMap();
@@ -228,6 +229,18 @@ private:
     int32_t                                 m_Height;
     std::vector<ShaderGroup>                m_ShaderGroups;
 
+    // Common
+    shader::UserProgram*                    m_BlurHShader;
+    shader::UserProgram*                    m_BlurVShader;
+    int32_t                                 m_BlurHTexLoc;
+    int32_t                                 m_BlurVTexLoc;
+    int32_t                                 m_BlurWidthLoc;
+    int32_t                                 m_BlurHeightLoc;
+    int32_t                                 m_BlurHRadiusLoc;
+    int32_t                                 m_BlurVRadiusLoc;
+    int32_t                                 m_BlurHStepLoc;
+    int32_t                                 m_BlurVStepLoc;
+
     // Image based Lighting
     int32_t                                 m_BRDFPFTMap;
 
@@ -243,8 +256,8 @@ private:
     // Shadow
     RenderTarget*                           m_ShadowRenderTarget[kPSSMSplitNum];
     int32_t                                 m_ShadowMap[kPSSMSplitNum];
-    int32_t                                 m_ShadowShader;
-    int32_t                                 m_InstanceShadowShader;
+    RenderTarget*                           m_BlurShadowRenderTarget[kPSSMSplitNum];
+    int32_t                                 m_BlurShadowMap[kPSSMSplitNum];
     Frustum                                 m_SplitFrustums[kPSSMSplitNum];
     Frustum                                 m_LightSpaceFrustum[kPSSMSplitNum];
     math::Matrix                            m_ShadowMatrix[kPSSMSplitNum];
@@ -273,12 +286,6 @@ private:
     int32_t                                 m_DSTexLoc;
     RenderTarget*                           m_BlurRenderTarget[4];
     int32_t                                 m_BlurTex[4];
-    shader::UserProgram*                    m_BlurHShader;
-    shader::UserProgram*                    m_BlurVShader;
-    int32_t                                 m_BlurHTexLoc;
-    int32_t                                 m_BlurVTexLoc;
-    int32_t                                 m_BlurWidthLoc;
-    int32_t                                 m_BlurHeightLoc;
     shader::UserProgram*                    m_TonemapShader;
     int32_t                                 m_TonemapTexLoc;
     int32_t                                 m_Bloom0TexLoc;
@@ -402,6 +409,17 @@ RenderImp::RenderImp()
 , m_Height(0)
 , m_PerspectiveType(Render::PRIMARY_PERS)
 
+// Common
+, m_BlurHShader(nullptr)
+, m_BlurVShader(nullptr)
+, m_BlurHTexLoc(-1)
+, m_BlurWidthLoc(-1)
+, m_BlurHeightLoc(-1)
+, m_BlurHRadiusLoc(-1)
+, m_BlurVRadiusLoc(-1)
+, m_BlurHStepLoc(-1)
+, m_BlurVStepLoc(-1)
+
 // Image based Lighting
 , m_BRDFPFTMap(-1)
 
@@ -411,8 +429,6 @@ RenderImp::RenderImp()
 , m_SpecularSkyPFCLOD(-1)
 
 // Shadow
-, m_ShadowShader(-1)
-, m_InstanceShadowShader(-1)
 , m_ShadowMapIndex(-1)
 
 // Decal
@@ -431,11 +447,6 @@ RenderImp::RenderImp()
 , m_FBHighBaseLoc(-1)
 , m_DownsamplerShader(nullptr)
 , m_DSTexLoc(-1)
-, m_BlurHShader(nullptr)
-, m_BlurVShader(nullptr)
-, m_BlurHTexLoc(-1)
-, m_BlurWidthLoc(-1)
-, m_BlurHeightLoc(-1)
 , m_TonemapShader(nullptr)
 , m_TonemapTexLoc(-1)
 , m_Bloom0TexLoc(-1)
@@ -486,6 +497,7 @@ void RenderImp::Initialize(int32_t width, int32_t height) {
     m_Width = width;
     m_Height = height;
 
+    PrepareCommon();
     PrepareFont();
     PrepareShadowMap();
     PrepareDecalMap();
@@ -509,12 +521,19 @@ void RenderImp::Destroy() {
     m_Height = 0;
     m_PerspectiveType = Render::PRIMARY_PERS;
 
+    // Common
+    GLB_SAFE_DELETE(m_BlurHShader);
+    GLB_SAFE_DELETE(m_BlurVShader);
+
     // Shadow
     for (int32_t i = 0; i < kPSSMSplitNum; i++) {
         GLB_SAFE_DELETE(m_ShadowRenderTarget[i]);
         m_ShadowMap[i] = -1;
     }
-    m_ShadowShader = -1;
+    for (int32_t i = 0; i < kPSSMSplitNum; i++) {
+        GLB_SAFE_DELETE(m_BlurShadowRenderTarget[i]);
+        m_BlurShadowMap[i] = -1;
+    }
 
     // Decal
     GLB_SAFE_DELETE(m_DecalRenderTarget);
@@ -536,8 +555,6 @@ void RenderImp::Destroy() {
         GLB_SAFE_DELETE(m_BlurRenderTarget[i]);
         m_BlurTex[i] = -1;
     }
-    GLB_SAFE_DELETE(m_BlurHShader);
-    GLB_SAFE_DELETE(m_BlurVShader);
 
     // Debug
     GLB_SAFE_DELETE(m_DebugLineShader);
@@ -974,24 +991,49 @@ void RenderImp::AfterDraw() {
     render::Device::SwapBuffer();
 }
 
+void RenderImp::PrepareCommon() {
+    // Blur shader
+    m_BlurHShader = shader::UserProgram::Create("..\\glb\\shader\\blur.vs", "..\\glb\\shader\\blurh.fs");
+    m_BlurVShader = shader::UserProgram::Create("..\\glb\\shader\\blur.vs", "..\\glb\\shader\\blurv.fs");
+    m_BlurHTexLoc = m_BlurHShader->GetUniformLocation("glb_unif_BlurTex");
+    m_BlurVTexLoc = m_BlurVShader->GetUniformLocation("glb_unif_BlurTex");
+    m_BlurWidthLoc = m_BlurHShader->GetUniformLocation("glb_unif_BlurTexWidth");
+    m_BlurHeightLoc = m_BlurVShader->GetUniformLocation("glb_unif_BlurTexHeight");
+    m_BlurHRadiusLoc = m_BlurHShader->GetUniformLocation("glb_unif_BlurRadius");
+    m_BlurVRadiusLoc = m_BlurVShader->GetUniformLocation("glb_unif_BlurRadius");
+    m_BlurHStepLoc = m_BlurHShader->GetUniformLocation("glb_unif_BlurStep");
+    m_BlurVStepLoc = m_BlurVShader->GetUniformLocation("glb_unif_BlurStep");
+}
+
 void RenderImp::PrepareFont() {
     m_FontShader = render::shader::UserProgram::Create("..\\glb\\shader\\font.vs", "..\\glb\\shader\\font.fs");
     m_FontMesh = render::mesh::FontMesh::Create();
 }
 
 void RenderImp::PrepareShadowMap() {
-    int32_t shadow_map_width = app::Application::GetShadowMapWidth();
-    int32_t shadow_map_height = app::Application::GetShadowMapHeight();
+    int32_t shadowMapWidth = app::Application::GetShadowMapWidth();
+    int32_t shadowMapHeight = app::Application::GetShadowMapHeight();
 
     for (int32_t i = 0; i < kPSSMSplitNum; i++) {
         // Create shadow render target
-        m_ShadowRenderTarget[i] = RenderTarget::Create(shadow_map_width, shadow_map_height);
+        m_ShadowRenderTarget[i] = RenderTarget::Create(shadowMapWidth, shadowMapHeight);
         GLB_SAFE_ASSERT(m_ShadowRenderTarget[i] != nullptr);
 
+        //// Create shadow map
+        //texture::Texture* shadowMap = texture::Texture::CreateFloat32Texture(shadowMapWidth, shadowMapHeight, true);
+        //if (shadowMap != nullptr) {
+        //    m_ShadowMap[i] = texture::Mgr::AddTexture(shadowMap);
+        //} else {
+        //    GLB_SAFE_ASSERT(false);
+        //}
+
+        //if (m_ShadowRenderTarget[i] != nullptr) {
+        //    m_ShadowRenderTarget[i]->AttachColorTexture(COLORBUF_COLOR_ATTACHMENT0, texture::Mgr::GetTextureById(m_ShadowMap[i]));
+        //}
         // Create shadow map
-        texture::Texture* shadow_map = texture::Texture::CreateFloat32DepthTexture(shadow_map_width, shadow_map_height, false);
-        if (shadow_map != nullptr) {
-            m_ShadowMap[i] = texture::Mgr::AddTexture(shadow_map);
+        texture::Texture* shadowMap = texture::Texture::CreateFloat32DepthTexture(shadowMapWidth, shadowMapHeight, false);
+        if (shadowMap != nullptr) {
+            m_ShadowMap[i] = texture::Mgr::AddTexture(shadowMap);
         } else {
             GLB_SAFE_ASSERT(false);
         }
@@ -999,11 +1041,23 @@ void RenderImp::PrepareShadowMap() {
         if (m_ShadowRenderTarget[i] != nullptr) {
             m_ShadowRenderTarget[i]->AttachDepthTexture(texture::Mgr::GetTextureById(m_ShadowMap[i]));
         }
-    }
 
-    // Create shadow shader TODO: Use UserShader
-    m_ShadowShader = shader::Mgr::AddUberShader("..\\glb\\shader\\shadow.vs", "..\\glb\\shader\\shadow.fs");
-    m_InstanceShadowShader = shader::Mgr::AddUberShader("..\\glb\\shader\\instanceShadow.vs", "..\\glb\\shader\\shadow.fs");
+        // Create blur shadow render target
+        m_BlurShadowRenderTarget[i] = RenderTarget::Create(shadowMapWidth, shadowMapHeight);
+        GLB_SAFE_ASSERT(m_BlurShadowRenderTarget[i] != nullptr);
+
+        // Create blur shadow map
+        texture::Texture* blurShadowMap = texture::Texture::CreateFloat32Texture(shadowMapWidth, shadowMapHeight, false);
+        if (blurShadowMap != nullptr) {
+            m_BlurShadowMap[i] = texture::Mgr::AddTexture(blurShadowMap);
+        } else {
+            GLB_SAFE_ASSERT(false);
+        }
+
+        if (m_BlurShadowRenderTarget[i] != nullptr) {
+            m_BlurShadowRenderTarget[i]->AttachColorTexture(COLORBUF_COLOR_ATTACHMENT0, texture::Mgr::GetTextureById(m_BlurShadowMap[i]));
+        }
+    }
 }
 
 void RenderImp::PrepareDecalMap() {
@@ -1079,13 +1133,6 @@ void RenderImp::PrepareHDR() {
 
     m_DownsamplerShader = shader::UserProgram::Create("..\\glb\\shader\\downsample.vs", "..\\glb\\shader\\downsample.fs");
     m_DSTexLoc = m_DownsamplerShader->GetUniformLocation("glb_unif_Tex");
-
-    m_BlurHShader = shader::UserProgram::Create("..\\glb\\shader\\bloom.vs", "..\\glb\\shader\\bloomh.fs");
-    m_BlurVShader = shader::UserProgram::Create("..\\glb\\shader\\bloom.vs", "..\\glb\\shader\\bloomv.fs");
-    m_BlurHTexLoc = m_BlurHShader->GetUniformLocation("glb_unif_BloomTex");
-    m_BlurVTexLoc = m_BlurVShader->GetUniformLocation("glb_unif_BloomTex");
-    m_BlurWidthLoc = m_BlurHShader->GetUniformLocation("glb_unif_BloomTexWidth");
-    m_BlurHeightLoc = m_BlurVShader->GetUniformLocation("glb_unif_BloomTexHeight");
 
     m_TonemapShader = shader::UserProgram::Create("..\\glb\\shader\\tonemap.vs", "..\\glb\\shader\\tonemap.fs");
     m_TonemapTexLoc = m_TonemapShader->GetUniformLocation("glb_unif_Tex");
@@ -2220,6 +2267,8 @@ void RenderImp::BloomVTex() {
 
         // Uniform
         render::Device::SetUniformSampler2D(m_BlurVTexLoc, 0);
+        render::Device::SetUniform1i(m_BlurVRadiusLoc, 5);
+        render::Device::SetUniform1f(m_BlurVStepLoc, 1.0f);
         render::Device::SetUniform1f(m_BlurHeightLoc, static_cast<float>(m_BlurRenderTarget[i]->GetHeight()));
 
         // Draw
@@ -2260,6 +2309,8 @@ void RenderImp::BloomHTex() {
 
         // Uniform
         render::Device::SetUniformSampler2D(m_BlurHTexLoc, 0);
+        render::Device::SetUniform1i(m_BlurHRadiusLoc, 5);
+        render::Device::SetUniform1f(m_BlurHStepLoc, 1.0f);
         render::Device::SetUniform1f(m_BlurWidthLoc, static_cast<float>(m_DownsamplerRenderTarget[i]->GetWidth()));
 
         // Draw
