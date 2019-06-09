@@ -31,12 +31,7 @@ void main() {
     float step = 1.0 / glb_unif_BloomTexWidth;
 
     for (int i = 1; i < 3; i++) {
-        if (vs_texcoord.x - i * step >= 0.0) {
-            color += texture2D(glb_unif_BloomTex, vec2(vs_texcoord.x - i * step, vs_texcoord.y)).xyz * kGaussNum[i];
-        }
-
-        if (vs_texcoord.x + i * step <= 1.0) {
-            color += texture2D(glb_unif_BloomTex, vec2(vs_texcoord.x + i * step, vs_texcoord.y)).xyz * kGaussNum[i];
-        }
+        color += texture2D(glb_unif_BloomTex, vec2(vs_texcoord.x - i * step, vs_texcoord.y)).xyz * kGaussNum[i];
+        color += texture2D(glb_unif_BloomTex, vec2(vs_texcoord.x + i * step, vs_texcoord.y)).xyz * kGaussNum[i];
     }
 }
