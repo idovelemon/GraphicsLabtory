@@ -29,11 +29,16 @@ float kGaussNum[10] = float[]
 );
 
 void main() {
-    color = texture(glb_unif_BlurTex, vs_texcoord).xyz * kGaussNum[0];
+    float total = kGaussNum[0];
+    for (int i = 1; i <= glb_unif_BlurRadius; i++) {
+        total = total + kGaussNum[i] * 2.0;
+    }
+
+    color = texture(glb_unif_BlurTex, vs_texcoord).xyz * kGaussNum[0] / total;
     float step = glb_unif_BlurStep / glb_unif_BlurTexWidth;
 
     for (int i = 1; i <= glb_unif_BlurRadius; i++) {
-        color += texture2D(glb_unif_BlurTex, vec2(vs_texcoord.x - i * step, vs_texcoord.y)).xyz * kGaussNum[i];
-        color += texture2D(glb_unif_BlurTex, vec2(vs_texcoord.x + i * step, vs_texcoord.y)).xyz * kGaussNum[i];
+        color += texture2D(glb_unif_BlurTex, vec2(vs_texcoord.x - i * step, vs_texcoord.y)).xyz * kGaussNum[i] / total;
+        color += texture2D(glb_unif_BlurTex, vec2(vs_texcoord.x + i * step, vs_texcoord.y)).xyz * kGaussNum[i] / total;
     }
 }
