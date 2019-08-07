@@ -24,7 +24,7 @@ public:
     bool Initialize() {
         // Camera
         //camera::ModelCamera* cam = camera::ModelCamera::Create(glb::Vector(0.0f, 2.3f, 1.5f), glb::Vector(0.0f, 2.2f, 0.0f));
-        scene::FreeCamera* cam = scene::FreeCamera::Create(math::Vector(0.0f, 10.0f, 10.0f), math::Vector(3.586983442f, 6.26142120f, -3.62632370f));
+        scene::FreeCamera* cam = scene::FreeCamera::Create(math::Vector(0.0f, 10.0f, 10.0f), math::Vector(0.0f, 10.0f, 0.0f));
         scene::Scene::SetCamera(scene::PRIMIAY_CAM, cam);
         cam = scene::FreeCamera::Create(math::Vector(-5.0f, 10.0f, 10.0f), math::Vector(0.0f, 0.0f, 0.0));
         scene::Scene::SetCamera(scene::SECONDARY_CAM, cam);
@@ -36,13 +36,13 @@ public:
 
         scene::Light light(scene::PARALLEL_LIGHT);
         light.color = math::Vector(1.2f, 1.2f, 1.2f);
-        light.dir = math::Vector(-1.0f, -1.0f, 1.0f);
+        light.dir = math::Vector(-1.0f, -2.0f, 1.0f);
         light.dir.Normalize();
         scene::Scene::SetLight(light, 1);
 
         // Perspective
-        render::Render::SetPerspective(render::Render::PRIMARY_PERS, 69.0f, 800 * 1.0f / 600, 0.1f, 100.0f);
-        render::Render::SetPerspective(render::Render::SECONDARY_PERS, 69.0f, 800 * 1.0f / 600, 0.1f, 10000.0f);
+        render::Render::SetPerspective(render::Render::PRIMARY_PERS, 45.0f, 800 * 1.0f / 600, 0.01f, 1000.0f);
+        render::Render::SetPerspective(render::Render::SECONDARY_PERS, 45.0f, 800 * 1.0f / 600, 0.01f, 1000.0f);
 
         // HDR
         render::Render::SetHighLightBase(0.95f);
@@ -53,18 +53,26 @@ public:
         obj->SetCullFaceEnable(true);
         obj->SetCullFaceMode(render::CULL_BACK);
         obj->SetDepthTestEnable(true);
-        obj->SetWorldMatrix(math::Matrix::CreateTranslateMatrix(0.0f, -1.0f, 0.0f));
+        math::Matrix groundMat = math::Matrix::CreateIdentityMatrix();
+        groundMat.Scale(5.0f, 1.0f, 5.0f);
+        groundMat.Translate(0.0f, -1.0f, 0.0f);
+        obj->SetWorldMatrix(groundMat);
 
-        int32_t num = 4;
-        for (int32_t i = 0; i < num; i++) {
-            for (int32_t j = 0; j < num; j++) {
+        int32_t numi = 20;
+        int32_t numj = 8;
+        for (int32_t i = 0; i < numi; i++) {
+            for (int32_t j = 0; j < numj; j++) {
                 // Add object
                 int32_t tree_header = scene::Scene::AddObject("res/coreRot.obj", "res/coreRot.mat");
                 scene::Object* obj = scene::Scene::GetObjectById(tree_header);
                 obj->SetCullFaceEnable(true);
                 obj->SetCullFaceMode(render::CULL_BACK);
                 obj->SetDepthTestEnable(true);
-                obj->SetWorldMatrix(math::Matrix::CreateTranslateMatrix(0.0f - (j - num/2) * 20.0f, 0.0f, 0.0f - (i - num/2) * 20.0f));
+
+                math::Matrix worldMat = math::Matrix::CreateIdentityMatrix();
+                worldMat.Scale(3.0f, 10.0f, 3.0f);
+                worldMat.Translate(0.0f - (j - numj/2) * 20.0f, 0.0f, 0.0f - (i - numi/2) * 20.0f);
+                obj->SetWorldMatrix(worldMat);
             }
         }
 
@@ -75,7 +83,11 @@ public:
         util::ProfileTime time;
         time.BeginProfile();
 
+        // Update input device
+        Input::Update();
+
         // Update scene
+        UpdateLight();
         UpdateCamera();
         scene::Scene::Update();
 
@@ -85,42 +97,43 @@ public:
         time.EndProfile();
         char buf[128];
         sprintf_s(buf, "%f\n", time.GetProfileTimeInMs());
-        OutputDebugStringA(buf);
+        //OutputDebugStringA(buf);
+    }
+
+    void UpdateLight() {
+        scene::Light light = scene::Scene::GetLight(1);
+        math::Matrix rotateMat = math::Matrix::CreateRotateYMatrix(0.1f);
+        light.dir = rotateMat * light.dir;
+        //scene::Scene::SetLight(light, 1);
     }
 
     void UpdateCamera() {
-        if (GetKeyState(VK_F1) & 0x8000) {
-            scene::Scene::SetCurCamera(scene::PRIMIAY_CAM);
-            render::Render::SetCurPerspectiveType(render::Render::PRIMARY_PERS);
-        } else if (GetKeyState(VK_F2) & 0x8000) {
-            scene::Scene::SetCurCamera(scene::SECONDARY_CAM);
-            render::Render::SetCurPerspectiveType(render::Render::SECONDARY_PERS);
+        if (Input::IsKeyboardButtonPressed(BK_LCONTROL)) {
+            if (Input::IsKeyboardButtonPressed(BK_F1)) {
+                scene::Scene::SetCurCamera(scene::PRIMIAY_CAM);
+                render::Render::SetCurPerspectiveType(render::Render::PRIMARY_PERS);
+            } else if (Input::IsKeyboardButtonPressed(BK_F2)) {
+                scene::Scene::SetCurCamera(scene::SECONDARY_CAM);
+                render::Render::SetCurPerspectiveType(render::Render::SECONDARY_PERS);
+            }
+            scene::FreeCamera* cam = reinterpret_cast<scene::FreeCamera*>(scene::Scene::GetCurCamera());
+
+            float diff_x = Input::GetMouseMoveX();
+            float diff_y = Input::GetMouseMoveY();
+            cam->Rotate(diff_y * 0.1f, diff_x * 0.1f);
+            float mx = 0.0f, my = 0.0f, mz = 0.0f;
+            if (Input::IsKeyboardButtonPressed(BK_A)) {
+                mx = -0.5f;
+            } else if (Input::IsKeyboardButtonPressed(BK_D)) {
+                mx = 0.5f;
+            }
+            if (Input::IsKeyboardButtonPressed(BK_W)) {
+                mz = 0.5f;
+            } else if (Input::IsKeyboardButtonPressed(BK_S)) {
+                mz = -0.5f;
+            }
+            cam->Move(mx, 0.0f, mz);
         }
-        //camera::ModelCamera* model_cam = reinterpret_cast<camera::ModelCamera*>(scene::Scene::GetCurCamera());
-        //float rot = 0.5f;
-        //model_cam->Rotate(rot);
-        scene::FreeCamera* cam = reinterpret_cast<scene::FreeCamera*>(scene::Scene::GetCurCamera());
-        
-        POINT cursor_pos;
-        GetCursorPos(&cursor_pos);
-        static int last_pos_x = cursor_pos.x, last_pos_y = cursor_pos.y;
-        int diff_x = cursor_pos.x - last_pos_x;
-        int diff_y = cursor_pos.y - last_pos_y;
-        last_pos_x = cursor_pos.x;
-        last_pos_y = cursor_pos.y;
-        cam->Rotate(diff_y * 0.1f, diff_x * 0.1f);
-        float mx = 0.0f, my = 0.0f, mz = 0.0f;
-        if (GetKeyState('A') & 0x8000) {
-            mx = -0.1f;
-        } else if (GetKeyState('D') & 0x8000) {
-            mx = 0.1f;
-        }
-        if (GetKeyState('W') & 0x8000) {
-            mz = 0.1f;
-        } else if (GetKeyState('S') & 0x8000) {
-            mz = -0.1f;
-        }
-        cam->Move(mx, 0.0f, mz);
     }
 
     void Destroy() {
@@ -136,6 +149,7 @@ int _stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPreInstance, LPSTR cmdLine,
     config.shadow_map_height = 1024;
     config.decalMapWidth = 1024;
     config.decalMapHeight = 1024;
+    config.msaaSamplerNum = 16;
     config.icon = IDI_ICON1;
     if (!glb::app::Application::Initialize(ApplicationPSSM::Create, hInstance, config)) {
         return 0;

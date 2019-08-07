@@ -32,6 +32,6 @@ void main() {
 		shadowM = glb_unif_ShadowM3;
 	}
 	gl_Position = shadowM * glb_unif_WorldM * vec4(glb_attr_Pos, 1.0);
-	vs_Vertex = vec3(gl_Position.xyz);
+	vs_Vertex = vec3(gl_Position.xyz) / gl_Position.w;
 	vs_Normal = (glb_unif_Trans_Inv_WorldM * vec4(glb_attr_Normal, 0.0)).xyz;
 }
