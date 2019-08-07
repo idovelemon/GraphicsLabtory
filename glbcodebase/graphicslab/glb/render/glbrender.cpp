@@ -30,6 +30,11 @@
 #include "GL/glew.h"
 #endif
 
+
+#ifndef GLB_ENABLE_VSM
+#define GLB_ENABLE_VSM (TRUE)
+#endif
+
 namespace glb {
 
 namespace render {
@@ -198,6 +203,10 @@ protected:
     void BuildShadowMatrixs(math::Matrix light_space_to_world_space);
     void PreDrawShadowMapCore();
     void DrawShadowMapCore();
+    void BlurShadowMap();
+    void BlurShadowMapV();
+    void BlurShadowMapH();
+    void GenShadowMapMipmap();
     math::AABB CalcAllObjectsBoundBox(math::Matrix trans, Frustum& frustum);
     void ShrinkLightFrustum(math::AABB caster, math::AABB receiver, Frustum& frustum);
     void CalculateFrustumInView(Frustum& frustum);
@@ -256,9 +265,11 @@ private:
     // Shadow
     RenderTarget*                           m_ShadowRenderTarget[kPSSMSplitNum];
     int32_t                                 m_ShadowMap[kPSSMSplitNum];
-    RenderTarget*                           m_BlurShadowRenderTarget[kPSSMSplitNum];
+    RenderTarget*                           m_BlurVShadowRenderTarget[kPSSMSplitNum];
+    RenderTarget*                           m_BlurHShadowRenderTarget[kPSSMSplitNum];
     int32_t                                 m_BlurShadowMap[kPSSMSplitNum];
     Frustum                                 m_SplitFrustums[kPSSMSplitNum];
+    math::Sphere                            m_SplitFrustumsBV[kPSSMSplitNum];
     Frustum                                 m_LightSpaceFrustum[kPSSMSplitNum];
     math::Matrix                            m_ShadowMatrix[kPSSMSplitNum];
     int32_t                                 m_ShadowMapIndex;
@@ -531,7 +542,8 @@ void RenderImp::Destroy() {
         m_ShadowMap[i] = -1;
     }
     for (int32_t i = 0; i < kPSSMSplitNum; i++) {
-        GLB_SAFE_DELETE(m_BlurShadowRenderTarget[i]);
+        GLB_SAFE_DELETE(m_BlurVShadowRenderTarget[i]);
+        GLB_SAFE_DELETE(m_BlurHShadowRenderTarget[i]);
         m_BlurShadowMap[i] = -1;
     }
 
@@ -859,6 +871,13 @@ void RenderImp::PreDraw() {
 void RenderImp::DrawShadowMap() {
     PreDrawShadowMapCore();
     DrawShadowMapCore();
+#if GLB_ENABLE_VSM
+    static const int32_t kVSMBlurPass = 2;
+    for (int32_t i = 0; i < kVSMBlurPass; i++) {
+        BlurShadowMap();
+    }
+    GenShadowMapMipmap();
+#endif
 }
 
 void RenderImp::DrawDecalMap() {
@@ -1019,19 +1038,12 @@ void RenderImp::PrepareShadowMap() {
         m_ShadowRenderTarget[i] = RenderTarget::Create(shadowMapWidth, shadowMapHeight);
         GLB_SAFE_ASSERT(m_ShadowRenderTarget[i] != nullptr);
 
-        //// Create shadow map
-        //texture::Texture* shadowMap = texture::Texture::CreateFloat32Texture(shadowMapWidth, shadowMapHeight, true);
-        //if (shadowMap != nullptr) {
-        //    m_ShadowMap[i] = texture::Mgr::AddTexture(shadowMap);
-        //} else {
-        //    GLB_SAFE_ASSERT(false);
-        //}
-
-        //if (m_ShadowRenderTarget[i] != nullptr) {
-        //    m_ShadowRenderTarget[i]->AttachColorTexture(COLORBUF_COLOR_ATTACHMENT0, texture::Mgr::GetTextureById(m_ShadowMap[i]));
-        //}
         // Create shadow map
-        texture::Texture* shadowMap = texture::Texture::CreateFloat32DepthTexture(shadowMapWidth, shadowMapHeight, false);
+#if GLB_ENABLE_VSM
+        texture::Texture* shadowMap = texture::Texture::CreateFloat32Texture(shadowMapWidth, shadowMapHeight, true);
+#else
+        texture::Texture* shadowMap = texture::Texture::CreateFloat32Texture(shadowMapWidth, shadowMapHeight, false);
+#endif
         if (shadowMap != nullptr) {
             m_ShadowMap[i] = texture::Mgr::AddTexture(shadowMap);
         } else {
@@ -1039,12 +1051,12 @@ void RenderImp::PrepareShadowMap() {
         }
 
         if (m_ShadowRenderTarget[i] != nullptr) {
-            m_ShadowRenderTarget[i]->AttachDepthTexture(texture::Mgr::GetTextureById(m_ShadowMap[i]));
+            m_ShadowRenderTarget[i]->AttachColorTexture(COLORBUF_COLOR_ATTACHMENT0, texture::Mgr::GetTextureById(m_ShadowMap[i]));
         }
 
-        // Create blur shadow render target
-        m_BlurShadowRenderTarget[i] = RenderTarget::Create(shadowMapWidth, shadowMapHeight);
-        GLB_SAFE_ASSERT(m_BlurShadowRenderTarget[i] != nullptr);
+        // Create vertical blur shadow render target
+        m_BlurVShadowRenderTarget[i] = RenderTarget::Create(shadowMapWidth, shadowMapHeight);
+        GLB_SAFE_ASSERT(m_BlurVShadowRenderTarget[i] != nullptr);
 
         // Create blur shadow map
         texture::Texture* blurShadowMap = texture::Texture::CreateFloat32Texture(shadowMapWidth, shadowMapHeight, false);
@@ -1054,8 +1066,16 @@ void RenderImp::PrepareShadowMap() {
             GLB_SAFE_ASSERT(false);
         }
 
-        if (m_BlurShadowRenderTarget[i] != nullptr) {
-            m_BlurShadowRenderTarget[i]->AttachColorTexture(COLORBUF_COLOR_ATTACHMENT0, texture::Mgr::GetTextureById(m_BlurShadowMap[i]));
+        if (m_BlurVShadowRenderTarget[i] != nullptr) {
+            m_BlurVShadowRenderTarget[i]->AttachColorTexture(COLORBUF_COLOR_ATTACHMENT0, texture::Mgr::GetTextureById(m_BlurShadowMap[i]));
+        }
+
+        // Create horizontal blur shadow render target
+        m_BlurHShadowRenderTarget[i] = RenderTarget::Create(shadowMapWidth, shadowMapHeight);
+        GLB_SAFE_ASSERT(m_BlurHShadowRenderTarget[i] != nullptr);
+
+        if (m_BlurHShadowRenderTarget[i] != nullptr) {
+            m_BlurHShadowRenderTarget[i]->AttachColorTexture(COLORBUF_COLOR_ATTACHMENT0, texture::Mgr::GetTextureById(m_ShadowMap[i]));
         }
     }
 }
@@ -1230,21 +1250,39 @@ void RenderImp::SplitFrustum() {
     float z_near = m_Perspective[m_PerspectiveType].znear;
     float z_far = m_Perspective[m_PerspectiveType].zfar;
     float split_scheme_practicals[kPSSMSplitNum + 1];
+    float adjustValue = 0.8f;  // TODO:Make it adjustable
     for (int32_t i = 0; i <= kPSSMSplitNum; i++) {
         float split_scheme_log = z_near * pow(z_far / z_near, 1.0f * i / kPSSMSplitNum);
         float split_scheme_uni = z_near + (z_far - z_near) * (1.0f * i / kPSSMSplitNum);
-        float split_scheme_practical = split_scheme_log * 0.5f + split_scheme_uni * 0.5f;
+        float split_scheme_practical = split_scheme_log * adjustValue + split_scheme_uni * (1.0f - adjustValue);
         split_scheme_practicals[i] = (split_scheme_practical - z_near) / (z_far - z_near);
     }
 
     // Calculate shadow split value
     for (int32_t i = 0; i < kPSSMSplitNum - 1; i++) {
-        m_ShadowSplitValue[i] = z_far * split_scheme_practicals[i + 1];
+        m_ShadowSplitValue[i] = z_near + z_far * split_scheme_practicals[i + 1];
     }
 
     // Split current frustum with practical split z value
     for (int32_t i = 0; i < kPSSMSplitNum; i++) {
         frustum.Split(split_scheme_practicals[i], split_scheme_practicals[i + 1], m_SplitFrustums[i]);
+    }
+
+    // Caculate split frustums' bounding sphere
+    for (int32_t i = 0; i < kPSSMSplitNum; i++) {
+        math::Vector points[8];
+        m_SplitFrustums[i].GetPoints(points);
+
+        if (i == 0) {
+            m_SplitFrustumsBV[i].m_Radius = m_ShadowSplitValue[i] / sqrt(2.0f);
+            m_SplitFrustumsBV[i].m_Center = math::Vector(0.0f, 0.0f, -m_ShadowSplitValue[i] / 2.0f);
+        } else if (i < kPSSMSplitNum - 1) {
+            m_SplitFrustumsBV[i].m_Radius = m_ShadowSplitValue[i] / sqrt(2.0f);
+            m_SplitFrustumsBV[i].m_Center = math::Vector(0.0f, 0.0f, -(m_ShadowSplitValue[i] + m_ShadowSplitValue[i - 1]) / 2.0f);
+        } else {
+            m_SplitFrustumsBV[i].m_Radius = z_far / sqrt(2.0f);
+            m_SplitFrustumsBV[i].m_Center = math::Vector(0.0f, 0.0f, -(z_far + m_ShadowSplitValue[i]) / 2.0f);
+        }
     }
 }
 
@@ -1306,11 +1344,13 @@ void RenderImp::BuildBasicLightFrustums(math::Matrix light_space_to_world_space)
         math::Vector points[8];
         m_SplitFrustums[i].GetPoints(points);
 
-        for (int32_t j = 0; j < 8; j++) {
-            points[j] = view_to_light * points[j];
-        }
-
-        math::AABB bv(points);
+        // First using bound sphere to reduce shadow shimmy
+        math::Sphere sphereBV = m_SplitFrustumsBV[i];
+        sphereBV.m_Center = view_to_light * sphereBV.m_Center;
+        math::AABB bv;
+        bv.m_Max = sphereBV.m_Center + math::Vector(1.0f, 1.0f, 1.0f) * sphereBV.m_Radius;
+        bv.m_Min = sphereBV.m_Center - math::Vector(1.0f, 1.0f, 1.0f) * sphereBV.m_Radius;
+        bv.m_Min.z -= kMaxSceneSize;
         bv.m_Max.z += kMaxSceneSize;  // Make frustum include all potential shadow caster objects
 
         points[Render::NLU] = math::Vector(bv.m_Min.x, bv.m_Max.y, bv.m_Max.z);  // NLU
@@ -1488,7 +1528,28 @@ void RenderImp::BuildShadowMatrixs(math::Matrix light_space_to_world_space) {
         // Size
         float width = bv.m_Max.x - bv.m_Min.x;
         float height = bv.m_Max.y - bv.m_Min.y;
+        width = max(width, height);
         float depth = bv.m_Max.z - bv.m_Min.z;
+
+        // Size in shadow map pixel increment(reduce shadow shimmy)
+        float worldUnitPerTexel = width / app::Application::GetShadowMapWidth();
+        bv.m_Max.x = bv.m_Max.x / worldUnitPerTexel;
+        bv.m_Max.x = floor(bv.m_Max.x);
+        bv.m_Max.x = bv.m_Max.x * worldUnitPerTexel;
+        bv.m_Max.y = bv.m_Max.y / worldUnitPerTexel;
+        bv.m_Max.y = floor(bv.m_Max.y);
+        bv.m_Max.y = bv.m_Max.y * worldUnitPerTexel;
+        bv.m_Min.x = bv.m_Min.x / worldUnitPerTexel;
+        bv.m_Min.x = floor(bv.m_Min.x);
+        bv.m_Min.x = bv.m_Min.x * worldUnitPerTexel;
+        bv.m_Min.y = bv.m_Min.y / worldUnitPerTexel;
+        bv.m_Min.y = floor(bv.m_Min.y);
+        bv.m_Min.y = bv.m_Min.y * worldUnitPerTexel;
+
+        width = bv.m_Max.x - bv.m_Min.x;
+        height = bv.m_Max.y - bv.m_Min.y;
+        width = max(width, height);
+        height = width; // Assume shadow map is always squre
 
         // Camera position in world space
         math::Vector pos = (bv.m_Max + bv.m_Min) * 0.5f;
@@ -1571,17 +1632,115 @@ void RenderImp::DrawShadowMapCore() {
         render::Device::SetViewport(0, 0, app::Application::GetShadowMapWidth(), app::Application::GetShadowMapHeight());
 
         // Draw Buffer
-        render::Device::SetDrawColorBuffer(render::COLORBUF_NONE);
+        render::Device::SetDrawColorBuffer(render::COLORBUF_COLOR_ATTACHMENT0);
 
         // Clear
         render::Device::SetClearDepth(1.0f);
-        render::Device::Clear(CLEAR_DEPTH);
+        render::Device::SetClearColor(1.0f, 1.0f, 1.0f);
+        render::Device::Clear(render::CLEAR_COLOR | render::CLEAR_DEPTH);
 
         DrawShadowMapNormal();
 
         // Reset
         render::Device::SetViewport(0, 0, static_cast<int32_t>(m_Width), static_cast<int32_t>(m_Height));
         render::Device::SetRenderTarget(nullptr);
+    }
+}
+
+void RenderImp::BlurShadowMap() {
+    BlurShadowMapV();
+    BlurShadowMapH();
+}
+
+void RenderImp::BlurShadowMapV() {
+    for (int32_t i = 0; i < kPSSMSplitNum; i++) {
+        // Render Target
+        render::Device::SetRenderTarget(m_BlurVShadowRenderTarget[i]);
+
+        // Viewport
+        render::Device::SetViewport(0, 0, m_BlurVShadowRenderTarget[i]->GetWidth(), m_BlurVShadowRenderTarget[i]->GetHeight());
+
+        // Draw Buffer
+        render::Device::SetDrawColorBuffer(render::COLORBUF_COLOR_ATTACHMENT0);
+
+        // Clear
+        render::Device::SetClearDepth(1.0f);
+        render::Device::SetClearColor(1.0f, 1.0f, 1.0f);
+        render::Device::Clear(render::CLEAR_COLOR | render::CLEAR_DEPTH);
+
+        // Shader
+        render::Device::SetShader(m_BlurVShader);
+        render::Device::SetShaderLayout(m_BlurVShader->GetShaderLayout());
+
+        // Vertex
+        render::Device::SetVertexBuffer(m_ScreenMesh->GetVertexBuffer());
+        render::Device::SetVertexLayout(m_ScreenMesh->GetVertexLayout());
+
+        // Texture
+        render::Device::ClearTexture();
+        render::Device::SetTexture(0, render::texture::Mgr::GetTextureById(m_ShadowMap[i]), 0);
+
+        // Uniform
+        render::Device::SetUniformSampler2D(m_BlurVTexLoc, 0);
+        render::Device::SetUniform1f(m_BlurHeightLoc, static_cast<float>(m_BlurVShadowRenderTarget[i]->GetHeight()));
+        render::Device::SetUniform1i(m_BlurVRadiusLoc, 3);
+        render::Device::SetUniform1f(m_BlurVStepLoc, 1.0f);
+
+        // Draw
+        render::Device::Draw(render::PT_TRIANGLES, 0, m_ScreenMesh->GetVertexNum());
+
+        // Reset
+        render::Device::SetRenderTarget(render::RenderTarget::DefaultRenderTarget());
+        render::Device::SetViewport(0, 0, app::Application::GetWindowWidth(), app::Application::GetWindowHeight());
+    }
+}
+
+void RenderImp::BlurShadowMapH() {
+    for (int32_t i = 0; i < kPSSMSplitNum; i++) {
+        // Render Target
+        render::Device::SetRenderTarget(m_BlurHShadowRenderTarget[i]);
+
+        // Viewport
+        render::Device::SetViewport(0, 0, m_BlurHShadowRenderTarget[i]->GetWidth(), m_BlurHShadowRenderTarget[i]->GetHeight());
+
+        // Draw Buffer
+        render::Device::SetDrawColorBuffer(render::COLORBUF_COLOR_ATTACHMENT0);
+
+        // Clear
+        render::Device::SetClearDepth(1.0f);
+        render::Device::SetClearColor(1.0f, 1.0f, 1.0f);
+        render::Device::Clear(render::CLEAR_COLOR | render::CLEAR_DEPTH);
+
+        // Shader
+        render::Device::SetShader(m_BlurHShader);
+        render::Device::SetShaderLayout(m_BlurHShader->GetShaderLayout());
+
+        // Vertex
+        render::Device::SetVertexBuffer(m_ScreenMesh->GetVertexBuffer());
+        render::Device::SetVertexLayout(m_ScreenMesh->GetVertexLayout());
+
+        // Texture
+        render::Device::ClearTexture();
+        render::Device::SetTexture(0, render::texture::Mgr::GetTextureById(m_BlurShadowMap[i]), 0);
+
+        // Uniform
+        render::Device::SetUniformSampler2D(m_BlurHTexLoc, 0);
+        render::Device::SetUniform1f(m_BlurHeightLoc, static_cast<float>(m_BlurHShadowRenderTarget[i]->GetHeight()));
+        render::Device::SetUniform1i(m_BlurHRadiusLoc, 3);
+        render::Device::SetUniform1f(m_BlurHStepLoc, 1.0f);
+
+        // Draw
+        render::Device::Draw(render::PT_TRIANGLES, 0, m_ScreenMesh->GetVertexNum());
+
+        // Reset
+        render::Device::SetRenderTarget(render::RenderTarget::DefaultRenderTarget());
+        render::Device::SetViewport(0, 0, app::Application::GetWindowWidth(), app::Application::GetWindowHeight());
+    }
+}
+
+void RenderImp::GenShadowMapMipmap() {
+    for (int32_t i = 0; i < kPSSMSplitNum; i++) {
+        texture::Mgr::GetTextureById(m_ShadowMap[i])->GenerateMipmap();
     }
 }
 
@@ -1634,17 +1793,23 @@ math::AABB RenderImp::CalcAllObjectsBoundBox(math::Matrix trans, Frustum& frustu
         }
     }
 
+    // Avoid there is no object in this frustum
+    if (num == 0) {
+        bv.m_Max = math::Vector(0.0f, 0.0f, 0.0f);
+        bv.m_Min = math::Vector(0.0f, 0.0f, 0.0f);
+    }
+
     return bv;
 }
 
 void RenderImp::ShrinkLightFrustum(math::AABB casters, math::AABB receivers, Frustum& frustum) {
     math::AABB frustum_bv = frustum.GetBoundBox();
 
-    frustum_bv.m_Min.x = std::max<float>(std::max<float>(receivers.m_Min.x, casters.m_Min.x), frustum_bv.m_Min.x);
-    frustum_bv.m_Max.x = std::min<float>(std::min<float>(receivers.m_Max.x, casters.m_Max.x), frustum_bv.m_Max.x);
+    //frustum_bv.m_Min.x = std::max<float>(std::max<float>(receivers.m_Min.x, casters.m_Min.x), frustum_bv.m_Min.x);
+    //frustum_bv.m_Max.x = std::min<float>(std::min<float>(receivers.m_Max.x, casters.m_Max.x), frustum_bv.m_Max.x);
 
-    frustum_bv.m_Min.y = std::max<float>(std::max<float>(receivers.m_Min.y, casters.m_Min.y), frustum_bv.m_Min.y);
-    frustum_bv.m_Max.y = std::min<float>(std::min<float>(receivers.m_Max.y, casters.m_Max.y), frustum_bv.m_Max.y);
+    //frustum_bv.m_Min.y = std::max<float>(std::max<float>(receivers.m_Min.y, casters.m_Min.y), frustum_bv.m_Min.y);
+    //frustum_bv.m_Max.y = std::min<float>(std::min<float>(receivers.m_Max.y, casters.m_Max.y), frustum_bv.m_Max.y);
 
     frustum_bv.m_Min.z = std::max<float>(receivers.m_Min.z, frustum_bv.m_Min.z);
     frustum_bv.m_Max.z = std::max<float>(casters.m_Max.z, frustum_bv.m_Max.z);
