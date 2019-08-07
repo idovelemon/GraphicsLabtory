@@ -9,6 +9,8 @@
 
 #include "glbvector.h"
 
+#include <stdint.h>
+
 namespace glb {
 
 namespace math {
@@ -40,6 +42,23 @@ public:
 public:
     Vector m_Max;
     Vector m_Min;
+};
+
+//-----------------------------------------------------------------------------------
+// Sphere DECLARATION
+//----------------------------------------------------------------------------------
+class Sphere {
+public:
+    Sphere();
+    Sphere(Vector* points, int32_t num);
+    ~Sphere();
+
+public:
+    bool HasIntersect(const Sphere& other);
+
+public:
+    Vector m_Center;
+    float m_Radius;
 };
 
 };  // namespace math
